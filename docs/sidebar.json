@@ -1,0 +1,20 @@
+{
+  "Getting started": {
+    "Overview": "/",
+    "Quick Start": "/data.html"
+  },
+  "Tutorials": {
+    "Overview": "/tutorial.html",
+    "": {
+      "Data processing": {
+        "Encoding MARIS to netCDF": "/tutorial.netcdfier.html"
+      }
+    }
+  },
+  "Data": {
+    "Core": "/data.core.html"
+  },
+  "Visualization": {
+    "Core": "/"
+  }
+}

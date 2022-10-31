@@ -1,0 +1,10 @@
+tepco:
+  time: time
+  Sampling coordinate North latitude (Decimal): latitude
+  Sampling coordinate East longitude (Decimal): longitude
+  131I radioactivity concentration (Bq/L): i131
+  134Cs radioactivity concentration (Bq/L): cs134
+  137Cs radioactivity concentration (Bq/L): cs137
+  Total beta radioactivity concentration (Bq/L): beta_tot 
+  Total alpha radioactivity concentration (Bq/L): alpha_tot
+  239Pu+240Pu radioactivity concentration (Bq/L): pu239_240_ratio

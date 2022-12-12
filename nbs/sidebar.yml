@@ -1,15 +1,11 @@
 website:
   sidebar:
     contents:
-      - section: "Tutorials"
+      - section: "Handlers"
         contents:
-          - section: "Handlers"
-            contents:
-              - tutorials/01_handler_tepco.ipynb
-              - tutorials/02_etl_helcom.ipynb
-              - tutorials/03_cdl_template.ipynb
+          - handlers/tepco.ipynb
       - section: API
         contents:
-          - section: data
-            contents:
-              - api/data/core.ipynb
+          - api/cdl.ipynb
+          - api/utils.ipynb
+          - api/serializers.ipynb

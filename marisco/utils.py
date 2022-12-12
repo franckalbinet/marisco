@@ -6,11 +6,12 @@ __all__ = ['has_valid_varname']
 # %% ../nbs/api/utils.ipynb 2
 from netCDF4 import Dataset
 from fastcore.test import test_eq
+from typing import Dict
 
 # %% ../nbs/api/utils.ipynb 4
 def has_valid_varname(
-    var_names=list,
-    cdl_path:str = '../../_data/output/maris-cdl.nc',
+    var_names:Dict, # Look up table associating dataset variable names to standardized one  
+    cdl_path:str, # Path to MARIS CDL file (point of truth)
 ):
     "Check that proposed variable names are in MARIS CDL"
     has_valid = True

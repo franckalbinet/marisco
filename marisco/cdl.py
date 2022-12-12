@@ -8,7 +8,7 @@ from netCDF4 import Dataset
 import pandas as pd
 from pathlib import Path
 from fastcore.basics import patch, store_attr
-from typing import Dict, Callable
+from typing import Dict
 
 # %% ../nbs/api/cdl.ipynb 3
 CONFIGS = {

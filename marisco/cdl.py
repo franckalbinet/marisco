@@ -18,6 +18,7 @@ CONFIGS = {
         'keyword': 'MARIS other-key-words',
         'license': 'Common ...'
     },
+    'grps': ['seawater', 'biota', 'sediment', 'suspended-matter'],
     'var_attrs': {
         'sample': {
             'long_name': 'Sample ID of measurement'
@@ -117,27 +118,30 @@ def generate(self:CDL,
             ):
     "Generate CDL"
     fname = Path(self.dest_dir)/self.cdl_fname
-    with Dataset(fname, 'w', format='NETCDF3_CLASSIC') as nc:
+    with Dataset(fname, 'w', format='NETCDF4') as nc:
         # Create dataset attributes
         nc.setncatts(self.cfgs['global_attr']) 
         
-        # Create dim
+        # Create shared `sample` dimension
         nc.createDimension('sample', None)
-       
-        # Create common variables
-        self.create_variable(nc, 'sample', self.cfgs['var_attrs']['sample'], 'i4')
-        for name in common_vars: self.create_variable(nc, name, self.cfgs['var_attrs'][name])
-        
-        # Create analyte variables
-        for analyte in self.get_analytes():
-            attrs = analyte['attrs']
-            attrs['unit'] = self.cfgs['placeholder']
 
-            self.create_variable(nc, analyte['name'], attrs)
+        # Create grps
+        for grp_name in self.cfgs['grps']:
+            grp = nc.createGroup(grp_name)
+            # Create common variables
+            self.create_variable(grp, 'sample', self.cfgs['var_attrs']['sample'], 'i4')
+            for name in common_vars: self.create_variable(grp, name, self.cfgs['var_attrs'][name])
 
-            # Related uncertainty and detection limit
-            for related_var in ['uncertainty', 'detection_limit']:
-                cfg = self.cfgs[related_var]
-                attrs['long_name'] += cfg['long_name']
-                attrs['standard_name'] += cfg['standard_name']
-                self.create_variable(nc, analyte['name'] + cfg['var_suffix'], attrs)
+            # Create analyte variables
+            for analyte in self.get_analytes():
+                attrs = analyte['attrs']
+                attrs['unit'] = self.cfgs['placeholder']
+
+                self.create_variable(grp, analyte['name'], attrs)
+
+                # Related uncertainty and detection limit
+                for related_var in ['uncertainty', 'detection_limit']:
+                    cfg = self.cfgs[related_var]
+                    attrs['long_name'] += cfg['long_name']
+                    attrs['standard_name'] += cfg['standard_name']
+                    self.create_variable(grp, analyte['name'] + cfg['var_suffix'], attrs)

@@ -4,6 +4,8 @@ website:
       - section: "Handlers"
         contents:
           - handlers/tepco.ipynb
+          - handlers/helcom.ipynb
+          - handlers/bailly-du-bois-irsn-2012.ipynb
       - section: API
         contents:
           - api/cdl.ipynb

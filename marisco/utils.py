@@ -10,14 +10,15 @@ from typing import Dict
 
 # %% ../nbs/api/utils.ipynb 4
 def has_valid_varname(
-    var_names:Dict, # Look up table associating dataset variable names to standardized one  
+    var_names:Dict, # Look up table associating dataset variable names to standardized ones  
     cdl_path:str, # Path to MARIS CDL file (point of truth)
 ):
     "Check that proposed variable names are in MARIS CDL"
     has_valid = True
     with Dataset(cdl_path) as nc:
+        grp = nc.groups[list(nc.groups.keys())[0]] # get any group
         for name in var_names.values():
-            if name not in nc.variables.keys():
+            if name not in grp.variables.keys():
                 has_valid = False
                 print(f'"{name}" variable name not found in MARIS CDL')
     

@@ -11,5 +11,7 @@ d = { 'settings': { 'branch': 'master',
                              'marisco.cdl.CDL.generate': ('api/cdl.html#cdl.generate', 'marisco/cdl.py'),
                              'marisco.cdl.CDL.get_analytes': ('api/cdl.html#cdl.get_analytes', 'marisco/cdl.py')},
             'marisco.cli': {'marisco.cli.cdl': ('api/cli.html#cdl', 'marisco/cli.py')},
-            'marisco.serializers': {'marisco.serializers.to_netcdf': ('api/serializers.html#to_netcdf', 'marisco/serializers.py')},
+            'marisco.serializers': { 'marisco.serializers.to_csv': ('api/serializers.html#to_csv', 'marisco/serializers.py'),
+                                     'marisco.serializers.to_netcdf': ('api/serializers.html#to_netcdf', 'marisco/serializers.py'),
+                                     'marisco.serializers.to_netcdf3': ('api/serializers.html#to_netcdf3', 'marisco/serializers.py')},
             'marisco.utils': {'marisco.utils.has_valid_varname': ('api/utils.html#has_valid_varname', 'marisco/utils.py')}}}

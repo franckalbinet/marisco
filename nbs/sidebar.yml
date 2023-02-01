@@ -8,6 +8,6 @@ website:
           - handlers/bailly-du-bois-irsn-2012.ipynb
       - section: API
         contents:
-          - api/cdl.ipynb
+          - api/nc_template.ipynb
           - api/utils.ipynb
           - api/serializers.ipynb

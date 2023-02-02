@@ -12,6 +12,9 @@ GITHUB_REPO = 'franckalbinet/marisco'
 
 # %% ../nbs/api/configs.ipynb 3
 CONFIGS = {
+    'names': {
+        'nc_template': 'maris-template.nc'
+    },
     'dirs': {
         'lut': str(BASE_PATH / 'lut'), # Look-up tables
     },
@@ -45,55 +48,58 @@ CONFIGS_CDL = {
         'keyword': 'MARIS other-key-words',
         'license': 'Common ...'
         },
-    'default_vars': {
-        'sample': {
-            'name': 'sample',
-            'long_name': 'Sample ID of measurement'
+    'dim': {
+        'name': 'sample',
+        'long_name': 'Sample ID of measurement'
+    },
+    'vars': {    
+        'defaults': {
+            'lon': {
+                'name': 'lon',
+                'long_name': 'Measurement longitude',
+                'standard_name': 'longitude',
+                'units': 'degrees_north',
+                'axis': 'Y',
+                '_CoordinateAxisType': 'Lon'
+            },
+            'lat': {
+                'name': 'lat',
+                'long_name': 'Measurement latitude',
+                'standard_name': 'latitude',
+                'units': 'degrees_east',
+                'axis': 'X',
+                '_CoordinateAxisType': 'Lat'
+            },
+            'depth': {
+                'name': 'depth',
+                'long_name': 'Depth below seal level',
+                'standard_name': 'depth_below_sea_floor',
+                'units': 'm',
+                'axis': 'Z'
+            },
+            'time': {
+                'name': 'time',
+                'long_name': 'Time of measurement',
+                'standard_name': 'time',
+                'units': 'seconds since 1970-01-01 00:00:00.0',
+                'time_origin': '1970-01-01 00:00:00',
+                'time_zone': 'UTC',
+                'abbreviation': 'Date/Time',
+                'axis': 'T',
+                'calendar': 'gregorian'
+            },
         },
-        'depth': {
-            'name': 'depth',
-            'long_name': 'Depth below seal level',
-            'standard_name': 'depth_below_sea_floor',
-            'units': 'm',
-            'axis': 'Z'},
-        'lon': {
-            'name': 'lon',
-            'long_name': 'Measurement longitude',
-            'standard_name': 'longitude',
-            'units': 'degrees_north',
-            'axis': 'Y',
-            '_CoordinateAxisType': 'Lon'
-        },
-        'lat': {
-            'name': 'lat',
-            'long_name': 'Measurement latitude',
-            'standard_name': 'latitude',
-            'units': 'degrees_east',
-            'axis': 'X',
-            '_CoordinateAxisType': 'Lat'
-        },
-        'time': {
-            'name': 'time',
-            'long_name': 'Time of measurement',
-            'standard_name': 'time',
-            'units': 'seconds since 1970-01-01 00:00:00.0',
-            'time_origin': '1970-01-01 00:00:00',
-            'time_zone': 'UTC',
-            'abbreviation': 'Date/Time',
-            'axis': 'T',
-            'calendar': 'gregorian'
-        },
-        'uncertainty': {
-            'name': 'uncertainty',
-            'long_name': ' uncertainty',
-            'standard_name': '_uncertainty',
-            'var_suffix': '_unc'
-        },
-        'detection_limit': {
-            'name': 'detection_limit',
-            'long_name': ' detection limit',
-            'standard_name': '_detection_limit',
-            'var_suffix': '_dl'
+        'suffixes':  {
+            'uncertainty': {
+                'name': '_unc',
+                'long_name': ' uncertainty',
+                'standard_name': '_uncertainty'
+            },
+            'detection_limit': {
+                'name': '_dl',
+                'long_name': ' detection limit',
+                'standard_name': '_detection_limit'
+            }
         }
     }
 }

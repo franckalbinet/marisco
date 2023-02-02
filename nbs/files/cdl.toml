@@ -1,0 +1,67 @@
+placeholder = "_to_be_filled_in_"
+
+[grps.sea]
+name = "seawater"
+
+[grps.bio]
+name = "biota"
+
+[grps.sed]
+name = "sediment"
+
+[grps.sus]
+name = "suspended-matter"
+
+[global_attrs]
+description = "Template description"
+summary = "Template summary"
+keyword = "MARIS other-key-words"
+license = "Common ..."
+
+[dim]
+name = "sample"
+long_name = "Sample ID of measurement"
+
+[vars.defaults.lon]
+name = "lon"
+long_name = "Measurement longitude"
+standard_name = "longitude"
+units = "degrees_north"
+axis = "Y"
+_CoordinateAxisType = "Lon"
+
+[vars.defaults.lat]
+name = "lat"
+long_name = "Measurement latitude"
+standard_name = "latitude"
+units = "degrees_east"
+axis = "X"
+_CoordinateAxisType = "Lat"
+
+[vars.defaults.depth]
+name = "depth"
+long_name = "Depth below seal level"
+standard_name = "depth_below_sea_floor"
+units = "m"
+axis = "Z"
+
+[vars.defaults.time]
+name = "time"
+long_name = "Time of measurement"
+standard_name = "time"
+units = "seconds since 1970-01-01 00:00:00.0"
+time_origin = "1970-01-01 00:00:00"
+time_zone = "UTC"
+abbreviation = "Date/Time"
+axis = "T"
+calendar = "gregorian"
+
+[vars.suffixes.uncertainty]
+name = "_unc"
+long_name = " uncertainty"
+standard_name = "_uncertainty"
+
+[vars.suffixes.detection_limit]
+name = "_dl"
+long_name = " detection limit"
+standard_name = "_detection_limit"

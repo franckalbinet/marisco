@@ -27,6 +27,7 @@ def download_luts(luts):
         request.urlretrieve(url, BASE_PATH / f'lut/{fname}')
 
 # %% ../../nbs/cli/init.ipynb 4
+@call_parse
 def main():
     "Create configuration files & download lookup tables"
     if BASE_PATH.exists():

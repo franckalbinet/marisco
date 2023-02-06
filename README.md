@@ -11,19 +11,84 @@ developed by the [IAEA Environmental
 Laboratories](https://www.iaea.org/about/organizational-structure/department-of-nuclear-sciences-and-applications/division-of-iaea-environment-laboratories)
 in Monaco.
 
-The present Python package provides utilities to:
+The present Python package provides command-line utilities to:
 
-1.  Encode harvested dataset as `NetCDF` or `.csv` formats
-2.  Provide an interface to the [IAEA Open Data platform soon
-    available](...)
-3.  …
+1.  Encode harvested datasets as `NetCDF` or `.csv` formats
+2.  Interact with the [IAEA Open Data platform soon available](...)
+3.  Provide data preprocessing pipelines for ad-hoc datasets
+4.  …
 
-## Install
+## Prerequisites
 
-``` sh
+We recommend to use the [“Mamba” python package
+manager](https://mamba.readthedocs.io) to create a clean and
+“deterministic” python environment.
+
+Once installed, a typical Mamba workflow could be:
+
+``` console
+# Create an isolated env. with your prefered python version
+mamba create -n name-of-your-env python=3.9 
+
+# Then
+mamba activate name-of-your-env
+mamba install your-packages-of-interest
+mamba deactivate # To quit your environment
+```
+
+## Install & configuration
+
+Now, to install `marisco` simply run
+
+``` console
 pip install marisco
 ```
 
+Once successfully installed, run the following command:
+
+``` console
+maris_init
+```
+
+This script will create a `.marisco/` directory containing various
+configuration/configurable files in your `/home` directory.
+
+*Notes: conda/mamba installer available soon.*
+
 ## How to use
 
-Soon …
+### Command line utilities
+
+All commands accept a `-h` argument to get access to its documentation.
+
+#### `maris_init`
+
+Create configuration files, MARIS NetCDF CDL (Common Data Language) and
+donwload required lookup tables (nomenclatures).
+
+#### `maris_create_nc_template`
+
+Generate MARIS NetCDF template to be used when encoding datasets
+
+#### `maris_netcdfy`
+
+Encode a MARIS dataset as NetCDF4.
+
+``` bash
+usage: maris_netcdfy [-h] n
+
+Encode MARIS dataset as NetCDF using Jupyter Notebook handlers
+
+positional arguments:
+  n           Noteboook (NetCDF handler) path to execute
+
+options:
+  -h, --help  show this help message and exit
+  
+```
+
+Example:
+
+``` sh
+maris_netcdfy name-of-notebook-handlers.ipynb
+```

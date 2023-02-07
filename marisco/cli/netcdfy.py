@@ -8,10 +8,20 @@ from pathlib import Path
 from fastcore.script import *
 from ..configs import BASE_PATH
 import papermill as pm
+from ..utils import parametrize
 
 # %% ../../nbs/cli/netcdfy.ipynb 2
 @call_parse
-def main(n:str,     # Noteboook (NetCDF handler) path to execute
+def main(data:str,  # Path to dataset to encode
+         nb_in:str, # Path to Jupyter noteboook (NetCDF handler) to execute
+         nc_out:str,# Path to generated NetCDF4
         ):
     "Encode MARIS dataset as NetCDF using Jupyter Notebook handlers"
-    pm.execute_notebook(n, BASE_PATH / 'tmp' / 'output.ipynb')
+    print(f'Handler: {nb_in}')
+    parametrize(nb_in)
+    inter_nb = BASE_PATH / 'tmp' / '_output.ipynb'
+    
+    pm.execute_notebook(
+        nb_in,
+        inter_nb,
+        parameters=dict(fname_in=data, fname_out=nc_out))

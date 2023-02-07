@@ -14,6 +14,7 @@ from fastcore.style import S
 
 from ..configs import BASE_PATH, CONFIGS, CONFIGS_CDL
 from ..utils import write_toml
+from . import create_nc_template
 
 # %% ../../nbs/cli/init.ipynb 2
 cfg_fname = 'configs.toml'
@@ -42,3 +43,5 @@ def main():
     write_toml(BASE_PATH / cfg_fname, CONFIGS)
     write_toml(BASE_PATH / cdl_fname, CONFIGS_CDL) 
     download_luts(CONFIGS['paths']['luts'])
+    
+    create_nc_template.main()

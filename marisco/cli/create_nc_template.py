@@ -13,8 +13,10 @@ from ..nc_template import NCTemplate
 from ..utils import read_toml
 
 # %% ../../nbs/cli/create_nc_template.ipynb 2
+@call_parse
 def main():
     "Create MARIS NetCDF template"
+    print('Creating MARIS NetCDF template ...')
     cfgs = read_toml(BASE_PATH / 'configs.toml')
     tpl_fname = BASE_PATH / cfgs['names']['nc_template']
     dbo_nuc = [n for n in list(cfgs['paths']['luts']) if '_nuclide' in n][0]

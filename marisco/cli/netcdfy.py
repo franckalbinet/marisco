@@ -18,6 +18,7 @@ def main(data:str,  # Path to dataset to encode
         ):
     "Encode MARIS dataset as NetCDF using Jupyter Notebook handlers"
     print(f'Handler: {nb_in}')
+    print(f'Output: {nc_out}')
     parametrize(nb_in)
     inter_nb = BASE_PATH / 'tmp' / '_output.ipynb'
     

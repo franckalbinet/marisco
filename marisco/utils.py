@@ -6,10 +6,12 @@ __all__ = ['has_valid_varname', 'write_toml', 'read_toml', 'get_bbox', 'parametr
 # %% ../nbs/api/utils.ipynb 2
 from netCDF4 import Dataset
 from fastcore.test import test_eq
+import pandas as pd
+import numpy as np
 from typing import Dict
 import tomli_w
 import tomli
-from shapely import MultiPoint
+from shapely import MultiPoint, Polygon
 import nbformat
 
 # %% ../nbs/api/utils.ipynb 4
@@ -48,9 +50,9 @@ def get_bbox(df,
     x, y = coord_cols
     for index, row in df.iterrows():
         arr.append((row[x], row[y]))
-    return MultiPoint(arr).bounds
+    return MultiPoint(arr).envelope
 
-# %% ../nbs/api/utils.ipynb 13
+# %% ../nbs/api/utils.ipynb 16
 def parametrize(notebook:str, # Notebook path
                ):
     "Add `parameters` notebook cell tag when seeing `#| params` special character"

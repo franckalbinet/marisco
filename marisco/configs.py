@@ -34,7 +34,7 @@ CONFIGS = {
     }
 }
 
-# %% ../nbs/api/configs.ipynb 4
+# %% ../nbs/api/configs.ipynb 5
 CONFIGS_CDL = { 
     'placeholder': '_to_be_filled_in_',
     'grps': {
@@ -66,10 +66,10 @@ CONFIGS_CDL = {
         'Conventions': 'CF-1.10 ACDD-1.3',
 
         # Publisher [ACDD1.3]
-        'publisher_name': 'Paul McGinnity',
-        'publisher_email': 'P.Mc-Ginnity@iaea.org', 
+        'publisher_name': 'Paul MCGINNITY, Iolanda OSVATH, Florence DESCROIX-COMANDUCCI',
+        'publisher_email': 'p.mc-ginnity@iaea.org, i.osvath@iaea.org, F.Descroix-Comanducci@iaea.org', 
         'publisher_url': 'https://maris.iaea.org',
-        'publisher_institution': 'IAEA Marine Radioactivity Information System (MARIS)', 
+        'publisher_institution': 'International Atomic Energy Agency - IAEA', 
 
         # Creator info [ACDD1.3]
         'creator_name': '',
@@ -78,9 +78,12 @@ CONFIGS_CDL = {
         'creator_email': '',
         'creator_url': '',
         'references': '',
-        'license': '',
+        'license': ' '.join(['Without prejudice to the applicable Terms and Conditions', 
+                             '(https://nucleus.iaea.org/Pages/Others/Disclaimer.aspx),',
+                             'I hereby agree that any use of the data will contain appropriate',
+                             'acknowledgement of the data source(s) and the IAEA Marine',
+                             'Radioactivity Information System (MARIS).']),
         'comment': '',
-
         # Dataset info & coordinates [ACDD1.3]
         #'project': '', # Network long name
         #'platform': '', # Should be a long / full name
@@ -160,11 +163,11 @@ CONFIGS_CDL = {
     }
 }
 
-# %% ../nbs/api/configs.ipynb 5
+# %% ../nbs/api/configs.ipynb 6
 def get_nc_tpl_path():
     return BASE_PATH / read_toml(BASE_PATH / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 7
+# %% ../nbs/api/configs.ipynb 8
 def get_cfgs(key=None):
     cfgs = read_toml(BASE_PATH / 'configs.toml')
     return cfgs if key is None else cfgs[key]

@@ -16,33 +16,49 @@ import nbformat
 
 # %% ../nbs/api/utils.ipynb 4
 def has_valid_varname(
-    var_names:Dict, # Look up table associating dataset variable names to standardized ones  
+    var_names:list, # variable (nuclide) names
     cdl_path:str, # Path to MARIS CDL file (point of truth)
 ):
     "Check that proposed variable names are in MARIS CDL"
     has_valid = True
     with Dataset(cdl_path) as nc:
         grp = nc.groups[list(nc.groups.keys())[0]] # get any group
-        for name in var_names.values():
+        for name in var_names:
             if name not in grp.variables.keys():
                 has_valid = False
                 print(f'"{name}" variable name not found in MARIS CDL')
     
     return has_valid
 
-# %% ../nbs/api/utils.ipynb 8
+# %% ../nbs/api/utils.ipynb 5
+#def has_valid_varname(
+#    var_names:Dict, # Look up table associating dataset variable names to standardized ones  
+#    cdl_path:str, # Path to MARIS CDL file (point of truth)
+#):
+#    "Check that proposed variable names are in MARIS CDL"
+#    has_valid = True
+#    with Dataset(cdl_path) as nc:
+#        grp = nc.groups[list(nc.groups.keys())[0]] # get any group
+#        for name in var_names.values():
+#            if name not in grp.variables.keys():
+#                has_valid = False
+#                print(f'"{name}" variable name not found in MARIS CDL')
+    
+#    return has_valid
+
+# %% ../nbs/api/utils.ipynb 9
 def write_toml(fname, cfg):
     print(f'Creating {fname}')
     with open(fname, "wb") as f:
         tomli_w.dump(cfg, f)
 
-# %% ../nbs/api/utils.ipynb 9
+# %% ../nbs/api/utils.ipynb 10
 def read_toml(fname):
     with open(fname, "rb") as f:
         config = tomli.load(f)
     return config
 
-# %% ../nbs/api/utils.ipynb 11
+# %% ../nbs/api/utils.ipynb 12
 def get_bbox(df,
              coord_cols=('lon', 'lat')
             ):
@@ -52,7 +68,7 @@ def get_bbox(df,
         arr.append((row[x], row[y]))
     return MultiPoint(arr).envelope
 
-# %% ../nbs/api/utils.ipynb 16
+# %% ../nbs/api/utils.ipynb 17
 def parametrize(notebook:str, # Notebook path
                ):
     "Add `parameters` notebook cell tag when seeing `#| params` special character"

@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['NCTemplate', 'derive']
 
-# %% ../nbs/api/nc_template.ipynb 2
+# %% ../nbs/api/nc_template.ipynb 3
 from netCDF4 import Dataset
 import pandas as pd
 from pathlib import Path
@@ -12,10 +12,11 @@ from fastcore.test import *
 from typing import Dict
 
 from .utils import read_toml
-from .configs import BASE_PATH
+from .configs import BASE_PATH, name2grp
 
-# %% ../nbs/api/nc_template.ipynb 3
+# %% ../nbs/api/nc_template.ipynb 4
 class NCTemplate:
+    "MARIS NetCDF templater"
     def __init__(self, 
                  tpl_fname:str, # CDL file name
                  vars_fname:str, # File name and path of MARIS nuclide look up table
@@ -25,7 +26,7 @@ class NCTemplate:
         store_attr()
         self.dim = self.cdl['dim']
 
-# %% ../nbs/api/nc_template.ipynb 6
+# %% ../nbs/api/nc_template.ipynb 7
 @patch
 def get_analytes(self:NCTemplate,
                  col_varnames:str='nc_name', # Column name containing the NetCDF variable names
@@ -45,14 +46,18 @@ def get_analytes(self:NCTemplate,
              'standard_name': sn
             } for n, ln, sn in zip(*(var_names, long_names, std_names))]
 
-# %% ../nbs/api/nc_template.ipynb 8
-def derive(analyte, suffix):
+# %% ../nbs/api/nc_template.ipynb 9
+def derive(
+    analyte:dict, # Analyte/nuclide/var name and associated netcdf attributes
+    suffix:dict,  # Naming rules as described in CDL
+):
+    "Derive NetCDf var name & attributes as defined in CDL" 
     derived = analyte.copy()
     for k, v in suffix.items():
         derived[k] += v
     return derived
 
-# %% ../nbs/api/nc_template.ipynb 10
+# %% ../nbs/api/nc_template.ipynb 15
 @patch
 def create_variable(self:NCTemplate, 
                nc, # NetCDF file
@@ -65,7 +70,7 @@ def create_variable(self:NCTemplate,
     nc_var.setncatts(attrs)    
     return nc
 
-# %% ../nbs/api/nc_template.ipynb 12
+# %% ../nbs/api/nc_template.ipynb 17
 @patch
 def generate(self:NCTemplate,
              common_vars:list=['lon', 'lat', 'depth', 'time'], # Common variables
@@ -94,6 +99,11 @@ def generate(self:NCTemplate,
             for var in self.cdl['vars']['defaults'].values(): 
                 self.create_variable(grp, var)
 
+            # Create group-specific variables
+            if name2grp(grp_name) in self.cdl['vars']:
+                for var in self.cdl['vars'][name2grp(grp_name)].values(): 
+                    self.create_variable(grp, var)
+            
             # Create analyte variables
             for analyte in self.get_analytes():
                 analyte['units'] = self.cdl['placeholder']
@@ -102,8 +112,3 @@ def generate(self:NCTemplate,
                 # Derived uncertainty and detection limit variables
                 for k, v in self.cdl['vars']['suffixes'].items():
                     self.create_variable(grp, derive(analyte, v))
-                #for related_var in ['uncertainty', 'detection_limit']:
-                #    cfg = self.cfgs[related_var]
-                #    attrs['long_name'] += cfg['long_name']
-                #    attrs['standard_name'] += cfg['standard_name']
-                #    self.create_variable(grp, analyte['name'] + cfg['var_suffix'], attrs)

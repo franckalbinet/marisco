@@ -51,10 +51,16 @@ date_modified = ""
 
 [dim]
 name = "sample"
+dtype = "i4"
+
+[dim.attrs]
 long_name = "Sample ID of measurement"
 
 [vars.defaults.lon]
 name = "lon"
+dtype = "f4"
+
+[vars.defaults.lon.attrs]
 long_name = "Measurement longitude"
 standard_name = "longitude"
 units = "degrees_north"
@@ -63,6 +69,9 @@ _CoordinateAxisType = "Lon"
 
 [vars.defaults.lat]
 name = "lat"
+dtype = "f4"
+
+[vars.defaults.lat.attrs]
 long_name = "Measurement latitude"
 standard_name = "latitude"
 units = "degrees_east"
@@ -71,6 +80,9 @@ _CoordinateAxisType = "Lat"
 
 [vars.defaults.depth]
 name = "depth"
+dtype = "f4"
+
+[vars.defaults.depth.attrs]
 long_name = "Depth below seal level"
 standard_name = "depth_below_sea_floor"
 units = "m"
@@ -78,6 +90,9 @@ axis = "Z"
 
 [vars.defaults.time]
 name = "time"
+dtype = "u8"
+
+[vars.defaults.time.attrs]
 long_name = "Time of measurement"
 standard_name = "time"
 units = "seconds since 1970-01-01 00:00:00.0"
@@ -89,25 +104,38 @@ calendar = "gregorian"
 
 [vars.bio.bio_group]
 name = "bio_group"
+dtype = "f4"
+
+[vars.bio.bio_group.attrs]
 long_name = "Biota group"
 standard_name = "biota_group_tbd"
 
 [vars.bio.body_part]
 name = "body_part"
+dtype = "f4"
+
+[vars.bio.body_part.attrs]
 long_name = "Body part"
 standard_name = "body_part_tbd"
 
 [vars.sed.sed_type]
 name = "sed_type"
+dtype = "f4"
+
+[vars.sed.sed_type.attrs]
 long_name = "Sediment type"
 standard_name = "sediment_type_tbd"
 
 [vars.suffixes.uncertainty]
 name = "_unc"
+
+[vars.suffixes.uncertainty.attrs]
 long_name = " uncertainty"
 standard_name = "_uncertainty"
 
 [vars.suffixes.detection_limit]
 name = "_dl"
+
+[vars.suffixes.detection_limit.attrs]
 long_name = " detection limit"
 standard_name = "_detection_limit"

@@ -15,6 +15,14 @@ from .utils import read_toml
 from .configs import BASE_PATH, name2grp
 
 # %% ../nbs/api/nc_template.ipynb 4
+# from each lut provided, create netcdf enumtype
+#enum_dict = {'Altocumulus': 7, 'Missing': 255,
+#             'Stratus': 2, 'Clear': 0,
+#             'Nimbostratus': 6, 'Cumulus': 4, 'Altostratus': 5, 
+#             'Cumulonimbus': 1, 'Stratocumulus': 3}
+#df = pd.read_excel(self.vars_fname, index_col=0)
+
+# %% ../nbs/api/nc_template.ipynb 7
 class NCTemplate:
     "MARIS NetCDF templater"
     def __init__(self, 
@@ -26,11 +34,12 @@ class NCTemplate:
         store_attr()
         self.dim = self.cdl['dim']
 
-# %% ../nbs/api/nc_template.ipynb 7
+# %% ../nbs/api/nc_template.ipynb 10
 @patch
 def get_analytes(self:NCTemplate,
                  col_varnames:str='nc_name', # Column name containing the NetCDF variable names
                  col_stdnames:str='nusymbol', # Column name containing the NetCDF standard names
+                 dtype:str='f4', # Default type
                 ):
     "Return the name of the variables analysed"
     df = pd.read_excel(self.vars_fname, index_col=0)
@@ -41,36 +50,46 @@ def get_analytes(self:NCTemplate,
                                                  axis=1).tolist()
     long_names = [name.capitalize() for name in long_names]
 
-    return [{'name': n, 
-             'long_name': ln,
-             'standard_name': sn
+    return [{'name': n,
+             'attrs': {
+                 'long_name': ln,
+                 'standard_name': sn
+             },
+             'dtype': dtype
             } for n, ln, sn in zip(*(var_names, long_names, std_names))]
 
-# %% ../nbs/api/nc_template.ipynb 9
+# %% ../nbs/api/nc_template.ipynb 13
 def derive(
     analyte:dict, # Analyte/nuclide/var name and associated netcdf attributes
     suffix:dict,  # Naming rules as described in CDL
 ):
     "Derive NetCDf var name & attributes as defined in CDL" 
-    derived = analyte.copy()
-    for k, v in suffix.items():
-        derived[k] += v
+    # TBD: refactor using recursion?
+    derived = deepcopy(analyte)
+    for k1, v1 in suffix.items():
+        if k1 == 'attrs':
+            for k2, v2 in suffix['attrs'].items():
+                derived['attrs'][k2] += v2
+        else:
+            derived[k1] += v1
     return derived
 
-# %% ../nbs/api/nc_template.ipynb 15
+# %% ../nbs/api/nc_template.ipynb 19
 @patch
 def create_variable(self:NCTemplate, 
                nc, # NetCDF file
                var:Dict, # Variable
-               dtype:str='f4', # Type of the variable
+               dtype:str|None=None, # Type of the variable
            ):
     name = var['name']
-    attrs = {k:v for k, v in var.items() if k != name}
+    dtype = None or var['dtype']
+    #attrs = {k:v for k, v in var['attrs'].items()}
+    attrs = var['attrs'].copy()
     nc_var = nc.createVariable(name, dtype, self.dim['name'])
     nc_var.setncatts(attrs)    
     return nc
 
-# %% ../nbs/api/nc_template.ipynb 17
+# %% ../nbs/api/nc_template.ipynb 21
 @patch
 def generate(self:NCTemplate,
              common_vars:list=['lon', 'lat', 'depth', 'time'], # Common variables
@@ -93,7 +112,8 @@ def generate(self:NCTemplate,
             grp = nc.createGroup(grp_name)
 
             # Create 'dim' variable
-            self.create_variable(grp, self.dim, 'i4')
+            #self.create_variable(grp, self.dim, 'i4')
+            self.create_variable(grp, self.dim)
             
             # Create default variables
             for var in self.cdl['vars']['defaults'].values(): 

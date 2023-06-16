@@ -12,7 +12,7 @@ BASE_PATH = Path.home() / '.marisco'
 GITHUB_REPO = 'franckalbinet/marisco'
 
 # %% ../nbs/api/configs.ipynb 3
-def get_luts(names=['nuclide', 'biogroup', 'bodypar', 'sedtype']):
+def get_luts(names=['nuclide', 'biogroup', 'bodypar', 'sedtype', 'species']):
     tpl_url = 'https://github.com/{repo}/blob/main/nbs/files/lut/dbo_{name}.xlsx?raw=true'
     return {f'dbo_{name}.xlsx': tpl_url.format(repo=GITHUB_REPO, name=name) for name in names}        
 
@@ -26,7 +26,8 @@ CONFIGS = {
         'tmp': str(BASE_PATH / 'tmp'), # Look-up tables
     },
     'paths': {
-        'luts': get_luts(['nuclide', 'biogroup', 'bodypar', 'sedtype'])
+        'luts': get_luts(['nuclide', 'biogroup', 'bodypar', 
+                          'sedtype', 'species'])
     },
     'units': {
         'time': 'seconds since 1970-01-01 00:00:00.0'
@@ -174,6 +175,7 @@ CONFIGS_CDL = {
                     'standard_name': 'biota_group_tbd'
                 },
                 #'dtype': BIO_GROUP_TYPE
+                #'dtype': 'bio_group_t'
                 'dtype': 'f4'
             },
             'body_part': {

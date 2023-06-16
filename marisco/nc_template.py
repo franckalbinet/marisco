@@ -5,11 +5,13 @@ __all__ = ['NCTemplate', 'derive']
 
 # %% ../nbs/api/nc_template.ipynb 3
 from netCDF4 import Dataset
+import numpy as np
 import pandas as pd
 from pathlib import Path
 from fastcore.basics import patch, store_attr
 from fastcore.test import *
 from typing import Dict
+from copy import deepcopy
 
 from .utils import read_toml
 from .configs import BASE_PATH, name2grp
@@ -22,7 +24,7 @@ from .configs import BASE_PATH, name2grp
 #             'Cumulonimbus': 1, 'Stratocumulus': 3}
 #df = pd.read_excel(self.vars_fname, index_col=0)
 
-# %% ../nbs/api/nc_template.ipynb 7
+# %% ../nbs/api/nc_template.ipynb 9
 class NCTemplate:
     "MARIS NetCDF templater"
     def __init__(self, 
@@ -34,7 +36,7 @@ class NCTemplate:
         store_attr()
         self.dim = self.cdl['dim']
 
-# %% ../nbs/api/nc_template.ipynb 10
+# %% ../nbs/api/nc_template.ipynb 12
 @patch
 def get_analytes(self:NCTemplate,
                  col_varnames:str='nc_name', # Column name containing the NetCDF variable names
@@ -58,7 +60,7 @@ def get_analytes(self:NCTemplate,
              'dtype': dtype
             } for n, ln, sn in zip(*(var_names, long_names, std_names))]
 
-# %% ../nbs/api/nc_template.ipynb 13
+# %% ../nbs/api/nc_template.ipynb 15
 def derive(
     analyte:dict, # Analyte/nuclide/var name and associated netcdf attributes
     suffix:dict,  # Naming rules as described in CDL
@@ -74,7 +76,7 @@ def derive(
             derived[k1] += v1
     return derived
 
-# %% ../nbs/api/nc_template.ipynb 19
+# %% ../nbs/api/nc_template.ipynb 21
 @patch
 def create_variable(self:NCTemplate, 
                nc, # NetCDF file
@@ -83,13 +85,12 @@ def create_variable(self:NCTemplate,
            ):
     name = var['name']
     dtype = None or var['dtype']
-    #attrs = {k:v for k, v in var['attrs'].items()}
     attrs = var['attrs'].copy()
     nc_var = nc.createVariable(name, dtype, self.dim['name'])
     nc_var.setncatts(attrs)    
     return nc
 
-# %% ../nbs/api/nc_template.ipynb 21
+# %% ../nbs/api/nc_template.ipynb 23
 @patch
 def generate(self:NCTemplate,
              common_vars:list=['lon', 'lat', 'depth', 'time'], # Common variables
@@ -102,6 +103,9 @@ def generate(self:NCTemplate,
     with Dataset(fname, 'w', format='NETCDF4') as nc:
         # Create dataset attributes
         nc.setncatts(self.cdl['global_attrs']) 
+        
+        # Create Enum type
+        #biogroup_type = nc.createEnumType(np.uint8, 'biogroup_t', enum_bio_group)
         
         # Create shared `sample` dimension
         nc.createDimension(self.dim['name'], None)

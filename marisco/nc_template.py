@@ -60,7 +60,7 @@ def get_analytes(self:NCTemplate,
              'dtype': dtype
             } for n, ln, sn in zip(*(var_names, long_names, std_names))]
 
-# %% ../nbs/api/nc_template.ipynb 15
+# %% ../nbs/api/nc_template.ipynb 14
 def derive(
     analyte:dict, # Analyte/nuclide/var name and associated netcdf attributes
     suffix:dict,  # Naming rules as described in CDL
@@ -76,7 +76,7 @@ def derive(
             derived[k1] += v1
     return derived
 
-# %% ../nbs/api/nc_template.ipynb 21
+# %% ../nbs/api/nc_template.ipynb 20
 @patch
 def create_variable(self:NCTemplate, 
                nc, # NetCDF file
@@ -90,7 +90,7 @@ def create_variable(self:NCTemplate,
     nc_var.setncatts(attrs)    
     return nc
 
-# %% ../nbs/api/nc_template.ipynb 23
+# %% ../nbs/api/nc_template.ipynb 22
 @patch
 def generate(self:NCTemplate,
              common_vars:list=['lon', 'lat', 'depth', 'time'], # Common variables

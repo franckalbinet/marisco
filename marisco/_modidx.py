@@ -44,6 +44,7 @@ d = { 'settings': { 'branch': 'master',
                                      'marisco.serializers.to_netcdf': ('api/serializers.html#to_netcdf', 'marisco/serializers.py')},
             'marisco.utils': { 'marisco.utils.get_bbox': ('api/utils.html#get_bbox', 'marisco/utils.py'),
                                'marisco.utils.has_valid_varname': ('api/utils.html#has_valid_varname', 'marisco/utils.py'),
+                               'marisco.utils.match_worms': ('api/utils.html#match_worms', 'marisco/utils.py'),
                                'marisco.utils.parametrize': ('api/utils.html#parametrize', 'marisco/utils.py'),
                                'marisco.utils.read_toml': ('api/utils.html#read_toml', 'marisco/utils.py'),
                                'marisco.utils.write_toml': ('api/utils.html#write_toml', 'marisco/utils.py')}}}

@@ -15,7 +15,7 @@ def to_netcdf(
     dfs:dict[pd.DataFrame], # dict of Dataframes to encode with group name as key {'sediment': df_sed, ...}
     fname_cdl:str, # File name and path to the MARIS CDL template
     fname_output:str, # Name of output file to produce
-    cfgs:Dict, # Config file containing global attributes
+    global_attrs:Dict, # Global attributes
     units_fn:Callable, # (group, variable) -> unit look up function
 ):
     "Encode MARIS dataset (provided as Pandas DataFrame) to NetCDF file"
@@ -23,7 +23,8 @@ def to_netcdf(
         # copy global attributes all at once via dictionary
         dst.setncatts(src.__dict__)
 
-        dst.setncatts(cfgs['global_attr']) 
+        #dst.setncatts(cfgs['global_attr']) 
+        dst.setncatts(global_attrs) 
         # copy dimensions
         for name, dimension in src.dimensions.items():
             dst.createDimension(

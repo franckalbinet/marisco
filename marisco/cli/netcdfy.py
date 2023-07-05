@@ -25,4 +25,4 @@ def main(data:str,  # Path to dataset to encode
     pm.execute_notebook(
         nb_in,
         inter_nb,
-        parameters=dict(fname_in=data, fname_out=nc_out))
+        parameters=dict(fname_in=data, fname_out=nc_out, test_mode=False))

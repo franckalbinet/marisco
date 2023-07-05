@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['cfg_fname', 'cdl_fname', 'download_luts', 'main']
 
-# %% ../../nbs/cli/init.ipynb 1
+# %% ../../nbs/cli/init.ipynb 2
 from pathlib import Path
 import sys
 from urllib import request
@@ -16,18 +16,18 @@ from ..configs import BASE_PATH, CONFIGS, CONFIGS_CDL
 from ..utils import write_toml
 from . import create_nc_template
 
-# %% ../../nbs/cli/init.ipynb 2
+# %% ../../nbs/cli/init.ipynb 3
 cfg_fname = 'configs.toml'
 cdl_fname = 'cdl.toml'
 
-# %% ../../nbs/cli/init.ipynb 3
+# %% ../../nbs/cli/init.ipynb 4
 def download_luts(luts):
     print('Downloading lookup tables ...')
     for fname, url in luts.items():
         print(f'  {url}')
         request.urlretrieve(url, BASE_PATH / f'lut/{fname}')
 
-# %% ../../nbs/cli/init.ipynb 4
+# %% ../../nbs/cli/init.ipynb 5
 @call_parse
 def main():
     "Create configuration files & download lookup tables"

@@ -48,6 +48,7 @@ time_coverage_end = ""
 local_time_zone = ""
 date_created = ""
 date_modified = ""
+publisher_postprocess_logs = ""
 
 [dim]
 name = "sample"
@@ -109,6 +110,14 @@ dtype = "f4"
 [vars.bio.bio_group.attrs]
 long_name = "Biota group"
 standard_name = "biota_group_tbd"
+
+[vars.bio.species_id]
+name = "species_id"
+dtype = "u8"
+
+[vars.bio.species_id.attrs]
+long_name = "Species ID"
+standard_name = "AphiaID"
 
 [vars.bio.body_part]
 name = "body_part"

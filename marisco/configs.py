@@ -106,10 +106,11 @@ CONFIGS_CDL = {
         #'time_coverage_resolution': '',
         'local_time_zone': '',
         'date_created': '',
-        'date_modified': ''
+        'date_modified': '',
         #
         # -- Additional metadata (custom to MARIS)
         #
+        'publisher_postprocess_logs': ''
         },
     'dim': {
         'name': 'sample',
@@ -178,6 +179,14 @@ CONFIGS_CDL = {
                 #'dtype': 'bio_group_t'
                 'dtype': 'f4'
             },
+            'species_id': {
+                'name': 'species_id',
+                'attrs': {  
+                    'long_name': 'Species ID',
+                    'standard_name': 'AphiaID'
+                },
+                'dtype': 'u8'
+            },
             'body_part': {
                 'name': 'body_part',
                 'attrs': {
@@ -222,11 +231,11 @@ CONFIGS_CDL = {
 # %% ../nbs/api/configs.ipynb 7
 name2grp = lambda x: {v['name']:k  for k, v in CONFIGS_CDL['grps'].items()}[x]
 
-# %% ../nbs/api/configs.ipynb 9
+# %% ../nbs/api/configs.ipynb 8
 def get_nc_tpl_path():
     return BASE_PATH / read_toml(BASE_PATH / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 11
+# %% ../nbs/api/configs.ipynb 10
 def get_cfgs(key=None):
     cfgs = read_toml(BASE_PATH / 'configs.toml')
     return cfgs if key is None else cfgs[key]

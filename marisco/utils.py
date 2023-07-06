@@ -2,7 +2,7 @@
 
 # %% auto 0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'has_valid_varname', 'write_toml', 'read_toml', 'get_bbox', 'parametrize',
-           'match_worms']
+           'download_files_in_folder', 'download_file', 'match_worms']
 
 # %% ../nbs/api/utils.ipynb 2
 from netCDF4 import Dataset
@@ -88,6 +88,36 @@ def parametrize(notebook:str, # Notebook path
     nbformat.write(nb, notebook)
 
 # %% ../nbs/api/utils.ipynb 22
+def download_files_in_folder(owner, repo, src_dir, dest_dir):
+    # Make a GET request to the GitHub API to get the contents of the folder
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{src_dir}"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        contents = response.json()
+
+        # Iterate over the files and download them
+        for item in contents:
+            if item["type"] == "file":
+                fname = item["name"]
+                download_file(owner, repo, src_dir, dest_dir, fname)
+    else:
+        print(f"Error: {response.status_code}")
+
+def download_file(owner, repo, src_dir, dest_dir, fname):
+    # Make a GET request to the GitHub API to get the raw file contents
+    url = f"https://raw.githubusercontent.com/{owner}/{repo}/master/{src_dir}/{fname}"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        # Save the file locally
+        with open(dest_dir / fname, "wb") as file:
+            file.write(response.content)
+        print(f"{fname} downloaded successfully.")
+    else:
+        print(f"Error: {response.status_code}")
+
+# %% ../nbs/api/utils.ipynb 24
 def match_worms(
     name:str # Name of species to look up in WoRMS
     ):

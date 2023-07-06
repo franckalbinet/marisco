@@ -12,18 +12,23 @@ from ..configs import BASE_PATH, CONFIGS, CONFIGS_CDL
 from ..nc_template import NCTemplate
 from ..utils import read_toml
 
-# %% ../../nbs/cli/create_nc_template.ipynb 2
+# %% ../../nbs/cli/create_nc_template.ipynb 5
 @call_parse
 def main():
     "Create MARIS NetCDF template"
     print('Creating MARIS NetCDF template ...')
     cfgs = read_toml(BASE_PATH / 'configs.toml')
     tpl_fname = BASE_PATH / cfgs['names']['nc_template']
-    dbo_nuc = [n for n in list(cfgs['paths']['luts']) if '_nuclide' in n][0]
+    
+    # BUG !!!
+    # dbo_nuclide.xlsx in ./marisco/luts
+    # dbo_nuc = [n for n in list(cfgs['paths']['luts']) if '_nuclide' in n][0]
+    dbo_nuc_path  = [p for p in Path(CONFIGS['dirs']['lut']).ls() if '_nuclide' in p.name][0]
     cdl = read_toml(BASE_PATH / 'cdl.toml')
     
     nc_tpl = NCTemplate(tpl_fname,
-                        vars_fname=Path(cfgs['dirs']['lut']) / dbo_nuc, 
+                        # vars_fname=Path(cfgs['dirs']['lut']) / dbo_nuc, 
+                        vars_fname=dbo_nuc_path, 
                         dest_dir=BASE_PATH,
                         cdl=cdl)
     nc_tpl.generate()

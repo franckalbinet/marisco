@@ -20,7 +20,6 @@ def main():
     cfgs = read_toml(BASE_PATH / 'configs.toml')
     tpl_fname = BASE_PATH / cfgs['names']['nc_template']
     
-    # BUG !!!
     # dbo_nuclide.xlsx in ./marisco/luts
     # dbo_nuc = [n for n in list(cfgs['paths']['luts']) if '_nuclide' in n][0]
     dbo_nuc_path  = [p for p in Path(CONFIGS['dirs']['lut']).ls() if '_nuclide' in p.name][0]

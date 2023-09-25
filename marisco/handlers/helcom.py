@@ -4,31 +4,26 @@
 __all__ = ['NC_TPL_PATH', 'varnames_lut_updates', 'coi_units_unc', 'coi_grp', 'renaming_rules', 'kw', 'load_data', 'rename_cols',
            'LowerStripRdnNameCB', 'get_unique_nuclides', 'get_varnames_lut', 'RemapRdnNameCB', 'ParseTimeCB',
            'fix_units', 'NormalizeUncUnitCB', 'get_species_lut', 'LookupBiotaSpeciesCB', 'RenameColumnCB',
-           'ReshapeLongToWide', 'EncodeTimeCB', 'SanitizeLonLatCB', 'get_attrs', 'units_fn', 'encode']
+           'ReshapeLongToWide', 'get_attrs', 'units_fn', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb 4
-# import os
-
 import pandas as pd
-# import numpy as np
 from tqdm import tqdm
 from functools import partial
 import fastcore.all as fc
 
-from cftime import date2num
 from pathlib import Path
-from datetime import datetime
-import re
 
-from ..utils import (has_valid_varname, match_worms,
-                           Callback, Transformer)
+from ..utils import (has_valid_varname, match_worms)
+from ..callbacks import (Callback, Transformer,
+                               EncodeTimeCB, SanitizeLonLatCB)
 
 from ..metadata import (GlobAttrsFeeder, BboxCB,
                               DepthRangeCB, TimeRangeCB,
                               ZoteroCB, KeyValuePairCB)
 
 from ..serializers import to_netcdf
-from ..configs import get_nc_tpl_path, get_cfgs, BASE_PATH
+from ..configs import get_nc_tpl_path, BASE_PATH
 
 NC_TPL_PATH = get_nc_tpl_path()
 
@@ -111,9 +106,7 @@ class RemapRdnNameCB(Callback):
 # %% ../../nbs/handlers/helcom.ipynb 28
 class ParseTimeCB(Callback):
     def __call__(self, tfm):
-        #format_time = lambda x: date2num(x, units=get_cfgs('units')['time'])
         for k in tfm.dfs.keys():
-            # Parse
             tfm.dfs[k]['time'] = pd.to_datetime(
                 tfm.dfs[k].DATE, infer_datetime_format=True)
 
@@ -252,26 +245,7 @@ class ReshapeLongToWide(Callback):
             tfm.dfs[k].index.name = 'sample'
 
 
-# %% ../../nbs/handlers/helcom.ipynb 52
-class EncodeTimeCB(Callback):
-    "Encode time as `int` representing seconds since xxx"
-
-    def __call__(self, tfm):
-        def format_time(x): return date2num(x, units=get_cfgs('units')['time'])
-        for k in tfm.dfs.keys():
-            tfm.dfs[k]['time'] = tfm.dfs[k]['time'].apply(format_time)
-
-
-# %% ../../nbs/handlers/helcom.ipynb 55
-class SanitizeLonLatCB(Callback):
-    "Drop row when both longitude & latitude equal 0"
-
-    def __call__(self, tfm):
-        tfm.dfs = {grp: (df[(df.lon != 0) & (df.lat != 0)])
-                   for grp, df in tfm.dfs.items()}
-
-
-# %% ../../nbs/handlers/helcom.ipynb 62
+# %% ../../nbs/handlers/helcom.ipynb 60
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -284,7 +258,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/helcom.ipynb 64
+# %% ../../nbs/handlers/helcom.ipynb 61
 def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[BboxCB(),
                                     DepthRangeCB(),
@@ -293,7 +267,7 @@ def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
                                     KeyValuePairCB('keywords', ', '.join(kw)),
                                     KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))])()
 
-# %% ../../nbs/handlers/helcom.ipynb 67
+# %% ../../nbs/handlers/helcom.ipynb 64
 def units_fn(grp_name):
     lut = {'seawater': 'Bq/m³',
            'sediment': 'Bq/kg',
@@ -301,7 +275,7 @@ def units_fn(grp_name):
     return lut[grp_name]
 
 
-# %% ../../nbs/handlers/helcom.ipynb 69
+# %% ../../nbs/handlers/helcom.ipynb 66
 def encode(fname_in, fname_out):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[LowerStripRdnNameCB(),

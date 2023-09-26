@@ -6,8 +6,6 @@ __all__ = ['cfg_fname', 'cdl_fname', 'main']
 # %% ../../nbs/cli/init.ipynb 2
 from pathlib import Path
 import sys
-# from urllib import request
-import requests
 
 from fastcore.script import *
 from fastcore.xtras import mkdir

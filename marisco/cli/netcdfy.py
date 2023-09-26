@@ -4,11 +4,10 @@
 __all__ = ['import_handler', 'main']
 
 # %% ../../nbs/cli/netcdfy.ipynb 2
-from pathlib import Path
 from fastcore.script import *
-from ..configs import BASE_PATH
 import importlib
-from ..handlers.helcom import encode
+
+from ..configs import get_nc_tpl_path
 
 # %% ../../nbs/cli/netcdfy.ipynb 3
 def import_handler(handler_name, fn_name='encode'):
@@ -28,4 +27,4 @@ def main(handler_name: str,  # Handler's name (e.g helcom, ...)
     "Encode MARIS dataset as NetCDF"
     print(f'Encoding: {handler_name} ...')
     encode = import_handler(f'marisco.handlers.{handler_name}')
-    encode(src, dest)
+    encode(src, dest, get_nc_tpl_path())

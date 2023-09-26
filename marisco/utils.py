@@ -76,7 +76,7 @@ def get_bbox(df,
         arr.append((row[x], row[y]))
     return MultiPoint(arr).envelope
 
-# %% ../nbs/api/utils.ipynb 22
+# %% ../nbs/api/utils.ipynb 20
 def download_files_in_folder(owner, repo, src_dir, dest_dir):
     # Make a GET request to the GitHub API to get the contents of the folder
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{src_dir}"
@@ -106,7 +106,7 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
     else:
         print(f"Error: {response.status_code}")
 
-# %% ../nbs/api/utils.ipynb 24
+# %% ../nbs/api/utils.ipynb 22
 def match_worms(
     name:str # Name of species to look up in WoRMS
     ):

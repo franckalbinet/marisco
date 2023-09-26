@@ -5,9 +5,12 @@ website:
         contents:
           - handlers/tepco.ipynb
           - handlers/helcom.ipynb
-          - handlers/bailly-du-bois-irsn-2012.ipynb
       - section: API
         contents:
+          - api/callbacks.ipynb
+          - api/configs.ipynb
+          - api/metadata.ipynb
           - api/nc_template.ipynb
-          - api/utils.ipynb
           - api/serializers.ipynb
+          - api/utils.ipynb
+          

@@ -10,7 +10,7 @@ import pandas as pd
 from pathlib import Path
 from fastcore.basics import patch, store_attr
 from fastcore.test import *
-from typing import Dict
+from typing import Dict, Union, List
 from copy import deepcopy
 
 from .utils import read_toml
@@ -81,7 +81,7 @@ def derive(
 def create_variable(self:NCTemplate, 
                nc, # NetCDF file
                var:Dict, # Variable
-               dtype:str|None=None, # Type of the variable
+               dtype:Union[str, None]=None, # Type of the variable
            ):
     name = var['name']
     dtype = None or var['dtype']

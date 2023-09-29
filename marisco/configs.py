@@ -3,14 +3,14 @@
 # %% auto 0
 __all__ = ['BASE_PATH', 'CONFIGS', 'CONFIGS_CDL', 'name2grp', 'get_nc_tpl_path', 'get_cfgs']
 
-# %% ../nbs/api/configs.ipynb 1
+# %% ../nbs/api/configs.ipynb 2
 from pathlib import Path
 from .utils import read_toml, write_toml
 
-# %% ../nbs/api/configs.ipynb 2
+# %% ../nbs/api/configs.ipynb 3
 BASE_PATH = Path.home() / '.marisco'
 
-# %% ../nbs/api/configs.ipynb 3
+# %% ../nbs/api/configs.ipynb 4
 CONFIGS = {
     'gh': {
         'owner': 'franckalbinet',
@@ -35,7 +35,7 @@ CONFIGS = {
     }
 }
 
-# %% ../nbs/api/configs.ipynb 4
+# %% ../nbs/api/configs.ipynb 5
 CONFIGS_CDL = { 
     'placeholder': '_to_be_filled_in_',
     'grps': {
@@ -225,14 +225,14 @@ CONFIGS_CDL = {
     }
 }
 
-# %% ../nbs/api/configs.ipynb 5
+# %% ../nbs/api/configs.ipynb 6
 name2grp = lambda x: {v['name']:k  for k, v in CONFIGS_CDL['grps'].items()}[x]
 
-# %% ../nbs/api/configs.ipynb 6
+# %% ../nbs/api/configs.ipynb 7
 def get_nc_tpl_path():
     return BASE_PATH / read_toml(BASE_PATH / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 8
+# %% ../nbs/api/configs.ipynb 9
 def get_cfgs(key=None):
     cfgs = read_toml(BASE_PATH / 'configs.toml')
     return cfgs if key is None else cfgs[key]

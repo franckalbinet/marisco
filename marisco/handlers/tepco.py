@@ -2,8 +2,8 @@
 
 # %% auto 0
 __all__ = ['renaming_rules_rdn', 'renaming_rules_cols', 'coi', 'kw', 'load_data', 'FixMissingValuesCB', 'RemoveJapanaseCharCB',
-           'RemapRdnNameCB', 'time_parser', 'ParseTimeCB', 'RenameColumnCB', 'SelectColumnsCB', 'get_attrs', 'units_fn',
-           'encode']
+           'FixRangeValueStringCB', 'RemapRdnNameCB', 'time_parser', 'ParseTimeCB', 'RenameColumnCB', 'SelectColumnsCB',
+           'get_attrs', 'units_fn', 'encode']
 
 # %% ../../nbs/handlers/tepco.ipynb 8
 def load_data(fname_in):
@@ -31,29 +31,6 @@ class FixMissingValuesCB(Callback):
             tfm.dfs[k][predicate] = np.nan
 
 # %% ../../nbs/handlers/tepco.ipynb 19
-# class FixJapanaseCharsCB(Callback):
-#     "Remove prepended 約 (about) char and take the mean of such value range e.g 約4.0E+00<&<約1.5E+01"
-    
-#     def _extract_and_calculate_mean(self, s, about_char='約'):
-#         s = s.replace(about_char, '')
-#         float_strings = re.findall(r"[+-]?\d+\.\d+E[+-]\d+", s)
-#         float_numbers = np.array(float_strings, dtype=float)
-#         return float_numbers.mean()
-
-#     def _transform_if_about(self, value, about_char='約'):
-#         if pd.isna(value): return value
-#         value = str(value)
-#         count = value.count(about_char)
-#         return (value.replace(about_char, '') if count == 1
-#                 else self._extract_and_calculate_mean(value, about_char) if count == 2
-#                 else value)
-
-#     def __call__(self, tfm): 
-#         for k in tfm.dfs.keys():
-#             cols_rdn = [c for c in tfm.dfs[k].columns if ('(Bq/L)' in c) and (tfm.dfs[k][c].dtype == 'object')]
-#             tfm.dfs[k][cols_rdn] = tfm.dfs[k][cols_rdn].map(self._transform_if_about)
-
-# %% ../../nbs/handlers/tepco.ipynb 20
 class RemoveJapanaseCharCB(Callback):
     "Remove 約 (about) char"
     def _transform_if_about(self, value, about_char='約'):
@@ -67,7 +44,27 @@ class RemoveJapanaseCharCB(Callback):
             cols_rdn = [c for c in tfm.dfs[k].columns if ('(Bq/L)' in c) and (tfm.dfs[k][c].dtype == 'object')]
             tfm.dfs[k][cols_rdn] = tfm.dfs[k][cols_rdn].map(self._transform_if_about)
 
-# %% ../../nbs/handlers/tepco.ipynb 26
+# %% ../../nbs/handlers/tepco.ipynb 22
+class FixRangeValueStringCB(Callback):
+    "Replace e.g `4.0E+00<&<8.0E+00` by its mean (here 6)"
+    
+    def _extract_and_calculate_mean(self, s):
+        float_strings = re.findall(r"[+-]?\d+\.\d+E[+-]\d+", s)
+        float_numbers = np.array(float_strings, dtype=float)
+        return float_numbers.mean()
+
+    def _transform_if_range(self, value, range_pattern=r'<&<'):
+        if pd.isna(value): return value
+        pattern = re.compile(range_pattern)
+        return (self._extract_and_calculate_mean(value) if pattern.search(str(value)) 
+                else value)
+
+    def __call__(self, tfm): 
+        for k in tfm.dfs.keys():
+            cols_rdn = [c for c in tfm.dfs[k].columns if ('(Bq/L)' in c) and (tfm.dfs[k][c].dtype == 'object')]
+            tfm.dfs[k][cols_rdn] = tfm.dfs[k][cols_rdn].map(self._transform_if_range)
+
+# %% ../../nbs/handlers/tepco.ipynb 25
 # Define nuclides-related columns renaming rules
 renaming_rules_rdn = {
     '131I radioactivity concentration (Bq/L)': 'i131',
@@ -117,7 +114,7 @@ renaming_rules_rdn = {
     '105Ru detection limit (Bq/L)': 'ru105_dl'}
 
 
-# %% ../../nbs/handlers/tepco.ipynb 28
+# %% ../../nbs/handlers/tepco.ipynb 27
 class RemapRdnNameCB(Callback):
     "Remap to MARIS radionuclide names"
     def __init__(self,
@@ -129,14 +126,14 @@ class RemapRdnNameCB(Callback):
             tfm.dfs[k].rename(columns=self.renaming_rules, inplace=True)
 
 
-# %% ../../nbs/handlers/tepco.ipynb 32
+# %% ../../nbs/handlers/tepco.ipynb 31
 def time_parser(col):
     day = str(col.iloc[0].date())
     time = str(col.iloc[1])
     return datetime.strptime(day + ' ' + time, '%Y-%m-%d %H:%M:%S')
 
 
-# %% ../../nbs/handlers/tepco.ipynb 33
+# %% ../../nbs/handlers/tepco.ipynb 32
 class ParseTimeCB(Callback):
     def __init__(self, 
                  fn_parser=time_parser,
@@ -148,12 +145,12 @@ class ParseTimeCB(Callback):
             tfm.dfs[k]['time'] = tfm.dfs[k][self.cols_time].apply(self.fn_parser, axis=1)
             tfm.dfs[k].drop(columns=self.cols_time)
 
-# %% ../../nbs/handlers/tepco.ipynb 36
+# %% ../../nbs/handlers/tepco.ipynb 35
 renaming_rules_cols = {
     'Sampling coordinate North latitude (Decimal)': 'lat',
     'Sampling coordinate East longitude (Decimal)': 'lon'}
 
-# %% ../../nbs/handlers/tepco.ipynb 37
+# %% ../../nbs/handlers/tepco.ipynb 36
 class RenameColumnCB(Callback):
     "Normalizing, renaming columns"
     def __init__(self,
@@ -165,10 +162,10 @@ class RenameColumnCB(Callback):
             tfm.dfs[k].rename(columns=self.renaming_rules, inplace=True)
 
 
-# %% ../../nbs/handlers/tepco.ipynb 40
+# %% ../../nbs/handlers/tepco.ipynb 39
 coi = ['time', 'lat', 'lon'] + list(renaming_rules_rdn.values())
 
-# %% ../../nbs/handlers/tepco.ipynb 41
+# %% ../../nbs/handlers/tepco.ipynb 40
 class SelectColumnsCB(Callback):
     def __init__(self,
                  coi=coi):
@@ -179,13 +176,13 @@ class SelectColumnsCB(Callback):
             tfm.dfs[k] = tfm.dfs[k][self.coi]
 
 
-# %% ../../nbs/handlers/tepco.ipynb 54
+# %% ../../nbs/handlers/tepco.ipynb 53
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Water Quality > Ocean Contaminants']
 
 
-# %% ../../nbs/handlers/tepco.ipynb 55
+# %% ../../nbs/handlers/tepco.ipynb 54
 def get_attrs(tfm, zotero_key, kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[BboxCB(),
                                     # DepthRangeCB(),
@@ -194,11 +191,11 @@ def get_attrs(tfm, zotero_key, kw=kw):
                                     KeyValuePairCB('keywords', ', '.join(kw)),
                                     KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))])()
 
-# %% ../../nbs/handlers/tepco.ipynb 58
+# %% ../../nbs/handlers/tepco.ipynb 57
 def units_fn(grp_name): 
     return 'Bq/l'
 
-# %% ../../nbs/handlers/tepco.ipynb 59
+# %% ../../nbs/handlers/tepco.ipynb 58
 def encode(fname_in, fname_out, nc_tpl_path):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[FixMissingValuesCB(),

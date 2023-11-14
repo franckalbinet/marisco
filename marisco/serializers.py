@@ -21,13 +21,13 @@ def cast_verbose(df, col):
     df_after = pd.to_numeric(df.reset_index()[col],
                                     errors='coerce', downcast=None)
     n_after = sum(df_after.notna())
-    if n_before != n_after:
+    if n_before != n_after: 
         print(f'Failed to convert type of {col} in {n_before - n_after} occurences')
     
     return df_after
 
-
-# %% ../nbs/api/serializers.ipynb 4
+# %% ../nbs/api/serializers.ipynb 6
+# Link to possible refactoring: https://chat.openai.com/share/5853317b-e102-427f-ba72-3fc6445f4368
 def to_netcdf(
     dfs:dict[pd.DataFrame], # dict of Dataframes to encode with group name as key {'sediment': df_sed, ...}
     fname_cdl:str, # File name and path to the MARIS CDL template
@@ -70,7 +70,7 @@ def to_netcdf(
                         src.groups[grp_name][name_var_src].units == '_to_be_filled_in_'):
                         grp_dest[name_var_src].units = units_fn(grp_name, name_var_src)
 
-# %% ../nbs/api/serializers.ipynb 5
+# %% ../nbs/api/serializers.ipynb 7
 def to_csv(
     fname_nc:str,
     fname_output:str):

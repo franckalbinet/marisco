@@ -54,7 +54,6 @@ def rename_cols(cols):
                 new_cols.append(inner)
     return new_cols
 
-
 # %% ../../nbs/handlers/helcom.ipynb 17
 class LowerStripRdnNameCB(Callback):
     "Convert nuclide names to lowercase & strip any trailing space(s)"
@@ -105,14 +104,13 @@ class RemapRdnNameCB(Callback):
 class ParseTimeCB(Callback):
     def __call__(self, tfm):
         for k in tfm.dfs.keys():
-            tfm.dfs[k]['time'] = pd.to_datetime(
-                tfm.dfs[k].DATE, infer_datetime_format=True)
+            tfm.dfs[k]['time'] = pd.to_datetime(tfm.dfs[k].DATE, 
+                                                format='%m/%d/%y %H:%M:%S')
 
 # %% ../../nbs/handlers/helcom.ipynb 32
 # Make measurement and uncertainty units consistent
 def fix_units(df, meas_col, unc_col):
     return df.apply(lambda row: row[unc_col] * row[meas_col]/100, axis=1)
-
 
 # %% ../../nbs/handlers/helcom.ipynb 33
 # Columns of interest
@@ -220,7 +218,6 @@ class RenameColumnCB(Callback):
             # Rename cols
             tfm.dfs[k].rename(columns=self.renaming_rules, inplace=True)
 
-
 # %% ../../nbs/handlers/helcom.ipynb 50
 class ReshapeLongToWide(Callback):
     def __init__(self): fc.store_attr()
@@ -241,7 +238,6 @@ class ReshapeLongToWide(Callback):
 
             # Set index
             tfm.dfs[k].index.name = 'sample'
-
 
 # %% ../../nbs/handlers/helcom.ipynb 61
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
@@ -271,7 +267,6 @@ def units_fn(grp_name):
            'sediment': 'Bq/kg',
            'biota': 'Bq/kg'}
     return lut[grp_name]
-
 
 # %% ../../nbs/handlers/helcom.ipynb 67
 def encode(fname_in, fname_out, nc_tpl_path):

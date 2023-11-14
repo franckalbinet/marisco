@@ -52,7 +52,7 @@ publisher_postprocess_logs = ""
 
 [dim]
 name = "sample"
-dtype = "i4"
+dtype = "u8"
 
 [dim.attrs]
 long_name = "Sample ID of measurement"

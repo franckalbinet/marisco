@@ -17,7 +17,7 @@ import fastcore.all as fc
 from fastcore.basics import patch
 
 from .utils import read_toml
-from .configs import name2grp, get_cfgs
+from .configs import name2grp, get_cfgs, enum_types
 
 # %% ../nbs/api/nc_template.ipynb 5
 class NCTemplater:

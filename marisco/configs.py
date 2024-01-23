@@ -343,13 +343,17 @@ def get_lut(src_dir:str, # Directory containing lookup tables
         lut = {sanitize(k): v for k, v in lut.items()}
     return lut
 
-# %% ../nbs/api/configs.ipynb 31
+# %% ../nbs/api/configs.ipynb 32
 def enum_types(
-    luts:list
+    lut_src_dir:str = get_cfgs()['dirs']['lut'], # Directory containing lookup tables
+    cdl_name:Path = BASE_PATH / CDL_FNAME, # Path to `cdl.toml` file
     ):
-    "Return a dictionary of "
-    return {
-        lut['name']: partial(get_lut, 
-                             fname=lut['fname'],
-                             key=lut['key'], value=lut['value']) for lut in luts
-        }
+    "Return a dict of NetCDF enumeration types."
+    enums_cfg = read_toml(cdl_name)['enums']
+    enum_types = {}
+    for enum in enums_cfg:
+        name, fname, key, value = enum.values()
+        lut = get_lut(lut_src_dir, fname, key=key, value=value)
+        enum_types[name] = lut
+        
+    return enum_types

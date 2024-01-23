@@ -9,7 +9,7 @@ from pathlib import Path
 from fastcore.script import *
 
 from ..configs import BASE_PATH, CONFIGS
-from ..nc_template import NCTemplate
+from ..nc_template import NCTemplater
 from ..utils import read_toml
 
 # %% ../../nbs/cli/create_nc_template.ipynb 5

@@ -23,7 +23,7 @@ from ..metadata import (GlobAttrsFeeder, BboxCB,
 from ..serializers import to_netcdf
 from ..configs import get_nc_tpl_path, BASE_PATH, get_nuclides_lut
 
-# %% ../../nbs/handlers/generic.ipynb 27
+# %% ../../nbs/handlers/generic.ipynb 33
 def load_data(fname):
     "Load generic MARIS data and return them as individual dataframe by sample type"
     dfs = {}
@@ -46,7 +46,7 @@ def rename_cols(cols):
                 new_cols.append(inner)
     return new_cols
 
-# %% ../../nbs/handlers/generic.ipynb 36
+# %% ../../nbs/handlers/generic.ipynb 41
 class RemapRdnNameCB(Callback):
     "Remap to MARIS radionuclide names"
     def __call__(self, tfm):
@@ -54,14 +54,14 @@ class RemapRdnNameCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k]['nusymbol'].replace(lut, inplace=True)
 
-# %% ../../nbs/handlers/generic.ipynb 39
+# %% ../../nbs/handlers/generic.ipynb 44
 class ParseTimeCB(Callback):
     def __call__(self, tfm):
         for k in tfm.dfs.keys():
             tfm.dfs[k]['time'] = pd.to_datetime(tfm.dfs[k].begperiod, 
                                                 format='%Y-%m-%d %H:%M:%S.%f')
 
-# %% ../../nbs/handlers/generic.ipynb 57
+# %% ../../nbs/handlers/generic.ipynb 62
 # Define columns of interest by sample type
 # coi_grp = {'seawater': ['NUCLIDE', 'VALUE_Bq/m³', 'ERROR%_m³', 'time',
 #                         'TDEPTH', 'LATITUDE (dddddd)', 'LONGITUDE (dddddd)'],
@@ -82,14 +82,14 @@ coi_grp = {'seawater': common_cols,
            'sediment': common_cols + ['sedtype_id']
            }
 
-# %% ../../nbs/handlers/generic.ipynb 58
+# %% ../../nbs/handlers/generic.ipynb 63
 # Define column names renaming rules
 renaming_rules = {
     'latitude': 'lat',
     'longitude': 'lon',
     'totdepth': 'tot_depth',
     'sampdepth': 'depth',
-    'temperatur': 'temp',
+    'temperatur': 'temperature',
     'activity': 'value',
     'uncertaint': 'unc',
     
@@ -110,7 +110,7 @@ renaming_rules = {
 }
 
 
-# %% ../../nbs/handlers/generic.ipynb 59
+# %% ../../nbs/handlers/generic.ipynb 64
 class RenameColumnCB(Callback):
     def __init__(self,
                  coi=coi_grp,
@@ -125,7 +125,7 @@ class RenameColumnCB(Callback):
             # Rename cols
             tfm.dfs[k].rename(columns=self.renaming_rules, inplace=True)
 
-# %% ../../nbs/handlers/generic.ipynb 65
+# %% ../../nbs/handlers/generic.ipynb 74
 class ReshapeLongToWide(Callback):
     def __init__(self): fc.store_attr()
 
@@ -146,7 +146,7 @@ class ReshapeLongToWide(Callback):
             # Set index
             tfm.dfs[k].index.name = 'sample'
 
-# %% ../../nbs/handlers/generic.ipynb 85
+# %% ../../nbs/handlers/generic.ipynb 94
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -159,7 +159,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/generic.ipynb 86
+# %% ../../nbs/handlers/generic.ipynb 95
 def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[BboxCB(),
                                     DepthRangeCB(),
@@ -168,7 +168,7 @@ def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
                                     KeyValuePairCB('keywords', ', '.join(kw)),
                                     KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))])()
 
-# %% ../../nbs/handlers/generic.ipynb 89
+# %% ../../nbs/handlers/generic.ipynb 98
 def units_fn(grp_name):
     lut = {'seawater': 'Bq/m³',
            'sediment': 'Bq/kg',
@@ -176,7 +176,7 @@ def units_fn(grp_name):
     return lut[grp_name]
 
 
-# %% ../../nbs/handlers/generic.ipynb 91
+# %% ../../nbs/handlers/generic.ipynb 100
 def encode(fname_in, fname_out, nc_tpl_path):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[LowerStripRdnNameCB(),

@@ -105,7 +105,7 @@ calendar = "gregorian"
 
 [vars.bio.bio_group]
 name = "bio_group"
-dtype = "f4"
+dtype = "bio_group_t"
 
 [vars.bio.bio_group.attrs]
 long_name = "Biota group"
@@ -113,7 +113,7 @@ standard_name = "biota_group_tbd"
 
 [vars.bio.species_id]
 name = "species_id"
-dtype = "u8"
+dtype = "species_t"
 
 [vars.bio.species_id.attrs]
 long_name = "Species ID"
@@ -121,7 +121,7 @@ standard_name = "AphiaID"
 
 [vars.bio.body_part]
 name = "body_part"
-dtype = "f4"
+dtype = "body_part_t"
 
 [vars.bio.body_part.attrs]
 long_name = "Body part"
@@ -129,7 +129,7 @@ standard_name = "body_part_tbd"
 
 [vars.sed.sed_type]
 name = "sed_type"
-dtype = "f4"
+dtype = "sed_type_t"
 
 [vars.sed.sed_type.attrs]
 long_name = "Sediment type"
@@ -137,6 +137,7 @@ standard_name = "sediment_type_tbd"
 
 [vars.suffixes.uncertainty]
 name = "_unc"
+dtype = "f4"
 
 [vars.suffixes.uncertainty.attrs]
 long_name = " uncertainty"
@@ -144,7 +145,67 @@ standard_name = "_uncertainty"
 
 [vars.suffixes.detection_limit]
 name = "_dl"
+dtype = "dl_type_t"
 
 [vars.suffixes.detection_limit.attrs]
 long_name = " detection limit"
 standard_name = "_detection_limit"
+
+[vars.suffixes.volume]
+name = "_vol"
+dtype = "f4"
+
+[vars.suffixes.volume.attrs]
+long_name = " volume"
+standard_name = "_volume"
+
+[vars.suffixes.filtered]
+name = "_filt"
+
+[vars.suffixes.filtered.attrs]
+long_name = " filtered"
+standard_name = "_filtered"
+
+[vars.suffixes.counting_method]
+name = "_counmet"
+
+[vars.suffixes.counting_method.attrs]
+long_name = " counting method"
+standard_name = "_counting_method"
+
+[vars.suffixes.unit]
+name = "_unit"
+
+[vars.suffixes.unit.attrs]
+long_name = " unit"
+standard_name = "_unit"
+
+[[enums]]
+name = "bio_group_t"
+fname = "dbo_biogroup.xlsx"
+key = "biogroup"
+value = "biogroup_id"
+
+[[enums]]
+name = "body_part_t"
+fname = "dbo_bodypar.xlsx"
+key = "bodypar"
+value = "bodypar_id"
+
+[[enums]]
+name = "species_t"
+fname = "dbo_species.xlsx"
+key = "species"
+value = "species_id"
+
+[[enums]]
+name = "sed_type_t"
+fname = "dbo_sedtype.xlsx"
+key = "sedtype"
+value = "sedtype_id"
+
+[[enums]]
+name = "dl_type_t"
+fname = "dbo_detection.xlsx"
+key = "detection_name"
+value = "detection_id"

@@ -145,7 +145,7 @@ standard_name = "_uncertainty"
 
 [vars.suffixes.detection_limit]
 name = "_dl"
-dtype = "dl_type_t"
+dtype = "f4"
 
 [vars.suffixes.detection_limit.attrs]
 long_name = " detection limit"
@@ -161,6 +161,7 @@ standard_name = "_volume"
 
 [vars.suffixes.filtered]
 name = "_filt"
+dtype = "f4"
 
 [vars.suffixes.filtered.attrs]
 long_name = " filtered"
@@ -168,6 +169,7 @@ standard_name = "_filtered"
 
 [vars.suffixes.counting_method]
 name = "_counmet"
+dtype = "f4"
 
 [vars.suffixes.counting_method.attrs]
 long_name = " counting method"
@@ -175,6 +177,7 @@ standard_name = "_counting_method"
 
 [vars.suffixes.unit]
 name = "_unit"
+dtype = "f4"
 
 [vars.suffixes.unit.attrs]
 long_name = " unit"

@@ -2,7 +2,7 @@
 
 # %% auto 0
 __all__ = ['CFG_FNAME', 'CDL_FNAME', 'BASE_PATH', 'CONFIGS', 'CONFIGS_CDL', 'NETCDF_TO_PYTHON_TYPE', 'name2grp',
-           'get_nc_tpl_path', 'get_cfgs', 'sanitize', 'get_lut', 'enum_types']
+           'get_nc_tpl_path', 'get_cfgs', 'sanitize', 'get_lut', 'get_enum_dicts']
 
 # %% ../nbs/api/configs.ipynb 2
 from pathlib import Path
@@ -228,7 +228,7 @@ CONFIGS_CDL = {
                     'long_name': ' detection limit',
                     'standard_name': '_detection_limit'
                 },
-                'dtype': 'dl_type_t'
+                'dtype': 'f4'
             },
             'volume': {
                 'name': '_vol',
@@ -243,21 +243,24 @@ CONFIGS_CDL = {
                 'attrs': {
                     'long_name': ' filtered',
                     'standard_name': '_filtered'
-                }
+                },
+                'dtype': 'f4'
             },
             'counting_method': {
                 'name': '_counmet',
                 'attrs': {
                     'long_name': ' counting method',
                     'standard_name': '_counting_method'
-                }
+                },
+                'dtype': 'f4'
             },
             'unit': {
                 'name': '_unit',
                 'attrs': {
                     'long_name': ' unit',
                     'standard_name': '_unit'
-                }
+                },
+                'dtype': 'f4'
             }
         }
     },
@@ -302,14 +305,20 @@ NETCDF_TO_PYTHON_TYPE = {
     }
 
 # %% ../nbs/api/configs.ipynb 17
-name2grp = lambda x: {v['name']:k  for k, v in CONFIGS_CDL['grps'].items()}[x]
+def name2grp(
+    name:str, # Name of the group
+    cdl_name:Path = BASE_PATH / CDL_FNAME, # Path to `cdl.toml` file 
+    ):
+    # Reverse `cdl.toml` config group dict so that group config key can be retrieve based on its name
+    cfg = read_toml(cdl_name)['grps']
+    return {v['name']:k  for k, v in cfg.items()}[name]
 
-# %% ../nbs/api/configs.ipynb 18
+# %% ../nbs/api/configs.ipynb 20
 def get_nc_tpl_path():
     "Return the name of the MARIS NetCDF template as defined in `configs.toml`"
     return BASE_PATH / read_toml(BASE_PATH / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 20
+# %% ../nbs/api/configs.ipynb 22
 def get_cfgs(
     key:str=None # `configs.toml` key of interest
     ) -> dict: # `configs.toml` file as dictionary
@@ -317,7 +326,7 @@ def get_cfgs(
     cfgs = read_toml(BASE_PATH / 'configs.toml')
     return cfgs if key is None else cfgs[key]
 
-# %% ../nbs/api/configs.ipynb 23
+# %% ../nbs/api/configs.ipynb 25
 def sanitize(s:str # String to sanitize
              ) -> str:
     """
@@ -329,7 +338,7 @@ def sanitize(s:str # String to sanitize
     s = re.sub(r'[().]', '', s)
     return re.sub(r'[/-]', ' ', s).strip() 
 
-# %% ../nbs/api/configs.ipynb 28
+# %% ../nbs/api/configs.ipynb 29
 def get_lut(src_dir:str, # Directory containing lookup tables
             fname:str, # Excel file lookup table name
             key:str, # Excel file column name to be used as dict keys 
@@ -343,8 +352,8 @@ def get_lut(src_dir:str, # Directory containing lookup tables
         lut = {sanitize(k): v for k, v in lut.items()}
     return lut
 
-# %% ../nbs/api/configs.ipynb 32
-def enum_types(
+# %% ../nbs/api/configs.ipynb 33
+def get_enum_dicts(
     lut_src_dir:str = get_cfgs()['dirs']['lut'], # Directory containing lookup tables
     cdl_name:Path = BASE_PATH / CDL_FNAME, # Path to `cdl.toml` file
     ):

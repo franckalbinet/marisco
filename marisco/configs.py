@@ -184,7 +184,6 @@ CONFIGS_CDL = {
                     'standard_name': 'biota_group_tbd'
                 },
                 'dtype': 'bio_group_t'
-                # 'dtype': 'f4'
             },
             'species_id': {
                 'name': 'species_id',
@@ -228,7 +227,7 @@ CONFIGS_CDL = {
                     'long_name': ' detection limit',
                     'standard_name': '_detection_limit'
                 },
-                'dtype': 'f4'
+                'dtype': 'dl_type_t'
             },
             'volume': {
                 'name': '_vol',
@@ -244,7 +243,7 @@ CONFIGS_CDL = {
                     'long_name': ' filtered',
                     'standard_name': '_filtered'
                 },
-                'dtype': 'f4'
+                'dtype': 'filt_type_t'
             },
             'counting_method': {
                 'name': '_counmet',
@@ -252,7 +251,7 @@ CONFIGS_CDL = {
                     'long_name': ' counting method',
                     'standard_name': '_counting_method'
                 },
-                'dtype': 'f4'
+                'dtype': 'counmet_type_t'
             },
             'unit': {
                 'name': '_unit',
@@ -260,7 +259,7 @@ CONFIGS_CDL = {
                     'long_name': ' unit',
                     'standard_name': '_unit'
                 },
-                'dtype': 'f4'
+                'dtype': 'unit_type_t'
             }
         }
     },
@@ -294,6 +293,30 @@ CONFIGS_CDL = {
             'fname': 'dbo_detection.xlsx', 
             'key': 'detection_name', 
             'value':'detection_id'
+        },
+        {
+            'name': 'unit_type_t', 
+            'fname': 'dbo_unit.xlsx', 
+            'key': 'unit_sanitized', 
+            'value':'unit_id'
+        },
+        {
+            'name': 'dl_type_t', 
+            'fname': 'dbo_detectlimit.xlsx', 
+            'key': 'name_sanitized', 
+            'value':'id'
+        },
+        {
+            'name': 'filt_type_t', 
+            'fname': 'dbo_filtered.xlsx', 
+            'key': 'name',
+            'value':'id'
+        },
+        {
+            'name': 'counmet_type_t', 
+            'fname': 'dbo_counmet.xlsx', 
+            'key': 'counmet',
+            'value':'counmet_id'
         }
         ]
 }
@@ -348,21 +371,21 @@ def get_lut(src_dir:str, # Directory containing lookup tables
     "Convert MARIS db lookup table excel file to dictionary `{'name': id, ...}`."
     fname = Path(src_dir) / fname
     lut = pd.read_excel(fname, index_col=key, usecols=[key, value])[value].to_dict()
-    if do_sanitize:
-        lut = {sanitize(k): v for k, v in lut.items()}
+    if do_sanitize: lut = {sanitize(k): v for k, v in lut.items()}
     return lut
 
-# %% ../nbs/api/configs.ipynb 33
+# %% ../nbs/api/configs.ipynb 32
 def get_enum_dicts(
     lut_src_dir:str = get_cfgs()['dirs']['lut'], # Directory containing lookup tables
     cdl_name:Path = BASE_PATH / CDL_FNAME, # Path to `cdl.toml` file
+    **kwargs
     ):
     "Return a dict of NetCDF enumeration types."
     enums_cfg = read_toml(cdl_name)['enums']
     enum_types = {}
     for enum in enums_cfg:
         name, fname, key, value = enum.values()
-        lut = get_lut(lut_src_dir, fname, key=key, value=value)
+        lut = get_lut(lut_src_dir, fname, key=key, value=value, **kwargs)
         enum_types[name] = lut
         
     return enum_types

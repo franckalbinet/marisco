@@ -145,7 +145,7 @@ standard_name = "_uncertainty"
 
 [vars.suffixes.detection_limit]
 name = "_dl"
-dtype = "f4"
+dtype = "dl_type_t"
 
 [vars.suffixes.detection_limit.attrs]
 long_name = " detection limit"
@@ -161,7 +161,7 @@ standard_name = "_volume"
 
 [vars.suffixes.filtered]
 name = "_filt"
-dtype = "f4"
+dtype = "filt_type_t"
 
 [vars.suffixes.filtered.attrs]
 long_name = " filtered"
@@ -169,7 +169,7 @@ standard_name = "_filtered"
 
 [vars.suffixes.counting_method]
 name = "_counmet"
-dtype = "f4"
+dtype = "counmet_type_t"
 
 [vars.suffixes.counting_method.attrs]
 long_name = " counting method"
@@ -177,7 +177,7 @@ standard_name = "_counting_method"
 
 [vars.suffixes.unit]
 name = "_unit"
-dtype = "f4"
+dtype = "unit_type_t"
 
 [vars.suffixes.unit.attrs]
 long_name = " unit"
@@ -212,3 +212,27 @@ name = "dl_type_t"
 fname = "dbo_detection.xlsx"
 key = "detection_name"
 value = "detection_id"
+
+[[enums]]
+name = "unit_type_t"
+fname = "dbo_unit.xlsx"
+key = "unit_sanitized"
+value = "unit_id"
+
+[[enums]]
+name = "dl_type_t"
+fname = "dbo_detectlimit.xlsx"
+key = "name_sanitized"
+value = "id"
+
+[[enums]]
+name = "filt_type_t"
+fname = "dbo_filtered.xlsx"
+key = "name"
+value = "id"
+
+[[enums]]
+name = "counmet_type_t"
+fname = "dbo_counmet.xlsx"
+key = "counmet"
+value = "counmet_id"

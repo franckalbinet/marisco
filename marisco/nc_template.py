@@ -82,7 +82,8 @@ def derive(
 def create_enum_types(self:NCTemplater):
     "Create enumeration types"
     for name, enum in self.enum_dicts.items(): 
-            self.enum_types[name] = self.nc.createEnumType(np.uint16, name, enum)
+        print(name, enum)
+        self.enum_types[name] = self.nc.createEnumType(np.uint16, name, enum)
 
 # %% ../nbs/api/nc_template.ipynb 18
 @fc.patch
@@ -151,13 +152,8 @@ def create_variable(self:NCTemplater,
 @fc.patch
 def generate(self:NCTemplater):
     "Generate CDL"
-    
     with Dataset(self.tpl_fname, 'w', format='NETCDF4') as self.nc:
-        # Create dataset attributes
         self.nc.setncatts(self.cdl['global_attrs']) 
-    
         self.create_enum_types()
-        
-        # Create shared `sample` dimension
-        self.nc.createDimension(self.dim['name'], None)
+        self.nc.createDimension(self.dim['name'], None) 
         self.create_groups()

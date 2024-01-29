@@ -44,7 +44,7 @@ CONFIGS = {
         'time': 'seconds since 1970-01-01 00:00:00.0'
     },
     'zotero': {
-        'api_key': 'your-zotero-api-key',
+        'api_key': '7nuMByrm19RP7reiQtYJwgPk',
         'lib_id': '2432820'
     }
 }

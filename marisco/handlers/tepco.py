@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['renaming_rules_rdn', 'renaming_rules_cols', 'coi', 'kw', 'load_data', 'FixMissingValuesCB', 'RemoveJapanaseCharCB',
            'FixRangeValueStringCB', 'RemapRdnNameCB', 'time_parser', 'ParseTimeCB', 'RenameColumnCB', 'SelectColumnsCB',
-           'get_attrs', 'units_fn', 'encode']
+           'get_attrs']
 
 # %% ../../nbs/handlers/tepco.ipynb 8
 def load_data(fname_in):
@@ -130,7 +130,6 @@ def time_parser(col):
     time = str(col.iloc[1])
     return datetime.strptime(day + ' ' + time, '%Y-%m-%d %H:%M:%S')
 
-
 # %% ../../nbs/handlers/tepco.ipynb 32
 class ParseTimeCB(Callback):
     def __init__(self, 
@@ -184,28 +183,28 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
 def get_attrs(tfm, zotero_key, kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[BboxCB(),
                                     # DepthRangeCB(),
-                                    TimeRangeCB(),
-                                    ZoteroCB(zotero_key),
+                                    TimeRangeCB(cfg()),
+                                    ZoteroCB(zotero_key, cfg=cfg()),
                                     KeyValuePairCB('keywords', ', '.join(kw)),
                                     KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))])()
 
 # %% ../../nbs/handlers/tepco.ipynb 57
-def units_fn(grp_name): 
-    return 'Bq/l'
+# def units_fn(grp_name): 
+#     return 'Bq/l'
 
 # %% ../../nbs/handlers/tepco.ipynb 58
-def encode(fname_in, fname_out, nc_tpl_path):
-    dfs = load_data(fname_in)
-    tfm = Transformer(dfs, cbs=[FixMissingValuesCB(),
-                                RemoveJapanaseCharCB(),
-                                FixRangeValueStringCB(),
-                                RemapRdnNameCB(),
-                                ParseTimeCB(),
-                                RenameColumnCB(),
-                                SelectColumnsCB(),
-                                EncodeTimeCB(),
-                                SanitizeLonLatCB()])
+# def encode(fname_in, fname_out, nc_tpl_path):
+#     dfs = load_data(fname_in)
+#     tfm = Transformer(dfs, cbs=[FixMissingValuesCB(),
+#                                 RemoveJapanaseCharCB(),
+#                                 FixRangeValueStringCB(),
+#                                 RemapRdnNameCB(),
+#                                 ParseTimeCB(),
+#                                 RenameColumnCB(),
+#                                 SelectColumnsCB(),
+#                                 EncodeTimeCB(),
+#                                 SanitizeLonLatCB()])
     
-    dfs_tfm = tfm()
-    attrs = get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw)
-    to_netcdf(dfs_tfm, nc_tpl_path, fname_out, attrs, units_fn)
+#     dfs_tfm = tfm()
+#     attrs = get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw)
+#     to_netcdf(dfs_tfm, nc_tpl_path, fname_out, attrs, units_fn)

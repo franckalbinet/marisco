@@ -24,7 +24,6 @@ def load_data(fname_in):
 # %% ../../nbs/handlers/tepco.ipynb 16
 class FixMissingValuesCB(Callback):
     "Assign `NaN` to values equal to `ND` (not detected) - to be confirmed "
-
     def __call__(self, tfm): 
         for k in tfm.dfs.keys():
             predicate = tfm.dfs[k] == 'ND'
@@ -35,7 +34,6 @@ class RemoveJapanaseCharCB(Callback):
     "Remove 約 (about) char"
     def _transform_if_about(self, value, about_char='約'):
         if pd.isna(value): return value
-        # value = str(value)
         return (value.replace(about_char, '') if str(value).count(about_char) != 0 
                 else value)
     

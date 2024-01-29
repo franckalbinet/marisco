@@ -14,25 +14,23 @@ from netCDF4 import Dataset
 import numpy as np
 import pandas as pd
 from pathlib import Path
-# from fastcore.basics import patch, store_attr
 import fastcore.all as fc
 from fastcore.basics import patch
 
 from .utils import read_toml
-from .configs import name2grp, get_cfgs, get_enum_dicts
+from .configs import name2grp, get_enum_dicts
 
 # %% ../nbs/api/nc_template.ipynb 5
 class NCTemplater:
     "MARIS NetCDF template generator."
     def __init__(self, 
-                 cdl_fname:Dict, # File name and path of the "Pseudo CDL" (`.toml`)
+                 cdl:Dict, # "Pseudo CDL" (`.toml`)
                  nuclide_vars_fname:str, # File name and path of MARIS nuclide lookup table containing variable names
                  tpl_fname:str, # File name and path of NetCDF4 file to be generated
                  enum_dicts:Dict # MARIS NetCDF enumeration types
                 ):
         fc.store_attr()
-        self.cdl = read_toml(cdl_fname)
-        self.dim = self.cdl['dim']
+        self.dim = cdl['dim']
         self.enum_types = {}
 
 # %% ../nbs/api/nc_template.ipynb 8
@@ -82,7 +80,6 @@ def derive(
 def create_enum_types(self:NCTemplater):
     "Create enumeration types"
     for name, enum in self.enum_dicts.items(): 
-        print(name, enum)
         self.enum_types[name] = self.nc.createEnumType(np.uint16, name, enum)
 
 # %% ../nbs/api/nc_template.ipynb 18
@@ -120,8 +117,8 @@ def create_group_specific_variables(self:NCTemplater,
                              grp:netCDF4.Group, # NetCDF group
                              ):
         "Create group specific variables"
-        cfg = self.cdl['vars']
-        for var in cfg.get(name2grp(grp.name), {}).values(): 
+        vars = self.cdl['vars']
+        for var in vars.get(name2grp(grp.name, self.cdl), {}).values(): 
             self.create_variable(grp, var)
 
 # %% ../nbs/api/nc_template.ipynb 22
@@ -138,9 +135,9 @@ def create_analyte_variables(self:NCTemplater,
 # %% ../nbs/api/nc_template.ipynb 23
 @fc.patch
 def create_variable(self:NCTemplater, 
-            grp:netCDF4.Group, # NetCDF group
-            var:Dict, # Variable specificiation dict with `name`, `dtype` and `attrs` keys
-           ):
+                    grp:netCDF4.Group, # NetCDF group
+                    var:Dict, # Variable specificiation dict with `name`, `dtype` and `attrs` keys
+                    ):
     "Create NetCDF variable with proper types (standard and enums)"
     name, dtype, attrs = var.values()
     nc_var = grp.createVariable(name, 

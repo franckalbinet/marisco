@@ -5,6 +5,7 @@ __all__ = ['Callback', 'run_cbs', 'Transformer', 'has_valid_varname', 'write_tom
            'download_files_in_folder', 'download_file', 'match_worms']
 
 # %% ../nbs/api/utils.ipynb 2
+from pathlib import Path
 from netCDF4 import Dataset
 from fastcore.test import test_eq
 import fastcore.all as fc
@@ -77,8 +78,12 @@ def get_bbox(df,
     return MultiPoint(arr).envelope
 
 # %% ../nbs/api/utils.ipynb 20
-def download_files_in_folder(owner, repo, src_dir, dest_dir):
-    # Make a GET request to the GitHub API to get the contents of the folder
+def download_files_in_folder(owner:str, 
+                             repo:str, 
+                             src_dir:str, 
+                             dest_dir:str
+                             ):
+    "Make a GET request to the GitHub API to get the contents of the folder"
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{src_dir}"
     response = requests.get(url)
 
@@ -100,7 +105,7 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
 
     if response.status_code == 200:
         # Save the file locally
-        with open(dest_dir / fname, "wb") as file:
+        with open(Path(dest_dir) / fname, "wb") as file:
             file.write(response.content)
         print(f"{fname} downloaded successfully.")
     else:

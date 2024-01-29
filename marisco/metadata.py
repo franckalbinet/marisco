@@ -8,17 +8,16 @@ import pandas as pd
 from fastcore.xtras import load_pickle
 import fastcore.all as fc
 
-from .utils import (read_toml, get_bbox, 
-                           Callback, run_cbs)
-from .configs import BASE_PATH, get_cfgs, CONFIGS_CDL
+from .utils import get_bbox, Callback, run_cbs
+from .configs import cfg, toml, cdl_cfg
 
 from cftime import num2date
 from pyzotero import zotero
 import json
 
-# %% ../nbs/api/metadata.ipynb 4
+# %% ../nbs/api/metadata.ipynb 3
 class GlobAttrsFeeder:
-    def __init__(self, dfs, cbs=None, attrs=CONFIGS_CDL['global_attrs'], logs=[]): 
+    def __init__(self, dfs, cbs=None, attrs=cdl_cfg()['global_attrs'], logs=[]): 
         fc.store_attr()
         
     def callback(self):
@@ -28,7 +27,7 @@ class GlobAttrsFeeder:
         self.callback()
         return self.attrs
 
-# %% ../nbs/api/metadata.ipynb 5
+# %% ../nbs/api/metadata.ipynb 4
 class BboxCB(Callback):
     "Compute dataset geographical bounding box"
     def __call__(self, obj):
@@ -41,7 +40,7 @@ class BboxCB(Callback):
             'geospatial_lon_max': lon_max,
             'geospatial_bounds': bbox.wkt})
 
-# %% ../nbs/api/metadata.ipynb 6
+# %% ../nbs/api/metadata.ipynb 5
 class DepthRangeCB(Callback):
     "Compute depth values range"
     def __call__(self, obj):
@@ -51,40 +50,40 @@ class DepthRangeCB(Callback):
             'geospatial_vertical_max': '0' if min_depth == 0 else str(-min_depth),
             'geospatial_vertical_min': str(-max_depth)})
 
-# %% ../nbs/api/metadata.ipynb 7
+# %% ../nbs/api/metadata.ipynb 6
 class TimeRangeCB(Callback):
     "Compute time values range"
     def __call__(self, obj):
         time = pd.concat(obj.dfs)['time']
-        start, end = [num2date(t, units=get_cfgs('units')['time']).isoformat() 
+        start, end = [num2date(t, units=cfg()('units')['time']).isoformat() 
                       for t in (time.min(), time.max())]
         obj.attrs.update({
             'time_coverage_start': start,
             'time_coverage_end': end})
 
-# %% ../nbs/api/metadata.ipynb 8
+# %% ../nbs/api/metadata.ipynb 7
 class ZoteroCB(Callback):
     "Retrieve Zotero metadata"
     def __init__(self, itemId): fc.store_attr()
         
     def __call__(self, obj):
-        item = ZoteroItem(self.itemId, get_cfgs('zotero'))
+        item = ZoteroItem(self.itemId, cfg()('zotero'))
         for attr in ['title', 'summary', 'creator_name']:
             obj.attrs[attr] = getattr(item, attr)()
 
-# %% ../nbs/api/metadata.ipynb 9
+# %% ../nbs/api/metadata.ipynb 8
 class KeyValuePairCB(Callback):
     def __init__(self, k, v): fc.store_attr()
     def __call__(self, obj): obj.attrs[self.k] = self.v
 
-# %% ../nbs/api/metadata.ipynb 10
+# %% ../nbs/api/metadata.ipynb 9
 class ZoteroItem:
-    def __init__(self, item_id, cfgs):
-        self.cfgs = cfgs
+    def __init__(self, item_id, cfg):
+        self.cfg = cfg
         self.item = self.getItem(item_id)
         
     def getItem(self, item_id):
-        zot = zotero.Zotero(self.cfgs['lib_id'], 'group', self.cfgs['api_key'])
+        zot = zotero.Zotero(self.cfg['lib_id'], 'group', self.cfg['api_key'])
         return zot.item(item_id)
     
     def title(self):

@@ -11,7 +11,7 @@ from fastcore.script import *
 from fastcore.xtras import mkdir
 from fastcore.style import S
 
-from ..configs import BASE_PATH, CONFIGS, CONFIGS_CDL, CFG_FNAME,  CDL_FNAME
+from ..configs import base_path, CONFIGS, CONFIGS_CDL, CFG_FNAME, CDL_FNAME
 from ..utils import write_toml, download_files_in_folder
 from . import create_nc_template
 
@@ -19,24 +19,27 @@ from . import create_nc_template
 @call_parse
 def main():
     "Create configuration files & download lookup tables"
-    if BASE_PATH.exists():
+    path = base_path()
+    if path.exists():
         msg = S.red('Configuration files already exist. Do you want to overwrite them? (y/[n]): ')
         if not input(msg).lower().startswith('y'): 
             sys.exit(1)
 
-    mkdir(BASE_PATH, overwrite=True)
+    mkdir(path, overwrite=True)
     for k, v in CONFIGS['dirs'].items():
         mkdir(v, parents=True, overwrite=True)
             
-    # Write configs dictionary as `.toml` in BASE_PATH
-    write_toml(BASE_PATH / CFG_FNAME, CONFIGS)
-    write_toml(BASE_PATH / CDL_FNAME, CONFIGS_CDL) 
+    # Write configs dictionary as `.toml` in base path
+    # using config dictionary literals during initialization
+    write_toml(path / CFG_FNAME, CONFIGS)
+    write_toml(path / CDL_FNAME, CONFIGS_CDL) 
     
-    # Download luts (look-up table) to BASE_PATH
+    # Download luts (look-up table) to base path
     print('Downloading look-up tables ...')
     owner, repo = CONFIGS['gh'].values()
-    download_files_in_folder(owner, repo, 
-                             src_dir=CONFIGS['paths']['luts'], dest_dir=BASE_PATH / 'lut')
     
-    # TO UNCOMMENT
-    # create_nc_template.main()
+    download_files_in_folder(owner, repo,
+                             src_dir=CONFIGS['paths']['luts'], 
+                             dest_dir=CONFIGS['dirs']['lut'])
+    
+    create_nc_template.main()

@@ -4,27 +4,23 @@
 __all__ = ['main']
 
 # %% ../../nbs/cli/create_nc_template.ipynb 1
-from pathlib import Path
-
 from fastcore.script import *
 
-from ..configs import BASE_PATH, CONFIGS
 from ..nc_template import NCTemplater
-from ..utils import read_toml
+from ..configs import (base_path, cdl_cfg, lut_path, 
+                             nuc_lut_path, nc_tpl_name, get_enum_dicts)
 
-# %% ../../nbs/cli/create_nc_template.ipynb 5
+# %% ../../nbs/cli/create_nc_template.ipynb 2
 @call_parse
 def main():
     "Create MARIS NetCDF template"
     print('Creating MARIS NetCDF template ...')
-    cfgs = read_toml(BASE_PATH / 'configs.toml')
-    tpl_fname = BASE_PATH / cfgs['names']['nc_template']
-    
-    dbo_nuc_path  = [p for p in Path(CONFIGS['dirs']['lut']).ls() if '_nuclide' in p.name][0]
-    cdl = read_toml(BASE_PATH / 'cdl.toml')
-    
-    nc_tpl = NCTemplate(tpl_fname,
-                        vars_fname=dbo_nuc_path, 
-                        dest_dir=BASE_PATH,
-                        cdl=cdl)
-    nc_tpl.generate()
+    cdl = cdl_cfg()
+    templater = NCTemplater(cdl=cdl,
+                            nuclide_vars_fname=nuc_lut_path(), 
+                            tpl_fname=base_path() / nc_tpl_name(),
+                            enum_dicts=get_enum_dicts(lut_src_dir=lut_path(), 
+                                                      cdl_enums=cdl['enums'])
+                            )
+
+    templater.generate()

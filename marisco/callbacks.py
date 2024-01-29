@@ -8,7 +8,7 @@ import fastcore.all as fc
 from operator import attrgetter
 from cftime import date2num
 
-from .configs import get_cfgs
+from .configs import cfg
 
 # %% ../nbs/api/callbacks.ipynb 3
 class Callback(): order = 0
@@ -35,9 +35,15 @@ class Transformer():
 # %% ../nbs/api/callbacks.ipynb 7
 class EncodeTimeCB(Callback):
     "Encode time as `int` representing seconds since xxx"
-
-    def __call__(self, tfm):
-        def format_time(x): return date2num(x, units=get_cfgs('units')['time'])
+    
+    def __init__(self, units):
+        self.units = units
+        
+    def __call__(self, tfm): 
+        def format_time(x): 
+            # return date2num(x, units=get_cfgs('units')['time'])
+            return date2num(x, units=self.units['time'])
+        
         for k in tfm.dfs.keys():
             tfm.dfs[k]['time'] = tfm.dfs[k]['time'].apply(format_time)
 

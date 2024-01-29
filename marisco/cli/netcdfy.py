@@ -7,7 +7,7 @@ __all__ = ['import_handler', 'main']
 from fastcore.script import *
 import importlib
 
-from ..configs import get_nc_tpl_path
+from ..configs import nc_tpl_path
 
 # %% ../../nbs/cli/netcdfy.ipynb 3
 def import_handler(handler_name, fn_name='encode'):

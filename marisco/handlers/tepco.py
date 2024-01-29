@@ -5,7 +5,7 @@ __all__ = ['renaming_rules_rdn', 'renaming_rules_cols', 'coi', 'kw', 'load_data'
            'FixRangeValueStringCB', 'RemapRdnNameCB', 'time_parser', 'ParseTimeCB', 'RenameColumnCB', 'SelectColumnsCB',
            'get_attrs']
 
-# %% ../../nbs/handlers/tepco.ipynb 8
+# %% ../../nbs/handlers/tepco.ipynb 7
 def load_data(fname_in):
     "Load TEPCO seawater data"
     
@@ -21,7 +21,7 @@ def load_data(fname_in):
     df.index.name = 'sample'
     return {'seawater': df}
 
-# %% ../../nbs/handlers/tepco.ipynb 16
+# %% ../../nbs/handlers/tepco.ipynb 15
 class FixMissingValuesCB(Callback):
     "Assign `NaN` to values equal to `ND` (not detected) - to be confirmed "
     def __call__(self, tfm): 
@@ -29,7 +29,7 @@ class FixMissingValuesCB(Callback):
             predicate = tfm.dfs[k] == 'ND'
             tfm.dfs[k][predicate] = np.nan
 
-# %% ../../nbs/handlers/tepco.ipynb 19
+# %% ../../nbs/handlers/tepco.ipynb 18
 class RemoveJapanaseCharCB(Callback):
     "Remove 約 (about) char"
     def _transform_if_about(self, value, about_char='約'):
@@ -42,7 +42,7 @@ class RemoveJapanaseCharCB(Callback):
             cols_rdn = [c for c in tfm.dfs[k].columns if ('(Bq/L)' in c) and (tfm.dfs[k][c].dtype == 'object')]
             tfm.dfs[k][cols_rdn] = tfm.dfs[k][cols_rdn].map(self._transform_if_about)
 
-# %% ../../nbs/handlers/tepco.ipynb 22
+# %% ../../nbs/handlers/tepco.ipynb 21
 class FixRangeValueStringCB(Callback):
     "Replace e.g `4.0E+00<&<8.0E+00` by its mean (here 6)"
     
@@ -62,7 +62,7 @@ class FixRangeValueStringCB(Callback):
             cols_rdn = [c for c in tfm.dfs[k].columns if ('(Bq/L)' in c) and (tfm.dfs[k][c].dtype == 'object')]
             tfm.dfs[k][cols_rdn] = tfm.dfs[k][cols_rdn].map(self._transform_if_range)
 
-# %% ../../nbs/handlers/tepco.ipynb 25
+# %% ../../nbs/handlers/tepco.ipynb 24
 # Define nuclides-related columns renaming rules
 renaming_rules_rdn = {
     '131I radioactivity concentration (Bq/L)': 'i131',
@@ -112,7 +112,7 @@ renaming_rules_rdn = {
     '105Ru detection limit (Bq/L)': 'ru105_dl'}
 
 
-# %% ../../nbs/handlers/tepco.ipynb 27
+# %% ../../nbs/handlers/tepco.ipynb 26
 class RemapRdnNameCB(Callback):
     "Remap to MARIS radionuclide names"
     def __init__(self,
@@ -124,13 +124,13 @@ class RemapRdnNameCB(Callback):
             tfm.dfs[k].rename(columns=self.renaming_rules, inplace=True)
 
 
-# %% ../../nbs/handlers/tepco.ipynb 31
+# %% ../../nbs/handlers/tepco.ipynb 30
 def time_parser(col):
     day = str(col.iloc[0].date())
     time = str(col.iloc[1])
     return datetime.strptime(day + ' ' + time, '%Y-%m-%d %H:%M:%S')
 
-# %% ../../nbs/handlers/tepco.ipynb 32
+# %% ../../nbs/handlers/tepco.ipynb 31
 class ParseTimeCB(Callback):
     def __init__(self, 
                  fn_parser=time_parser,
@@ -142,12 +142,12 @@ class ParseTimeCB(Callback):
             tfm.dfs[k]['time'] = tfm.dfs[k][self.cols_time].apply(self.fn_parser, axis=1)
             tfm.dfs[k].drop(columns=self.cols_time)
 
-# %% ../../nbs/handlers/tepco.ipynb 35
+# %% ../../nbs/handlers/tepco.ipynb 34
 renaming_rules_cols = {
     'Sampling coordinate North latitude (Decimal)': 'lat',
     'Sampling coordinate East longitude (Decimal)': 'lon'}
 
-# %% ../../nbs/handlers/tepco.ipynb 36
+# %% ../../nbs/handlers/tepco.ipynb 35
 class RenameColumnCB(Callback):
     "Normalizing, renaming columns"
     def __init__(self,
@@ -159,10 +159,10 @@ class RenameColumnCB(Callback):
             tfm.dfs[k].rename(columns=self.renaming_rules, inplace=True)
 
 
-# %% ../../nbs/handlers/tepco.ipynb 39
+# %% ../../nbs/handlers/tepco.ipynb 38
 coi = ['time', 'lat', 'lon'] + list(renaming_rules_rdn.values())
 
-# %% ../../nbs/handlers/tepco.ipynb 40
+# %% ../../nbs/handlers/tepco.ipynb 39
 class SelectColumnsCB(Callback):
     def __init__(self,
                  coi=coi):
@@ -173,13 +173,13 @@ class SelectColumnsCB(Callback):
             tfm.dfs[k] = tfm.dfs[k][self.coi]
 
 
-# %% ../../nbs/handlers/tepco.ipynb 53
+# %% ../../nbs/handlers/tepco.ipynb 52
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Water Quality > Ocean Contaminants']
 
 
-# %% ../../nbs/handlers/tepco.ipynb 54
+# %% ../../nbs/handlers/tepco.ipynb 53
 def get_attrs(tfm, zotero_key, kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[BboxCB(),
                                     # DepthRangeCB(),
@@ -188,11 +188,11 @@ def get_attrs(tfm, zotero_key, kw=kw):
                                     KeyValuePairCB('keywords', ', '.join(kw)),
                                     KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))])()
 
-# %% ../../nbs/handlers/tepco.ipynb 57
+# %% ../../nbs/handlers/tepco.ipynb 56
 # def units_fn(grp_name): 
 #     return 'Bq/l'
 
-# %% ../../nbs/handlers/tepco.ipynb 58
+# %% ../../nbs/handlers/tepco.ipynb 57
 # def encode(fname_in, fname_out, nc_tpl_path):
 #     dfs = load_data(fname_in)
 #     tfm = Transformer(dfs, cbs=[FixMissingValuesCB(),

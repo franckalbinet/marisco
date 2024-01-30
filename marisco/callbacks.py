@@ -4,6 +4,7 @@
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'EncodeTimeCB', 'SanitizeLonLatCB']
 
 # %% ../nbs/api/callbacks.ipynb 2
+import copy
 import fastcore.all as fc
 from operator import attrgetter
 from cftime import date2num
@@ -22,7 +23,8 @@ def run_cbs(cbs, obj=None):
 # %% ../nbs/api/callbacks.ipynb 5
 class Transformer():
     def __init__(self, dfs, cbs=None): 
-        fc.store_attr()
+        self.cbs = cbs
+        self.dfs = {k: v.copy() for k, v in dfs.items()}
         self.logs = []
         
     def callback(self):

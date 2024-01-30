@@ -71,7 +71,6 @@ class ZoteroItem:
     def __init__(self, item_id, cfg):
         self.cfg = cfg
         self.item = self.getItem(item_id)
-        print(self.item)
         
     def getItem(self, item_id):
         zot = zotero.Zotero(self.cfg['lib_id'], 'group', self.cfg['api_key'])

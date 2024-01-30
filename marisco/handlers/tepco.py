@@ -164,9 +164,7 @@ coi = ['time', 'lat', 'lon'] + list(renaming_rules_rdn.values())
 
 # %% ../../nbs/handlers/tepco.ipynb 39
 class SelectColumnsCB(Callback):
-    def __init__(self,
-                 coi=coi):
-        fc.store_attr()
+    def __init__(self, coi=coi): fc.store_attr()
 
     def __call__(self, tfm):
         for k in tfm.dfs.keys():

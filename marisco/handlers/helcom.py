@@ -22,7 +22,6 @@ from ..metadata import (GlobAttrsFeeder, BboxCB,
                               DepthRangeCB, TimeRangeCB,
                               ZoteroCB, KeyValuePairCB)
 
-from ..serializers import to_netcdf
 from ..configs import base_path, nc_tpl_path, cfg
 
 # %% ../../nbs/handlers/helcom.ipynb 8

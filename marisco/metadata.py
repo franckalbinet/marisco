@@ -11,17 +11,18 @@ from pyzotero import zotero
 import json
 
 from .utils import get_bbox, Callback, run_cbs
-from .configs import CONFIGS_CDL, CONFIGS
+from .configs import CONFIGS
 
 # %% ../nbs/api/metadata.ipynb 3
 class GlobAttrsFeeder:
+    "Produce NetCDF global attributes as specified by the callbacks."
     def __init__(self, 
-                 dfs, 
-                 cbs=None, 
-                 attrs=CONFIGS_CDL['global_attrs'], 
-                 logs=[]
+                 dfs:dict, # Dictionary of NetCDF group DataFrames
+                 cbs:list=[], # Callbacks
+                 logs:list=[] # List of preprocessing steps taken
                  ): 
         fc.store_attr()
+        self.attrs = {}
         
     def callback(self):
         run_cbs(self.cbs, self)

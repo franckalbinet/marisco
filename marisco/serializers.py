@@ -18,6 +18,7 @@ class NetCDFEncoder:
                  src_fname:str, # File name and path to the MARIS CDL template
                  dest_fname:str, # Name of output file to produce
                  global_attrs:Dict, # Global attributes
+                 verbose:bool=False, # Print currently written NetCDF group and variable names
                  ):
         store_attr()
         self.enum_types = {}
@@ -25,8 +26,9 @@ class NetCDFEncoder:
 # %% ../nbs/api/serializers.ipynb 7
 @patch 
 def copy_global_attributes(self:NetCDFEncoder):
+    "Update NetCDF template global attributes as specified by `global_attrs` argument."
     self.dest.setncatts(self.src.__dict__)
-    self.dest.setncatts(self.global_attrs)
+    for k, v in self.global_attrs.items(): self.dest.setncattr(k, v)
 
 # %% ../nbs/api/serializers.ipynb 8
 @patch 
@@ -56,8 +58,7 @@ def process_group(self:NetCDFEncoder, group_name, df):
 @patch
 def copy_variables(self:NetCDFEncoder, group_name, df, group_dest):
     for var_name, var_src in self.src.groups[group_name].variables.items():
-        if var_name in df.reset_index().columns:
-            # self.copy_enums()
+        if var_name in df.reset_index().columns: 
             self.copy_variable(var_name, var_src, df, group_dest)
 
 # %% ../nbs/api/serializers.ipynb 13
@@ -65,6 +66,7 @@ def copy_variables(self:NetCDFEncoder, group_name, df, group_dest):
 def copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_dest):
     dtype_name = var_src.datatype.name
     enums_src = self.src.enumtypes
+    if self.verbose: print(f'Group: {group_dest.name}, Variable: {var_name}')
     if dtype_name in enums_src: self._copy_enum_type_if_needed(dtype_name)   
     self._create_and_copy_variable(var_name, var_src, df, group_dest, dtype_name)
     self.copy_variable_attributes(var_name, var_src, group_dest)

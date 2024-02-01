@@ -76,6 +76,7 @@ CONFIGS_CDL = {
         }
     },
     'global_attrs': {
+        # Do not update keys. Only values if required
         'id': '', # zotero?
         'title': '',
         'summary': '',

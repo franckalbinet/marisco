@@ -4,7 +4,7 @@
 __all__ = ['varnames_lut_updates', 'coi_units_unc', 'coi_grp', 'renaming_rules', 'kw', 'load_data', 'rename_cols',
            'LowerStripRdnNameCB', 'get_unique_nuclides', 'get_varnames_lut', 'RemapRdnNameCB', 'ParseTimeCB',
            'fix_units', 'NormalizeUncUnitCB', 'get_species_lut', 'LookupBiotaSpeciesCB', 'RenameColumnCB',
-           'ReshapeLongToWide', 'get_attrs']
+           'ReshapeLongToWide', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb 4
 import pandas as pd
@@ -23,6 +23,7 @@ from ..metadata import (GlobAttrsFeeder, BboxCB,
                               ZoteroCB, KeyValuePairCB)
 
 from ..configs import base_path, nc_tpl_path, cfg
+from ..serializers import NetCDFEncoder
 
 # %% ../../nbs/handlers/helcom.ipynb 8
 def load_data(src_dir,
@@ -130,7 +131,20 @@ class NormalizeUncUnitCB(Callback):
     def fix_units(self, df, meas_col, unc_col):
         return df.apply(lambda row: row[unc_col] * row[meas_col]/100, axis=1)
 
-# %% ../../nbs/handlers/helcom.ipynb 38
+# %% ../../nbs/handlers/helcom.ipynb 35
+class NormalizeUncUnitCB(Callback):
+    "Convert uncertainty from % to activity unit"
+
+    def __init__(self, coi=coi_units_unc): fc.store_attr()
+
+    def __call__(self, tfm):
+        for grp, val, unc in self.coi:
+            tfm.dfs[grp][unc] = self.fix_units(tfm.dfs[grp], val, unc)
+
+    def fix_units(self, df, meas_col, unc_col):
+        return df.apply(lambda row: row[unc_col] * row[meas_col]/100, axis=1)
+
+# %% ../../nbs/handlers/helcom.ipynb 39
 def get_species_lut(fname_in, overwrite=False):
     fname_lut = 'species_helcom.pkl'
     config_path = base_path() / 'lut' / fname_lut
@@ -160,7 +174,7 @@ def get_species_lut(fname_in, overwrite=False):
         
     return lut
 
-# %% ../../nbs/handlers/helcom.ipynb 40
+# %% ../../nbs/handlers/helcom.ipynb 41
 class LookupBiotaSpeciesCB(Callback):
     'Match "RUBIN" species with WorMS db taxon name (AphiaID)'
     def __init__(self, fn_lut): fc.store_attr()
@@ -169,7 +183,7 @@ class LookupBiotaSpeciesCB(Callback):
         tfm.dfs['biota']['species_id'] = tfm.dfs['biota']['RUBIN'].apply(
             lambda x: lut[x.strip()])
 
-# %% ../../nbs/handlers/helcom.ipynb 45
+# %% ../../nbs/handlers/helcom.ipynb 46
 # Define columns of interest by sample type
 coi_grp = {'seawater': ['NUCLIDE', 'VALUE_Bq/m³', 'ERROR%_m³', 'time',
                         'TDEPTH', 'LATITUDE (dddddd)', 'LONGITUDE (dddddd)'],
@@ -181,7 +195,7 @@ coi_grp = {'seawater': ['NUCLIDE', 'VALUE_Bq/m³', 'ERROR%_m³', 'time',
                      'species_id', 'TISSUE']}
 
 
-# %% ../../nbs/handlers/helcom.ipynb 46
+# %% ../../nbs/handlers/helcom.ipynb 47
 # Define column names renaming rules
 renaming_rules = {
     'NUCLIDE': 'nuclide',
@@ -202,7 +216,7 @@ renaming_rules = {
 }
 
 
-# %% ../../nbs/handlers/helcom.ipynb 47
+# %% ../../nbs/handlers/helcom.ipynb 48
 class RenameColumnCB(Callback):
     def __init__(self,
                  coi=coi_grp,
@@ -217,7 +231,7 @@ class RenameColumnCB(Callback):
             # Rename cols
             tfm.dfs[k].rename(columns=self.renaming_rules, inplace=True)
 
-# %% ../../nbs/handlers/helcom.ipynb 50
+# %% ../../nbs/handlers/helcom.ipynb 51
 class ReshapeLongToWide(Callback):
     def __init__(self): fc.store_attr()
 
@@ -251,35 +265,34 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/helcom.ipynb 63
+# %% ../../nbs/handlers/helcom.ipynb 62
 def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
-    return GlobAttrsFeeder(tfm.dfs, cbs=[BboxCB(),
-                                    DepthRangeCB(),
-                                    TimeRangeCB(cfg()),
-                                    ZoteroCB(zotero_key, cfg=cfg()),
-                                    KeyValuePairCB('keywords', ', '.join(kw)),
-                                    KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))])()
+    return GlobAttrsFeeder(tfm.dfs, cbs=[
+        BboxCB(),
+        DepthRangeCB(),
+        TimeRangeCB(cfg()),
+        ZoteroCB(zotero_key, cfg=cfg()),
+        KeyValuePairCB('keywords', ', '.join(kw)),
+        KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
+        ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 66
-# def units_fn(grp_name):
-#     lut = {'seawater': 'Bq/m³',
-#            'sediment': 'Bq/kg',
-#            'biota': 'Bq/kg'}
-#     return lut[grp_name]
-
-# %% ../../nbs/handlers/helcom.ipynb 68
-# def encode(fname_in, fname_out, nc_tpl_path):
-#     dfs = load_data(fname_in)
-#     tfm = Transformer(dfs, cbs=[LowerStripRdnNameCB(),
-#                                 RemapRdnNameCB(),
-#                                 ParseTimeCB(),
-#                                 NormalizeUncUnitCB(),
-#                                 LookupBiotaSpeciesCB(partial(get_species_lut, fname_in)),
-#                                 RenameColumnCB(),
-#                                 ReshapeLongToWide(),
-#                                 EncodeTimeCB(),
-#                                 SanitizeLonLatCB()])
+# %% ../../nbs/handlers/helcom.ipynb 65
+def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
+    dfs = load_data(fname_in)
+    tfm = Transformer(dfs, cbs=[
+        LowerStripRdnNameCB(),
+        RemapRdnNameCB(),
+        ParseTimeCB(),
+        NormalizeUncUnitCB(),
+        LookupBiotaSpeciesCB(partial(get_species_lut, fname_in)),
+        RenameColumnCB(),
+        ReshapeLongToWide(),
+        EncodeTimeCB(cfg()),
+        SanitizeLonLatCB()])
     
-#     dfs_tfm = tfm()
-#     attrs = get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw)
-#     to_netcdf(dfs_tfm, nc_tpl_path(), fname_out, attrs, units_fn)
+    encoder = NetCDFEncoder(tfm(), 
+                            src_fname=nc_tpl_path,
+                            dest_fname=fname_out, 
+                            global_attrs=get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw),
+                            **kwargs)
+    encoder.encode()

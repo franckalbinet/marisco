@@ -18,6 +18,7 @@ class NetCDFEncoder:
                  src_fname:str, # File name and path to the MARIS CDL template
                  dest_fname:str, # Name of output file to produce
                  global_attrs:Dict, # Global attributes
+                 enums_xtra:Dict={}, # Enumeration types to overwrite
                  verbose:bool=False, # Print currently written NetCDF group and variable names
                  ):
         store_attr()
@@ -31,47 +32,41 @@ def copy_global_attributes(self:NetCDFEncoder):
     for k, v in self.global_attrs.items(): self.dest.setncattr(k, v)
 
 # %% ../nbs/api/serializers.ipynb 8
-@patch 
-def copy_enums(self:NetCDFEncoder):
-    "Copy enumeration type from src NetCDF if required"
-    print(self.src.enumtypes)
-
-# %% ../nbs/api/serializers.ipynb 9
 @patch
 def copy_dimensions(self:NetCDFEncoder):
     for name, dimension in self.src.dimensions.items():
         self.dest.createDimension(name, (len(dimension) if not dimension.isunlimited() else None))
 
-# %% ../nbs/api/serializers.ipynb 10
+# %% ../nbs/api/serializers.ipynb 9
 @patch
 def process_groups(self:NetCDFEncoder):
     for grp_name, df in self.dfs.items():
         self.process_group(grp_name, df)
 
-# %% ../nbs/api/serializers.ipynb 11
+# %% ../nbs/api/serializers.ipynb 10
 @patch
 def process_group(self:NetCDFEncoder, group_name, df):
     group_dest = self.dest.createGroup(group_name)
     self.copy_variables(group_name, df, group_dest)
 
-# %% ../nbs/api/serializers.ipynb 12
+# %% ../nbs/api/serializers.ipynb 11
 @patch
 def copy_variables(self:NetCDFEncoder, group_name, df, group_dest):
     for var_name, var_src in self.src.groups[group_name].variables.items():
         if var_name in df.reset_index().columns: 
             self.copy_variable(var_name, var_src, df, group_dest)
 
-# %% ../nbs/api/serializers.ipynb 13
+# %% ../nbs/api/serializers.ipynb 12
 @patch
 def copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_dest):
     dtype_name = var_src.datatype.name
     enums_src = self.src.enumtypes
     if self.verbose: print(f'Group: {group_dest.name}, Variable: {var_name}')
-    if dtype_name in enums_src: self._copy_enum_type_if_needed(dtype_name)   
+    if dtype_name in enums_src: self.copy_enum_type(dtype_name)   
     self._create_and_copy_variable(var_name, var_src, df, group_dest, dtype_name)
     self.copy_variable_attributes(var_name, var_src, group_dest)
 
-# %% ../nbs/api/serializers.ipynb 14
+# %% ../nbs/api/serializers.ipynb 13
 @patch
 def _create_and_copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_dest, dtype_name):
     variable_type = self.enum_types.get(dtype_name, var_src.datatype)
@@ -80,22 +75,23 @@ def _create_and_copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_d
     df_sanitized = self.cast_verbose_rf(df, var_name)
     group_dest[var_name][:] = df_sanitized.values
 
-# %% ../nbs/api/serializers.ipynb 15
+# %% ../nbs/api/serializers.ipynb 14
 @patch
-def _copy_enum_type_if_needed(self:NetCDFEncoder, dtype_name):
+def copy_enum_type(self:NetCDFEncoder, dtype_name):
     if dtype_name not in self.enum_types:
         enum_info = self.src.enumtypes[dtype_name]
-        self.enum_types[dtype_name] = self.dest.createEnumType(enum_info.dtype, enum_info.name, enum_info.enum_dict)
+        if enum_info.name in self.enums_xtra:
+            enum_info.enum_dict = self.enums_xtra[enum_info.name]
+        self.enum_types[dtype_name] = self.dest.createEnumType(enum_info.dtype, 
+                                                               enum_info.name, 
+                                                               enum_info.enum_dict)
 
-# %% ../nbs/api/serializers.ipynb 16
+# %% ../nbs/api/serializers.ipynb 15
 @patch
 def copy_variable_attributes(self:NetCDFEncoder, var_name, var_src, group_dest):
     group_dest[var_name].setncatts(var_src.__dict__)
-    # group_name = group_dest.path.split('/')[-1]
-    # if (hasattr(var_src, 'units') and var_src.units == '_to_be_filled_in_'):
-    #     group_dest[var_name].units = self.units_fn(group_name, var_name)
 
-# %% ../nbs/api/serializers.ipynb 17
+# %% ../nbs/api/serializers.ipynb 16
 @patch
 def cast_verbose_rf(self:NetCDFEncoder, 
                     df, 
@@ -114,7 +110,7 @@ def cast_verbose_rf(self:NetCDFEncoder,
     
     return df_after
 
-# %% ../nbs/api/serializers.ipynb 18
+# %% ../nbs/api/serializers.ipynb 17
 @patch
 def encode(self:NetCDFEncoder):
     "Encode MARIS NetCDF based on template and dataframes."

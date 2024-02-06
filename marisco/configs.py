@@ -35,6 +35,7 @@ CONFIGS = {
     },
     'dirs': {
         'lut': str(base_path() / 'lut'), # Look-up tables
+        'cache': str(base_path() / 'cache'), # Cache (e.f WoRMS species)
         'tmp': str(base_path() / 'tmp')
     },
     'paths': {
@@ -291,9 +292,9 @@ CONFIGS_CDL = {
         },
         {
             'name': 'species_t', 
-            'fname': 'dbo_species.xlsx', 
-            'key': 'species', 
-            'value':'species_id'
+            'fname': 'dbo_species_expanded.xlsx', 
+            'key': 'scientificname', 
+            'value':'AphiaID'
         },
         {
             'name': 'sed_type_t', 
@@ -383,7 +384,10 @@ def get_lut(src_dir:str, # Directory containing lookup tables
             ) -> dict: # MARIS lookup table
     "Convert MARIS db lookup table excel file to dictionary `{'name': id, ...}`."
     fname = Path(src_dir) / fname
-    lut = pd.read_excel(fname, index_col=key, usecols=[key, value])[value].to_dict()
+    df = pd.read_excel(fname, usecols=[key, value]).dropna(subset=value)
+    df[value] = df[value].astype('int')
+    df = df.set_index(key)
+    lut = df[value].to_dict()
     if do_sanitize: lut = {sanitize(k): v for k, v in lut.items()}
     return lut
 

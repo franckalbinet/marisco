@@ -197,9 +197,9 @@ value = "bodypar_id"
 
 [[enums]]
 name = "species_t"
-fname = "dbo_species.xlsx"
-key = "species"
-value = "species_id"
+fname = "dbo_species_expanded.xlsx"
+key = "scientificname"
+value = "AphiaID"
 
 [[enums]]
 name = "sed_type_t"

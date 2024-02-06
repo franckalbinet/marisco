@@ -3,8 +3,8 @@
 # %% auto 0
 __all__ = ['varnames_lut_updates', 'coi_units_unc', 'coi_grp', 'renaming_rules', 'kw', 'load_data', 'rename_cols',
            'LowerStripRdnNameCB', 'get_unique_nuclides', 'get_varnames_lut', 'RemapRdnNameCB', 'ParseTimeCB',
-           'fix_units', 'NormalizeUncUnitCB', 'get_species_lut', 'LookupBiotaSpeciesCB', 'RenameColumnCB',
-           'ReshapeLongToWide', 'get_attrs', 'encode']
+           'fix_units', 'NormalizeUncUnitCB', 'get_worms_species', 'get_species_lut', 'LookupBiotaSpeciesCB',
+           'RenameColumnCB', 'ReshapeLongToWide', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb 4
 import pandas as pd
@@ -65,7 +65,7 @@ class LowerStripRdnNameCB(Callback):
 
 # %% ../../nbs/handlers/helcom.ipynb 20
 def get_unique_nuclides(dfs):
-    "Get list of unique radionuclide types measured across samples"
+    "Get list of unique radionuclide types measured across samples."
     nuclides = []
     for k in dfs.keys():
         nuclides += dfs[k]['NUCLIDE'].unique().tolist()
@@ -89,8 +89,7 @@ def get_varnames_lut(dfs, lut=varnames_lut_updates):
 
 # %% ../../nbs/handlers/helcom.ipynb 25
 class RemapRdnNameCB(Callback):
-    "Remap to MARIS radionuclide names"
-
+    "Remap to MARIS radionuclide names."
     def __init__(self,
                  fn_lut=partial(get_varnames_lut, lut=varnames_lut_updates)):
         fc.store_attr()
@@ -144,7 +143,41 @@ class NormalizeUncUnitCB(Callback):
     def fix_units(self, df, meas_col, unc_col):
         return df.apply(lambda row: row[unc_col] * row[meas_col]/100, axis=1)
 
-# %% ../../nbs/handlers/helcom.ipynb 39
+# %% ../../nbs/handlers/helcom.ipynb 40
+def get_worms_species(fname_in, overwrite=False):
+    fname_lut = 'species_helcom.pkl'
+    # fname_cache = 
+    config_path = base_path() / 'lut' / fname_lut
+    repo_path = Path('../files/lut') / fname_lut
+
+    # if overwrite or (not config_path.exists()):
+    if overwrite:
+        df = pd.read_csv(Path(fname_in) / 'RUBIN_NAME.csv')
+        lut = {}
+        
+        for _, row in tqdm(df[['RUBIN', 'SCIENTIFIC NAME']].iterrows(), total=df.shape[0]):
+            res = match_worms(row['SCIENTIFIC NAME'])
+            if (res == -1):
+                print(f"No match for {row['RUBIN']} ({row['SCIENTIFIC NAME']})")
+                id = -1
+                lut[row['RUBIN']] = {'id': id, 'name': '', 'status': ''}
+            else:
+                if len(res[0]) > 1:
+                    print(f"Several matches for {row['RUBIN']} ({row['SCIENTIFIC NAME']})")
+                    
+                id, name, status = [res[0][0].get(key) 
+                                    for key in ['AphiaID', 'scientificname', 'status']]        
+                
+                lut[row['RUBIN']] = {'id': id, 'name': name, 'status': status}
+            break
+        # fc.save_pickle(config_path, lut)
+        # fc.save_pickle(repo_path, lut)
+    else:
+        lut = fc.load_pickle(config_path)
+        
+    return lut
+
+# %% ../../nbs/handlers/helcom.ipynb 43
 def get_species_lut(fname_in, overwrite=False):
     fname_lut = 'species_helcom.pkl'
     config_path = base_path() / 'lut' / fname_lut
@@ -174,16 +207,16 @@ def get_species_lut(fname_in, overwrite=False):
         
     return lut
 
-# %% ../../nbs/handlers/helcom.ipynb 41
+# %% ../../nbs/handlers/helcom.ipynb 50
 class LookupBiotaSpeciesCB(Callback):
-    'Match "RUBIN" species with WorMS db taxon name (AphiaID)'
+    'Match "RUBIN" species with WorMS db taxon name (AphiaID).'
     def __init__(self, fn_lut): fc.store_attr()
     def __call__(self, tfm):
         lut = self.fn_lut()
         tfm.dfs['biota']['species_id'] = tfm.dfs['biota']['RUBIN'].apply(
             lambda x: lut[x.strip()])
 
-# %% ../../nbs/handlers/helcom.ipynb 46
+# %% ../../nbs/handlers/helcom.ipynb 55
 # Define columns of interest by sample type
 coi_grp = {'seawater': ['NUCLIDE', 'VALUE_Bq/m³', 'ERROR%_m³', 'time',
                         'TDEPTH', 'LATITUDE (dddddd)', 'LONGITUDE (dddddd)'],
@@ -195,7 +228,7 @@ coi_grp = {'seawater': ['NUCLIDE', 'VALUE_Bq/m³', 'ERROR%_m³', 'time',
                      'species_id', 'TISSUE']}
 
 
-# %% ../../nbs/handlers/helcom.ipynb 47
+# %% ../../nbs/handlers/helcom.ipynb 56
 # Define column names renaming rules
 renaming_rules = {
     'NUCLIDE': 'nuclide',
@@ -216,7 +249,7 @@ renaming_rules = {
 }
 
 
-# %% ../../nbs/handlers/helcom.ipynb 48
+# %% ../../nbs/handlers/helcom.ipynb 57
 class RenameColumnCB(Callback):
     def __init__(self,
                  coi=coi_grp,
@@ -231,7 +264,7 @@ class RenameColumnCB(Callback):
             # Rename cols
             tfm.dfs[k].rename(columns=self.renaming_rules, inplace=True)
 
-# %% ../../nbs/handlers/helcom.ipynb 51
+# %% ../../nbs/handlers/helcom.ipynb 60
 class ReshapeLongToWide(Callback):
     def __init__(self): fc.store_attr()
 
@@ -252,7 +285,7 @@ class ReshapeLongToWide(Callback):
             # Set index
             tfm.dfs[k].index.name = 'sample'
 
-# %% ../../nbs/handlers/helcom.ipynb 61
+# %% ../../nbs/handlers/helcom.ipynb 70
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -265,7 +298,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/helcom.ipynb 62
+# %% ../../nbs/handlers/helcom.ipynb 71
 def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -276,7 +309,7 @@ def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 65
+# %% ../../nbs/handlers/helcom.ipynb 74
 def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[

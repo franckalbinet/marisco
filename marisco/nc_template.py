@@ -16,7 +16,8 @@ from pathlib import Path
 import fastcore.all as fc
 from fastcore.basics import patch
 
-from .utils import read_toml
+# from marisco.utils import read_toml
+from .inout import read_toml
 from .configs import name2grp, get_enum_dicts
 
 # %% ../nbs/api/nc_template.ipynb 5

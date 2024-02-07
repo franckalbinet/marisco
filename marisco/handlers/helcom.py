@@ -3,8 +3,9 @@
 # %% auto 0
 __all__ = ['varnames_lut_updates', 'coi_units_unc', 'coi_grp', 'renaming_rules', 'kw', 'load_data', 'rename_cols',
            'LowerStripRdnNameCB', 'get_unique_nuclides', 'get_varnames_lut', 'RemapRdnNameCB', 'ParseTimeCB',
-           'fix_units', 'NormalizeUncUnitCB', 'get_worms_species', 'get_species_lut', 'LookupBiotaSpeciesCB',
-           'RenameColumnCB', 'ReshapeLongToWide', 'get_attrs', 'encode']
+           'fix_units', 'NormalizeUncUnitCB', 'get_worms_species', 'LookupBiotaSpeciesCB', 'get_bodypart',
+           'LookupBiotaBodyPartCB', 'get_sediment', 'LookupSedimentCB', 'RenameColumnCB', 'ReshapeLongToWide',
+           'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb 4
 import pandas as pd
@@ -14,7 +15,8 @@ import fastcore.all as fc
 
 from pathlib import Path
 
-from ..utils import (has_valid_varname, match_worms)
+from ..utils import (has_valid_varname, match_worms, 
+                           match_maris_species, match_maris_sediment)
 from ..callbacks import (Callback, Transformer,
                                EncodeTimeCB, SanitizeLonLatCB)
 
@@ -22,7 +24,7 @@ from ..metadata import (GlobAttrsFeeder, BboxCB,
                               DepthRangeCB, TimeRangeCB,
                               ZoteroCB, KeyValuePairCB)
 
-from ..configs import base_path, nc_tpl_path, cfg
+from ..configs import base_path, nc_tpl_path, cfg, cache_path
 from ..serializers import NetCDFEncoder
 
 # %% ../../nbs/handlers/helcom.ipynb 8
@@ -143,92 +145,100 @@ class NormalizeUncUnitCB(Callback):
     def fix_units(self, df, meas_col, unc_col):
         return df.apply(lambda row: row[unc_col] * row[meas_col]/100, axis=1)
 
-# %% ../../nbs/handlers/helcom.ipynb 40
-def get_worms_species(fname_in, overwrite=False):
-    fname_lut = 'species_helcom.pkl'
-    # fname_cache = 
-    config_path = base_path() / 'lut' / fname_lut
-    repo_path = Path('../files/lut') / fname_lut
+# %% ../../nbs/handlers/helcom.ipynb 41
+def get_worms_species(fname_in, fname_cache, overwrite=False):
+    fname_cache = cache_path() / fname_cache
+    lut = {}
 
-    # if overwrite or (not config_path.exists()):
-    if overwrite:
+    if overwrite or (not fname_cache.exists()):
         df = pd.read_csv(Path(fname_in) / 'RUBIN_NAME.csv')
-        lut = {}
         
         for _, row in tqdm(df[['RUBIN', 'SCIENTIFIC NAME']].iterrows(), total=df.shape[0]):
             res = match_worms(row['SCIENTIFIC NAME'])
             if (res == -1):
                 print(f"No match for {row['RUBIN']} ({row['SCIENTIFIC NAME']})")
                 id = -1
-                lut[row['RUBIN']] = {'id': id, 'name': '', 'status': ''}
+                lut[row['RUBIN']] = {'id': id, 'name': '', 'status': '', 'match_type': ''}
             else:
                 if len(res[0]) > 1:
                     print(f"Several matches for {row['RUBIN']} ({row['SCIENTIFIC NAME']})")
                     
-                id, name, status = [res[0][0].get(key) 
-                                    for key in ['AphiaID', 'scientificname', 'status']]        
+                id, name, status, match_type = [res[0][0].get(key) 
+                                                for key in ['AphiaID', 'scientificname', 'status', 'match_type']]        
                 
-                lut[row['RUBIN']] = {'id': id, 'name': name, 'status': status}
-            break
-        # fc.save_pickle(config_path, lut)
-        # fc.save_pickle(repo_path, lut)
+                lut[row['RUBIN']] = {'id': id, 'name': name, 'status': status, 'match_type': match_type}
+        fc.save_pickle(fname_cache, lut)
     else:
-        lut = fc.load_pickle(config_path)
+        lut = fc.load_pickle(fname_cache)
         
     return lut
 
 # %% ../../nbs/handlers/helcom.ipynb 43
-def get_species_lut(fname_in, overwrite=False):
-    fname_lut = 'species_helcom.pkl'
-    config_path = base_path() / 'lut' / fname_lut
-    repo_path = Path('../files/lut') / fname_lut
-
-    if overwrite or (not config_path.exists()):
-        df = pd.read_csv(Path(fname_in) / 'RUBIN_NAME.csv')
-        lut = {}
-        
-        for _, row in tqdm(df[['RUBIN', 'SCIENTIFIC NAME']].iterrows(), total=df.shape[0]):
-            res = match_worms(row['SCIENTIFIC NAME'])
-            if (res == -1):
-                print(f"No match for {row['RUBIN']} ({row['SCIENTIFIC NAME']})")
-                aphia_id = -1
-            else:
-                if len(res[0]) > 1:
-                    print(
-                        f"Several matches for {row['RUBIN']} ({row['SCIENTIFIC NAME']})")
-                    print(res)
-                aphia_id = res[0][0]['AphiaID']
-
-            lut[row['RUBIN']] = aphia_id
-        fc.save_pickle(config_path, lut)
-        fc.save_pickle(repo_path, lut)
-    else:
-        lut = fc.load_pickle(config_path)
-        
-    return lut
-
-# %% ../../nbs/handlers/helcom.ipynb 50
 class LookupBiotaSpeciesCB(Callback):
     'Match "RUBIN" species with WorMS db taxon name (AphiaID).'
     def __init__(self, fn_lut): fc.store_attr()
     def __call__(self, tfm):
         lut = self.fn_lut()
         tfm.dfs['biota']['species_id'] = tfm.dfs['biota']['RUBIN'].apply(
-            lambda x: lut[x.strip()])
+            lambda x: lut[x.strip()]['id'])
 
-# %% ../../nbs/handlers/helcom.ipynb 55
+# %% ../../nbs/handlers/helcom.ipynb 47
+def get_bodypart():
+    "Naive lut - TO BE REFACTORED"
+    return {
+        5: 52, 1: 1,
+        41: 1, 3: 3,
+        51: 54, 43: 19,
+        42: 59, 12: 20,
+        10: 7, 18: 25,
+        52: 55, 20: 38,
+        8: 12, 54: 57,
+        53: 56}
+
+# %% ../../nbs/handlers/helcom.ipynb 48
+class LookupBiotaBodyPartCB(Callback):
+    'Update bodypart id based on MARIS dbo_bodypar.xlsx'
+    def __init__(self, fn_lut): fc.store_attr()
+    def __call__(self, tfm):
+        lut = self.fn_lut()
+        tfm.dfs['biota']['body_part'] = tfm.dfs['biota']['TISSUE'].apply(lambda x: lut[x])
+
+# %% ../../nbs/handlers/helcom.ipynb 53
+def get_sediment(verbose=False):
+    lut = {}
+    if verbose: print('Source:Destination')
+    # df_sediment = pd.read_csv(Path(fname_in) / 'SEDIMENT_TYPE.csv')
+    for _, row in df_sediment.iterrows():
+        match = match_maris_sediment(row['SEDIMENT TYPE'])
+        lut[row['SEDI']] = match.iloc[0,0]
+        if verbose: print(f'({row["SEDI"]}) {row["SEDIMENT TYPE"]}: ({match.iloc[0,0]}) {match.iloc[0,1]}')
+    return lut        
+
+# %% ../../nbs/handlers/helcom.ipynb 58
+class LookupSedimentCB(Callback):
+    'Update sediment id  based on MARIS dbo_sedtype.xlsx'
+    def __init__(self, fn_lut): fc.store_attr()
+    def __call__(self, tfm):
+        lut = self.fn_lut()
+        tfm.dfs['sediment']['SEDI'] = dfs['sediment']['SEDI'].fillna(-99).astype('int')
+        # To check with Helcom
+        tfm.dfs['sediment']['SEDI'].replace(56, -99, inplace=True)
+        tfm.dfs['sediment']['SEDI'].replace(73, -99, inplace=True)
+        tfm.dfs['sediment']['sed_type'] = tfm.dfs['sediment']['SEDI'].apply(lambda x: lut[x])
+
+# %% ../../nbs/handlers/helcom.ipynb 61
 # Define columns of interest by sample type
 coi_grp = {'seawater': ['NUCLIDE', 'VALUE_Bq/m³', 'ERROR%_m³', 'time',
                         'TDEPTH', 'LATITUDE (dddddd)', 'LONGITUDE (dddddd)'],
            'sediment': ['NUCLIDE', 'VALUE_Bq/kg', 'ERROR%_kg', 'time',
                         'TDEPTH', 'LATITUDE (dddddd)', 'LONGITUDE (dddddd)',
-                        'SEDI'],
+                        'sed_type'],
            'biota': ['NUCLIDE', 'VALUE_Bq/kg', 'ERROR%', 'time',
                      'SDEPTH', 'LATITUDE ddmmmm', 'LONGITUDE ddmmmm',
-                     'species_id', 'TISSUE']}
+                     'species_id', 'body_part']}
 
 
-# %% ../../nbs/handlers/helcom.ipynb 56
+# %% ../../nbs/handlers/helcom.ipynb 62
 # Define column names renaming rules
 renaming_rules = {
     'NUCLIDE': 'nuclide',
@@ -242,14 +252,11 @@ renaming_rules = {
     'LATITUDE (dddddd)': 'lat',
     'LATITUDE ddmmmm': 'lat',
     'LONGITUDE (dddddd)': 'lon',
-    'LONGITUDE ddmmmm': 'lon',
-    # group specific
-    'TISSUE': 'body_part',
-    'SEDI': 'sed_type'
+    'LONGITUDE ddmmmm': 'lon'
 }
 
 
-# %% ../../nbs/handlers/helcom.ipynb 57
+# %% ../../nbs/handlers/helcom.ipynb 63
 class RenameColumnCB(Callback):
     def __init__(self,
                  coi=coi_grp,
@@ -264,7 +271,7 @@ class RenameColumnCB(Callback):
             # Rename cols
             tfm.dfs[k].rename(columns=self.renaming_rules, inplace=True)
 
-# %% ../../nbs/handlers/helcom.ipynb 60
+# %% ../../nbs/handlers/helcom.ipynb 66
 class ReshapeLongToWide(Callback):
     def __init__(self): fc.store_attr()
 
@@ -285,7 +292,7 @@ class ReshapeLongToWide(Callback):
             # Set index
             tfm.dfs[k].index.name = 'sample'
 
-# %% ../../nbs/handlers/helcom.ipynb 70
+# %% ../../nbs/handlers/helcom.ipynb 76
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -298,7 +305,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/helcom.ipynb 71
+# %% ../../nbs/handlers/helcom.ipynb 77
 def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -309,7 +316,7 @@ def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 74
+# %% ../../nbs/handlers/helcom.ipynb 83
 def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[
@@ -317,15 +324,25 @@ def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
         RemapRdnNameCB(),
         ParseTimeCB(),
         NormalizeUncUnitCB(),
-        LookupBiotaSpeciesCB(partial(get_species_lut, fname_in)),
+        LookupBiotaSpeciesCB(partial(get_worms_species, 
+                                     fname_in, 'species_helcom.pkl')),
+        LookupBiotaBodyPartCB(get_bodypart),
+        LookupSedimentCB(get_sediment),
         RenameColumnCB(),
         ReshapeLongToWide(),
         EncodeTimeCB(cfg()),
         SanitizeLonLatCB()])
     
+    species_lut = get_worms_species(fname_in, 'species_helcom.pkl')
+    enums_xtra = {
+        'species_t': {info['name']: info['id'] 
+                      for info in species_lut.values() if info['name'] != ''}
+    }
+    
     encoder = NetCDFEncoder(tfm(), 
                             src_fname=nc_tpl_path,
                             dest_fname=fname_out, 
                             global_attrs=get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw),
+                            enums_xtra=enums_xtra,
                             **kwargs)
     encoder.encode()

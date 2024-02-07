@@ -12,7 +12,8 @@ from fastcore.xtras import mkdir
 from fastcore.style import S
 
 from ..configs import base_path, CONFIGS, CONFIGS_CDL, CFG_FNAME, CDL_FNAME
-from ..utils import write_toml, download_files_in_folder
+from ..inout import write_toml
+from ..utils import download_files_in_folder
 from . import create_nc_template
 
 # %% ../../nbs/cli/init.ipynb 3

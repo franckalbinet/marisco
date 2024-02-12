@@ -193,6 +193,14 @@ CONFIGS_CDL = {
                 },
                 'dtype': 'u8',
             },
+            'area': {
+                'name': 'area',
+                'attrs': {
+                    'long_name': 'Marine area/region id',
+                    'standard_name': 'area_id'
+                },
+                'dtype': 'area_t'
+            },
         },
         'bio': {
             'bio_group': {
@@ -232,7 +240,7 @@ CONFIGS_CDL = {
         },
         'suffixes':  {
             'uncertainty': {
-                'name': '_unc',
+                'name': 'unc',
                 'attrs': {
                     'long_name': ' uncertainty',
                     'standard_name': '_uncertainty'
@@ -240,7 +248,7 @@ CONFIGS_CDL = {
                 'dtype': 'f4'
             },
             'detection_limit': {
-                'name': '_dl',
+                'name': 'dl',
                 'attrs': {
                     'long_name': ' detection limit',
                     'standard_name': '_detection_limit'
@@ -248,15 +256,31 @@ CONFIGS_CDL = {
                 'dtype': 'dl_type_t'
             },
             'volume': {
-                'name': '_vol',
+                'name': 'vol',
                 'attrs': {
                     'long_name': ' volume',
                     'standard_name': '_volume'
                 },
                 'dtype': 'f4'
             },
+            'salinity': {
+                'name': 'sal',
+                'attrs': {
+                    'long_name': ' salinity',
+                    'standard_name': '_sal'
+                },
+                'dtype': 'f4'
+            },
+            'temperature': {
+                'name': 'temp',
+                'attrs': {
+                    'long_name': ' temperature',
+                    'standard_name': '_temp'
+                },
+                'dtype': 'f4'
+            },
             'filtered': {
-                'name': '_filt',
+                'name': 'filt',
                 'attrs': {
                     'long_name': ' filtered',
                     'standard_name': '_filtered'
@@ -264,15 +288,31 @@ CONFIGS_CDL = {
                 'dtype': 'filt_type_t'
             },
             'counting_method': {
-                'name': '_counmet',
+                'name': 'counmet',
                 'attrs': {
                     'long_name': ' counting method',
                     'standard_name': '_counting_method'
                 },
                 'dtype': 'counmet_type_t'
             },
+            'sampling_method': {
+                'name': 'sampmet',
+                'attrs': {
+                    'long_name': ' sampling method',
+                    'standard_name': '_sampling_method'
+                },
+                'dtype': 'sampmet_type_t'
+            },
+            'preparation_method': {
+                'name': 'prepmet',
+                'attrs': {
+                    'long_name': ' preparation method',
+                    'standard_name': '_preparation_method'
+                },
+                'dtype': 'prepmet_type_t'
+            },
             'unit': {
-                'name': '_unit',
+                'name': 'unit',
                 'attrs': {
                     'long_name': ' unit',
                     'standard_name': '_unit'
@@ -282,6 +322,12 @@ CONFIGS_CDL = {
         }
     },
     'enums': [
+        {
+            'name': 'area_t', 
+            'fname': 'dbo_area.xlsx', 
+            'key': 'displayName', 
+            'value':'areaId'
+        },
         {
             'name': 'bio_group_t', 
             'fname': 'dbo_biogroup.xlsx', 

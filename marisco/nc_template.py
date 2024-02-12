@@ -16,7 +16,6 @@ from pathlib import Path
 import fastcore.all as fc
 from fastcore.basics import patch
 
-# from marisco.utils import read_toml
 from .inout import read_toml
 from .configs import name2grp, get_enum_dicts
 
@@ -70,7 +69,7 @@ def derive(
 ) -> dict: # Derived variable name and associated attributes
     "Derive NetCDF nuclide-dependent variable names & attributes as defined in CDL." 
     return {
-        'name': nuclide['name'] + suffix['name'],
+        'name': nuclide['name'] + '_' + suffix['name'],
         'dtype': suffix['dtype'],  # Using dtype from suffix
         'attrs': {key: nuclide['attrs'][key] + suffix['attrs'][key] for key in nuclide['attrs']}
         }

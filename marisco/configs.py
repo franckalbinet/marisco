@@ -253,7 +253,7 @@ CONFIGS_CDL = {
                     'long_name': ' detection limit',
                     'standard_name': '_detection_limit'
                 },
-                'dtype': 'dl_type_t'
+                'dtype': 'dl_t'
             },
             'volume': {
                 'name': 'vol',
@@ -285,7 +285,7 @@ CONFIGS_CDL = {
                     'long_name': ' filtered',
                     'standard_name': '_filtered'
                 },
-                'dtype': 'filt_type_t'
+                'dtype': 'filt_t'
             },
             'counting_method': {
                 'name': 'counmet',
@@ -293,7 +293,7 @@ CONFIGS_CDL = {
                     'long_name': ' counting method',
                     'standard_name': '_counting_method'
                 },
-                'dtype': 'counmet_type_t'
+                'dtype': 'counmet_t'
             },
             'sampling_method': {
                 'name': 'sampmet',
@@ -301,7 +301,7 @@ CONFIGS_CDL = {
                     'long_name': ' sampling method',
                     'standard_name': '_sampling_method'
                 },
-                'dtype': 'sampmet_type_t'
+                'dtype': 'sampmet_t'
             },
             'preparation_method': {
                 'name': 'prepmet',
@@ -309,7 +309,7 @@ CONFIGS_CDL = {
                     'long_name': ' preparation method',
                     'standard_name': '_preparation_method'
                 },
-                'dtype': 'prepmet_type_t'
+                'dtype': 'prepmet_t'
             },
             'unit': {
                 'name': 'unit',
@@ -317,7 +317,7 @@ CONFIGS_CDL = {
                     'long_name': ' unit',
                     'standard_name': '_unit'
                 },
-                'dtype': 'unit_type_t'
+                'dtype': 'unit_t'
             }
         }
     },
@@ -353,34 +353,34 @@ CONFIGS_CDL = {
             'value':'sedtype_id'
         },
         {
-            'name': 'dl_type_t', 
-            'fname': 'dbo_detection.xlsx', 
-            'key': 'detection_name', 
-            'value':'detection_id'
-        },
-        {
-            'name': 'unit_type_t', 
+            'name': 'unit_t', 
             'fname': 'dbo_unit.xlsx', 
             'key': 'unit_sanitized', 
             'value':'unit_id'
         },
         {
-            'name': 'dl_type_t', 
+            'name': 'dl_t', 
             'fname': 'dbo_detectlimit.xlsx', 
             'key': 'name_sanitized', 
             'value':'id'
         },
         {
-            'name': 'filt_type_t', 
+            'name': 'filt_t', 
             'fname': 'dbo_filtered.xlsx', 
             'key': 'name',
             'value':'id'
         },
         {
-            'name': 'counmet_type_t', 
+            'name': 'counmet_t', 
             'fname': 'dbo_counmet.xlsx', 
             'key': 'counmet',
             'value':'counmet_id'
+        },
+        {
+            'name': 'sampmmet_t', 
+            'fname': 'dbo_sampmet.xlsx', 
+            'key': 'sampmet',
+            'value':'sampmet_id'
         }
         ]
 }

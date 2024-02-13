@@ -103,6 +103,14 @@ abbreviation = "Date/Time"
 axis = "T"
 calendar = "gregorian"
 
+[vars.defaults.area]
+name = "area"
+dtype = "area_t"
+
+[vars.defaults.area.attrs]
+long_name = "Marine area/region id"
+standard_name = "area_id"
+
 [vars.bio.bio_group]
 name = "bio_group"
 dtype = "bio_group_t"
@@ -145,7 +153,7 @@ standard_name = "_uncertainty"
 
 [vars.suffixes.detection_limit]
 name = "dl"
-dtype = "dl_type_t"
+dtype = "dl_t"
 
 [vars.suffixes.detection_limit.attrs]
 long_name = " detection limit"
@@ -177,7 +185,7 @@ standard_name = "_temp"
 
 [vars.suffixes.filtered]
 name = "filt"
-dtype = "filt_type_t"
+dtype = "filt_t"
 
 [vars.suffixes.filtered.attrs]
 long_name = " filtered"
@@ -185,19 +193,41 @@ standard_name = "_filtered"
 
 [vars.suffixes.counting_method]
 name = "counmet"
-dtype = "counmet_type_t"
+dtype = "counmet_t"
 
 [vars.suffixes.counting_method.attrs]
 long_name = " counting method"
 standard_name = "_counting_method"
 
+[vars.suffixes.sampling_method]
+name = "sampmet"
+dtype = "sampmet_t"
+
+[vars.suffixes.sampling_method.attrs]
+long_name = " sampling method"
+standard_name = "_sampling_method"
+
+[vars.suffixes.preparation_method]
+name = "prepmet"
+dtype = "prepmet_t"
+
+[vars.suffixes.preparation_method.attrs]
+long_name = " preparation method"
+standard_name = "_preparation_method"
+
 [vars.suffixes.unit]
 name = "unit"
-dtype = "unit_type_t"
+dtype = "unit_t"
 
 [vars.suffixes.unit.attrs]
 long_name = " unit"
 standard_name = "_unit"
+
+[[enums]]
+name = "area_t"
+fname = "dbo_area.xlsx"
+key = "displayName"
+value = "areaId"
 
 [[enums]]
 name = "bio_group_t"
@@ -224,31 +254,31 @@ key = "sedtype"
 value = "sedtype_id"
 
 [[enums]]
-name = "dl_type_t"
-fname = "dbo_detection.xlsx"
-key = "detection_name"
-value = "detection_id"
-
-[[enums]]
-name = "unit_type_t"
+name = "unit_t"
 fname = "dbo_unit.xlsx"
 key = "unit_sanitized"
 value = "unit_id"
 
 [[enums]]
-name = "dl_type_t"
+name = "dl_t"
 fname = "dbo_detectlimit.xlsx"
 key = "name_sanitized"
 value = "id"
 
 [[enums]]
-name = "filt_type_t"
+name = "filt_t"
 fname = "dbo_filtered.xlsx"
 key = "name"
 value = "id"
 
 [[enums]]
-name = "counmet_type_t"
+name = "counmet_t"
 fname = "dbo_counmet.xlsx"
 key = "counmet"
 value = "counmet_id"
+
+[[enums]]
+name = "sampmmet_t"
+fname = "dbo_sampmet.xlsx"
+key = "sampmet"
+value = "sampmet_id"

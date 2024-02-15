@@ -47,7 +47,7 @@ class EncodeTimeCB(Callback):
 
 # %% ../nbs/api/callbacks.ipynb 8
 class SanitizeLonLatCB(Callback):
-    "Drop row when both longitude & latitude equal 0"
+    "Drop row when both longitude & latitude equal 0."
     def __call__(self, tfm):
         tfm.dfs = {grp: (df[(df.lon != 0) & (df.lat != 0)])
                    for grp, df in tfm.dfs.items()}

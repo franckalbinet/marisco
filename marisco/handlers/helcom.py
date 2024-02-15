@@ -349,7 +349,8 @@ def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
         RenameColumnCB(),
         ReshapeLongToWide(),
         EncodeTimeCB(cfg()),
-        SanitizeLonLatCB()])
+        SanitizeLonLatCB()
+        ])
     
     species_lut = get_maris_species(fname_in, 'species_helcom.pkl')
     enums_xtra = {

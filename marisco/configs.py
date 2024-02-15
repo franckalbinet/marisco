@@ -211,11 +211,11 @@ CONFIGS_CDL = {
                 },
                 'dtype': 'bio_group_t'
             },
-            'species_id': {
-                'name': 'species_id',
+            'species': {
+                'name': 'species',
                 'attrs': {  
-                    'long_name': 'Species ID',
-                    'standard_name': 'AphiaID'
+                    'long_name': 'Species',
+                    'standard_name': 'species'
                 },
                 'dtype': 'species_t'
             },
@@ -377,10 +377,16 @@ CONFIGS_CDL = {
             'value':'counmet_id'
         },
         {
-            'name': 'sampmmet_t', 
+            'name': 'sampmet_t', 
             'fname': 'dbo_sampmet.xlsx', 
             'key': 'sampmet',
             'value':'sampmet_id'
+        },
+        {
+            'name': 'prepmet_t', 
+            'fname': 'dbo_prepmet.xlsx', 
+            'key': 'prepmet',
+            'value':'prepmet_id'
         }
         ]
 }

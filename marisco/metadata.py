@@ -47,18 +47,19 @@ class BboxCB(Callback):
 # %% ../nbs/api/metadata.ipynb 5
 class DepthRangeCB(Callback):
     "Compute depth values range"
+    def __init__(self, depth_col='depth'): fc.store_attr()
     def __call__(self, obj):
-        max_depth = pd.concat(obj.dfs).depth.max()
-        min_depth = pd.concat(obj.dfs).depth.min()
-        obj.attrs.update({
-            'geospatial_vertical_max': '0' if min_depth == 0 else str(-min_depth),
-            'geospatial_vertical_min': str(-max_depth)})
+        depths = pd.concat(obj.dfs).get(self.depth_col, default=pd.Series([]))
+        if not depths.empty:
+            max_depth, min_depth = depths.max(), depths.min()
+            obj.attrs.update({
+                'geospatial_vertical_max': '0' if min_depth == 0 else str(-min_depth),
+                'geospatial_vertical_min': str(-max_depth)})
 
 # %% ../nbs/api/metadata.ipynb 6
 class TimeRangeCB(Callback):
     "Compute time values range"
     def __init__(self, cfg): fc.store_attr()
-        
     def __call__(self, obj):
         time = pd.concat(obj.dfs)['time']
         start, end = [num2date(t, units=self.cfg['units']['time']).isoformat() 
@@ -96,7 +97,6 @@ class ZoteroCB(Callback):
     def __init__(self, itemId, cfg): fc.store_attr()
         
     def __call__(self, obj):
-        # item = ZoteroItem(self.itemId, cfg()('zotero'))
         item = ZoteroItem(self.itemId, self.cfg['zotero'])
         for attr in ['title', 'summary', 'creator_name']:
             obj.attrs[attr] = getattr(item, attr)()

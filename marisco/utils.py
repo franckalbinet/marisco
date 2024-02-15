@@ -62,13 +62,11 @@ def has_valid_varname(
 def get_bbox(df,
              coord_cols=('lon', 'lat')
             ):
-    arr = []
-    x, y = coord_cols
-    for index, row in df.iterrows():
-        arr.append((row[x], row[y]))
+    x, y = coord_cols        
+    arr = [(row[x], row[y]) for _, row in df.iterrows()]
     return MultiPoint(arr).envelope
 
-# %% ../nbs/api/utils.ipynb 17
+# %% ../nbs/api/utils.ipynb 19
 def download_files_in_folder(owner:str, 
                              repo:str, 
                              src_dir:str, 
@@ -102,7 +100,7 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
     else:
         print(f"Error: {response.status_code}")
 
-# %% ../nbs/api/utils.ipynb 19
+# %% ../nbs/api/utils.ipynb 21
 def match_worms(
     name:str # Name of species to look up in WoRMS
     ):
@@ -125,7 +123,7 @@ def match_worms(
     else:
         return -1
 
-# %% ../nbs/api/utils.ipynb 25
+# %% ../nbs/api/utils.ipynb 27
 def match_maris_species(
     name:str, # Name of species to look up 
     col_lookup:str='species', # Name of the column where the character strings match
@@ -147,7 +145,7 @@ def match_maris_species(
         results.append(result)
     return pd.DataFrame(results).sort_values(by='score', ascending=True)[:nresults]
 
-# %% ../nbs/api/utils.ipynb 28
+# %% ../nbs/api/utils.ipynb 30
 def match_maris_sediment(
     name:str, # Name of sediment to look up 
     col_lookup:str='sedtype', # Name of the column where the character strings match

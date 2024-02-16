@@ -7,7 +7,7 @@ __all__ = ['GlobAttrsFeeder', 'BboxCB', 'DepthRangeCB', 'TimeRangeCB', 'ZoteroIt
 import pandas as pd
 import fastcore.all as fc
 from cftime import num2date
-from pyzotero import zotero
+from pyzotero import zotero, zotero_errors
 import json
 
 from .utils import get_bbox, Callback, run_cbs
@@ -73,11 +73,17 @@ class ZoteroItem:
     def __init__(self, item_id, cfg):
         self.cfg = cfg
         self.item = self.getItem(item_id)
-        
+    
+    def exist(self): return self.item != None
+    
     def getItem(self, item_id):
         zot = zotero.Zotero(self.cfg['lib_id'], 'group', self.cfg['api_key'])
-        return zot.item(item_id)
-    
+        try:
+            return zot.item(item_id)
+        except zotero_errors.ResourceNotFound:
+            print(f'Item {item_id} does not exist in Zotero library')
+            return None
+            
     def title(self):
         return self.item['data']['title']
     
@@ -85,8 +91,9 @@ class ZoteroItem:
         return self.item['data']['abstractNote']
     
     def creator_name(self):
-        creators = [f'{c["creatorType"]}: {c["name"]}' for c in self.item['data']['creators']]
-        return '; '.join(creators)
+        # creators = [f'{c["creatorType"]}: {c["name"]}' for c in self.item['data']['creators']]
+        # return '; '.join(creators)
+        return self.item['data']['creators']
             
     def __repr__(self):
         return json.dumps(self.item, indent=4) 
@@ -95,13 +102,13 @@ class ZoteroItem:
 class ZoteroCB(Callback):
     "Retrieve Zotero metadata"
     def __init__(self, itemId, cfg): fc.store_attr()
-        
     def __call__(self, obj):
         item = ZoteroItem(self.itemId, self.cfg['zotero'])
-        for attr in ['title', 'summary', 'creator_name']:
-            obj.attrs[attr] = getattr(item, attr)()
+        if item.exist(): 
+            for attr in ['title', 'summary', 'creator_name']:
+                obj.attrs[attr] = getattr(item, attr)()
 
-# %% ../nbs/api/metadata.ipynb 9
+# %% ../nbs/api/metadata.ipynb 12
 class KeyValuePairCB(Callback):
     def __init__(self, k, v): fc.store_attr()
     def __call__(self, obj): obj.attrs[self.k] = self.v

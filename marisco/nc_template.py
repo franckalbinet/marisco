@@ -26,7 +26,8 @@ class NCTemplater:
                  cdl:Dict, # "Pseudo CDL" (`.toml`)
                  nuclide_vars_fname:str, # File name and path of MARIS nuclide lookup table containing variable names
                  tpl_fname:str, # File name and path of NetCDF4 file to be generated
-                 enum_dicts:Dict # MARIS NetCDF enumeration types
+                 enum_dicts:Dict, # MARIS NetCDF enumeration types
+                 verbose=False
                 ):
         fc.store_attr()
         self.dim = cdl['dim']
@@ -79,6 +80,8 @@ def derive(
 def create_enum_types(self:NCTemplater):
     "Create enumeration types"
     for name, enum in self.enum_dicts.items(): 
+        if self.verbose: 
+            print(f'Creating {name} enumeration type')
         self.enum_types[name] = self.nc.createEnumType(np.uint, name, enum)
 
 # %% ../nbs/api/nc_template.ipynb 19

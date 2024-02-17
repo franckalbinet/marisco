@@ -18,6 +18,7 @@ from ..metadata import (GlobAttrsFeeder, BboxCB,
                               DepthRangeCB, TimeRangeCB,
                               ZoteroCB, KeyValuePairCB)
 from ..configs import lut_path, cdl_cfg, cfg, nc_tpl_path
+from ..serializers import NetCDFEncoder
 
 # %% ../../nbs/handlers/maris_dump.ipynb 9
 def load_dump(fname): 
@@ -127,9 +128,9 @@ class DropNAColumnsCB(Callback):
 
 # %% ../../nbs/handlers/maris_dump.ipynb 26
 def get_dl_lut():
-    fname = lut_path() / 'dbo_detection.xlsx'
-    df_nuclide = pd.read_excel(fname, usecols=['previous_name', 'detection_id'])
-    return df_nuclide.set_index('previous_name').to_dict()['detection_id']
+    fname = lut_path() / 'dbo_detectlimit.xlsx'
+    df_nuclide = pd.read_excel(fname, usecols=['name', 'id'])
+    return df_nuclide.set_index('name').to_dict()['id']
 
 # %% ../../nbs/handlers/maris_dump.ipynb 28
 class SanitizeDetectionLimitCB(Callback):
@@ -143,7 +144,7 @@ class SanitizeDetectionLimitCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k]['dl'] = tfm.dfs[k]['dl'].replace(lut)
 
-# %% ../../nbs/handlers/maris_dump.ipynb 31
+# %% ../../nbs/handlers/maris_dump.ipynb 33
 class ReshapeLongToWide(Callback):
     "Convert data from long to wide with renamed columns."
     def __init__(self, value_col='nuclide'):
@@ -166,14 +167,14 @@ class ReshapeLongToWide(Callback):
             tfm.dfs[k].columns = self.renamed_cols(tfm.dfs[k].columns)
             tfm.dfs[k].index.name = 'sample'
 
-# %% ../../nbs/handlers/maris_dump.ipynb 34
+# %% ../../nbs/handlers/maris_dump.ipynb 36
 class EncodeTimeCB(Callback):
     "Encode time as `int` representing seconds since xxx (TBD)."  
     def __call__(self, tfm):
         for k in tfm.dfs.keys():
             tfm.dfs[k].time = 9999
 
-# %% ../../nbs/handlers/maris_dump.ipynb 41
+# %% ../../nbs/handlers/maris_dump.ipynb 43
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -185,7 +186,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/maris_dump.ipynb 42
+# %% ../../nbs/handlers/maris_dump.ipynb 44
 def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -196,35 +197,36 @@ def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/maris_dump.ipynb 44
+# %% ../../nbs/handlers/maris_dump.ipynb 46
 def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
     df = load_dump(fname_in)
     ref_ids = kwargs.get('ref_ids', df.ref_id.unique())
     # for ref_id in tqdm(ref_ids):
+    print('Encoding ...')
     for ref_id in ref_ids:
         dfs = load_data(df, ref_id)
-        print(get_fname(dfs), ': ', get_zotero_key(dfs))
+        print(get_fname(dfs))
         # print(get_fname(dfs))    
-        # tfm = Transformer(dfs, cbs=[
-        #     RemapRdnNameCB(),
-        #     RenameColumnCB(),
-        #     DropNAColumnsCB(),
-        #     SanitizeDetectionLimitCB(),
-        #     ReshapeLongToWide(),
-        #     EncodeTimeCB(),
-        #     SanitizeLonLatCB()
-        #     ])
+        tfm = Transformer(dfs, cbs=[
+            RemapRdnNameCB(),
+            RenameColumnCB(),
+            DropNAColumnsCB(),
+            SanitizeDetectionLimitCB(),
+            ReshapeLongToWide(),
+            EncodeTimeCB(),
+            SanitizeLonLatCB()
+            ])
         
         # species_lut = get_maris_species(fname_in, 'species_helcom.pkl')
         # enums_xtra = {
         #     'species_t': {info['name']: info['id'] 
         #                   for info in species_lut.values() if info['name'] != ''}
         # }
-        
-        # encoder = NetCDFEncoder(tfm(), 
-        #                         src_fname=nc_tpl_path,
-        #                         dest_fname=Paht(fname_out) / get_fname(dfs), 
-        #                         global_attrs=get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw),
-        #                         # enums_xtra=enums_xtra,
-        #                         **kwargs)
-        # encoder.encode()
+        encoder = NetCDFEncoder(tfm(), 
+                                src_fname=nc_tpl_path,
+                                dest_fname=Path(fname_out) / get_fname(dfs), 
+                                global_attrs=get_attrs(tfm, zotero_key=get_zotero_key(dfs), kw=kw),
+                                verbose=kwargs.get('verbose', False)
+                                # enums_xtra=enums_xtra
+                                )
+        encoder.encode()

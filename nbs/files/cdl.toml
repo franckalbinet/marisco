@@ -119,13 +119,13 @@ dtype = "bio_group_t"
 long_name = "Biota group"
 standard_name = "biota_group_tbd"
 
-[vars.bio.species_id]
-name = "species_id"
+[vars.bio.species]
+name = "species"
 dtype = "species_t"
 
-[vars.bio.species_id.attrs]
-long_name = "Species ID"
-standard_name = "AphiaID"
+[vars.bio.species.attrs]
+long_name = "Species"
+standard_name = "species"
 
 [vars.bio.body_part]
 name = "body_part"
@@ -278,7 +278,13 @@ key = "counmet"
 value = "counmet_id"
 
 [[enums]]
-name = "sampmmet_t"
+name = "sampmet_t"
 fname = "dbo_sampmet.xlsx"
 key = "sampmet"
 value = "sampmet_id"
+
+[[enums]]
+name = "prepmet_t"
+fname = "dbo_prepmet.xlsx"
+key = "prepmet"
+value = "prepmet_id"

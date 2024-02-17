@@ -12,15 +12,17 @@ from ..configs import (base_path, cdl_cfg, lut_path,
 
 # %% ../../nbs/cli/create_nc_template.ipynb 2
 @call_parse
-def main():
-    "Create MARIS NetCDF template"
+def main(verbose:bool=False # Verbose
+         ):
+    "Create MARIS NetCDF template, optionally in verbose mode"
     print('Creating MARIS NetCDF template ...')
     cdl = cdl_cfg()
     templater = NCTemplater(cdl=cdl,
                             nuclide_vars_fname=nuc_lut_path(), 
                             tpl_fname=base_path() / nc_tpl_name(),
                             enum_dicts=get_enum_dicts(lut_src_dir=lut_path(), 
-                                                      cdl_enums=cdl['enums'])
+                                                      cdl_enums=cdl['enums']),
+                            verbose=verbose
                             )
 
     templater.generate()

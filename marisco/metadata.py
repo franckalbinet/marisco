@@ -93,7 +93,7 @@ class ZoteroItem:
     def creator_name(self):
         # creators = [f'{c["creatorType"]}: {c["name"]}' for c in self.item['data']['creators']]
         # return '; '.join(creators)
-        return self.item['data']['creators']
+        return json.dumps(self.item['data']['creators'])
             
     def __repr__(self):
         return json.dumps(self.item, indent=4) 

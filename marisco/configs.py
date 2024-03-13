@@ -342,7 +342,7 @@ CONFIGS_CDL = {
         },
         {
             'name': 'species_t', 
-            'fname': 'dbo_species_expanded.xlsx', 
+            'fname': 'dbo_species_cleaned.xlsx', 
             'key': 'species', 
             'value':'species_id'
         },

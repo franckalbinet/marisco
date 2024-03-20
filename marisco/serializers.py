@@ -62,6 +62,7 @@ def copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_dest):
     dtype_name = var_src.datatype.name
     enums_src = self.src.enumtypes
     if self.verbose: print(f'Group: {group_dest.name}, Variable: {var_name}')
+    # if the type of the var is an enum (meaning present in the template src) then create it
     if dtype_name in enums_src: self.copy_enum_type(dtype_name)   
     self._create_and_copy_variable(var_name, var_src, df, group_dest, dtype_name)
     self.copy_variable_attributes(var_name, var_src, group_dest)
@@ -78,8 +79,10 @@ def _create_and_copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_d
 # %% ../nbs/api/serializers.ipynb 14
 @patch
 def copy_enum_type(self:NetCDFEncoder, dtype_name):
+    # if enum type not already created
     if dtype_name not in self.enum_types:
         enum_info = self.src.enumtypes[dtype_name]
+        # if a subset of an enum is defined in enums_xtra (typically for the lengthy species_t)
         if enum_info.name in self.enums_xtra:
             enum_info.enum_dict = self.enums_xtra[enum_info.name]
         self.enum_types[dtype_name] = self.dest.createEnumType(enum_info.dtype, 

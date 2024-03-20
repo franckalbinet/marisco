@@ -4,7 +4,7 @@
 __all__ = ['CFG_FNAME', 'CDL_FNAME', 'NUCLIDE_LOOKUP_FNAME', 'MARISCO_CFG_DIRNAME', 'CONFIGS', 'CONFIGS_CDL',
            'NETCDF_TO_PYTHON_TYPE', 'base_path', 'cfg', 'nuc_lut_path', 'lut_path', 'cache_path', 'cdl_cfg',
            'species_lut_path', 'sediments_lut_path', 'name2grp', 'nc_tpl_name', 'nc_tpl_path', 'sanitize', 'get_lut',
-           'get_enum_dicts']
+           'Enums', 'get_enum_dicts']
 
 # %% ../nbs/api/configs.ipynb 2
 from pathlib import Path
@@ -460,13 +460,33 @@ def get_lut(src_dir:str, # Directory containing lookup tables
     return lut
 
 # %% ../nbs/api/configs.ipynb 37
+class Enums():
+    "Return dictionaries of MARIS NetCDF's enumeration types"
+    def __init__(self, 
+               lut_src_dir:str,
+               cdl_enums:dict
+               ):
+        fc.store_attr()
+        self.types = self.lookup()
+        
+    def filter(self, name, values):
+        return {name: id for name, id in self.types[name].items() if id in values}
+    
+    def lookup(self):
+        types = {}
+        for enum in self.cdl_enums:
+            name, fname, key, value = enum.values()
+            lut = get_lut(self.lut_src_dir, fname, key=key, value=value)
+            types[name] = lut
+        return types
+
+# %% ../nbs/api/configs.ipynb 44
 def get_enum_dicts(
     lut_src_dir:str,
     cdl_enums:dict,
     **kwargs
     ):
-    "Return a dict of NetCDF enumeration types."
-    
+    "Return a dict of NetCDF enumeration types"
     enum_types = {}
     for enum in cdl_enums:
         name, fname, key, value = enum.values()

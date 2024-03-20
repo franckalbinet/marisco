@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['kw', 'load_dump', 'load_data', 'get_zotero_key', 'get_fname', 'get_varnames_lut', 'RemapRdnNameCB', 'renaming_rules',
            'RenameColumnCB', 'DropNAColumnsCB', 'get_dl_lut', 'SanitizeDetectionLimitCB', 'ParseTimeCB',
-           'ReshapeLongToWide', 'get_attrs', 'encode']
+           'ReshapeLongToWide', 'get_attrs', 'enums_xtra', 'encode']
 
 # %% ../../nbs/handlers/maris_dump.ipynb 4
 from tqdm import tqdm
@@ -15,7 +15,7 @@ from ..callbacks import (Callback, Transformer, SanitizeLonLatCB, EncodeTimeCB)
 from ..metadata import (GlobAttrsFeeder, BboxCB,
                               DepthRangeCB, TimeRangeCB,
                               ZoteroCB, KeyValuePairCB)
-from ..configs import lut_path, cdl_cfg, cfg, nc_tpl_path, get_enum_dicts
+from ..configs import lut_path, cdl_cfg, cfg, nc_tpl_path, Enums
 from ..serializers import NetCDFEncoder
 
 # %% ../../nbs/handlers/maris_dump.ipynb 9
@@ -145,23 +145,32 @@ class ParseTimeCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k]['time'] = pd.to_datetime(tfm.dfs[k].time, format='ISO8601')
 
-# %% ../../nbs/handlers/maris_dump.ipynb 39
+# %% ../../nbs/handlers/maris_dump.ipynb 40
 class ReshapeLongToWide(Callback):
     "Convert data from long to wide with renamed columns."
-    def __init__(self, value_col='nuclide'):
+    def __init__(self, columns='nuclide', values=['value']):
         fc.store_attr()
+        # Retrieve all possible derived vars (e.g 'unc', 'dl', ...) from configs
         self.derived_cols = [value['name'] for value in cdl_cfg()['vars']['suffixes'].values()]
     
     def renamed_cols(self, cols):
-        return [f'{inner}_{outer}' if inner else outer for outer, inner in cols]
+        "Flatten columns name"
+        return [inner if outer == "value" else f'{inner}_{outer}'
+                if inner else outer
+                for outer, inner in cols]
 
     def pivot(self, df):
+        # Among all possible 'derived cols' select the ones present in df
         derived_coi = [col for col in self.derived_cols if col in df.columns]
+        
         df.reset_index(names='sample', inplace=True)
-        idx = list(set(df.columns) - set([self.value_col] + derived_coi))
+        
+        idx = list(set(df.columns) - set([self.columns] + derived_coi + self.values))
+        # print('idx: ', idx)
+        # print('derived_coi: ', derived_coi)
         return df.pivot_table(index=idx,
-                              columns=self.value_col,
-                              values=derived_coi,
+                              columns=self.columns,
+                              values=self.values + derived_coi,
                               fill_value=0,
                               aggfunc=lambda x: x
                               ).reset_index()
@@ -173,7 +182,7 @@ class ReshapeLongToWide(Callback):
             # tfm.dfs[k].index.name = 'sample'
             tfm.dfs[k].set_index('sample', inplace=True)
 
-# %% ../../nbs/handlers/maris_dump.ipynb 48
+# %% ../../nbs/handlers/maris_dump.ipynb 49
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -185,7 +194,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/maris_dump.ipynb 49
+# %% ../../nbs/handlers/maris_dump.ipynb 50
 def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -196,7 +205,18 @@ def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/maris_dump.ipynb 51
+# %% ../../nbs/handlers/maris_dump.ipynb 52
+def enums_xtra(tfm, vars):
+    "Retrieve a subset of the lengthy enum as 'species_t' for instance"
+    enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
+    xtras = {}
+    for var in vars:
+        unique_vals = tfm.unique(var)
+        if unique_vals.any():
+            xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
+    return xtras
+
+# %% ../../nbs/handlers/maris_dump.ipynb 53
 def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
     df = load_dump(fname_in)
     ref_ids = kwargs.get('ref_ids', df.ref_id.unique())
@@ -212,19 +232,15 @@ def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
             ParseTimeCB(),
             ReshapeLongToWide(),
             EncodeTimeCB(cfg()),
-            SanitizeLonLatCB()
+            SanitizeLonLatCB(verbose=True)
             ])
-        
-        # species_lut = get_maris_species(fname_in, 'species_helcom.pkl')
-        # enums_xtra = {
-        #     'species_t': {info['name']: info['id'] 
-        #                   for info in species_lut.values() if info['name'] != ''}
-        # }
-        encoder = NetCDFEncoder(tfm(), 
+       
+        tfm()
+        encoder = NetCDFEncoder(tfm.dfs, 
                                 src_fname=nc_tpl_path,
                                 dest_fname=Path(fname_out) / get_fname(dfs), 
                                 global_attrs=get_attrs(tfm, zotero_key=get_zotero_key(dfs), kw=kw),
-                                verbose=kwargs.get('verbose', False)
-                                # enums_xtra=enums_xtra
+                                verbose=kwargs.get('verbose', False),
+                                enums_xtra=enums_xtra(tfm, vars=['species', 'body_part'])
                                 )
         encoder.encode()

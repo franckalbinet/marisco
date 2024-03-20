@@ -8,19 +8,20 @@ import copy
 import fastcore.all as fc
 from operator import attrgetter
 from cftime import date2num
+import numpy as np
 
 from .configs import cfg
 
-# %% ../nbs/api/callbacks.ipynb 3
+# %% ../nbs/api/callbacks.ipynb 4
 class Callback(): order = 0
 
-# %% ../nbs/api/callbacks.ipynb 4
+# %% ../nbs/api/callbacks.ipynb 5
 def run_cbs(cbs, obj=None):
     for cb in sorted(cbs, key=attrgetter('order')):
         if cb.__doc__: obj.logs.append(cb.__doc__)
         cb(obj)
 
-# %% ../nbs/api/callbacks.ipynb 5
+# %% ../nbs/api/callbacks.ipynb 6
 class Transformer():
     def __init__(self, dfs, cbs=None): 
         self.cbs = cbs
@@ -30,24 +31,34 @@ class Transformer():
     def callback(self):
         run_cbs(self.cbs, self)
         
+    def unique(self, col_name):
+        "Distinct values of a specific column present in all groups"
+        columns = [df.get(col_name) for df in self.dfs.values() if df.get(col_name) is not None]
+        values = np.concatenate(columns) if columns else []
+        return np.unique(values)
+        
     def __call__(self):
-        self.callback()
+        if self.cbs: self.callback()
         return self.dfs
 
-# %% ../nbs/api/callbacks.ipynb 7
+# %% ../nbs/api/callbacks.ipynb 11
 class EncodeTimeCB(Callback):
     "Encode time as `int` representing seconds since xxx"    
     def __init__(self, cfg): fc.store_attr()
-    
     def __call__(self, tfm): 
         def format_time(x): return date2num(x, units=self.cfg['units']['time'])
         
         for k in tfm.dfs.keys():
             tfm.dfs[k]['time'] = tfm.dfs[k]['time'].apply(format_time)
 
-# %% ../nbs/api/callbacks.ipynb 8
+# %% ../nbs/api/callbacks.ipynb 12
 class SanitizeLonLatCB(Callback):
     "Drop row when both longitude & latitude equal 0."
+    def __init__(self, verbose=False): fc.store_attr()
     def __call__(self, tfm):
-        tfm.dfs = {grp: (df[(df.lon != 0) & (df.lat != 0)])
-                   for grp, df in tfm.dfs.items()}
+        for grp, df in tfm.dfs.items():
+            mask = (df.lon == 0) & (df.lat == 0)
+            nZeroes = mask.sum()
+            if nZeroes and self.verbose: 
+                print(f'The "{grp}" group contains {nZeroes} data points whose (lon, lat) = (0, 0)')
+            tfm.dfs[grp] = df.loc[~mask]

@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.551">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Data pipeline (handler) to convert global MARIS db dump into NetCDF format">
+
+<title>marisco - MARIS dump</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="marisco - MARIS dump">
+<meta property="og:description" content="Data pipeline (handler) to convert global MARIS db dump into NetCDF format">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="marisco - MARIS dump">
+<meta name="twitter:description" content="Data pipeline (handler) to convert global MARIS db dump into NetCDF format">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">MARIS dump</li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/tepco.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TEPCO</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc_template.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS NetCDF Template</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/serializers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Serializers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Utilities</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#packages-import" id="toc-packages-import" class="nav-link active" data-scroll-target="#packages-import">Packages import</a></li>
+  <li><a href="#utils" id="toc-utils" class="nav-link" data-scroll-target="#utils">Utils</a>
+  <ul class="collapse">
+  <li><a href="#get_fname" id="toc-get_fname" class="nav-link" data-scroll-target="#get_fname">get_fname</a></li>
+  <li><a href="#get_zotero_key" id="toc-get_zotero_key" class="nav-link" data-scroll-target="#get_zotero_key">get_zotero_key</a></li>
+  <li><a href="#load_data" id="toc-load_data" class="nav-link" data-scroll-target="#load_data">load_data</a></li>
+  <li><a href="#load_dump" id="toc-load_dump" class="nav-link" data-scroll-target="#load_dump">load_dump</a></li>
+  </ul></li>
+  <li><a href="#load-data" id="toc-load-data" class="nav-link" data-scroll-target="#load-data">Load data</a></li>
+  <li><a href="#data-transformation-pipeline" id="toc-data-transformation-pipeline" class="nav-link" data-scroll-target="#data-transformation-pipeline">Data transformation pipeline</a>
+  <ul class="collapse">
+  <li><a href="#normalize-nuclide-names" id="toc-normalize-nuclide-names" class="nav-link" data-scroll-target="#normalize-nuclide-names">Normalize nuclide names</a></li>
+  <li><a href="#get_varnames_lut" id="toc-get_varnames_lut" class="nav-link" data-scroll-target="#get_varnames_lut">get_varnames_lut</a></li>
+  <li><a href="#remaprdnnamecb" id="toc-remaprdnnamecb" class="nav-link" data-scroll-target="#remaprdnnamecb">RemapRdnNameCB</a></li>
+  <li><a href="#rename-columns" id="toc-rename-columns" class="nav-link" data-scroll-target="#rename-columns">Rename columns</a></li>
+  <li><a href="#renaming_rules" id="toc-renaming_rules" class="nav-link" data-scroll-target="#renaming_rules">renaming_rules</a></li>
+  <li><a href="#renamecolumncb" id="toc-renamecolumncb" class="nav-link" data-scroll-target="#renamecolumncb">RenameColumnCB</a></li>
+  <li><a href="#drop-nan-only-columns" id="toc-drop-nan-only-columns" class="nav-link" data-scroll-target="#drop-nan-only-columns">Drop NaN only columns</a></li>
+  <li><a href="#dropnacolumnscb" id="toc-dropnacolumnscb" class="nav-link" data-scroll-target="#dropnacolumnscb">DropNAColumnsCB</a></li>
+  <li><a href="#sanitize-detection-limit-values" id="toc-sanitize-detection-limit-values" class="nav-link" data-scroll-target="#sanitize-detection-limit-values">Sanitize detection limit values</a></li>
+  <li><a href="#get_dl_lut" id="toc-get_dl_lut" class="nav-link" data-scroll-target="#get_dl_lut">get_dl_lut</a></li>
+  <li><a href="#sanitizedetectionlimitcb" id="toc-sanitizedetectionlimitcb" class="nav-link" data-scroll-target="#sanitizedetectionlimitcb">SanitizeDetectionLimitCB</a></li>
+  <li><a href="#parse-time" id="toc-parse-time" class="nav-link" data-scroll-target="#parse-time">Parse time</a></li>
+  <li><a href="#parsetimecb" id="toc-parsetimecb" class="nav-link" data-scroll-target="#parsetimecb">ParseTimeCB</a></li>
+  <li><a href="#reshape-long-to-wide" id="toc-reshape-long-to-wide" class="nav-link" data-scroll-target="#reshape-long-to-wide">Reshape: long to wide</a></li>
+  <li><a href="#reshapelongtowide" id="toc-reshapelongtowide" class="nav-link" data-scroll-target="#reshapelongtowide">ReshapeLongToWide</a></li>
+  <li><a href="#encode-time-seconds-since" id="toc-encode-time-seconds-since" class="nav-link" data-scroll-target="#encode-time-seconds-since">Encode time (seconds since …)</a></li>
+  <li><a href="#sanitize-coordinates" id="toc-sanitize-coordinates" class="nav-link" data-scroll-target="#sanitize-coordinates">Sanitize coordinates</a></li>
+  </ul></li>
+  <li><a href="#encode-to-netcdf" id="toc-encode-to-netcdf" class="nav-link" data-scroll-target="#encode-to-netcdf">Encode to NetCDF</a>
+  <ul class="collapse">
+  <li><a href="#get_attrs" id="toc-get_attrs" class="nav-link" data-scroll-target="#get_attrs">get_attrs</a></li>
+  <li><a href="#enums_xtra" id="toc-enums_xtra" class="nav-link" data-scroll-target="#enums_xtra">enums_xtra</a></li>
+  <li><a href="#encode" id="toc-encode" class="nav-link" data-scroll-target="#encode">encode</a></li>
+  <li><a href="#single-dataset" id="toc-single-dataset" class="nav-link" data-scroll-target="#single-dataset">Single dataset</a></li>
+  <li><a href="#all-datasets" id="toc-all-datasets" class="nav-link" data-scroll-target="#all-datasets">All datasets</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">MARIS dump</h1>
+</div>
+
+<div>
+  <div class="description">
+    Data pipeline (handler) to convert global MARIS db dump into <code>NetCDF</code> format
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="packages-import" class="level2">
+<h2 class="anchored" data-anchor-id="packages-import">Packages import</h2>
+<div id="0db45fee" class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload</code></pre>
+</div>
+</div>
+<div id="51f2351f" class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">'display.max_rows'</span>, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="d65ade1e" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="d02bf0a9" class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fname_in = Path().home() / 'pro/data/maris/MARIS_exportSample_20240312_tab2.txt'</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>fname_in <span class="op">=</span> Path().home() <span class="op">/</span> <span class="st">'pro/data/maris/MARIS_exportSample_20240313.txt'</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>dir_dest <span class="op">=</span> <span class="st">'../../_data/output/dump'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="utils" class="level2">
+<h2 class="anchored" data-anchor-id="utils">Utils</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/maris_dump.py#L42" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="get_fname" class="level3">
+<h3 class="anchored" data-anchor-id="get_fname">get_fname</h3>
+<blockquote class="blockquote">
+<pre><code> get_fname (dfs)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/maris_dump.py#L39" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_zotero_key" class="level3">
+<h3 class="anchored" data-anchor-id="get_zotero_key">get_zotero_key</h3>
+<blockquote class="blockquote">
+<pre><code> get_zotero_key (dfs)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L9" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="load_data" class="level3">
+<h3 class="anchored" data-anchor-id="load_data">load_data</h3>
+<blockquote class="blockquote">
+<pre><code> load_data (df:pandas.core.frame.DataFrame, ref_id:int)</code></pre>
+</blockquote>
+<p>Load specific MARIS dataset through its ref_id</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>df</td>
+<td>DataFrame</td>
+<td>MARIS global dump</td>
+</tr>
+<tr class="even">
+<td>ref_id</td>
+<td>int</td>
+<td>Reference id of interest</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/maris_dump.py#L22" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="load_dump" class="level3">
+<h3 class="anchored" data-anchor-id="load_dump">load_dump</h3>
+<blockquote class="blockquote">
+<pre><code> load_dump (fname)</code></pre>
+</blockquote>
+</section>
+</section>
+<section id="load-data" class="level2">
+<h2 class="anchored" data-anchor-id="load-data">Load data</h2>
+<div id="715e849d" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> load_dump(fname_in)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="fb42d376" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ref_id</th>
+<th data-quarto-table-cell-role="th">displaytext</th>
+<th data-quarto-table-cell-role="th">samptype</th>
+<th data-quarto-table-cell-role="th">nuclide_id</th>
+<th data-quarto-table-cell-role="th">latitude</th>
+<th data-quarto-table-cell-role="th">longitude</th>
+<th data-quarto-table-cell-role="th">begperiod</th>
+<th data-quarto-table-cell-role="th">endperiod</th>
+<th data-quarto-table-cell-role="th">sampdepth</th>
+<th data-quarto-table-cell-role="th">totdepth</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">bodypar_id</th>
+<th data-quarto-table-cell-role="th">sedtype_id</th>
+<th data-quarto-table-cell-role="th">volume</th>
+<th data-quarto-table-cell-role="th">salinity</th>
+<th data-quarto-table-cell-role="th">temperatur</th>
+<th data-quarto-table-cell-role="th">sampmet_id</th>
+<th data-quarto-table-cell-role="th">prepmet_id</th>
+<th data-quarto-table-cell-role="th">counmet_id</th>
+<th data-quarto-table-cell-role="th">activity</th>
+<th data-quarto-table-cell-role="th">zoterourl</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>182</td>
+<td>Urban et al., 2015</td>
+<td>Biota</td>
+<td>33</td>
+<td>-35.140833</td>
+<td>117.604444</td>
+<td>2014-05-06 00:00:00</td>
+<td>NaN</td>
+<td>-1.0</td>
+<td>NaN</td>
+<td>...</td>
+<td>52</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>6</td>
+<td>20</td>
+<td>0.387</td>
+<td>https://www.zotero.org/groups/2432820/maris/it...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>182</td>
+<td>Urban et al., 2015</td>
+<td>Biota</td>
+<td>47</td>
+<td>-35.140833</td>
+<td>117.604444</td>
+<td>2014-05-06 00:00:00</td>
+<td>NaN</td>
+<td>-1.0</td>
+<td>NaN</td>
+<td>...</td>
+<td>52</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>6</td>
+<td>5</td>
+<td>1.44</td>
+<td>https://www.zotero.org/groups/2432820/maris/it...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>182</td>
+<td>Urban et al., 2015</td>
+<td>Biota</td>
+<td>31</td>
+<td>-16.466944</td>
+<td>123.535833</td>
+<td>2014-02-27 00:00:00</td>
+<td>NaN</td>
+<td>-1.0</td>
+<td>NaN</td>
+<td>...</td>
+<td>52</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>6</td>
+<td>20</td>
+<td>0.042</td>
+<td>https://www.zotero.org/groups/2432820/maris/it...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>182</td>
+<td>Urban et al., 2015</td>
+<td>Biota</td>
+<td>33</td>
+<td>-16.466944</td>
+<td>123.535833</td>
+<td>2014-02-27 00:00:00</td>
+<td>NaN</td>
+<td>-1.0</td>
+<td>NaN</td>
+<td>...</td>
+<td>52</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>6</td>
+<td>20</td>
+<td>0.075</td>
+<td>https://www.zotero.org/groups/2432820/maris/it...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>182</td>
+<td>Urban et al., 2015</td>
+<td>Biota</td>
+<td>47</td>
+<td>-16.466944</td>
+<td>123.535833</td>
+<td>2014-02-27 00:00:00</td>
+<td>NaN</td>
+<td>-1.0</td>
+<td>NaN</td>
+<td>...</td>
+<td>52</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>6</td>
+<td>5</td>
+<td>0.069</td>
+<td>https://www.zotero.org/groups/2432820/maris/it...</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 26 columns</p>
+</div>
+</div>
+</div>
+</div>
+<div id="a259eafa" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 52, 191 (OSPAR), 100 (HELCOM), 717 (only seawater)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>ref_id <span class="op">=</span> <span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="333c1cc3" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(df, ref_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8efeaaa9" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dfs.keys()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>dict_keys(['biota', 'seawater', 'sediment'])</code></pre>
+</div>
+</div>
+</section>
+<section id="data-transformation-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="data-transformation-pipeline">Data transformation pipeline</h2>
+<section id="normalize-nuclide-names" class="level3">
+<h3 class="anchored" data-anchor-id="normalize-nuclide-names">Normalize nuclide names</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/maris_dump.py#L48" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_varnames_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_varnames_lut">get_varnames_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_varnames_lut ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L116" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="remaprdnnamecb" class="level3">
+<h3 class="anchored" data-anchor-id="remaprdnnamecb">RemapRdnNameCB</h3>
+<blockquote class="blockquote">
+<pre><code> RemapRdnNameCB (fn_lut=&lt;function get_varnames_lut&gt;)</code></pre>
+</blockquote>
+<p>Remap to MARIS radionuclide names.</p>
+<div id="360152cd" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(df, ref_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="92a45542" class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(df, ref_id)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[RemapRdnNameCB()])</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'sediment'</span>][<span class="st">'nuclide_id'</span>].unique())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['ru106' 'sb125' 'cs134' 'cs137' 'k40' 'co60' 'ag110m' 'ra226' 'th232'
+ 'pb212' 'pb214' 'pu238' 'am241' 'pu239_240_tot' 'zr95' 'mn54' 'ac228'
+ 'u235' 'tl208' 'be7' 'bi214' 'ra223' 'ru103' 'sr90' 'eu155' 'ba140'
+ 'co58' 'ra224' 'po210' 'ra228' 'th228' 'ce144' 'cs134_137_tot' 'pb210'
+ 'pu239' 'cd109' 'bi212' 'pu238_240_tot' 'nb95' 'ir192' 'sb124' 'zn65'
+ 'th234' 'pu241']</code></pre>
+</div>
+</div>
+</section>
+<section id="rename-columns" class="level3">
+<h3 class="anchored" data-anchor-id="rename-columns">Rename columns</h3>
+<div id="eef59c5f" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>dfs[<span class="st">'sediment'</span>].columns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Index(['ref_id', 'displaytext', 'samptype', 'nuclide_id', 'latitude',
+       'longitude', 'begperiod', 'endperiod', 'sampdepth', 'totdepth',
+       'uncertaint', 'unit_id', 'detection', 'area_id', 'species_id',
+       'biogroup_id', 'bodypar_id', 'sedtype_id', 'volume', 'salinity',
+       'temperatur', 'sampmet_id', 'prepmet_id', 'counmet_id', 'activity',
+       'zoterourl'],
+      dtype='object')</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/maris_dump.py#L67" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="renaming_rules" class="level3">
+<h3 class="anchored" data-anchor-id="renaming_rules">renaming_rules</h3>
+<blockquote class="blockquote">
+<pre><code> renaming_rules ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L151" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="renamecolumncb" class="level3">
+<h3 class="anchored" data-anchor-id="renamecolumncb">RenameColumnCB</h3>
+<blockquote class="blockquote">
+<pre><code> RenameColumnCB (renaming_rules=&lt;function renaming_rules&gt;)</code></pre>
+</blockquote>
+<p>Renaming variables to MARIS standard names.</p>
+<div id="0ed8c9c6" class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(df, ref_id)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    RemapRdnNameCB(),</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    RenameColumnCB()</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'sediment'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               lat        lon                 time depth       unc unit dl  \
+549778   54.838333        9.9  1989-06-14 00:00:00  -1.0      3.99    4  =   
+549779   54.838333        9.9  1989-06-14 00:00:00  -1.0       NaN    2  =   
+549780   54.838333        9.9  1989-06-14 00:00:00  -1.0     1.674    4  =   
+549781   54.838333        9.9  1989-06-14 00:00:00  -1.0       NaN    2  =   
+549782   54.838333        9.9  1989-06-14 00:00:00  -1.0     1.829    4  =   
+...            ...        ...                  ...   ...       ...  ... ..   
+1532415  57.619722  23.621389  2005-12-02 00:00:00  -1.0   86.2836    4  =   
+1532416  57.619722  23.621389  2005-12-02 00:00:00  -1.0       NaN    2  =   
+1532417  57.619722  23.621389  2005-12-02 00:00:00  -1.0  24.45552    4  =   
+1532418  57.619722  23.621389  2005-12-02 00:00:00  -1.0       NaN    2  =   
+1532419  57.619722  23.621389  2005-12-02 00:00:00  -1.0  123.2568    4  =   
+
+         area species bio_group body_part sed_type  vol  sal temp sampmet  \
+549778   2374       0         0         0       59  NaN  NaN  NaN       0   
+549779   2374       0         0         0       59  NaN  NaN  NaN       0   
+549780   2374       0         0         0       59  NaN  NaN  NaN       0   
+549781   2374       0         0         0       59  NaN  NaN  NaN       0   
+549782   2374       0         0         0       59  NaN  NaN  NaN       0   
+...       ...     ...       ...       ...      ...  ...  ...  ...     ...   
+1532415  2409       0         0         0       58  NaN  NaN  NaN       0   
+1532416  2409       0         0         0       58  NaN  NaN  NaN       0   
+1532417  2409       0         0         0       58  NaN  NaN  NaN       0   
+1532418  2409       0         0         0       58  NaN  NaN  NaN       0   
+1532419  2409       0         0         0       58  NaN  NaN  NaN       0   
+
+        prepmet counmet    value nuclide  
+549778        0       0     26.6   ru106  
+549779        0       0    134.0   sb125  
+549780        0       0     18.6   sb125  
+549781        0       0     42.5   cs134  
+549782        0       0      5.9   cs134  
+...         ...     ...      ...     ...  
+1532415       0       0   1106.2     k40  
+1532416       0       0  991.023   cs137  
+1532417       0       0    550.8   cs137  
+1532418       0       0  2461.36     k40  
+1532419       0       0   1368.0     k40  
+
+[123196 rows x 20 columns]</code></pre>
+</div>
+</div>
+</section>
+<section id="drop-nan-only-columns" class="level3">
+<h3 class="anchored" data-anchor-id="drop-nan-only-columns">Drop NaN only columns</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/maris_dump.py#L107" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="dropnacolumnscb" class="level3">
+<h3 class="anchored" data-anchor-id="dropnacolumnscb">DropNAColumnsCB</h3>
+<blockquote class="blockquote">
+<pre><code> DropNAColumnsCB (na_value=0)</code></pre>
+</blockquote>
+<p>Drop variable containing only NaN or ‘Not available’ (id=0 in MARIS lookup tables).</p>
+<div id="9e0f69f1" class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(df, ref_id)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    RemapRdnNameCB(),</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    RenameColumnCB(),</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    DropNAColumnsCB()</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'sediment'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             lat        lon                 time     unc  unit dl  area  \
+14936 -62.166667 -94.276111  2003-01-31 00:00:00    5.00     4  =  1907   
+14937 -62.166667 -94.276111  2003-01-31 00:00:00  222.00     4  =  1907   
+14938 -62.166667 -94.276111  2003-01-31 00:00:00    0.10     4  =  1907   
+14939 -62.166667 -94.276111  2003-01-31 00:00:00    0.07     4  =  1907   
+14940 -62.166667 -94.276111  2003-01-31 00:00:00   40.00     4  =  1907   
+15080 -62.169444 -58.601944  2003-01-31 00:00:00    0.71     4  =  1907   
+15081 -62.169444 -58.601944  2003-01-31 00:00:00    0.79     4  =  1907   
+15082 -62.172500 -58.546667  2003-01-31 00:00:00    0.50     4  =  1907   
+15083 -62.172500 -58.546667  2003-01-31 00:00:00    0.43     4  =  1907   
+15084 -62.173889 -58.443889  2003-01-31 00:00:00    0.41     4  =  1907   
+15085 -62.173889 -58.443889  2003-01-31 00:00:00    0.47     4  =  1907   
+15086 -62.190556 -58.610556  2003-01-31 00:00:00    0.63     4  =  1907   
+15087 -62.190556 -58.610556  2003-01-31 00:00:00    0.72     4  =  1907   
+15088 -62.222500 -58.411667  2003-01-31 00:00:00    0.53     4  =  1907   
+15089 -62.222500 -58.411667  2003-01-31 00:00:00    0.29     4  =  1907   
+15090 -62.086944 -58.369444  2003-01-31 00:00:00    0.60     4  =  1907   
+15091 -62.086944 -58.369444  2003-01-31 00:00:00    0.79     4  =  1907   
+15092 -62.088611 -58.386944  2003-01-31 00:00:00    0.53     4  =  1907   
+15093 -62.088611 -58.386944  2003-01-31 00:00:00    0.93     4  =  1907   
+15094 -62.091111 -58.464722  2003-01-31 00:00:00    0.52     4  =  1907   
+15095 -62.091111 -58.464722  2003-01-31 00:00:00    0.79     4  =  1907   
+15096 -62.095556 -58.392778  2003-01-31 00:00:00    0.68     4  =  1907   
+15097 -62.095556 -58.392778  2003-01-31 00:00:00    0.54     4  =  1907   
+15098 -62.097222 -58.331389  2003-01-31 00:00:00    0.59     4  =  1907   
+15099 -62.097222 -58.331389  2003-01-31 00:00:00    0.58     4  =  1907   
+15100 -62.084722 -58.388333  2003-01-31 00:00:00    0.57     4  =  1907   
+15101 -62.084722 -58.388333  2003-01-31 00:00:00    0.76     4  =  1907   
+15102 -62.131389 -58.410833  2003-01-31 00:00:00    0.52     4  =  1907   
+15103 -62.131389 -58.410833  2003-01-31 00:00:00    0.90     4  =  1907   
+15104 -62.157500 -58.490833  2003-01-31 00:00:00    0.44     4  =  1907   
+15105 -62.158333 -58.461389  2003-01-31 00:00:00    0.41     4  =  1907   
+15106 -62.158333 -58.461389  2003-01-31 00:00:00    0.40     4  =  1907   
+15107 -62.160556 -58.368056  2003-01-31 00:00:00    0.44     4  =  1907   
+15108 -62.160556 -58.368056  2003-01-31 00:00:00    0.47     4  =  1907   
+15109 -62.166667 -94.276111  2003-01-31 00:00:00   44.00     4  =  1907   
+15110 -62.166667 -94.276111  2003-01-31 00:00:00    8.00     4  =  1907   
+
+       sed_type  sampmet  prepmet  counmet   value nuclide  
+14936         0        5        7       20   17.00   ra228  
+14937         0        5        7       20  612.00     k40  
+14938         0        5        7       20    0.30   pu238  
+14939         0        5        7       20    0.19   pu239  
+14940         0        5        7       20   31.00    sr90  
+15080        12        5        7       26   24.44   th232  
+15081        12        5        7       26   27.28    u238  
+15082         6        5        7       26   17.11   th232  
+15083         6        5        7       26   14.88    u238  
+15084         0        5        7       26   14.26   th232  
+15085         0        5        7       26   16.12    u238  
+15086         2        5        7       26   21.59   th232  
+15087         2        5        7       26   24.80    u238  
+15088         6        5        7       26   18.33   th232  
+15089         6        5        7       26    9.92    u238  
+15090        12        5        7       26   20.77   th232  
+15091        12        5        7       26   27.28    u238  
+15092        12        5        7       26   18.33   th232  
+15093        12        5        7       26   32.24    u238  
+15094         6        5        7       26   17.92   th232  
+15095         6        5        7       26   27.28    u238  
+15096        12        5        7       26   23.56    u238  
+15097        12        5        7       26   18.74   th232  
+15098        12        5        7       26   20.37   th232  
+15099        12        5        7       26   19.84    u238  
+15100        12        5        7       26   19.55   th232  
+15101        12        5        7       26   26.04    u238  
+15102         6        5        7       26   17.92   th232  
+15103         6        5        7       26   31.00    u238  
+15104         0        5        7       26   15.07   th232  
+15105         6        5        7       26   14.26   th232  
+15106         6        5        7       26   13.64    u238  
+15107         0        5        7       26   15.07   th232  
+15108         0        5        7       26   16.12    u238  
+15109         0        5        7       20  105.00   pb210  
+15110         0        5        7       20   21.00   ra226  </code></pre>
+</div>
+</div>
+</section>
+<section id="sanitize-detection-limit-values" class="level3">
+<h3 class="anchored" data-anchor-id="sanitize-detection-limit-values">Sanitize detection limit values</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/maris_dump.py#L125" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_dl_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_dl_lut">get_dl_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_dl_lut ()</code></pre>
+</blockquote>
+<div id="bbef9550" class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>get_dl_lut()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'Not Available': 0, '=': 1, '&lt;': 2, 'ND': 3, 'DE': 4}</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/maris_dump.py#L131" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="sanitizedetectionlimitcb" class="level3">
+<h3 class="anchored" data-anchor-id="sanitizedetectionlimitcb">SanitizeDetectionLimitCB</h3>
+<blockquote class="blockquote">
+<pre><code> SanitizeDetectionLimitCB (fn_lut=&lt;function get_dl_lut&gt;)</code></pre>
+</blockquote>
+<p>Assign Detection Limit name to its id based on MARIS nomenclature.</p>
+<div id="e71200b5" class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(df, ref_id)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    RemapRdnNameCB(),</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    RenameColumnCB(),</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    DropNAColumnsCB(),</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    SanitizeDetectionLimitCB()</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'sediment'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               lat        lon                 time depth       unc unit  dl  \
+549778   54.838333        9.9  1989-06-14 00:00:00  -1.0      3.99    4   1   
+549779   54.838333        9.9  1989-06-14 00:00:00  -1.0       NaN    2   1   
+549780   54.838333        9.9  1989-06-14 00:00:00  -1.0     1.674    4   1   
+549781   54.838333        9.9  1989-06-14 00:00:00  -1.0       NaN    2   1   
+549782   54.838333        9.9  1989-06-14 00:00:00  -1.0     1.829    4   1   
+...            ...        ...                  ...   ...       ...  ...  ..   
+1532415  57.619722  23.621389  2005-12-02 00:00:00  -1.0   86.2836    4   1   
+1532416  57.619722  23.621389  2005-12-02 00:00:00  -1.0       NaN    2   1   
+1532417  57.619722  23.621389  2005-12-02 00:00:00  -1.0  24.45552    4   1   
+1532418  57.619722  23.621389  2005-12-02 00:00:00  -1.0       NaN    2   1   
+1532419  57.619722  23.621389  2005-12-02 00:00:00  -1.0  123.2568    4   1   
+
+         area sed_type sampmet prepmet    value nuclide  
+549778   2374       59       0       0     26.6   ru106  
+549779   2374       59       0       0    134.0   sb125  
+549780   2374       59       0       0     18.6   sb125  
+549781   2374       59       0       0     42.5   cs134  
+549782   2374       59       0       0      5.9   cs134  
+...       ...      ...     ...     ...      ...     ...  
+1532415  2409       58       0       0   1106.2     k40  
+1532416  2409       58       0       0  991.023   cs137  
+1532417  2409       58       0       0    550.8   cs137  
+1532418  2409       58       0       0  2461.36     k40  
+1532419  2409       58       0       0   1368.0     k40  
+
+[123196 rows x 13 columns]</code></pre>
+</div>
+</div>
+</section>
+<section id="parse-time" class="level3">
+<h3 class="anchored" data-anchor-id="parse-time">Parse time</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L134" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="parsetimecb" class="level3">
+<h3 class="anchored" data-anchor-id="parsetimecb">ParseTimeCB</h3>
+<blockquote class="blockquote">
+<pre><code> ParseTimeCB ()</code></pre>
+</blockquote>
+<p>Initialize self. See help(type(self)) for accurate signature.</p>
+<div id="3ebcdf32" class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(df, ref_id)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    RemapRdnNameCB(),</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    RenameColumnCB(),</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    DropNAColumnsCB(),</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    SanitizeDetectionLimitCB(),</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    ParseTimeCB()</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'sediment'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               lat        lon       time depth       unc unit  dl  area  \
+549778   54.838333        9.9 1989-06-14  -1.0      3.99    4   1  2374   
+549779   54.838333        9.9 1989-06-14  -1.0       NaN    2   1  2374   
+549780   54.838333        9.9 1989-06-14  -1.0     1.674    4   1  2374   
+549781   54.838333        9.9 1989-06-14  -1.0       NaN    2   1  2374   
+549782   54.838333        9.9 1989-06-14  -1.0     1.829    4   1  2374   
+...            ...        ...        ...   ...       ...  ...  ..   ...   
+1532415  57.619722  23.621389 2005-12-02  -1.0   86.2836    4   1  2409   
+1532416  57.619722  23.621389 2005-12-02  -1.0       NaN    2   1  2409   
+1532417  57.619722  23.621389 2005-12-02  -1.0  24.45552    4   1  2409   
+1532418  57.619722  23.621389 2005-12-02  -1.0       NaN    2   1  2409   
+1532419  57.619722  23.621389 2005-12-02  -1.0  123.2568    4   1  2409   
+
+        sed_type sampmet prepmet    value nuclide  
+549778        59       0       0     26.6   ru106  
+549779        59       0       0    134.0   sb125  
+549780        59       0       0     18.6   sb125  
+549781        59       0       0     42.5   cs134  
+549782        59       0       0      5.9   cs134  
+...          ...     ...     ...      ...     ...  
+1532415       58       0       0   1106.2     k40  
+1532416       58       0       0  991.023   cs137  
+1532417       58       0       0    550.8   cs137  
+1532418       58       0       0  2461.36     k40  
+1532419       58       0       0   1368.0     k40  
+
+[123196 rows x 13 columns]</code></pre>
+</div>
+</div>
+</section>
+<section id="reshape-long-to-wide" class="level3">
+<h3 class="anchored" data-anchor-id="reshape-long-to-wide">Reshape: long to wide</h3>
+<div id="96b85c6a" class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span>([<span class="st">'a'</span>, <span class="st">'b'</span>] <span class="op">+</span> [<span class="st">'c'</span>, <span class="st">'b'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'a', 'b', 'c'}</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/maris_dump.py#L149" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="reshapelongtowide" class="level3">
+<h3 class="anchored" data-anchor-id="reshapelongtowide">ReshapeLongToWide</h3>
+<blockquote class="blockquote">
+<pre><code> ReshapeLongToWide (columns='nuclide', values=['value'])</code></pre>
+</blockquote>
+<p>Convert data from long to wide with renamed columns.</p>
+<div id="7328389e" class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(df, ref_id)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    RemapRdnNameCB(),</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    RenameColumnCB(),</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    DropNAColumnsCB(),</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    SanitizeDetectionLimitCB(),</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    ParseTimeCB(),</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    ReshapeLongToWide()</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'sediment'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         sed_type       time  depth        lon  area        lat  ac228_dl  \
+sample                                                                      
+630057          0 1984-06-03   -1.0  14.418333  2401  54.333333         0   
+630058          0 1984-06-03   -1.0  14.418333  2401  54.333333         0   
+630059          0 1984-06-03   -1.0  14.418333  2401  54.333333         0   
+630060          0 1984-06-03   -1.0  14.418333  2401  54.333333         0   
+630061          0 1984-06-03   -1.0  14.418333  2401  54.333333         0   
+...           ...        ...    ...        ...   ...        ...       ...   
+1456914        62 1998-09-23   -1.0  12.250000  2401  54.583333         0   
+1484005        62 1998-09-23   -1.0  12.250000  2401  54.583333         0   
+1484006        62 1998-09-23   -1.0  12.250000  2401  54.583333         0   
+1484007        62 1998-09-23   -1.0  12.250000  2401  54.583333         0   
+1484008        62 1998-09-23   -1.0  12.250000  2401  54.583333         0   
+
+         ag110m_dl  am241_dl  ba140_dl  ...  sb124  sb125  sr90  th228  th232  \
+sample                                  ...                                     
+630057           0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+630058           0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+630059           0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+630060           0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+630061           0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+...            ...       ...       ...  ...    ...    ...   ...    ...    ...   
+1456914          0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+1484005          0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+1484006          0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+1484007          0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+1484008          0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+
+         th234  tl208  u235  zn65  zr95  
+sample                                   
+630057     0.0    0.0   0.0   0.0   0.0  
+630058     0.0    0.0   0.0   0.0   0.0  
+630059     0.0    0.0   0.0   0.0   0.0  
+630060     0.0    0.0   0.0   0.0   0.0  
+630061     0.0    0.0   0.0   0.0   0.0  
+...        ...    ...   ...   ...   ...  
+1456914    0.0    0.0   0.0   0.0   0.0  
+1484005    0.0    0.0   0.0   0.0   0.0  
+1484006    0.0    0.0   0.0   0.0   0.0  
+1484007    0.0    0.0   0.0   0.0   0.0  
+1484008    0.0    0.0   0.0   0.0   0.0  
+
+[123196 rows x 270 columns]</code></pre>
+</div>
+</div>
+</section>
+<section id="encode-time-seconds-since" class="level3">
+<h3 class="anchored" data-anchor-id="encode-time-seconds-since">Encode time (seconds since …)</h3>
+<div id="73e0ef14" class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(df, ref_id)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    RemapRdnNameCB(),</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    RenameColumnCB(),</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    DropNAColumnsCB(),</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    SanitizeDetectionLimitCB(),</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>    ParseTimeCB(),</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>    ReshapeLongToWide(),</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>    EncodeTimeCB(cfg())</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'sediment'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         sed_type       time  depth        lon  area        lat  ac228_dl  \
+sample                                                                      
+630057          0  455068800   -1.0  14.418333  2401  54.333333         0   
+630058          0  455068800   -1.0  14.418333  2401  54.333333         0   
+630059          0  455068800   -1.0  14.418333  2401  54.333333         0   
+630060          0  455068800   -1.0  14.418333  2401  54.333333         0   
+630061          0  455068800   -1.0  14.418333  2401  54.333333         0   
+...           ...        ...    ...        ...   ...        ...       ...   
+1456914        62  906508800   -1.0  12.250000  2401  54.583333         0   
+1484005        62  906508800   -1.0  12.250000  2401  54.583333         0   
+1484006        62  906508800   -1.0  12.250000  2401  54.583333         0   
+1484007        62  906508800   -1.0  12.250000  2401  54.583333         0   
+1484008        62  906508800   -1.0  12.250000  2401  54.583333         0   
+
+         ag110m_dl  am241_dl  ba140_dl  ...  sb124  sb125  sr90  th228  th232  \
+sample                                  ...                                     
+630057           0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+630058           0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+630059           0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+630060           0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+630061           0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+...            ...       ...       ...  ...    ...    ...   ...    ...    ...   
+1456914          0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+1484005          0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+1484006          0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+1484007          0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+1484008          0         0         0  ...    0.0    0.0   0.0    0.0    0.0   
+
+         th234  tl208  u235  zn65  zr95  
+sample                                   
+630057     0.0    0.0   0.0   0.0   0.0  
+630058     0.0    0.0   0.0   0.0   0.0  
+630059     0.0    0.0   0.0   0.0   0.0  
+630060     0.0    0.0   0.0   0.0   0.0  
+630061     0.0    0.0   0.0   0.0   0.0  
+...        ...    ...   ...   ...   ...  
+1456914    0.0    0.0   0.0   0.0   0.0  
+1484005    0.0    0.0   0.0   0.0   0.0  
+1484006    0.0    0.0   0.0   0.0   0.0  
+1484007    0.0    0.0   0.0   0.0   0.0  
+1484008    0.0    0.0   0.0   0.0   0.0  
+
+[123196 rows x 270 columns]</code></pre>
+</div>
+</div>
+</section>
+<section id="sanitize-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="sanitize-coordinates">Sanitize coordinates</h3>
+<div id="80141e2a" class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(df, ref_id)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    RemapRdnNameCB(),</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    RenameColumnCB(),</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    DropNAColumnsCB(),</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    SanitizeDetectionLimitCB(),</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    ParseTimeCB(),</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>    ReshapeLongToWide(),</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>    EncodeTimeCB(cfg()),</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>    SanitizeLonLatCB()</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a><span class="co"># print(tfm()['sediment'])</span></span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>df_debug <span class="op">=</span> tfm()[<span class="st">'sediment'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="encode-to-netcdf" class="level2">
+<h2 class="anchored" data-anchor-id="encode-to-netcdf">Encode to NetCDF</h2>
+<div id="c55f5ef3" class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(df, ref_id)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    RemapRdnNameCB(),</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    RenameColumnCB(),</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    DropNAColumnsCB(),</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    SanitizeDetectionLimitCB(),</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>    ParseTimeCB(),</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>    ReshapeLongToWide(),</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>    EncodeTimeCB(cfg()),</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>    SanitizeLonLatCB()</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>dfs_tfm <span class="op">=</span> tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="640925a3" class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>tfm.logs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>['Remap to MARIS radionuclide names.',
+ 'Renaming variables to MARIS standard names.',
+ "Drop variable containing only NaN or 'Not available' (id=0 in MARIS lookup tables).",
+ 'Assign Detection Limit name to its id based on MARIS nomenclature.',
+ 'Convert data from long to wide with renamed columns.',
+ 'Encode time as `int` representing seconds since xxx',
+ 'Drop row when both longitude &amp; latitude equal 0.']</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L181" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="get_attrs" class="level3">
+<h3 class="anchored" data-anchor-id="get_attrs">get_attrs</h3>
+<blockquote class="blockquote">
+<pre><code> get_attrs (tfm, zotero_key='26VMZZ2Q', kw=['oceanography', 'Earth Science
+            &gt; Oceans &gt; Ocean Chemistry&gt; Radionuclides', 'Earth Science &gt;
+            Human Dimensions &gt; Environmental Impacts &gt; Nuclear Radiation
+            Exposure', 'Earth Science &gt; Oceans &gt; Ocean Chemistry &gt; Ocean
+            Tracers, Earth Science &gt; Oceans &gt; Marine Sediments', 'Earth
+            Science &gt; Oceans &gt; Ocean Chemistry, Earth Science &gt; Oceans &gt;
+            Sea Ice &gt; Isotopes', 'Earth Science &gt; Oceans &gt; Water Quality &gt;
+            Ocean Contaminants', 'Earth Science &gt; Biological
+            Classification &gt; Animals/Vertebrates &gt; Fish', 'Earth Science &gt;
+            Biosphere &gt; Ecosystems &gt; Marine Ecosystems', 'Earth Science &gt;
+            Biological Classification &gt; Animals/Invertebrates &gt; Mollusks',
+            'Earth Science &gt; Biological Classification &gt;
+            Animals/Invertebrates &gt; Arthropods &gt; Crustaceans', 'Earth
+            Science &gt; Biological Classification &gt; Plants &gt; Macroalgae
+            (Seaweeds)'])</code></pre>
+</blockquote>
+<div id="6385d9e3" class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>get_attrs(tfm, zotero_key<span class="op">=</span><span class="st">'3W354SQG'</span>, kw<span class="op">=</span>kw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'geospatial_lat_min': '-125.49983',
+ 'geospatial_lat_max': '50.002',
+ 'geospatial_lon_min': '-145.00116',
+ 'geospatial_lon_max': '48.574',
+ 'geospatial_bounds': 'POLYGON ((-145.00116 48.574, -125.49983 48.574, -125.49983 50.002, -145.00116 50.002, -145.00116 48.574))',
+ 'geospatial_vertical_max': '-2.1',
+ 'geospatial_vertical_min': '-1001.6',
+ 'time_coverage_start': '2011-06-05T00:00:00',
+ 'time_coverage_end': '2019-08-25T00:00:00',
+ 'title': 'Radioactivity Monitoring of the Irish Marine Environment 1991 and 1992',
+ 'summary': '',
+ 'creator_name': '[{"creatorType": "author", "firstName": "A.", "lastName": "McGarry"}, {"creatorType": "author", "firstName": "S.", "lastName": "Lyons"}, {"creatorType": "author", "firstName": "C.", "lastName": "McEnri"}, {"creatorType": "author", "firstName": "T.", "lastName": "Ryan"}, {"creatorType": "author", "firstName": "M.", "lastName": "O\'Colmain"}, {"creatorType": "author", "firstName": "J.D.", "lastName": "Cunningham"}]',
+ 'keywords': 'oceanography, Earth Science &gt; Oceans &gt; Ocean Chemistry&gt; Radionuclides, Earth Science &gt; Human Dimensions &gt; Environmental Impacts &gt; Nuclear Radiation Exposure, Earth Science &gt; Oceans &gt; Ocean Chemistry &gt; Ocean Tracers, Earth Science &gt; Oceans &gt; Marine Sediments, Earth Science &gt; Oceans &gt; Ocean Chemistry, Earth Science &gt; Oceans &gt; Sea Ice &gt; Isotopes, Earth Science &gt; Oceans &gt; Water Quality &gt; Ocean Contaminants, Earth Science &gt; Biological Classification &gt; Animals/Vertebrates &gt; Fish, Earth Science &gt; Biosphere &gt; Ecosystems &gt; Marine Ecosystems, Earth Science &gt; Biological Classification &gt; Animals/Invertebrates &gt; Mollusks, Earth Science &gt; Biological Classification &gt; Animals/Invertebrates &gt; Arthropods &gt; Crustaceans, Earth Science &gt; Biological Classification &gt; Plants &gt; Macroalgae (Seaweeds)',
+ 'publisher_postprocess_logs': "Remap to MARIS radionuclide names., Renaming variables to MARIS standard names., Drop variable containing only NaN or 'Not available' (id=0 in MARIS lookup tables)., Assign Detection Limit name to its id based on MARIS nomenclature., Convert data from long to wide with renamed columns., Encode time as `int` representing seconds since xxx, Drop row when both longitude &amp; latitude equal 0."}</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/maris_dump.py#L209" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="enums_xtra" class="level3">
+<h3 class="anchored" data-anchor-id="enums_xtra">enums_xtra</h3>
+<blockquote class="blockquote">
+<pre><code> enums_xtra (tfm, vars)</code></pre>
+</blockquote>
+<p>Retrieve a subset of the lengthy enum as ‘species_t’ for instance</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/maris_dump.py#L220" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="encode" class="level3">
+<h3 class="anchored" data-anchor-id="encode">encode</h3>
+<blockquote class="blockquote">
+<pre><code> encode (fname_in, fname_out, nc_tpl_path, **kwargs)</code></pre>
+</blockquote>
+</section>
+<section id="single-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="single-dataset">Single dataset</h3>
+<div id="11578c2d" class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>            RemapRdnNameCB(),</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>            RenameColumnCB(),</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>            DropNAColumnsCB(),</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>            SanitizeDetectionLimitCB(),</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>            ParseTimeCB(),</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>            ReshapeLongToWide(),</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>            EncodeTimeCB(cfg()),</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>            SanitizeLonLatCB(verbose<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>            ])</span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'biota':                value        time  depth  bio_group        lon  area  \
+ sample                                                                
+ 662144      0.000000  1537401600   -1.0          4  14.500000  2401   
+ 1496956     0.000000  1537401600   -1.0          4  14.500000  2401   
+ 648566      0.000002   786153600   49.5          4  20.560000  2401   
+ 1448546     0.000002   786153600   49.5          4  20.560000  2401   
+ 648565      0.000003   786153600   49.5          4  20.560000  2401   
+ ...              ...         ...    ...        ...        ...   ...   
+ 1507441  2100.000000   526521600    0.0         11  18.366667  2402   
+ 637491   2210.000000   565920000   14.5         11  10.510000  2401   
+ 1454028  2210.000000   565920000   14.5         11  10.510000  2401   
+ 711921   2850.000000   803260800    0.0         11  23.500000  2409   
+ 1532087  2850.000000   803260800    0.0         11  23.500000  2409   
+ 
+          body_part        lat  species  ac228_counmet  ...  sr89_unit  \
+ sample                                                 ...              
+ 662144          52  53.833333      247              0  ...          0   
+ 1496956         52  53.833333      247              0  ...          0   
+ 648566          52  56.570000       99              0  ...          0   
+ 1448546         52  56.570000       99              0  ...          0   
+ 648565          52  56.570000       99              0  ...          0   
+ ...            ...        ...      ...            ...  ...        ...   
+ 1507441         40  60.503333       96              0  ...          0   
+ 637491          40  54.490000      110              0  ...          0   
+ 1454028         40  54.490000      110              0  ...          0   
+ 711921          55  57.033333       96              0  ...          0   
+ 1532087         55  57.033333       96              0  ...          0   
+ 
+          sr90_unit  tc99_unit  te129m_unit  th228_unit  th232_unit  \
+ sample                                                               
+ 662144           0          0            0           0           0   
+ 1496956          0          0            0           0           0   
+ 648566           0          0            0           0           0   
+ 1448546          0          0            0           0           0   
+ 648565           0          0            0           0           0   
+ ...            ...        ...          ...         ...         ...   
+ 1507441          0          0            0           0           0   
+ 637491           0          0            0           0           0   
+ 1454028          0          0            0           0           0   
+ 711921           0          0            0           0           0   
+ 1532087          0          0            0           0           0   
+ 
+          tl208_unit  u235_unit  zn65_unit  zr95_unit  
+ sample                                                
+ 662144            0          0          0          0  
+ 1496956           0          0          0          0  
+ 648566            0          0          0          0  
+ 1448546           0          0          0          0  
+ 648565            0          0          0          0  
+ ...             ...        ...        ...        ...  
+ 1507441           0          0          0          0  
+ 637491            0          0          0          0  
+ 1454028           0          0          0          0  
+ 711921            0          0          0          0  
+ 1532087           0          0          0          0  
+ 
+ [29746 rows x 269 columns],
+ 'seawater':             value        time  depth        lon  area        lat  \
+ sample                                                             
+ 621865        0.0   926726400    0.0  20.341667  2401  55.881667   
+ 1491657       0.0   926726400    0.0  20.341667  2401  55.881667   
+ 651749        0.0   926899200    0.0  19.393333  2401  56.063333   
+ 1477556       0.0   926899200    0.0  19.393333  2401  56.063333   
+ 625494        0.0   964224000    0.0  20.956667  2401  55.311667   
+ ...           ...         ...    ...        ...   ...        ...   
+ 1520156   20000.0   684201600   25.0  29.333333  2407  60.083333   
+ 709378    43000.0   677548800    0.0  28.833333  2407  59.866667   
+ 1524238   43000.0   677548800    0.0  28.833333  2407  59.866667   
+ 703163   114740.0  1429747200    0.0  26.353333  2407  60.370000   
+ 1522231  114740.0  1429747200    0.0  26.353333  2407  60.370000   
+ 
+          ag110m_counmet  am241_counmet  ba140_counmet  ce144_counmet  ...  \
+ sample                                                                ...   
+ 621865                0              0              0              0  ...   
+ 1491657               0              0              0              0  ...   
+ 651749                0              0              0              0  ...   
+ 1477556               0              0              0              0  ...   
+ 625494                0              0              0              0  ...   
+ ...                 ...            ...            ...            ...  ...   
+ 1520156               0              0              0              0  ...   
+ 709378                0              0              0              0  ...   
+ 1524238               0              0              0              0  ...   
+ 703163                0              0              0              0  ...   
+ 1522231               0              0              0              0  ...   
+ 
+          pu240_unit  ru103_unit  ru106_unit  sb125_unit  sr89_unit  sr90_unit  \
+ sample                                                                          
+ 621865            0           0           0           0          0          0   
+ 1491657           0           0           0           0          0          0   
+ 651749            0           0           0           0          0          0   
+ 1477556           0           0           0           0          0          0   
+ 625494            0           0           0           0          0          0   
+ ...             ...         ...         ...         ...        ...        ...   
+ 1520156           0           0           0           0          0          0   
+ 709378            0           0           0           0          0          0   
+ 1524238           0           0           0           0          0          0   
+ 703163            0           0           0           0          0          0   
+ 1522231           0           0           0           0          0          0   
+ 
+          tc99_unit  u234_unit  u238_unit  zr95_unit  
+ sample                                               
+ 621865           0          0          0          0  
+ 1491657          0          0          0          0  
+ 651749           0          0          0          0  
+ 1477556          0          0          0          0  
+ 625494           0          0          0          0  
+ ...            ...        ...        ...        ...  
+ 1520156          0          0          0          0  
+ 709378           0          0          0          0  
+ 1524238          0          0          0          0  
+ 703163           0          0          0          0  
+ 1522231          0          0          0          0  
+ 
+ [39272 rows x 246 columns],
+ 'sediment':          sed_type     value        time  depth        lon  area        lat  \
+ sample                                                                       
+ 669867          0     0.003   893548800   -1.0  18.233333  2401  58.583333   
+ 1452398         0     0.003   893548800   -1.0  18.233333  2401  58.583333   
+ 669862          0     0.005   893548800   -1.0  18.233333  2401  58.583333   
+ 1452393         0     0.005   893548800   -1.0  18.233333  2401  58.583333   
+ 696294          0     0.009  1181174400   -1.0  19.729722  2402  61.066667   
+ ...           ...       ...         ...    ...        ...   ...        ...   
+ 1456905        62  9450.000   906508800   -1.0  12.250000  2401  54.583333   
+ 674983         62  9490.000   906508800   -1.0  12.250000  2401  54.583333   
+ 1456913        62  9490.000   906508800   -1.0  12.250000  2401  54.583333   
+ 674971         62  9730.000   906508800   -1.0  12.250000  2401  54.583333   
+ 1456901        62  9730.000   906508800   -1.0  12.250000  2401  54.583333   
+ 
+          ac228_dl  ag110m_dl  am241_dl  ...  sb124_unit  sb125_unit  \
+ sample                                  ...                           
+ 669867          0          0         0  ...           0           0   
+ 1452398         0          0         0  ...           0           0   
+ 669862          0          0         0  ...           0           0   
+ 1452393         0          0         0  ...           0           0   
+ 696294          0          0         0  ...           0           0   
+ ...           ...        ...       ...  ...         ...         ...   
+ 1456905         0          0         0  ...           0           0   
+ 674983          0          0         0  ...           0           0   
+ 1456913         0          0         0  ...           0           0   
+ 674971          0          0         0  ...           0           0   
+ 1456901         0          0         0  ...           0           0   
+ 
+          sr90_unit  th228_unit  th232_unit  th234_unit  tl208_unit  u235_unit  \
+ sample                                                                          
+ 669867           0           0           0           0           0          0   
+ 1452398          0           0           0           0           0          0   
+ 669862           0           0           0           0           0          0   
+ 1452393          0           0           0           0           0          0   
+ 696294           0           0           0           0           0          0   
+ ...            ...         ...         ...         ...         ...        ...   
+ 1456905          0           0           0           0           0          0   
+ 674983           0           0           0           0           0          0   
+ 1456913          0           0           0           0           0          0   
+ 674971           0           0           0           0           0          0   
+ 1456901          0           0           0           0           0          0   
+ 
+          zn65_unit  zr95_unit  
+ sample                         
+ 669867           0          0  
+ 1452398          0          0  
+ 669862           0          0  
+ 1452393          0          0  
+ 696294           0          0  
+ ...            ...        ...  
+ 1456905          0          0  
+ 674983           0          0  
+ 1456913          0          0  
+ 674971           0          0  
+ 1456901          0          0  
+ 
+ [122788 rows x 227 columns]}</code></pre>
+</div>
+</div>
+<div id="26bd157d" class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>ref_id <span class="op">=</span> <span class="dv">12</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>encode(fname_in, dir_dest, nc_tpl_path(), verbose<span class="op">=</span><span class="va">True</span>, ref_ids<span class="op">=</span>[ref_id])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Encoding ...
+12-Higgo-et-al-1980.nc
+The "biota" group contains 16 data points whose (lon, lat) = (0, 0)
+Group: biota, Variable: sample
+Group: biota, Variable: lon
+Group: biota, Variable: lat
+Group: biota, Variable: time
+Group: biota, Variable: area
+Group: biota, Variable: bio_group
+Group: biota, Variable: species
+Group: biota, Variable: body_part
+Group: biota, Variable: po210_unc
+Group: biota, Variable: po210_dl
+Group: biota, Variable: po210_counmet
+Group: biota, Variable: po210_sampmet
+Group: biota, Variable: po210_unit
+Group: biota, Variable: th232_unc
+Group: biota, Variable: th232_dl
+Group: biota, Variable: th232_counmet
+Group: biota, Variable: th232_sampmet
+Group: biota, Variable: th232_unit
+Group: biota, Variable: u238_unc
+Group: biota, Variable: u238_dl
+Group: biota, Variable: u238_counmet
+Group: biota, Variable: u238_sampmet
+Group: biota, Variable: u238_unit
+Group: biota, Variable: pu239_240_tot_unc
+Group: biota, Variable: pu239_240_tot_dl
+Group: biota, Variable: pu239_240_tot_counmet
+Group: biota, Variable: pu239_240_tot_sampmet
+Group: biota, Variable: pu239_240_tot_unit</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  0%|          | 0/1 [00:00&lt;?, ?it/s]                                             </code></pre>
+</div>
+</div>
+</section>
+<section id="all-datasets" class="level3">
+<h3 class="anchored" data-anchor-id="all-datasets">All datasets</h3>
+<div id="c13a3f6f" class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>encode(fname_in, dir_dest, nc_tpl_path(), verbose<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Encoding ...
+182-Urban-et-al-2015.nc
+183-Bokor-et-al-2016.nc
+226-Sdraulig-2018.nc
+323-Johansen-et-al-2019.nc
+374-Ostlund-et-al-1987.nc
+402-CCHDO-2018.nc
+401-Olsen-et-al-2016.nc
+358-Kall-et-al-2014.nc
+568-Johansen-2020.nc
+30-Östlund-and-Grall-1991.nc
+97-ASPAMARD-2004.nc
+99-Aoyama-and-Hirose-2004.nc
+106-Yamada-et-al-2006.nc
+18-Cherry-and-Heyraud-1982.nc
+16-Cherry-and-Heyraud-1981.nc
+443-Heyraud-et-al-1994.nc
+508-Lee-et-al-2018.nc
+509-Johansen-et-al-2015.nc
+395-Bailly-du-Bois-et-al-2020.nc
+400-Boyer-et-al-2013.nc
+122-Casacuberta-et-al-2018.nc
+103-RADNOR-2010.nc
+190-Schlitzer-et-al-2018.nc
+432-Efurd-et-al-1997.nc
+685-Chamizo-et-al-2021.nc
+718-Smith-2024.nc
+222-Huang-et-al-2019.nc
+380-Smith-et-al-2020.nc
+720-Payne-et-al-2024.nc
+Item TBC does not exist in Zotero library
+191-OSPAR-Comissions-Radioactive-Substances-Committee-(RSC)-2018.nc
+199-Skjerdal-et-al-2020.nc
+200-Zaborska-et-al-2010.nc
+381-Smith-2020.nc
+477-Valette-Silver-et-al-1999.nc
+409-Cherry-et-al-1987.nc
+201-Mietelski-et-al-2008.nc
+571-Szufa-2018.nc
+712-Fávaro-et-al-2012.nc
+570-Szufa-2020.nc
+109-Gulin-and-Stokozov-2005.nc
+130-Wada-et-al-2016.nc
+121-TEPCO---Tokyo-Electric-Power-Company-2011.nc
+132-Fukushima-Prefectural-Federation-of-Fisheries-Co-operative-Associations-2012.nc
+224-Takata-et-al-2019.nc
+225-Takata-et-al-2016.nc
+123-Fukushima-Prefecture-2013.nc
+126-Fukushima-Prefecture-2011.nc
+147-MOE---Ministry-of-the-Environment-2012.nc
+148-JAEA---Japan-Atomic-Energy-Agency-2013.nc
+149-JAEA---Japan-Atomic-Energy-Agency-2013.nc
+142-NRA---Nuclear-Regulation-Authority-2013.nc
+145-MOE---Ministry-of-the-Environment-2011.nc
+146-MEXT---Ministry-of-Education-Culture-Sports-Science-and-Technology-2011.nc
+205-MERI-2018.nc
+206-MERI-2019.nc
+119-MEXT---Ministry-of-Education-Culture-Sports-Science-and-Technology-2011.nc
+120-NRA---Nuclear-Regulation-Authority-2013.nc
+155-Buesseler-et-al-2012.nc
+156-Yoshida-et-al-2015.nc
+157-Buesseler-2018.nc
+202-MERI-2015.nc
+203-MERI-2016.nc
+143-Fukushima-Prefecture-2011.nc
+144-Fukushima-Prefecture-2013.nc
+129-Wada-et-al-2016.nc
+131-Ibaraki-Prefecture-2011.nc
+680-TEPCO---Tokyo-Electric-Power-Company-2021.nc
+204-MERI-2017.nc
+117-Oikawa-et-al-2013.nc
+118-Kaeriyama-et-al-2013.nc
+127-Fukushima-Prefecture-2013.nc
+682-NRA---Nuclear-Regulation-Authority-2021.nc
+681-NRA---Nuclear-Regulation-Authority-2021.nc
+193-Kusakabe-and-Takata-2020.nc
+194-Tateda-and-Misonou-1990.nc
+195-Tateda-and-Koyanagi-1994.nc
+153-Yu-et-al-2018.nc
+158-Buesseler-2018.nc
+159-Buesseler-2018.nc
+124-MOE---Ministry-of-the-Environment-2011.nc
+125-MOE---Ministry-of-the-Environment-2012.nc
+717-Smith-et-al-2017.nc
+679-TEPCO---Tokyo-Electric-Power-Company-2021.nc
+684-NRA---Nuclear-Regulation-Authority-2021.nc
+687-TEPCO---Tokyo-Electric-Power-Company-2021.nc
+688-NRA---Nuclear-Regulation-Authority-2021.nc
+683-NRA---Nuclear-Regulation-Authority-2021.nc
+135-Japan-Fisheries-Research-and-Education-Agency-2015.nc
+137-JCG---Japan-Coast-Guard-2011.nc
+141-TEPCO---Tokyo-Electric-Power-Company-2011.nc
+133-Fisheries-Agency---Ministry-of-Agriculture-Forestry-and-Fisheries-2011.nc
+134-MOE---Ministry-of-the-Environment-2012.nc
+404-Azouz-and-Dulai-2017.nc
+428-Yu-et-al-2015.nc
+445-Hoffman-et-al-1974.nc
+440-Yamada-and-Nagaya-2000.nc
+237-Takata-et-al-2018.nc
+139-MEXT---Ministry-of-Education-Culture-Sports-Science-and-Technology-2011.nc
+140-MEXT---Ministry-of-Education-Culture-Sports-Science-and-Technology-2011.nc
+427-Yamamoto-et-al-1994.nc
+689-NRA---Nuclear-Regulation-Authority-2021.nc
+549-Shigeoka-et-al-2019.nc
+550-Sohtome-2014.nc
+514-Miki-et-al-2016.nc
+548-Suchanek-et-al-1996.nc
+436-Nakamura-et-al-2015.nc
+446-Valette-Silver-and-Lauenstein-1995.nc
+513-Madigan-2012.nc
+572-Aono-et-al-2000.nc
+113-Kitamura-et-al-2013.nc
+114-Charette-et-al-2013.nc
+116-Suzuki-et-al-2013.nc
+207-MERI-2020.nc
+223-Buesseler-et-al-2018.nc
+232-Honda-et-al-2012.nc
+233-Aoyama-et-al-2013.nc
+234-Aoyama-et-al-2013.nc
+196-Tateda-and-Koyanagi-1996.nc
+22-Fowler-et-al-1983.nc
+56-Kaeriyama-et-al-2014.nc
+128-NRA---Nuclear-Regulation-Authority-2013.nc
+178-Pham-et-al-2016.nc
+474-Madigan-et-al-2017.nc
+476-Ruelas-Inzunza-et-al-2012.nc
+478-Yamada-et-al-1999.nc
+516-Madigan-and-Fisher-2013.nc
+517-Morita-et-al-2007.nc
+518-Morita-et-al-2010.nc
+520-Baumann-et-al-2013.nc
+433-Smith-and-Towler-1993.nc
+115-Casacuberta-et-al-2013.nc
+430-Baumann-et-al-2015.nc
+542-Ruelas-Inzunza-et-al-2012.nc
+546-Takagi-et-al-2015.nc
+547-Ruelas-Inzunza-2014.nc
+479-Morita-2010.nc
+511-Zeng-2017.nc
+512-Takahashi-et-al-2015.nc
+411-Guy-et-al-2020.nc
+322-Département-de-Suivi-des-Centres-dExpérimentations-Nucléaires-(DSCEN)-2018.nc
+321-Département-de-Suivi-des-Centres-dExpérimentations-Nucléaires-(DSCEN)-2011.nc
+466-Jeffree-et-al-1997.nc
+467-Poletiko-et-al-1994.nc
+279-Pearson-et-al-2016.nc
+282-Pearson-et-al-2016.nc
+169-Villa-Alfageme-et-al-2019.nc
+569-Bellamy-and-Hunter-1997.nc
+408-Carvalho-2011.nc
+396-Ostlund-nd.nc
+397-Ostlund-and-Grall-1987.nc
+399-Andrié-et-al-1988.nc
+465-Tejera-et-al-2019.nc
+84-MAFF-(now-Cefas)-2004.nc
+188-Thünen-Institute-2018.nc
+448-HEYRAUD-et-al-1988.nc
+303-Carvalho-et-al-2011.nc
+540-Deiaa-2020.nc
+296-Carvalho-et-al-2011.nc
+301-Fonollosa-et-al-2015.nc
+316-Pollard-et-al-1998.nc
+326-Benmansour-et-al-2006.nc
+339-Benkdad-et-al-2011.nc
+341-CNESTEN-2019.nc
+371-CNESTEN-2020.nc
+161-Gómez-Guzmán-et-al-2013.nc
+168-Vivo-Vilches-et-al-2018.nc
+186-Corcho-Alvarado-et-al-2014.nc
+431-Malta-and-Carvalho-2011.nc
+405-Berrow-et-al-1998.nc
+692-Cunningham-et-al-1988.nc
+693-OGrady-and-Currivan-1990.nc
+694-OGrady-et-al-1991.nc
+41-Aarkrog-et-al-1994.nc
+357-Arnedo-et-al-2013.nc
+372-CNESTEN-2020.nc
+248-trok-and-Smodi-2011.nc
+308-Jalili-et-al-2009.nc
+311-Ryan-et-al-1999.nc
+352-Hamid-et-al-2010.nc
+25-Nies-1989.nc
+31-Aarkrog-et-al-1992.nc
+174-Hurtado-Bermúdez-et-al-2018.nc
+177-Laissaoui-et-al-2013.nc
+419-Kanisch-and-Aust-2013.nc
+559-Fiev-et-al-2013.nc
+562-Joensen-2011.nc
+691-Cunningham-and-OGrady-1986.nc
+484-Saito-et-al-2003.nc
+269-Mársico-et-al-2014.nc
+305-Pereira-2009.nc
+362-Onjefu-et-al-2016.nc
+108-Figueira-et-al-2006.nc
+438-Cherry-et-al-1994.nc
+711-Ramos-2010.nc
+366-Onjefu-et-al-2017.nc
+12-Higgo-et-al-1980.nc
+The "biota" group contains 16 data points whose (lon, lat) = (0, 0)
+27-Krishnaswami-et-al-1985.nc
+The "biota" group contains 56 data points whose (lon, lat) = (0, 0)
+173-Hurtado-Bermudez-et-al-2017.nc
+235-Jesus-and-Mazzilli-2017.nc
+236-Teixeira-and-Mazzilli-2017.nc
+10-Fukai-et-al-1980.nc
+The "seawater" group contains 3 data points whose (lon, lat) = (0, 0)
+444-Gouvea-et-al-1992.nc
+483-Cunha-et-al-1993.nc
+441-Godoy-et-al-2003.nc
+442-Moura-et-al-2015.nc
+485-Pereira-and-Kelecom-2010.nc
+528-Godoy-et-al-2008.nc
+555-Gouvea-et-al-2008.nc
+102-RWS-2010.nc
+170-Mas-et-al-2004.nc
+451-Swift-et-al-1994.nc
+538-Brown-1999.nc
+690-CEFAS-2020.nc
+450-Ghose-and-Heaton-2005.nc
+198-Skjerdal-et-al-2017.nc
+697-Long-et-al-1998.nc
+230-Rui-et-al-2019.nc
+197-Skjerdal-et-al-2015.nc
+531-Leppänen-2013.nc
+6-Kautsky-and-Eicke-1982.nc
+44-Aarkrog-et-al-1989.nc
+415-Heldal-et-al-2003.nc
+482-Heldal-2019.nc
+500-Ababneh-et-al-2018.nc
+566-Stepnowski-and-Skwarzec-2000.nc
+481-Andersen-et-al-2006.nc
+698-Ryan-et-al-2000.nc
+701-Ryan-et-al-2007.nc
+695-McGarry-et-al-1994.nc
+696-Pollard-et-al-1996.nc
+699-Ryan-et-al-2003.nc
+702-Smith-et-al-2007.nc
+703-Fegan-et-al-2008.nc
+704-Fegan-et-al-2010.nc
+700-McMahon-et-al-2005.nc
+705-McGinnity-et-al-2010.nc
+709-EPA-Ireland-2020.nc
+534-McCartney-et-al-2000.nc
+271-Renaud-et-al-2015.nc
+292-Bustamante-et-al-2002.nc
+317-Connan-et-al-2007.nc
+716-Renaud-et-al-2015.nc
+100-HELCOM-MORS-2018.nc
+162-Gómez-Guzmán-et-al-2014.nc
+553-Zakaria-et-al-2008.nc
+565-Dahlgaard-1996.nc
+172-Pham-et-al-2014.nc
+558-Fiévet-2020.nc
+567-Germain-1995.nc
+17-Guary-et-al-1982.nc
+62-McDonald-et-al-1986.nc
+274-Pietrzak-Flis-et-al-2001.nc
+551-Zalewska-and-Saniewski-2011.nc
+552-Zalewska-2016.nc
+563-Ciesielski-2015.nc
+564-Saremi-et-al-2018.nc
+171-Gómez-Guzmán-et-al-2013.nc
+151-Petrinec-et-al-2012.nc
+281-Desideri-et-al-2010.nc
+283-Rogic-et-al-2013.nc
+510-Men-et-al-2020.nc
+268-Antovic-and-Antovic-2011.nc
+250-Romaric-et-al-2012.nc
+472-Antovic-and-Antovic-2011.nc
+150-Petrinec-et-al-2013.nc
+410-Jia-et-al-2020.nc
+299-Kristan-et-al-2015.nc
+255-Roselli-et-al-2017.nc
+449-Kiliç-et-al-2018.nc
+561-Kül-2020.nc
+280-Mat-Çatal-et-al-2012.nc
+284-Aközcan-and-Ugur-2013.nc
+302-Kiliç-et-al-2014.nc
+412-Ugur-et-al-2002.nc
+554-Yilmaz-2020.nc
+530-Aközcan-2013.nc
+219-Polikarpov-et-al-1991.nc
+536-Nonova-2016.nc
+220-Bologa-and-Patrascu-1994.nc
+221-Varinlioglu-et-al-1995.nc
+537-Nonova-2014.nc
+2-Crusius-and-Anderson-1991.nc
+3-Top-and-Clarke-1983.nc
+310-Güngör-et-al-2006.nc
+229-Cartes-et-al-2017.nc
+242-Fonollosa-et-al-2017.nc
+247-Nadal-et-al-2011.nc
+373-Castrillejo-et-al-2017.nc
+398-Andrié-and-Merlivat-1988.nc
+260-Diaz-Frances-et-al-2017.nc
+318-Camacho-and-Tenorio-2011.nc
+334-Laissaoui-et-al-2008.nc
+338-Thébault-et-al-2008.nc
+333-Noureddine-et-al-2008.nc
+356-González-Fernández-et-al-2012.nc
+14-Ballestra-et-al-1980.nc
+218-Delbono-et-al-2016.nc
+9-Fukai-et-al-1980.nc
+11-Holm-et-al-1980.nc
+560-Kiliç-2014.nc
+413-Hafizoglu-et-al-2020.nc
+539-Karabayir-2020.nc
+231-Tamburrino-et-al-2019.nc
+216-ENEA-Casaccia-Research-Centre-Radiation-Protection-Institute-2016.nc
+217-ENEA-Casaccia-Research-Centre-Radiation-Protection-Institute-2017.nc
+211-ENEA-Casaccia-Research-Centre-Radiation-Protection-Institute-2011.nc
+212-ENEA-Casaccia-Research-Centre-Radiation-Protection-Institute-2012.nc
+213-ENEA-Casaccia-Research-Centre-Radiation-Protection-Institute-2013.nc
+214-ENEA-Casaccia-Research-Centre-Radiation-Protection-Institute-2014.nc
+215-ENEA-Casaccia-Research-Centre-Radiation-Protection-Institute-2015.nc
+227-Barsanti-et-al-2011.nc
+57-Hamilton-et-al-1994.nc
+77-Strand-and-Nikitin-1993.nc
+378-Chen-et-al-2017.nc
+473-Cooper-et-al-2000.nc
+332-Diab-et-al-2019.nc
+364-Zakaly-et-al-2016.nc
+348-El-Mamoney-and-Khater-2004.nc
+331-Ramadan-et-al-2018.nc
+429-Al-Trabulsy-et-al-2013.nc
+337-Arafat-et-al-2017.nc
+342-Sirelkhatim-et-al-2008.nc
+344-Sam-et-al-2000.nc
+349-El-Arabi-2005.nc
+351-Uosif-et-al-2008.nc
+363-Uosif-et-al-2016.nc
+256-Hassona-et-al-2008.nc
+556-Sirelkhatim-et-al-2008.nc
+346-Sam-2003.nc
+298-Uddin-et-al-2017.nc
+403-Al-Qaradawi-et-al-2015.nc
+241-Al-Ghadban-et-al-2012.nc
+288-Uddin-et-al-2012.nc
+290-Uddin-and-Bebhehani-2014.nc
+544-Uddin-2019.nc
+499-Khot-2018.nc
+254-Hemalatha-et-al-2015.nc
+263-Raj-et-al-2016.nc
+275-Avadhani-et-al-2001.nc
+422-Sartandel-et-al-2016.nc
+295-Mishra-et-al-2009.nc
+469-Sartandel-2020.nc
+470-Sartandel-2015.nc
+496-Khan-et-al-2011.nc
+497-Khan-2012.nc
+289-Khan-and-Wesley-2011.nc
+420-Khan-and-Wesley-2016.nc
+252-Khan-and-Wesley-2012.nc
+291-Khan-et-al-2011.nc
+297-Sunith-Shine-et-al-2013.nc
+494-Wesley-and-Khan-2011.nc
+498-Pole-2017.nc
+286-Khan-and-Wesley-2011.nc
+304-Khan-and-Wesley-2011.nc
+543-Nadhiya-et-al-2019.nc
+300-Khan-et-al-2014.nc
+253-Sivakumar-2014.nc
+258-Arunachalam-et-al-2014.nc
+265-Sathyapriya-et-al-2017.nc
+307-Ghose-et-al-2000.nc
+245-Musthafa-and-Krishnamoorthy-2012.nc
+277-Kannan-et-al-2001.nc
+529-Alam-et-al-1995.nc
+312-Hasan-et-al-2006.nc
+486-Alam-et-al-1999.nc
+495-Suriyanarayanan-2010.nc
+105-Theng-and-Mohamed-2005.nc
+240-Khandaker-et-al-2015.nc
+259-Alam-and-Mohamed-2011.nc
+314-Khandaker-et-al-2015.nc
+315-Zakri-and-Mohamed-2016.nc
+503-Alam-2016.nc
+505-Khandaker-2019.nc
+502-Abdullah-et-al-2015.nc
+243-Khandaker-et-al-2013.nc
+13-Guary-et-al-1981.nc
+28-Ballestra-et-al-1984.nc
+175-Santos-et-al-2007.nc
+176-Chamizo-et-al-2010.nc
+20-Fukai-et-al-1982.nc
+24-Heyraud-and-Cherry-1983.nc
+325-Lee-et-al-2006.nc
+327-Benkrid-and-Noureddine-2007.nc
+328-Noureddine-et-al-2007.nc
+345-Noureddine-et-al-2003.nc
+15-Fukai-et-al-1981.nc
+251-Strady-et-al-2015.nc
+324-Noureddine-et-al-2006.nc
+160-Pham-et-al-2010.nc
+165-Chamizo-et-al-2016.nc
+166-Bressac-et-al-2017.nc
+370-Hassen-et-al-2019.nc
+417-Holm-et-al-1994.nc
+545-Guendouzi-2020.nc
+414-Harmelin-Vivien-2012.nc
+359-El-Gamal-2014.nc
+266-Al-Masri-et-al-2000.nc
+267-Aoun-et-al-2015.nc
+278-El-Samad-et-al-2017.nc
+335-El-Saharty-2013.nc
+336-Atta-and-Zakaria-2014.nc
+468-Samad-2014.nc
+343-Ademola-and-Ehiedu-2010.nc
+353-Amekudzie-et-al-2011.nc
+367-Klubi-et-al-2017.nc
+368-Botwe-et-al-2017.nc
+361-Isola-and-Ajadi-2015.nc
+369-Botwe-et-al-2017.nc
+340-Babatunde-et-al-2015.nc
+228-Botwe-et-al-2017.nc
+360-Iwetan-et-al-2015.nc
+313-Alonso-Hernandez-et-al-2002.nc
+187-Carnero-Bravo-et-al-2018.nc
+185-Alonso-Hernández-et-al-2017.nc
+184-Díaz-Asencio-et-al-2016.nc
+306-Meinhold-and-Holtzman-1998.nc
+435-Meinhold-et-al-1996.nc
+439-Continental-Shelf-Associates-Inc-1999.nc
+8-Smith-and-Walton-1980.nc
+152-Zhou-et-al-2018.nc
+249-Tuo-et-al-2016.nc
+261-Kim-et-al-2017.nc
+519-Kong-et-al-2021.nc
+154-Dong-et-al-2018.nc
+244-Choi-et-al-2008.nc
+257-Lee-et-al-2009.nc
+287-Yang-et-al-2015.nc
+421-Cho-et-al-2016.nc
+475-Inoue-et-al-2005.nc
+527-Inoue-2019.nc
+136-Otosaka-et-al-2010.nc
+515-Kim-2020.nc
+101-Ito-et-al-2007.nc
+52-Amano-et-al-1996.nc
+507-Momoshima-et-al-2012.nc
+426-Waska-et-al-2008.nc
+273-Hong-et-al-2011.nc
+406-Burger-et-al-2007.nc
+425-USDOE-Office-of-Legacy-Management-2013.nc
+416-Hamilton-et-al-2008.nc
+418-Bu-et-al-2013.nc
+407-Burger-et-al-2007.nc
+447-Burger-et-al-2006.nc
+379-Chen-et-al-2015.nc
+377-Chen-et-al-2019.nc
+471-Chester-et-al-2013.nc
+501-Yii-and-Mahmood-2011.nc
+506-Mahmood-2018.nc
+557-Van-2020.nc
+424-Wan-Mahmood-and-Yii-2012.nc
+437-Abd-Rahim-Mohamed-and-Feong-Kuan-2005.nc
+285-Lee-and-Wang-2013.nc
+107-Yamada-et-al-2006.nc
+434-Kulsawat-and-Porntepkasemsan-2016.nc
+423-Lim-and-Mohamed-2019.nc
+309-Syarbaini-et-al-2014.nc
+179-Villa-Alfageme-et-al-2018.nc
+533-Pham-et-al-2010.nc
+350-Zourarah-et-al-2007.nc
+354-Nyarko-et-al-2011.nc
+270-Garcia-Orellana-et-al-2016.nc
+294-Bode-et-al-2015.nc
+697-Long-et-al-1998.nc</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  0%|          | 0/526 [00:00&lt;?, ?it/s]  0%|          | 1/526 [00:02&lt;21:30,  2.46s/it]  0%|          | 2/526 [00:04&lt;20:08,  2.31s/it]  1%|          | 3/526 [00:06&lt;19:28,  2.23s/it]  1%|          | 4/526 [00:09&lt;20:23,  2.34s/it]  1%|          | 5/526 [00:15&lt;33:14,  3.83s/it]  1%|          | 6/526 [00:22&lt;42:13,  4.87s/it]  1%|▏         | 7/526 [00:25&lt;35:58,  4.16s/it]  2%|▏         | 8/526 [00:27&lt;29:59,  3.47s/it]  2%|▏         | 9/526 [00:29&lt;27:22,  3.18s/it]  2%|▏         | 10/526 [00:32&lt;24:49,  2.89s/it]  2%|▏         | 11/526 [00:34&lt;23:24,  2.73s/it]  2%|▏         | 12/526 [00:43&lt;39:30,  4.61s/it]  2%|▏         | 13/526 [00:45&lt;32:55,  3.85s/it]  3%|▎         | 14/526 [00:48&lt;29:28,  3.45s/it]  3%|▎         | 15/526 [00:50&lt;25:35,  3.01s/it]  3%|▎         | 16/526 [00:52&lt;22:55,  2.70s/it]  3%|▎         | 17/526 [00:54&lt;21:17,  2.51s/it]  3%|▎         | 18/526 [00:56&lt;21:19,  2.52s/it]  4%|▎         | 19/526 [01:15&lt;1:02:24,  7.38s/it]  4%|▍         | 20/526 [01:17&lt;50:02,  5.93s/it]    4%|▍         | 21/526 [01:20&lt;40:40,  4.83s/it]  4%|▍         | 22/526 [01:22&lt;34:16,  4.08s/it]  4%|▍         | 23/526 [01:33&lt;52:46,  6.30s/it]  5%|▍         | 24/526 [01:36&lt;42:58,  5.14s/it]  5%|▍         | 25/526 [01:39&lt;37:45,  4.52s/it]  5%|▍         | 26/526 [01:41&lt;32:04,  3.85s/it]  5%|▌         | 27/526 [01:43&lt;27:11,  3.27s/it]  5%|▌         | 28/526 [01:45&lt;23:46,  2.86s/it]  6%|▌         | 29/526 [01:47&lt;21:47,  2.63s/it]  6%|▌         | 30/526 [02:00&lt;47:19,  5.72s/it]  6%|▌         | 31/526 [02:03&lt;39:00,  4.73s/it]  6%|▌         | 32/526 [02:05&lt;32:14,  3.92s/it]  6%|▋         | 33/526 [02:07&lt;27:26,  3.34s/it]  6%|▋         | 34/526 [02:09&lt;24:53,  3.04s/it]  7%|▋         | 35/526 [02:11&lt;22:46,  2.78s/it]  7%|▋         | 36/526 [02:13&lt;21:14,  2.60s/it]  7%|▋         | 37/526 [02:15&lt;19:35,  2.40s/it]  7%|▋         | 38/526 [02:17&lt;18:25,  2.26s/it]  7%|▋         | 39/526 [02:19&lt;17:30,  2.16s/it]  8%|▊         | 40/526 [02:21&lt;16:45,  2.07s/it]  8%|▊         | 41/526 [02:38&lt;54:24,  6.73s/it]  8%|▊         | 42/526 [03:53&lt;3:38:27, 27.08s/it]  8%|▊         | 43/526 [04:01&lt;2:51:34, 21.31s/it]  8%|▊         | 44/526 [04:03&lt;2:05:49, 15.66s/it]  9%|▊         | 45/526 [04:07&lt;1:35:55, 11.97s/it]  9%|▊         | 46/526 [04:09&lt;1:12:43,  9.09s/it]  9%|▉         | 47/526 [04:14&lt;1:01:19,  7.68s/it]  9%|▉         | 48/526 [04:16&lt;48:39,  6.11s/it]    9%|▉         | 49/526 [04:19&lt;42:15,  5.32s/it] 10%|▉         | 50/526 [04:22&lt;36:46,  4.63s/it] 10%|▉         | 51/526 [04:25&lt;31:36,  3.99s/it] 10%|▉         | 52/526 [04:27&lt;26:44,  3.38s/it] 10%|█         | 53/526 [04:29&lt;23:57,  3.04s/it] 10%|█         | 54/526 [04:32&lt;24:02,  3.06s/it] 10%|█         | 55/526 [04:35&lt;24:04,  3.07s/it] 11%|█         | 56/526 [04:38&lt;24:10,  3.09s/it] 11%|█         | 57/526 [04:42&lt;24:08,  3.09s/it] 11%|█         | 58/526 [04:44&lt;22:48,  2.92s/it] 11%|█         | 59/526 [04:46&lt;20:44,  2.67s/it] 11%|█▏        | 60/526 [04:48&lt;19:07,  2.46s/it] 12%|█▏        | 61/526 [04:52&lt;21:12,  2.74s/it] 12%|█▏        | 62/526 [04:55&lt;22:08,  2.86s/it] 12%|█▏        | 63/526 [04:58&lt;22:29,  2.91s/it] 12%|█▏        | 64/526 [05:00&lt;20:19,  2.64s/it] 12%|█▏        | 65/526 [05:05&lt;25:35,  3.33s/it] 13%|█▎        | 66/526 [05:12&lt;35:15,  4.60s/it] 13%|█▎        | 67/526 [05:17&lt;36:20,  4.75s/it] 13%|█▎        | 68/526 [05:21&lt;33:03,  4.33s/it] 13%|█▎        | 69/526 [05:23&lt;29:05,  3.82s/it] 13%|█▎        | 70/526 [05:25&lt;24:49,  3.27s/it] 13%|█▎        | 71/526 [05:27&lt;22:01,  2.90s/it] 14%|█▎        | 72/526 [05:30&lt;20:28,  2.71s/it] 14%|█▍        | 73/526 [05:32&lt;20:43,  2.74s/it] 14%|█▍        | 74/526 [05:35&lt;20:35,  2.73s/it] 14%|█▍        | 75/526 [05:37&lt;18:42,  2.49s/it] 14%|█▍        | 76/526 [05:39&lt;17:25,  2.32s/it] 15%|█▍        | 77/526 [05:41&lt;17:00,  2.27s/it] 15%|█▍        | 78/526 [05:43&lt;16:25,  2.20s/it] 15%|█▌        | 79/526 [05:45&lt;15:56,  2.14s/it] 15%|█▌        | 80/526 [05:47&lt;16:05,  2.16s/it] 15%|█▌        | 81/526 [05:49&lt;15:25,  2.08s/it] 16%|█▌        | 82/526 [05:52&lt;15:44,  2.13s/it] 16%|█▌        | 83/526 [05:56&lt;21:39,  2.93s/it] 16%|█▌        | 84/526 [05:58&lt;19:52,  2.70s/it] 16%|█▌        | 85/526 [06:01&lt;19:06,  2.60s/it] 16%|█▋        | 86/526 [06:03&lt;18:08,  2.47s/it] 17%|█▋        | 87/526 [06:05&lt;17:04,  2.33s/it] 17%|█▋        | 88/526 [06:07&lt;17:09,  2.35s/it] 17%|█▋        | 89/526 [06:09&lt;16:05,  2.21s/it] 17%|█▋        | 90/526 [06:15&lt;22:50,  3.14s/it] 17%|█▋        | 91/526 [06:17&lt;20:49,  2.87s/it] 17%|█▋        | 92/526 [06:19&lt;19:21,  2.68s/it] 18%|█▊        | 93/526 [06:21&lt;17:58,  2.49s/it] 18%|█▊        | 94/526 [06:23&lt;17:34,  2.44s/it] 18%|█▊        | 95/526 [06:26&lt;16:59,  2.37s/it] 18%|█▊        | 96/526 [06:28&lt;16:19,  2.28s/it] 18%|█▊        | 97/526 [06:31&lt;17:24,  2.44s/it] 19%|█▊        | 98/526 [06:32&lt;16:20,  2.29s/it] 19%|█▉        | 99/526 [06:34&lt;15:38,  2.20s/it] 19%|█▉        | 100/526 [06:36&lt;15:10,  2.14s/it] 19%|█▉        | 101/526 [06:39&lt;15:31,  2.19s/it] 19%|█▉        | 102/526 [06:41&lt;15:18,  2.17s/it] 20%|█▉        | 103/526 [06:43&lt;15:21,  2.18s/it] 20%|█▉        | 104/526 [06:45&lt;14:45,  2.10s/it] 20%|█▉        | 105/526 [06:47&lt;14:22,  2.05s/it] 20%|██        | 106/526 [06:49&lt;14:03,  2.01s/it] 20%|██        | 107/526 [06:51&lt;14:02,  2.01s/it] 21%|██        | 108/526 [06:53&lt;14:20,  2.06s/it] 21%|██        | 109/526 [06:55&lt;13:52,  2.00s/it] 21%|██        | 110/526 [06:57&lt;13:37,  1.97s/it] 21%|██        | 111/526 [06:59&lt;13:41,  1.98s/it] 21%|██▏       | 112/526 [07:01&lt;13:33,  1.96s/it] 21%|██▏       | 113/526 [07:04&lt;15:32,  2.26s/it] 22%|██▏       | 114/526 [07:06&lt;16:07,  2.35s/it] 22%|██▏       | 115/526 [07:09&lt;16:13,  2.37s/it] 22%|██▏       | 116/526 [07:11&lt;15:14,  2.23s/it] 22%|██▏       | 117/526 [07:12&lt;14:34,  2.14s/it] 22%|██▏       | 118/526 [07:14&lt;14:02,  2.07s/it] 23%|██▎       | 119/526 [07:17&lt;14:27,  2.13s/it] 23%|██▎       | 120/526 [07:19&lt;14:34,  2.15s/it] 23%|██▎       | 121/526 [07:21&lt;13:58,  2.07s/it] 23%|██▎       | 122/526 [07:23&lt;13:49,  2.05s/it] 23%|██▎       | 123/526 [07:25&lt;13:27,  2.00s/it] 24%|██▎       | 124/526 [07:26&lt;13:06,  1.96s/it] 24%|██▍       | 125/526 [07:28&lt;12:55,  1.93s/it] 24%|██▍       | 126/526 [07:30&lt;12:47,  1.92s/it] 24%|██▍       | 127/526 [07:32&lt;13:18,  2.00s/it] 24%|██▍       | 128/526 [07:34&lt;13:02,  1.97s/it] 25%|██▍       | 129/526 [07:36&lt;12:54,  1.95s/it] 25%|██▍       | 130/526 [07:38&lt;12:41,  1.92s/it] 25%|██▍       | 131/526 [07:40&lt;12:39,  1.92s/it] 25%|██▌       | 132/526 [07:42&lt;12:30,  1.91s/it] 25%|██▌       | 133/526 [07:44&lt;12:45,  1.95s/it] 25%|██▌       | 134/526 [07:46&lt;12:35,  1.93s/it] 26%|██▌       | 135/526 [07:48&lt;12:26,  1.91s/it] 26%|██▌       | 136/526 [07:50&lt;12:30,  1.92s/it] 26%|██▌       | 137/526 [07:51&lt;12:18,  1.90s/it] 26%|██▌       | 138/526 [07:53&lt;12:06,  1.87s/it] 26%|██▋       | 139/526 [07:55&lt;12:11,  1.89s/it] 27%|██▋       | 140/526 [07:58&lt;13:54,  2.16s/it] 27%|██▋       | 141/526 [08:00&lt;13:58,  2.18s/it] 27%|██▋       | 142/526 [08:02&lt;13:23,  2.09s/it] 27%|██▋       | 143/526 [08:04&lt;12:59,  2.03s/it] 27%|██▋       | 144/526 [08:06&lt;12:35,  1.98s/it] 28%|██▊       | 145/526 [08:08&lt;12:24,  1.95s/it] 28%|██▊       | 146/526 [08:10&lt;12:55,  2.04s/it] 28%|██▊       | 147/526 [08:12&lt;12:36,  2.00s/it] 28%|██▊       | 148/526 [08:14&lt;13:18,  2.11s/it] 28%|██▊       | 149/526 [08:17&lt;13:37,  2.17s/it] 29%|██▊       | 150/526 [08:19&lt;13:16,  2.12s/it] 29%|██▊       | 151/526 [08:21&lt;13:01,  2.08s/it] 29%|██▉       | 152/526 [08:23&lt;13:15,  2.13s/it] 29%|██▉       | 153/526 [08:30&lt;23:28,  3.78s/it] 29%|██▉       | 154/526 [09:59&lt;3:00:16, 29.08s/it] 29%|██▉       | 155/526 [10:01&lt;2:10:01, 21.03s/it] 30%|██▉       | 156/526 [10:03&lt;1:35:04, 15.42s/it] 30%|██▉       | 157/526 [10:05&lt;1:09:55, 11.37s/it] 30%|███       | 158/526 [10:07&lt;52:19,  8.53s/it]   30%|███       | 159/526 [10:09&lt;39:56,  6.53s/it] 30%|███       | 160/526 [10:11&lt;31:19,  5.14s/it] 31%|███       | 161/526 [10:13&lt;25:43,  4.23s/it] 31%|███       | 162/526 [10:15&lt;21:23,  3.52s/it] 31%|███       | 163/526 [10:17&lt;18:25,  3.04s/it] 31%|███       | 164/526 [26:01&lt;28:42:55, 285.57s/it] 31%|███▏      | 165/526 [26:05&lt;20:09:33, 201.03s/it] 32%|███▏      | 166/526 [26:07&lt;14:07:49, 141.30s/it] 32%|███▏      | 167/526 [26:09&lt;9:55:34, 99.54s/it]   32%|███▏      | 168/526 [26:11&lt;6:59:24, 70.29s/it] 32%|███▏      | 169/526 [26:13&lt;4:56:28, 49.83s/it] 32%|███▏      | 170/526 [26:16&lt;3:31:45, 35.69s/it] 33%|███▎      | 171/526 [26:19&lt;2:32:28, 25.77s/it] 33%|███▎      | 172/526 [26:22&lt;1:51:37, 18.92s/it] 33%|███▎      | 173/526 [26:26&lt;1:24:49, 14.42s/it] 33%|███▎      | 174/526 [26:30&lt;1:06:48, 11.39s/it] 33%|███▎      | 175/526 [26:32&lt;49:54,  8.53s/it]   33%|███▎      | 176/526 [26:34&lt;38:10,  6.55s/it] 34%|███▎      | 177/526 [26:36&lt;29:59,  5.16s/it] 34%|███▍      | 178/526 [26:37&lt;24:14,  4.18s/it] 34%|███▍      | 179/526 [26:39&lt;20:11,  3.49s/it] 34%|███▍      | 180/526 [26:41&lt;17:31,  3.04s/it] 34%|███▍      | 181/526 [26:44&lt;16:53,  2.94s/it] 35%|███▍      | 182/526 [26:46&lt;15:47,  2.75s/it] 35%|███▍      | 183/526 [26:48&lt;14:38,  2.56s/it] 35%|███▍      | 184/526 [26:50&lt;13:29,  2.37s/it] 35%|███▌      | 185/526 [26:52&lt;12:56,  2.28s/it] 35%|███▌      | 186/526 [26:55&lt;12:59,  2.29s/it] 36%|███▌      | 187/526 [26:57&lt;12:26,  2.20s/it] 36%|███▌      | 188/526 [26:59&lt;12:36,  2.24s/it] 36%|███▌      | 189/526 [27:01&lt;11:54,  2.12s/it] 36%|███▌      | 190/526 [27:03&lt;11:25,  2.04s/it] 36%|███▋      | 191/526 [27:05&lt;11:07,  1.99s/it] 37%|███▋      | 192/526 [27:07&lt;10:59,  1.97s/it] 37%|███▋      | 193/526 [27:09&lt;11:12,  2.02s/it] 37%|███▋      | 194/526 [27:11&lt;11:10,  2.02s/it] 37%|███▋      | 195/526 [27:13&lt;11:03,  2.01s/it] 37%|███▋      | 196/526 [27:15&lt;10:49,  1.97s/it] 37%|███▋      | 197/526 [27:16&lt;10:38,  1.94s/it] 38%|███▊      | 198/526 [27:18&lt;10:37,  1.94s/it] 38%|███▊      | 199/526 [27:20&lt;10:46,  1.98s/it] 38%|███▊      | 200/526 [27:22&lt;10:46,  1.98s/it] 38%|███▊      | 201/526 [27:24&lt;10:42,  1.98s/it] 38%|███▊      | 202/526 [27:26&lt;10:35,  1.96s/it] 39%|███▊      | 203/526 [27:28&lt;10:41,  1.99s/it] 39%|███▉      | 204/526 [27:31&lt;11:13,  2.09s/it] 39%|███▉      | 205/526 [27:33&lt;11:13,  2.10s/it] 39%|███▉      | 206/526 [27:35&lt;10:50,  2.03s/it] 39%|███▉      | 207/526 [27:37&lt;10:36,  2.00s/it] 40%|███▉      | 208/526 [27:38&lt;10:23,  1.96s/it] 40%|███▉      | 209/526 [27:40&lt;10:25,  1.97s/it] 40%|███▉      | 210/526 [27:43&lt;10:40,  2.03s/it] 40%|████      | 211/526 [27:45&lt;10:40,  2.03s/it] 40%|████      | 212/526 [27:47&lt;11:01,  2.11s/it] 40%|████      | 213/526 [27:49&lt;11:27,  2.20s/it] 41%|████      | 214/526 [27:51&lt;11:13,  2.16s/it] 41%|████      | 215/526 [27:55&lt;12:57,  2.50s/it] 41%|████      | 216/526 [27:57&lt;12:40,  2.45s/it] 41%|████▏     | 217/526 [27:59&lt;11:55,  2.32s/it] 41%|████▏     | 218/526 [28:02&lt;12:08,  2.37s/it] 42%|████▏     | 219/526 [28:04&lt;12:10,  2.38s/it] 42%|████▏     | 220/526 [28:06&lt;11:27,  2.25s/it] 42%|████▏     | 221/526 [28:08&lt;11:02,  2.17s/it] 42%|████▏     | 222/526 [28:10&lt;10:53,  2.15s/it] 42%|████▏     | 223/526 [28:12&lt;11:18,  2.24s/it] 43%|████▎     | 224/526 [28:15&lt;11:39,  2.32s/it] 43%|████▎     | 225/526 [28:17&lt;11:40,  2.33s/it] 43%|████▎     | 226/526 [28:20&lt;11:53,  2.38s/it] 43%|████▎     | 227/526 [28:22&lt;11:41,  2.34s/it] 43%|████▎     | 228/526 [28:24&lt;11:39,  2.35s/it] 44%|████▎     | 229/526 [28:27&lt;12:03,  2.44s/it] 44%|████▎     | 230/526 [28:31&lt;13:34,  2.75s/it] 44%|████▍     | 231/526 [28:33&lt;13:35,  2.76s/it] 44%|████▍     | 232/526 [28:36&lt;12:51,  2.63s/it] 44%|████▍     | 233/526 [28:38&lt;12:20,  2.53s/it] 44%|████▍     | 234/526 [28:40&lt;11:51,  2.44s/it] 45%|████▍     | 235/526 [28:43&lt;11:41,  2.41s/it] 45%|████▍     | 236/526 [28:45&lt;11:46,  2.44s/it] 45%|████▌     | 237/526 [28:47&lt;10:50,  2.25s/it] 45%|████▌     | 238/526 [28:49&lt;10:33,  2.20s/it] 45%|████▌     | 239/526 [28:51&lt;10:11,  2.13s/it] 46%|████▌     | 240/526 [28:53&lt;09:51,  2.07s/it] 46%|████▌     | 241/526 [28:55&lt;09:43,  2.05s/it] 46%|████▌     | 242/526 [28:57&lt;09:27,  2.00s/it] 46%|████▌     | 243/526 [32:25&lt;5:01:01, 63.82s/it] 46%|████▋     | 244/526 [32:27&lt;3:33:20, 45.39s/it] 47%|████▋     | 245/526 [32:29&lt;2:31:30, 32.35s/it] 47%|████▋     | 246/526 [32:31&lt;1:48:19, 23.21s/it] 47%|████▋     | 247/526 [32:33&lt;1:18:19, 16.85s/it] 47%|████▋     | 248/526 [32:36&lt;58:52, 12.71s/it]   47%|████▋     | 249/526 [32:39&lt;44:44,  9.69s/it] 48%|████▊     | 250/526 [32:41&lt;34:19,  7.46s/it] 48%|████▊     | 251/526 [32:43&lt;26:30,  5.78s/it] 48%|████▊     | 252/526 [32:45&lt;21:04,  4.62s/it] 48%|████▊     | 253/526 [32:47&lt;17:15,  3.79s/it] 48%|████▊     | 254/526 [32:49&lt;14:41,  3.24s/it] 48%|████▊     | 255/526 [32:50&lt;12:44,  2.82s/it] 49%|████▊     | 256/526 [32:52&lt;11:41,  2.60s/it] 49%|████▉     | 257/526 [32:54&lt;10:41,  2.39s/it] 49%|████▉     | 258/526 [32:56&lt;10:14,  2.29s/it] 49%|████▉     | 259/526 [32:58&lt;09:43,  2.19s/it] 49%|████▉     | 260/526 [33:00&lt;09:17,  2.09s/it] 50%|████▉     | 261/526 [33:02&lt;09:08,  2.07s/it] 50%|████▉     | 262/526 [33:04&lt;09:11,  2.09s/it] 50%|█████     | 263/526 [33:06&lt;08:54,  2.03s/it] 50%|█████     | 264/526 [33:09&lt;09:12,  2.11s/it] 50%|█████     | 265/526 [33:10&lt;08:51,  2.04s/it] 51%|█████     | 266/526 [33:12&lt;08:47,  2.03s/it] 51%|█████     | 267/526 [33:14&lt;08:33,  1.98s/it] 51%|█████     | 268/526 [33:16&lt;08:23,  1.95s/it] 51%|█████     | 269/526 [33:18&lt;08:36,  2.01s/it] 51%|█████▏    | 270/526 [33:20&lt;08:29,  1.99s/it] 52%|█████▏    | 271/526 [33:22&lt;08:19,  1.96s/it] 52%|█████▏    | 272/526 [33:24&lt;08:09,  1.93s/it] 52%|█████▏    | 273/526 [33:26&lt;08:07,  1.93s/it] 52%|█████▏    | 274/526 [33:28&lt;08:11,  1.95s/it] 52%|█████▏    | 275/526 [33:30&lt;08:13,  1.97s/it] 52%|█████▏    | 276/526 [33:32&lt;08:06,  1.94s/it] 53%|█████▎    | 277/526 [33:34&lt;07:57,  1.92s/it] 53%|█████▎    | 278/526 [33:36&lt;07:55,  1.92s/it] 53%|█████▎    | 279/526 [33:38&lt;08:22,  2.03s/it] 53%|█████▎    | 280/526 [33:40&lt;08:08,  1.99s/it] 53%|█████▎    | 281/526 [33:42&lt;08:00,  1.96s/it] 54%|█████▎    | 282/526 [33:44&lt;08:02,  1.98s/it] 54%|█████▍    | 283/526 [33:46&lt;07:53,  1.95s/it] 54%|█████▍    | 284/526 [33:47&lt;07:46,  1.93s/it] 54%|█████▍    | 285/526 [33:49&lt;07:40,  1.91s/it] 54%|█████▍    | 286/526 [33:51&lt;07:39,  1.92s/it] 55%|█████▍    | 287/526 [33:53&lt;07:35,  1.90s/it] 55%|█████▍    | 288/526 [33:55&lt;07:49,  1.97s/it] 55%|█████▍    | 289/526 [33:57&lt;07:43,  1.95s/it] 55%|█████▌    | 290/526 [33:59&lt;07:35,  1.93s/it] 55%|█████▌    | 291/526 [34:01&lt;07:28,  1.91s/it] 56%|█████▌    | 292/526 [34:03&lt;07:40,  1.97s/it] 56%|█████▌    | 293/526 [34:05&lt;07:33,  1.95s/it] 56%|█████▌    | 294/526 [34:07&lt;07:54,  2.04s/it] 56%|█████▌    | 295/526 [34:09&lt;07:40,  1.99s/it] 56%|█████▋    | 296/526 [34:11&lt;07:47,  2.03s/it] 56%|█████▋    | 297/526 [34:14&lt;08:06,  2.12s/it] 57%|█████▋    | 298/526 [34:16&lt;08:03,  2.12s/it] 57%|█████▋    | 299/526 [34:18&lt;07:48,  2.06s/it] 57%|█████▋    | 300/526 [34:20&lt;08:01,  2.13s/it] 57%|█████▋    | 301/526 [34:22&lt;07:44,  2.06s/it] 57%|█████▋    | 302/526 [34:24&lt;07:29,  2.01s/it] 58%|█████▊    | 303/526 [34:26&lt;07:24,  1.99s/it] 58%|█████▊    | 304/526 [34:27&lt;07:15,  1.96s/it] 58%|█████▊    | 305/526 [34:29&lt;07:08,  1.94s/it] 58%|█████▊    | 306/526 [34:31&lt;07:00,  1.91s/it] 58%|█████▊    | 307/526 [34:33&lt;07:07,  1.95s/it] 59%|█████▊    | 308/526 [34:35&lt;06:58,  1.92s/it] 59%|█████▊    | 309/526 [34:37&lt;06:52,  1.90s/it] 59%|█████▉    | 310/526 [34:39&lt;06:47,  1.89s/it] 59%|█████▉    | 311/526 [34:41&lt;06:48,  1.90s/it] 59%|█████▉    | 312/526 [34:43&lt;06:53,  1.93s/it] 60%|█████▉    | 313/526 [34:46&lt;07:43,  2.17s/it] 60%|█████▉    | 314/526 [34:48&lt;07:45,  2.19s/it] 60%|█████▉    | 315/526 [34:50&lt;07:26,  2.11s/it] 60%|██████    | 316/526 [34:52&lt;07:39,  2.19s/it] 60%|██████    | 317/526 [34:54&lt;07:16,  2.09s/it] 60%|██████    | 318/526 [34:56&lt;07:06,  2.05s/it] 61%|██████    | 319/526 [34:59&lt;07:46,  2.25s/it] 61%|██████    | 320/526 [35:01&lt;07:25,  2.16s/it] 61%|██████    | 321/526 [35:03&lt;07:47,  2.28s/it] 61%|██████    | 322/526 [35:05&lt;07:20,  2.16s/it] 61%|██████▏   | 323/526 [35:07&lt;06:59,  2.07s/it] 62%|██████▏   | 324/526 [35:09&lt;06:47,  2.02s/it] 62%|██████▏   | 325/526 [35:11&lt;06:38,  1.98s/it] 62%|██████▏   | 326/526 [35:13&lt;06:44,  2.02s/it] 62%|██████▏   | 327/526 [35:15&lt;06:35,  1.99s/it] 62%|██████▏   | 328/526 [35:17&lt;06:38,  2.01s/it] 63%|██████▎   | 329/526 [35:19&lt;06:33,  2.00s/it] 63%|██████▎   | 330/526 [35:21&lt;06:25,  1.96s/it] 63%|██████▎   | 331/526 [35:23&lt;06:30,  2.00s/it] 63%|██████▎   | 332/526 [35:25&lt;06:25,  1.99s/it] 63%|██████▎   | 333/526 [35:27&lt;06:25,  1.99s/it] 63%|██████▎   | 334/526 [35:28&lt;06:15,  1.96s/it] 64%|██████▎   | 335/526 [35:31&lt;06:19,  1.99s/it] 64%|██████▍   | 336/526 [35:32&lt;06:10,  1.95s/it] 64%|██████▍   | 337/526 [35:34&lt;06:02,  1.92s/it] 64%|██████▍   | 338/526 [35:36&lt;06:01,  1.92s/it] 64%|██████▍   | 339/526 [35:38&lt;06:15,  2.01s/it] 65%|██████▍   | 340/526 [35:40&lt;06:06,  1.97s/it] 65%|██████▍   | 341/526 [35:42&lt;05:59,  1.94s/it] 65%|██████▌   | 342/526 [35:44&lt;06:05,  1.99s/it] 65%|██████▌   | 343/526 [35:46&lt;05:56,  1.95s/it] 65%|██████▌   | 344/526 [35:48&lt;05:51,  1.93s/it] 66%|██████▌   | 345/526 [35:51&lt;06:24,  2.12s/it] 66%|██████▌   | 346/526 [35:53&lt;06:21,  2.12s/it] 66%|██████▌   | 347/526 [35:55&lt;06:07,  2.05s/it] 66%|██████▌   | 348/526 [35:56&lt;05:55,  1.99s/it] 66%|██████▋   | 349/526 [35:59&lt;06:10,  2.09s/it] 67%|██████▋   | 350/526 [36:01&lt;05:56,  2.02s/it] 67%|██████▋   | 351/526 [36:03&lt;05:48,  1.99s/it] 67%|██████▋   | 352/526 [36:05&lt;05:50,  2.02s/it] 67%|██████▋   | 353/526 [36:06&lt;05:41,  1.98s/it] 67%|██████▋   | 354/526 [36:08&lt;05:37,  1.96s/it] 67%|██████▋   | 355/526 [36:10&lt;05:31,  1.94s/it] 68%|██████▊   | 356/526 [36:12&lt;05:25,  1.91s/it] 68%|██████▊   | 357/526 [36:14&lt;05:19,  1.89s/it] 68%|██████▊   | 358/526 [36:16&lt;05:16,  1.89s/it] 68%|██████▊   | 359/526 [36:18&lt;05:25,  1.95s/it] 68%|██████▊   | 360/526 [36:20&lt;05:22,  1.94s/it] 69%|██████▊   | 361/526 [36:22&lt;05:15,  1.91s/it] 69%|██████▉   | 362/526 [36:24&lt;05:16,  1.93s/it] 69%|██████▉   | 363/526 [36:26&lt;05:16,  1.94s/it] 69%|██████▉   | 364/526 [36:28&lt;05:12,  1.93s/it] 69%|██████▉   | 365/526 [36:30&lt;05:26,  2.03s/it] 70%|██████▉   | 366/526 [36:32&lt;05:39,  2.12s/it] 70%|██████▉   | 367/526 [36:34&lt;05:34,  2.10s/it] 70%|██████▉   | 368/526 [36:36&lt;05:19,  2.02s/it] 70%|███████   | 369/526 [36:38&lt;05:10,  1.98s/it] 70%|███████   | 370/526 [36:40&lt;05:04,  1.95s/it] 71%|███████   | 371/526 [36:42&lt;05:08,  1.99s/it] 71%|███████   | 372/526 [36:44&lt;05:03,  1.97s/it] 71%|███████   | 373/526 [36:46&lt;05:05,  2.00s/it] 71%|███████   | 374/526 [36:48&lt;04:55,  1.95s/it] 71%|███████▏  | 375/526 [36:50&lt;04:51,  1.93s/it] 71%|███████▏  | 376/526 [36:51&lt;04:46,  1.91s/it] 72%|███████▏  | 377/526 [36:54&lt;04:59,  2.01s/it] 72%|███████▏  | 378/526 [36:56&lt;04:56,  2.00s/it] 72%|███████▏  | 379/526 [36:58&lt;04:52,  1.99s/it] 72%|███████▏  | 380/526 [37:00&lt;04:55,  2.02s/it] 72%|███████▏  | 381/526 [37:02&lt;04:56,  2.04s/it] 73%|███████▎  | 382/526 [37:04&lt;05:03,  2.11s/it] 73%|███████▎  | 383/526 [37:06&lt;04:50,  2.03s/it] 73%|███████▎  | 384/526 [37:08&lt;04:49,  2.04s/it] 73%|███████▎  | 385/526 [37:10&lt;04:45,  2.02s/it] 73%|███████▎  | 386/526 [37:12&lt;04:46,  2.05s/it] 74%|███████▎  | 387/526 [37:14&lt;04:38,  2.00s/it] 74%|███████▍  | 388/526 [37:16&lt;04:28,  1.94s/it] 74%|███████▍  | 389/526 [37:18&lt;04:22,  1.91s/it] 74%|███████▍  | 390/526 [37:20&lt;04:28,  1.97s/it] 74%|███████▍  | 391/526 [37:22&lt;04:26,  1.98s/it] 75%|███████▍  | 392/526 [37:24&lt;04:24,  1.97s/it] 75%|███████▍  | 393/526 [37:26&lt;04:26,  2.00s/it] 75%|███████▍  | 394/526 [37:28&lt;04:20,  1.98s/it] 75%|███████▌  | 395/526 [37:30&lt;04:14,  1.95s/it] 75%|███████▌  | 396/526 [37:32&lt;04:12,  1.95s/it] 75%|███████▌  | 397/526 [37:34&lt;04:13,  1.97s/it] 76%|███████▌  | 398/526 [37:35&lt;04:07,  1.93s/it] 76%|███████▌  | 399/526 [37:37&lt;04:01,  1.90s/it] 76%|███████▌  | 400/526 [37:39&lt;04:06,  1.96s/it] 76%|███████▌  | 401/526 [37:41&lt;04:10,  2.01s/it] 76%|███████▋  | 402/526 [37:44&lt;04:10,  2.02s/it] 77%|███████▋  | 403/526 [37:46&lt;04:15,  2.08s/it] 77%|███████▋  | 404/526 [37:48&lt;04:05,  2.01s/it] 77%|███████▋  | 405/526 [37:50&lt;04:12,  2.09s/it] 77%|███████▋  | 406/526 [37:52&lt;04:09,  2.08s/it] 77%|███████▋  | 407/526 [37:54&lt;04:00,  2.02s/it] 78%|███████▊  | 408/526 [37:56&lt;03:57,  2.01s/it] 78%|███████▊  | 409/526 [37:58&lt;03:57,  2.03s/it] 78%|███████▊  | 410/526 [38:00&lt;03:50,  1.99s/it] 78%|███████▊  | 411/526 [38:02&lt;03:50,  2.00s/it] 78%|███████▊  | 412/526 [38:04&lt;03:54,  2.05s/it] 79%|███████▊  | 413/526 [38:06&lt;03:46,  2.01s/it] 79%|███████▊  | 414/526 [38:08&lt;03:40,  1.97s/it] 79%|███████▉  | 415/526 [38:10&lt;03:35,  1.94s/it] 79%|███████▉  | 416/526 [38:12&lt;03:41,  2.01s/it] 79%|███████▉  | 417/526 [38:14&lt;03:37,  1.99s/it] 79%|███████▉  | 418/526 [38:16&lt;03:48,  2.11s/it] 80%|███████▉  | 419/526 [38:18&lt;03:39,  2.06s/it] 80%|███████▉  | 420/526 [38:20&lt;03:39,  2.07s/it] 80%|████████  | 421/526 [38:22&lt;03:32,  2.03s/it] 80%|████████  | 422/526 [38:24&lt;03:42,  2.14s/it] 80%|████████  | 423/526 [38:26&lt;03:32,  2.06s/it] 81%|████████  | 424/526 [38:28&lt;03:26,  2.02s/it] 81%|████████  | 425/526 [38:30&lt;03:21,  1.99s/it] 81%|████████  | 426/526 [38:32&lt;03:19,  1.99s/it] 81%|████████  | 427/526 [38:34&lt;03:14,  1.97s/it] 81%|████████▏ | 428/526 [38:36&lt;03:09,  1.94s/it] 82%|████████▏ | 429/526 [38:38&lt;03:16,  2.02s/it] 82%|████████▏ | 430/526 [38:40&lt;03:11,  1.99s/it] 82%|████████▏ | 431/526 [38:43&lt;03:25,  2.16s/it] 82%|████████▏ | 432/526 [38:45&lt;03:14,  2.07s/it] 82%|████████▏ | 433/526 [38:47&lt;03:29,  2.25s/it] 83%|████████▎ | 434/526 [38:50&lt;03:40,  2.39s/it] 83%|████████▎ | 435/526 [38:52&lt;03:35,  2.36s/it] 83%|████████▎ | 436/526 [38:54&lt;03:18,  2.21s/it] 83%|████████▎ | 437/526 [38:56&lt;03:09,  2.13s/it] 83%|████████▎ | 438/526 [38:58&lt;03:02,  2.08s/it] 83%|████████▎ | 439/526 [39:00&lt;03:07,  2.15s/it] 84%|████████▎ | 440/526 [39:02&lt;02:57,  2.06s/it] 84%|████████▍ | 441/526 [39:04&lt;02:59,  2.11s/it] 84%|████████▍ | 442/526 [39:06&lt;02:51,  2.04s/it] 84%|████████▍ | 443/526 [39:08&lt;02:48,  2.03s/it] 84%|████████▍ | 444/526 [39:10&lt;02:43,  1.99s/it] 85%|████████▍ | 445/526 [39:12&lt;02:40,  1.98s/it] 85%|████████▍ | 446/526 [39:14&lt;02:35,  1.95s/it] 85%|████████▍ | 447/526 [39:16&lt;02:47,  2.12s/it] 85%|████████▌ | 448/526 [39:19&lt;02:46,  2.13s/it] 85%|████████▌ | 449/526 [39:21&lt;02:42,  2.12s/it] 86%|████████▌ | 450/526 [39:23&lt;02:41,  2.13s/it] 86%|████████▌ | 451/526 [39:25&lt;02:33,  2.05s/it] 86%|████████▌ | 452/526 [39:27&lt;02:28,  2.01s/it] 86%|████████▌ | 453/526 [39:29&lt;02:23,  1.96s/it] 86%|████████▋ | 454/526 [39:31&lt;02:21,  1.97s/it] 87%|████████▋ | 455/526 [39:32&lt;02:18,  1.95s/it] 87%|████████▋ | 456/526 [39:34&lt;02:17,  1.96s/it] 87%|████████▋ | 457/526 [39:36&lt;02:13,  1.93s/it] 87%|████████▋ | 458/526 [39:38&lt;02:11,  1.94s/it] 87%|████████▋ | 459/526 [39:40&lt;02:08,  1.92s/it] 87%|████████▋ | 460/526 [39:42&lt;02:08,  1.95s/it] 88%|████████▊ | 461/526 [39:44&lt;02:07,  1.96s/it]                                                 </code></pre>
+</div>
+<div class="cell-output cell-output-error">
+<pre><code>TypeError: ufunc 'points' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe''</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

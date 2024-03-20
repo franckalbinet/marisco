@@ -1,0 +1,3959 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.551">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Data pipeline (handler) to convert TEPCO dataset (Source) to NetCDF format">
+
+<title>marisco - TEPCO</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="marisco - TEPCO">
+<meta property="og:description" content="Data pipeline (handler) to convert TEPCO dataset (Source) to NetCDF format">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="marisco - TEPCO">
+<meta name="twitter:description" content="Data pipeline (handler) to convert TEPCO dataset (Source) to NetCDF format">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../handlers/tepco.html">Handlers</a></li><li class="breadcrumb-item"><a href="../handlers/tepco.html">TEPCO</a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/tepco.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">TEPCO</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc_template.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS NetCDF Template</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/serializers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Serializers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Utilities</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#packages-import" id="toc-packages-import" class="nav-link active" data-scroll-target="#packages-import">Packages import</a></li>
+  <li><a href="#utils" id="toc-utils" class="nav-link" data-scroll-target="#utils">Utils</a>
+  <ul class="collapse">
+  <li><a href="#load_data" id="toc-load_data" class="nav-link" data-scroll-target="#load_data">load_data</a></li>
+  </ul></li>
+  <li><a href="#load-tables" id="toc-load-tables" class="nav-link" data-scroll-target="#load-tables">Load tables</a></li>
+  <li><a href="#data-transformation-pipeline" id="toc-data-transformation-pipeline" class="nav-link" data-scroll-target="#data-transformation-pipeline">Data transformation pipeline</a>
+  <ul class="collapse">
+  <li><a href="#fix-missing-values" id="toc-fix-missing-values" class="nav-link" data-scroll-target="#fix-missing-values">Fix missing values</a></li>
+  <li><a href="#fixmissingvaluescb" id="toc-fixmissingvaluescb" class="nav-link" data-scroll-target="#fixmissingvaluescb">FixMissingValuesCB</a></li>
+  <li><a href="#remove-japanese-character" id="toc-remove-japanese-character" class="nav-link" data-scroll-target="#remove-japanese-character">Remove Japanese character</a></li>
+  <li><a href="#removejapanasecharcb" id="toc-removejapanasecharcb" class="nav-link" data-scroll-target="#removejapanasecharcb">RemoveJapanaseCharCB</a></li>
+  <li><a href="#fix-values-range-string" id="toc-fix-values-range-string" class="nav-link" data-scroll-target="#fix-values-range-string">Fix values range string</a></li>
+  <li><a href="#fixrangevaluestringcb" id="toc-fixrangevaluestringcb" class="nav-link" data-scroll-target="#fixrangevaluestringcb">FixRangeValueStringCB</a></li>
+  <li><a href="#normalize-nuclide-name" id="toc-normalize-nuclide-name" class="nav-link" data-scroll-target="#normalize-nuclide-name">Normalize nuclide name</a></li>
+  <li><a href="#remaprdnnamecb" id="toc-remaprdnnamecb" class="nav-link" data-scroll-target="#remaprdnnamecb">RemapRdnNameCB</a></li>
+  <li><a href="#parse-time" id="toc-parse-time" class="nav-link" data-scroll-target="#parse-time">Parse time</a></li>
+  <li><a href="#time_parser" id="toc-time_parser" class="nav-link" data-scroll-target="#time_parser">time_parser</a></li>
+  <li><a href="#parsetimecb" id="toc-parsetimecb" class="nav-link" data-scroll-target="#parsetimecb">ParseTimeCB</a></li>
+  <li><a href="#rename-columns" id="toc-rename-columns" class="nav-link" data-scroll-target="#rename-columns">Rename columns</a></li>
+  <li><a href="#renamecolumncb" id="toc-renamecolumncb" class="nav-link" data-scroll-target="#renamecolumncb">RenameColumnCB</a></li>
+  <li><a href="#select-columns-of-interest" id="toc-select-columns-of-interest" class="nav-link" data-scroll-target="#select-columns-of-interest">Select columns of interest</a></li>
+  <li><a href="#selectcolumnscb" id="toc-selectcolumnscb" class="nav-link" data-scroll-target="#selectcolumnscb">SelectColumnsCB</a></li>
+  <li><a href="#encode-time-seconds-since" id="toc-encode-time-seconds-since" class="nav-link" data-scroll-target="#encode-time-seconds-since">Encode time (seconds since …)</a></li>
+  <li><a href="#retrieve-depth" id="toc-retrieve-depth" class="nav-link" data-scroll-target="#retrieve-depth">Retrieve depth</a></li>
+  <li><a href="#sanitize-coordinates" id="toc-sanitize-coordinates" class="nav-link" data-scroll-target="#sanitize-coordinates">Sanitize coordinates</a></li>
+  </ul></li>
+  <li><a href="#encode-to-netcdf" id="toc-encode-to-netcdf" class="nav-link" data-scroll-target="#encode-to-netcdf">Encode to NetCDF</a>
+  <ul class="collapse">
+  <li><a href="#feed-global-attributes" id="toc-feed-global-attributes" class="nav-link" data-scroll-target="#feed-global-attributes">Feed global attributes</a></li>
+  <li><a href="#get_attrs" id="toc-get_attrs" class="nav-link" data-scroll-target="#get_attrs">get_attrs</a></li>
+  <li><a href="#encoding" id="toc-encoding" class="nav-link" data-scroll-target="#encoding">Encoding</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../handlers/tepco.html">Handlers</a></li><li class="breadcrumb-item"><a href="../handlers/tepco.html">TEPCO</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">TEPCO</h1>
+</div>
+
+<div>
+  <div class="description">
+    Data pipeline (handler) to convert TEPCO dataset (<a href="https://radioactivity.nsr.go.jp/ja/list/349/list-1.html">Source</a>) to <code>NetCDF</code> format
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="packages-import" class="level2">
+<h2 class="anchored" data-anchor-id="packages-import">Packages import</h2>
+<div id="0db45fee" class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload</code></pre>
+</div>
+</div>
+<div id="3a8d979f" class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fastcore.<span class="bu">all</span> <span class="im">as</span> fc</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.callbacks <span class="im">import</span> (Callback, Transformer,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                               EncodeTimeCB, SanitizeLonLatCB)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.utils <span class="im">import</span> has_valid_varname</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.configs <span class="im">import</span> nc_tpl_path, cfg</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.metadata <span class="im">import</span> (GlobAttrsFeeder, BboxCB,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                              DepthRangeCB, TimeRangeCB,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                              ZoteroCB, KeyValuePairCB)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="7969707f-98cb-4d7c-9d0a-47f7408d5098" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fname_in <span class="op">=</span> <span class="st">'../../_data/xls/tepco/coastal_water.xlsx'</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fname_out <span class="op">=</span> <span class="st">'../../_data/output/tepco.nc'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="utils" class="level2">
+<h2 class="anchored" data-anchor-id="utils">Utils</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L9" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="load_data" class="level3">
+<h3 class="anchored" data-anchor-id="load_data">load_data</h3>
+<blockquote class="blockquote">
+<pre><code> load_data (fname_in)</code></pre>
+</blockquote>
+<p>Load TEPCO seawater data</p>
+</section>
+</section>
+<section id="load-tables" class="level2">
+<h2 class="anchored" data-anchor-id="load-tables">Load tables</h2>
+<p>The data is provided as a single <code>.xls</code> file. A preview of this file, e.g using <a href="http://www.openoffice.org/">Open Office</a>, indicates the presence of two datasets in a single sheet: the measurements and their locations that can be joined using the <code>Sampling point number</code> column.</p>
+<div id="3c8c242c" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="f68389c5" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"# of cols, rows: </span><span class="sc">{</span>dfs[<span class="st">'seawater'</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dfs[<span class="st">'seawater'</span>].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># of cols, rows: (21477, 52)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sampling date</th>
+<th data-quarto-table-cell-role="th">Sampling time</th>
+<th data-quarto-table-cell-role="th">Sampling point number</th>
+<th data-quarto-table-cell-role="th">Collection layer of seawater</th>
+<th data-quarto-table-cell-role="th">131I radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">131I detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">134Cs radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">134Cs detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">137Cs radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">137Cs detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">54Mn detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">3H radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">3H detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">125Sb radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">125Sb detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">105Ru radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">105Ru detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">Unnamed: 49</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate North latitude (Decimal)</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate East longitude (Decimal)</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sample</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2011-03-21</td>
+<td>23:15:00</td>
+<td>T-3</td>
+<td>NaN</td>
+<td>1100</td>
+<td>13</td>
+<td>48</td>
+<td>9.2</td>
+<td>53</td>
+<td>8.8</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2011-03-21</td>
+<td>23:45:00</td>
+<td>T-4</td>
+<td>NaN</td>
+<td>660</td>
+<td>12</td>
+<td>31</td>
+<td>8.7</td>
+<td>33</td>
+<td>8.3</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.01</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2011-03-22</td>
+<td>14:28:00</td>
+<td>T-3</td>
+<td>NaN</td>
+<td>1100</td>
+<td>20</td>
+<td>46</td>
+<td>14</td>
+<td>40</td>
+<td>14</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2011-03-22</td>
+<td>15:06:00</td>
+<td>T-4</td>
+<td>NaN</td>
+<td>670</td>
+<td>19</td>
+<td>39</td>
+<td>11</td>
+<td>44</td>
+<td>11</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.01</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2011-03-23</td>
+<td>13:51:00</td>
+<td>T-3</td>
+<td>NaN</td>
+<td>740</td>
+<td>27</td>
+<td>51</td>
+<td>20</td>
+<td>55</td>
+<td>20</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>34.0</td>
+<td>25.0</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 52 columns</p>
+</div>
+</div>
+</div>
+</div>
+<div id="84b36a8b" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dfs[<span class="st">'seawater'</span>].sample(<span class="dv">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sampling date</th>
+<th data-quarto-table-cell-role="th">Sampling time</th>
+<th data-quarto-table-cell-role="th">Sampling point number</th>
+<th data-quarto-table-cell-role="th">Collection layer of seawater</th>
+<th data-quarto-table-cell-role="th">131I radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">131I detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">134Cs radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">134Cs detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">137Cs radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">137Cs detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">54Mn detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">3H radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">3H detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">125Sb radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">125Sb detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">105Ru radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">105Ru detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">Unnamed: 49</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate North latitude (Decimal)</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate East longitude (Decimal)</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sample</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">21125</td>
+<td>2022-05-16</td>
+<td>08:27:00</td>
+<td>T-D9</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0012</td>
+<td>0.0055</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.33</td>
+<td>141.07</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7954</td>
+<td>2014-10-16</td>
+<td>10:00:00</td>
+<td>T-3</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.3</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">17124</td>
+<td>2019-12-16</td>
+<td>09:14:00</td>
+<td>T-D5</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0013</td>
+<td>0.012</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.42</td>
+<td>141.07</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2736</td>
+<td>2012-02-24</td>
+<td>08:25:00</td>
+<td>T-3</td>
+<td>上層</td>
+<td>ND</td>
+<td>約8.6E-01</td>
+<td>ND</td>
+<td>約9.0E-01</td>
+<td>ND</td>
+<td>約1.0E+00</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4765</td>
+<td>2013-03-06</td>
+<td>09:06:00</td>
+<td>T-D9</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>ND</td>
+<td>2.9</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.33</td>
+<td>141.07</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7516</td>
+<td>2014-07-22</td>
+<td>09:31:00</td>
+<td>T-D9</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.014</td>
+<td>NaN</td>
+<td>0.035</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.33</td>
+<td>141.07</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10929</td>
+<td>2016-04-08</td>
+<td>09:03:00</td>
+<td>T-7</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0013</td>
+<td>0.0022</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.23</td>
+<td>141.20</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11897</td>
+<td>2016-11-07</td>
+<td>09:42:00</td>
+<td>T-B4</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0013</td>
+<td>0.0043</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.35</td>
+<td>141.15</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1628</td>
+<td>2011-10-16</td>
+<td>07:35:00</td>
+<td>T-4</td>
+<td>上層</td>
+<td>ND</td>
+<td>約4.0E+00</td>
+<td>ND</td>
+<td>約6.0E+00</td>
+<td>ND</td>
+<td>約9.0E+00</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.01</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15570</td>
+<td>2019-01-22</td>
+<td>06:27:00</td>
+<td>T-B1</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0011</td>
+<td>0.0031</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.53</td>
+<td>141.22</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">19669</td>
+<td>2021-07-06</td>
+<td>10:50:00</td>
+<td>T-3</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.29</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15939</td>
+<td>2019-04-08</td>
+<td>07:59:00</td>
+<td>T-14</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0012</td>
+<td>0.0035</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.55</td>
+<td>141.06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">15935</td>
+<td>2019-04-05</td>
+<td>05:29:00</td>
+<td>T-17-1</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0015</td>
+<td>NaN</td>
+<td>0.0076</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.06</td>
+<td>141.01</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13802</td>
+<td>2017-12-26</td>
+<td>11:20:00</td>
+<td>T-3</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0028</td>
+<td>NaN</td>
+<td>0.022</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1241</td>
+<td>2011-08-24</td>
+<td>08:16:00</td>
+<td>T-MG2</td>
+<td>上層</td>
+<td>ND</td>
+<td>約4.0E+00</td>
+<td>ND</td>
+<td>約6.0E+00</td>
+<td>ND</td>
+<td>約9.0E+00</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>38.30</td>
+<td>141.67</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3069</td>
+<td>2012-04-10</td>
+<td>08:50:00</td>
+<td>T-D5</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.046</td>
+<td>NaN</td>
+<td>0.062</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.42</td>
+<td>141.07</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">556</td>
+<td>2011-06-21</td>
+<td>07:38:00</td>
+<td>T-E</td>
+<td>下層</td>
+<td>ND</td>
+<td>約8.0E+00</td>
+<td>ND</td>
+<td>約1.4E+01</td>
+<td>ND</td>
+<td>約1.3E+01</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>35.80</td>
+<td>140.84</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">8780</td>
+<td>2015-03-13</td>
+<td>10:24:00</td>
+<td>T-11</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0029</td>
+<td>NaN</td>
+<td>0.012</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2742</td>
+<td>2012-02-27</td>
+<td>14:10:00</td>
+<td>T-E</td>
+<td>上層</td>
+<td>ND</td>
+<td>約1.2E+00</td>
+<td>ND</td>
+<td>約1.4E+00</td>
+<td>ND</td>
+<td>約1.4E+00</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>35.80</td>
+<td>140.84</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">18418</td>
+<td>2020-10-01</td>
+<td>08:03:00</td>
+<td>T-M10</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0013</td>
+<td>0.0016</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.00</td>
+<td>141.08</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8953</td>
+<td>2015-04-09</td>
+<td>04:44:00</td>
+<td>T-22</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0019</td>
+<td>NaN</td>
+<td>0.0062</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.82</td>
+<td>141.02</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1692</td>
+<td>2011-10-25</td>
+<td>06:25:00</td>
+<td>T-MA</td>
+<td>上層</td>
+<td>ND</td>
+<td>約6.7E-01</td>
+<td>ND</td>
+<td>約9.4E-01</td>
+<td>ND</td>
+<td>約1.0E+00</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.75</td>
+<td>141.08</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10334</td>
+<td>2015-12-15</td>
+<td>06:57:00</td>
+<td>T-B1</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0014</td>
+<td>0.0042</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.53</td>
+<td>141.22</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">16901</td>
+<td>2019-11-11</td>
+<td>08:30:00</td>
+<td>T-11</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0013</td>
+<td>0.018</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">11739</td>
+<td>2016-10-04</td>
+<td>08:00:00</td>
+<td>T-5</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0014</td>
+<td>0.0058</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.42</td>
+<td>141.20</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4798</td>
+<td>2013-03-15</td>
+<td>09:46:00</td>
+<td>T-11</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.029</td>
+<td>NaN</td>
+<td>0.053</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3476</td>
+<td>2012-06-27</td>
+<td>09:45:00</td>
+<td>T-MG6</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.022</td>
+<td>NaN</td>
+<td>0.032</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>38.08</td>
+<td>141.00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">12120</td>
+<td>2016-12-19</td>
+<td>09:04:00</td>
+<td>T-D5</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0014</td>
+<td>0.0043</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.42</td>
+<td>141.07</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20016</td>
+<td>2021-09-21</td>
+<td>08:18:00</td>
+<td>T-14</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0014</td>
+<td>0.0037</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.55</td>
+<td>141.06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">16782</td>
+<td>2019-10-10</td>
+<td>07:12:00</td>
+<td>T-5</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.001</td>
+<td>0.002</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.42</td>
+<td>141.20</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6303</td>
+<td>2013-12-18</td>
+<td>10:34:00</td>
+<td>T-MG1</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0041</td>
+<td>NaN</td>
+<td>0.0091</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>38.33</td>
+<td>141.28</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13901</td>
+<td>2018-01-17</td>
+<td>07:23:00</td>
+<td>T-7</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0012</td>
+<td>0.0011</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.23</td>
+<td>141.20</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8164</td>
+<td>2014-11-18</td>
+<td>09:20:00</td>
+<td>T-6</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>0.46</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.48</td>
+<td>141.04</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">16404</td>
+<td>2019-07-17</td>
+<td>07:29:00</td>
+<td>T-5</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0013</td>
+<td>0.0029</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.42</td>
+<td>141.20</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">17496</td>
+<td>2020-03-13</td>
+<td>13:44:00</td>
+<td>T-Z</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.93</td>
+<td>ND</td>
+<td>1.1</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>36.79</td>
+<td>140.79</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">8991</td>
+<td>2015-04-14</td>
+<td>09:10:00</td>
+<td>T-6</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.012</td>
+<td>NaN</td>
+<td>0.045</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.48</td>
+<td>141.04</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5278</td>
+<td>2013-06-11</td>
+<td>09:17:00</td>
+<td>T-D1</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.015</td>
+<td>NaN</td>
+<td>0.026</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.50</td>
+<td>141.07</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3559</td>
+<td>2012-07-16</td>
+<td>07:45:00</td>
+<td>T-12</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.016</td>
+<td>NaN</td>
+<td>0.024</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.15</td>
+<td>141.04</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">19614</td>
+<td>2021-06-23</td>
+<td>05:26:00</td>
+<td>T-12</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0013</td>
+<td>0.0029</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.15</td>
+<td>141.04</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17454</td>
+<td>2020-03-03</td>
+<td>06:37:00</td>
+<td>T-B4</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0015</td>
+<td>0.0043</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.35</td>
+<td>141.15</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">19612</td>
+<td>2021-06-22</td>
+<td>13:35:00</td>
+<td>T-6</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0012</td>
+<td>0.0087</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.48</td>
+<td>141.04</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1321</td>
+<td>2011-09-06</td>
+<td>07:55:00</td>
+<td>T-4</td>
+<td>上層</td>
+<td>ND</td>
+<td>約4.0E+00</td>
+<td>ND</td>
+<td>約6.0E+00</td>
+<td>ND</td>
+<td>約9.0E+00</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.01</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14826</td>
+<td>2018-08-03</td>
+<td>10:39:00</td>
+<td>T-A</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.85</td>
+<td>ND</td>
+<td>1.2</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>36.71</td>
+<td>140.76</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17761</td>
+<td>2020-05-12</td>
+<td>08:10:00</td>
+<td>T-4</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0014</td>
+<td>NaN</td>
+<td>0.026</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.01</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5181</td>
+<td>2013-05-25</td>
+<td>05:44:00</td>
+<td>T-B3</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.006</td>
+<td>NaN</td>
+<td>0.012</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.41</td>
+<td>141.15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17159</td>
+<td>2019-12-29</td>
+<td>08:13:00</td>
+<td>T-5</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0013</td>
+<td>ND</td>
+<td>0.0029</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.42</td>
+<td>141.20</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2230</td>
+<td>2011-12-24</td>
+<td>09:05:00</td>
+<td>T-14</td>
+<td>下層</td>
+<td>ND</td>
+<td>約7.5E-01</td>
+<td>ND</td>
+<td>約9.3E-01</td>
+<td>ND</td>
+<td>約1.1E+00</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.55</td>
+<td>141.06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9468</td>
+<td>2015-07-07</td>
+<td>08:55:00</td>
+<td>T-6</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.03</td>
+<td>NaN</td>
+<td>0.11</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.48</td>
+<td>141.04</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5101</td>
+<td>2013-05-13</td>
+<td>09:58:00</td>
+<td>T-7</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0029</td>
+<td>NaN</td>
+<td>0.0072</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.23</td>
+<td>141.20</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13544</td>
+<td>2017-11-01</td>
+<td>09:22:00</td>
+<td>T-MG3</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>ND</td>
+<td>0.0014</td>
+<td>0.0014</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>38.23</td>
+<td>141.58</td>
+</tr>
+</tbody>
+</table>
+
+<p>50 rows × 52 columns</p>
+</div>
+</div>
+</div>
+</div>
+<div id="993a33d8" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>dfs[<span class="st">'seawater'</span>][<span class="st">'Sampling point number'</span>].unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array(['T-3', 'T-4', 'T-5', 'T-7', 'T-11', 'T-12', 'T-14', 'T-18', 'T-20',
+       'T-22', 'T-MA', 'T-M10', 'T-A', 'T-D', 'T-E', 'T-B', 'T-C',
+       'T-MG1', 'T-MG2', 'T-MG3', 'T-MG4', 'T-MG5', 'T-MG6', 'T-D1',
+       'T-D5', 'T-D9', 'T-E1', 'T-G4', 'T-H1', 'T-S6', 'T-17-1', 'T-B3',
+       'T-13-1', 'T-S3', 'T-S4', 'T-B4', 'T-S1', 'T-S2', 'T-MG0', 'T-Z',
+       'T-B1', 'T-B2', 'T-S7', 'T-S8', 'T-0', 'T-4-1', 'T-4-2', 'T-6'],
+      dtype=object)</code></pre>
+</div>
+</div>
+</section>
+<section id="data-transformation-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="data-transformation-pipeline">Data transformation pipeline</h2>
+<section id="fix-missing-values" class="level3">
+<h3 class="anchored" data-anchor-id="fix-missing-values">Fix missing values</h3>
+<p><code>ND</code> is assigned <code>NaN</code>. This needs to be confirmed.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L25" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="fixmissingvaluescb" class="level3">
+<h3 class="anchored" data-anchor-id="fixmissingvaluescb">FixMissingValuesCB</h3>
+<blockquote class="blockquote">
+<pre><code> FixMissingValuesCB ()</code></pre>
+</blockquote>
+<p>Assign <code>NaN</code> to values equal to <code>ND</code> (not detected) - to be confirmed</p>
+<div id="bcb6cf70" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[FixMissingValuesCB()])</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>tfm()[<span class="st">'seawater'</span>].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sampling date</th>
+<th data-quarto-table-cell-role="th">Sampling time</th>
+<th data-quarto-table-cell-role="th">Sampling point number</th>
+<th data-quarto-table-cell-role="th">Collection layer of seawater</th>
+<th data-quarto-table-cell-role="th">131I radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">131I detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">134Cs radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">134Cs detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">137Cs radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">137Cs detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">54Mn detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">3H radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">3H detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">125Sb radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">125Sb detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">105Ru radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">105Ru detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">Unnamed: 49</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate North latitude (Decimal)</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate East longitude (Decimal)</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sample</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2011-03-21</td>
+<td>23:15:00</td>
+<td>T-3</td>
+<td>NaN</td>
+<td>1100</td>
+<td>13</td>
+<td>48</td>
+<td>9.2</td>
+<td>53</td>
+<td>8.8</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2011-03-21</td>
+<td>23:45:00</td>
+<td>T-4</td>
+<td>NaN</td>
+<td>660</td>
+<td>12</td>
+<td>31</td>
+<td>8.7</td>
+<td>33</td>
+<td>8.3</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.01</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2011-03-22</td>
+<td>14:28:00</td>
+<td>T-3</td>
+<td>NaN</td>
+<td>1100</td>
+<td>20</td>
+<td>46</td>
+<td>14</td>
+<td>40</td>
+<td>14</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2011-03-22</td>
+<td>15:06:00</td>
+<td>T-4</td>
+<td>NaN</td>
+<td>670</td>
+<td>19</td>
+<td>39</td>
+<td>11</td>
+<td>44</td>
+<td>11</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.01</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2011-03-23</td>
+<td>13:51:00</td>
+<td>T-3</td>
+<td>NaN</td>
+<td>740</td>
+<td>27</td>
+<td>51</td>
+<td>20</td>
+<td>55</td>
+<td>20</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>34.0</td>
+<td>25.0</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 52 columns</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="remove-japanese-character" class="level3">
+<h3 class="anchored" data-anchor-id="remove-japanese-character">Remove Japanese character</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L33" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="removejapanasecharcb" class="level3">
+<h3 class="anchored" data-anchor-id="removejapanasecharcb">RemoveJapanaseCharCB</h3>
+<blockquote class="blockquote">
+<pre><code> RemoveJapanaseCharCB ()</code></pre>
+</blockquote>
+<p>Remove 約 (about) char</p>
+<div id="29af29b5" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    FixMissingValuesCB(),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    RemoveJapanaseCharCB()])</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>tfm()[<span class="st">'seawater'</span>].sample(<span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sampling date</th>
+<th data-quarto-table-cell-role="th">Sampling time</th>
+<th data-quarto-table-cell-role="th">Sampling point number</th>
+<th data-quarto-table-cell-role="th">Collection layer of seawater</th>
+<th data-quarto-table-cell-role="th">131I radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">131I detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">134Cs radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">134Cs detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">137Cs radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">137Cs detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">54Mn detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">3H radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">3H detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">125Sb radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">125Sb detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">105Ru radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">105Ru detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">Unnamed: 49</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate North latitude (Decimal)</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate East longitude (Decimal)</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sample</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14037</td>
+<td>2018-02-14</td>
+<td>07:52:00</td>
+<td>T-D1</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0012</td>
+<td>0.0052</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.50</td>
+<td>141.07</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">10236</td>
+<td>2015-12-02</td>
+<td>10:13:00</td>
+<td>T-D5</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0021</td>
+<td>NaN</td>
+<td>0.0110</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.42</td>
+<td>141.07</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">13253</td>
+<td>2017-08-29</td>
+<td>09:40:00</td>
+<td>T-6</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0065</td>
+<td>NaN</td>
+<td>0.0390</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.48</td>
+<td>141.04</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">10490</td>
+<td>2016-01-21</td>
+<td>10:20:00</td>
+<td>T-6</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.37</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.48</td>
+<td>141.04</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">17480</td>
+<td>2020-03-12</td>
+<td>07:10:00</td>
+<td>T-MA</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0016</td>
+<td>0.0033</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.75</td>
+<td>141.08</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7866</td>
+<td>2014-09-26</td>
+<td>08:40:00</td>
+<td>T-D5</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0031</td>
+<td>NaN</td>
+<td>0.0091</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.42</td>
+<td>141.07</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">12771</td>
+<td>2017-05-16</td>
+<td>09:40:00</td>
+<td>T-6</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0047</td>
+<td>NaN</td>
+<td>0.0330</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.48</td>
+<td>141.04</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2765</td>
+<td>2012-02-28</td>
+<td>10:34:00</td>
+<td>T-MG1</td>
+<td>中層</td>
+<td>NaN</td>
+<td>1.0E+00</td>
+<td>NaN</td>
+<td>1.3E+00</td>
+<td>NaN</td>
+<td>1.2E+00</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>38.33</td>
+<td>141.28</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">14050</td>
+<td>2018-02-16</td>
+<td>07:10:00</td>
+<td>T-7</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0013</td>
+<td>0.0023</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.23</td>
+<td>141.20</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8373</td>
+<td>2014-12-22</td>
+<td>07:58:00</td>
+<td>T-D9</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.3</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.33</td>
+<td>141.07</td>
+</tr>
+</tbody>
+</table>
+
+<p>100 rows × 52 columns</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="fix-values-range-string" class="level3">
+<h3 class="anchored" data-anchor-id="fix-values-range-string">Fix values range string</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L46" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="fixrangevaluestringcb" class="level3">
+<h3 class="anchored" data-anchor-id="fixrangevaluestringcb">FixRangeValueStringCB</h3>
+<blockquote class="blockquote">
+<pre><code> FixRangeValueStringCB ()</code></pre>
+</blockquote>
+<p>Replace e.g <code>4.0E+00&lt;&amp;&lt;8.0E+00</code> by its mean (here 6)</p>
+<div id="ea5c7404" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    FixMissingValuesCB(),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    RemoveJapanaseCharCB(),</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    FixRangeValueStringCB()])</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>tfm()[<span class="st">'seawater'</span>].sample(<span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sampling date</th>
+<th data-quarto-table-cell-role="th">Sampling time</th>
+<th data-quarto-table-cell-role="th">Sampling point number</th>
+<th data-quarto-table-cell-role="th">Collection layer of seawater</th>
+<th data-quarto-table-cell-role="th">131I radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">131I detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">134Cs radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">134Cs detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">137Cs radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">137Cs detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">54Mn detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">3H radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">3H detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">125Sb radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">125Sb detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">105Ru radioactivity concentration (Bq/L)</th>
+<th data-quarto-table-cell-role="th">105Ru detection limit (Bq/L)</th>
+<th data-quarto-table-cell-role="th">Unnamed: 49</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate North latitude (Decimal)</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate East longitude (Decimal)</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sample</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12263</td>
+<td>2017-01-26</td>
+<td>08:57:00</td>
+<td>T-5</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0013</td>
+<td>0.0036</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.42</td>
+<td>141.20</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">16389</td>
+<td>2019-07-12</td>
+<td>08:15:00</td>
+<td>T-B</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.79</td>
+<td>NaN</td>
+<td>1.1</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>36.51</td>
+<td>140.67</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">13998</td>
+<td>2018-02-08</td>
+<td>06:01:00</td>
+<td>T-20</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0012</td>
+<td>0.0031</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>36.97</td>
+<td>141.00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11115</td>
+<td>2016-05-17</td>
+<td>07:32:00</td>
+<td>T-D9</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0011</td>
+<td>0.0077</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.33</td>
+<td>141.07</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">17110</td>
+<td>2019-12-13</td>
+<td>09:33:00</td>
+<td>T-MG2</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0015</td>
+<td>0.0020</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>38.30</td>
+<td>141.67</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">9963</td>
+<td>2015-10-14</td>
+<td>08:05:00</td>
+<td>T-5</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0017</td>
+<td>0.0051</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.42</td>
+<td>141.20</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11651</td>
+<td>2016-09-15</td>
+<td>05:56:00</td>
+<td>T-S3</td>
+<td>下層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0012</td>
+<td>0.0059</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.46</td>
+<td>141.08</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">17483</td>
+<td>2020-03-12</td>
+<td>10:41:00</td>
+<td>T-S1</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0012</td>
+<td>0.0150</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.58</td>
+<td>141.04</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11589</td>
+<td>2016-09-03</td>
+<td>10:06:00</td>
+<td>T-MG1</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0.0015</td>
+<td>0.0062</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>38.33</td>
+<td>141.28</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3375</td>
+<td>2012-06-12</td>
+<td>09:40:00</td>
+<td>T-MG0</td>
+<td>上層</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1.9E-03</td>
+<td>0.0036</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>38.63</td>
+<td>141.58</td>
+</tr>
+</tbody>
+</table>
+
+<p>100 rows × 52 columns</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="normalize-nuclide-name" class="level3">
+<h3 class="anchored" data-anchor-id="normalize-nuclide-name">Normalize nuclide name</h3>
+<div id="8ea62385" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if these variable names consistent with MARIS CDL</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>has_valid_varname(renaming_rules_rdn.values(), nc_tpl_path())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>True</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L116" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="remaprdnnamecb" class="level3">
+<h3 class="anchored" data-anchor-id="remaprdnnamecb">RemapRdnNameCB</h3>
+<blockquote class="blockquote">
+<pre><code> RemapRdnNameCB (renaming_rules={'131I radioactivity concentration
+                 (Bq/L)': 'i131', '131I detection limit (Bq/L)':
+                 'i131_dl', '134Cs radioactivity concentration (Bq/L)':
+                 'cs134', '134Cs detection limit (Bq/L)': 'cs134_dl',
+                 '137Cs radioactivity concentration (Bq/L)': 'cs137',
+                 '137Cs detection limit (Bq/L)': 'cs137_dl', '132I
+                 radioactivity concentration (Bq/L)': 'i132', '132I
+                 detection limit (Bq/L)': 'i132_dl', '132Te radioactivity
+                 concentration (Bq/L)': 'te132', '132Te detection limit
+                 (Bq/L)': 'te132_dl', '136Cs radioactivity concentration
+                 (Bq/L)': 'cs136', '136Cs detection limit (Bq/L)':
+                 'cs136_dl', '140La radioactivity concentration (Bq/L)':
+                 'la140', '140La detection limit (Bq/L)': 'la140_dl',
+                 '89Sr radioactivity concentration (Bq/L)': 'sr89', '89Sr
+                 detection limit (Bq/L)': 'sr89_dl', '90Sr radioactivity
+                 concentration (Bq/L)': 'sr90', '90Sr detection limit
+                 (Bq/L)': 'sr90_dl', '238Pu radioactivity concentration
+                 (Bq/L)': 'pu238', '238Pu detection limit (Bq/L)':
+                 'pu238_dl', '239Pu+240Pu radioactivity concentration
+                 (Bq/L)': 'pu239_240_tot', '239Pu+240Pu statistical error
+                 (Bq/L)': 'pu239_240_tot_unc', '239Pu+240Pu detection
+                 limit (Bq/L)': 'pu239_240_tot_dl', 'Total alpha
+                 radioactivity concentration (Bq/L)': 'talpha', 'Total
+                 alpha detection limit (Bq/L)': 'talpha_dl', 'Total beta
+                 radioactivity concentration (Bq/L)': 'tbeta', 'Total beta
+                 detection limit (Bq/L)': 'tbeta_dl', '140Ba radioactivity
+                 concentration (Bq/L)': 'ba140', '140Ba detection limit
+                 (Bq/L)': 'ba140_dl', '106Ru radioactivity concentration
+                 (Bq/L)': 'ru106', '106Ru detection limit (Bq/L)':
+                 'ru106_dl', '58Co radioactivity concentration (Bq/L)':
+                 'co58', '58Co detection limit (Bq/L)': 'co58_dl', '60Co
+                 radioactivity concentration (Bq/L)': 'co60', '60Co
+                 detection limit (Bq/L)': 'co60_dl', '144Ce radioactivity
+                 concentration (Bq/L)': 'ce144', '144Ce detection limit
+                 (Bq/L)': 'ce144_dl', '54Mn radioactivity concentration
+                 (Bq/L)': 'mn54', '54Mn detection limit (Bq/L)':
+                 'mn54_dl', '3H radioactivity concentration (Bq/L)': 'h3',
+                 '3H detection limit (Bq/L)': 'h3_dl', '125Sb
+                 radioactivity concentration (Bq/L)': 'sb125', '125Sb
+                 detection limit (Bq/L)': 'sb125_dl', '105Ru radioactivity
+                 concentration (Bq/L)': 'ru105', '105Ru detection limit
+                 (Bq/L)': 'ru105_dl'})</code></pre>
+</blockquote>
+<p>Remap to MARIS radionuclide names</p>
+<div id="f18e4b50" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[FixMissingValuesCB(),</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                            RemoveJapanaseCharCB(),</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                            FixRangeValueStringCB(),</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB()])</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>tfm()[<span class="st">'seawater'</span>].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Sampling date</th>
+<th data-quarto-table-cell-role="th">Sampling time</th>
+<th data-quarto-table-cell-role="th">Sampling point number</th>
+<th data-quarto-table-cell-role="th">Collection layer of seawater</th>
+<th data-quarto-table-cell-role="th">i131</th>
+<th data-quarto-table-cell-role="th">i131_dl</th>
+<th data-quarto-table-cell-role="th">cs134</th>
+<th data-quarto-table-cell-role="th">cs134_dl</th>
+<th data-quarto-table-cell-role="th">cs137</th>
+<th data-quarto-table-cell-role="th">cs137_dl</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">mn54_dl</th>
+<th data-quarto-table-cell-role="th">h3</th>
+<th data-quarto-table-cell-role="th">h3_dl</th>
+<th data-quarto-table-cell-role="th">sb125</th>
+<th data-quarto-table-cell-role="th">sb125_dl</th>
+<th data-quarto-table-cell-role="th">ru105</th>
+<th data-quarto-table-cell-role="th">ru105_dl</th>
+<th data-quarto-table-cell-role="th">Unnamed: 49</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate North latitude (Decimal)</th>
+<th data-quarto-table-cell-role="th">Sampling coordinate East longitude (Decimal)</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sample</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2011-03-21</td>
+<td>23:15:00</td>
+<td>T-3</td>
+<td>NaN</td>
+<td>1100.0</td>
+<td>13</td>
+<td>48.0</td>
+<td>9.2</td>
+<td>53.0</td>
+<td>8.8</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2011-03-21</td>
+<td>23:45:00</td>
+<td>T-4</td>
+<td>NaN</td>
+<td>660.0</td>
+<td>12</td>
+<td>31.0</td>
+<td>8.7</td>
+<td>33.0</td>
+<td>8.3</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.01</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2011-03-22</td>
+<td>14:28:00</td>
+<td>T-3</td>
+<td>NaN</td>
+<td>1100.0</td>
+<td>20</td>
+<td>46.0</td>
+<td>14</td>
+<td>40.0</td>
+<td>14</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2011-03-22</td>
+<td>15:06:00</td>
+<td>T-4</td>
+<td>NaN</td>
+<td>670.0</td>
+<td>19</td>
+<td>39.0</td>
+<td>11</td>
+<td>44.0</td>
+<td>11</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>37.24</td>
+<td>141.01</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2011-03-23</td>
+<td>13:51:00</td>
+<td>T-3</td>
+<td>NaN</td>
+<td>740.0</td>
+<td>27</td>
+<td>51.0</td>
+<td>20</td>
+<td>55.0</td>
+<td>20</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>34.0</td>
+<td>25.0</td>
+<td>NaN</td>
+<td>37.32</td>
+<td>141.03</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 52 columns</p>
+</div>
+</div>
+</div>
+</div>
+<div id="46b2e5bd" class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>tfm()[<span class="st">'seawater'</span>].columns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Index(['Sampling date', 'Sampling time', 'Sampling point number',
+       'Collection layer of seawater', 'i131', 'i131_dl', 'cs134', 'cs134_dl',
+       'cs137', 'cs137_dl', 'i132', 'i132_dl', 'te132', 'te132_dl', 'cs136',
+       'cs136_dl', 'la140', 'la140_dl', 'sr89', 'sr89_dl', 'sr90', 'sr90_dl',
+       'pu238', 'pu238_dl', 'pu239_240_tot', 'pu239_240_tot_unc',
+       'pu239_240_tot_dl', 'talpha', 'talpha_dl', 'tbeta', 'tbeta_dl', 'ba140',
+       'ba140_dl', 'ru106', 'ru106_dl', 'co58', 'co58_dl', 'co60', 'co60_dl',
+       'ce144', 'ce144_dl', 'mn54', 'mn54_dl', 'h3', 'h3_dl', 'sb125',
+       'sb125_dl', 'ru105', 'ru105_dl', 'Unnamed: 49',
+       'Sampling coordinate North latitude (Decimal)',
+       'Sampling coordinate East longitude (Decimal)'],
+      dtype='object')</code></pre>
+</div>
+</div>
+</section>
+<section id="parse-time" class="level3">
+<h3 class="anchored" data-anchor-id="parse-time">Parse time</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L128" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="time_parser" class="level3">
+<h3 class="anchored" data-anchor-id="time_parser">time_parser</h3>
+<blockquote class="blockquote">
+<pre><code> time_parser (col)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L134" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="parsetimecb" class="level3">
+<h3 class="anchored" data-anchor-id="parsetimecb">ParseTimeCB</h3>
+<blockquote class="blockquote">
+<pre><code> ParseTimeCB (fn_parser=&lt;function time_parser&gt;, cols_time=['Sampling
+              date', 'Sampling time'])</code></pre>
+</blockquote>
+<p>Initialize self. See help(type(self)) for accurate signature.</p>
+<div id="31ccd38c" class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[FixMissingValuesCB(),</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>                            RemoveJapanaseCharCB(),</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>                            FixRangeValueStringCB(),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB()])</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'seawater'</span>][<span class="st">'time'</span>][:<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>sample
+0   2011-03-21 23:15:00
+1   2011-03-21 23:45:00
+2   2011-03-22 14:28:00
+3   2011-03-22 15:06:00
+4   2011-03-23 13:51:00
+Name: time, dtype: datetime64[ns]</code></pre>
+</div>
+</div>
+</section>
+<section id="rename-columns" class="level3">
+<h3 class="anchored" data-anchor-id="rename-columns">Rename columns</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L151" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="renamecolumncb" class="level3">
+<h3 class="anchored" data-anchor-id="renamecolumncb">RenameColumnCB</h3>
+<blockquote class="blockquote">
+<pre><code> RenameColumnCB (renaming_rules={'Sampling coordinate North latitude
+                 (Decimal)': 'lat', 'Sampling coordinate East longitude
+                 (Decimal)': 'lon'})</code></pre>
+</blockquote>
+<p>Normalizing, renaming columns</p>
+<div id="d16f240b" class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[FixMissingValuesCB(),</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>                            RemoveJapanaseCharCB(),</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                            FixRangeValueStringCB(),</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                            FixRangeValueStringCB(),</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                            RenameColumnCB()])</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'seawater'</span>][:<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       Sampling date Sampling time Sampling point number  \
+sample                                                     
+0         2011-03-21      23:15:00                   T-3   
+1         2011-03-21      23:45:00                   T-4   
+2         2011-03-22      14:28:00                   T-3   
+3         2011-03-22      15:06:00                   T-4   
+4         2011-03-23      13:51:00                   T-3   
+
+       Collection layer of seawater    i131 i131_dl  cs134 cs134_dl  cs137  \
+sample                                                                       
+0                               NaN  1100.0      13   48.0      9.2   53.0   
+1                               NaN   660.0      12   31.0      8.7   33.0   
+2                               NaN  1100.0      20   46.0       14   40.0   
+3                               NaN   670.0      19   39.0       11   44.0   
+4                               NaN   740.0      27   51.0       20   55.0   
+
+       cs137_dl  ...  h3  h3_dl  sb125  sb125_dl  ru105  ru105_dl  \
+sample           ...                                                
+0           8.8  ... NaN    NaN    NaN       NaN    NaN       NaN   
+1           8.3  ... NaN    NaN    NaN       NaN    NaN       NaN   
+2            14  ... NaN    NaN    NaN       NaN    NaN       NaN   
+3            11  ... NaN    NaN    NaN       NaN    NaN       NaN   
+4            20  ... NaN    NaN    NaN       NaN   34.0      25.0   
+
+        Unnamed: 49    lat     lon                time  
+sample                                                  
+0               NaN  37.32  141.03 2011-03-21 23:15:00  
+1               NaN  37.24  141.01 2011-03-21 23:45:00  
+2               NaN  37.32  141.03 2011-03-22 14:28:00  
+3               NaN  37.24  141.01 2011-03-22 15:06:00  
+4               NaN  37.32  141.03 2011-03-23 13:51:00  
+
+[5 rows x 53 columns]</code></pre>
+</div>
+</div>
+</section>
+<section id="select-columns-of-interest" class="level3">
+<h3 class="anchored" data-anchor-id="select-columns-of-interest">Select columns of interest</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L166" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="selectcolumnscb" class="level3">
+<h3 class="anchored" data-anchor-id="selectcolumnscb">SelectColumnsCB</h3>
+<blockquote class="blockquote">
+<pre><code> SelectColumnsCB (coi=['time', 'lat', 'lon', 'i131', 'i131_dl', 'cs134',
+                  'cs134_dl', 'cs137', 'cs137_dl', 'i132', 'i132_dl',
+                  'te132', 'te132_dl', 'cs136', 'cs136_dl', 'la140',
+                  'la140_dl', 'sr89', 'sr89_dl', 'sr90', 'sr90_dl',
+                  'pu238', 'pu238_dl', 'pu239_240_tot',
+                  'pu239_240_tot_unc', 'pu239_240_tot_dl', 'talpha',
+                  'talpha_dl', 'tbeta', 'tbeta_dl', 'ba140', 'ba140_dl',
+                  'ru106', 'ru106_dl', 'co58', 'co58_dl', 'co60',
+                  'co60_dl', 'ce144', 'ce144_dl', 'mn54', 'mn54_dl', 'h3',
+                  'h3_dl', 'sb125', 'sb125_dl', 'ru105', 'ru105_dl'])</code></pre>
+</blockquote>
+<p>Initialize self. See help(type(self)) for accurate signature.</p>
+<div id="836d2c1c" class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[FixMissingValuesCB(),</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                            RemoveJapanaseCharCB(),</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                            FixRangeValueStringCB(),</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>                            RenameColumnCB(),</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>                            SelectColumnsCB()])</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'seawater'</span>][:<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                      time    lat     lon    i131 i131_dl  cs134 cs134_dl  \
+sample                                                                      
+0      2011-03-21 23:15:00  37.32  141.03  1100.0      13   48.0      9.2   
+1      2011-03-21 23:45:00  37.24  141.01   660.0      12   31.0      8.7   
+2      2011-03-22 14:28:00  37.32  141.03  1100.0      20   46.0       14   
+3      2011-03-22 15:06:00  37.24  141.01   670.0      19   39.0       11   
+4      2011-03-23 13:51:00  37.32  141.03   740.0      27   51.0       20   
+
+        cs137 cs137_dl   i132  ...  ce144  ce144_dl  mn54  mn54_dl  h3  h3_dl  \
+sample                         ...                                              
+0        53.0      8.8  160.0  ...    NaN       NaN   NaN      NaN NaN    NaN   
+1        33.0      8.3  120.0  ...    NaN       NaN   NaN      NaN NaN    NaN   
+2        40.0       14    NaN  ...    NaN       NaN   NaN      NaN NaN    NaN   
+3        44.0       11    NaN  ...    NaN       NaN   NaN      NaN NaN    NaN   
+4        55.0       20  200.0  ...    NaN       NaN   NaN      NaN NaN    NaN   
+
+        sb125  sb125_dl ru105  ru105_dl  
+sample                                   
+0         NaN       NaN   NaN       NaN  
+1         NaN       NaN   NaN       NaN  
+2         NaN       NaN   NaN       NaN  
+3         NaN       NaN   NaN       NaN  
+4         NaN       NaN  34.0      25.0  
+
+[5 rows x 48 columns]</code></pre>
+</div>
+</div>
+</section>
+<section id="encode-time-seconds-since" class="level3">
+<h3 class="anchored" data-anchor-id="encode-time-seconds-since">Encode time (seconds since …)</h3>
+<div id="9fa2a859" class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[FixMissingValuesCB(),</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>                            RemoveJapanaseCharCB(),</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                            FixRangeValueStringCB(),</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>                            RenameColumnCB(),</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>                            SelectColumnsCB(),</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>                            EncodeTimeCB(cfg())])</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'seawater'</span>][:<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              time    lat     lon    i131 i131_dl  cs134 cs134_dl  cs137  \
+sample                                                                     
+0       1300749300  37.32  141.03  1100.0      13   48.0      9.2   53.0   
+1       1300751100  37.24  141.01   660.0      12   31.0      8.7   33.0   
+2       1300804080  37.32  141.03  1100.0      20   46.0       14   40.0   
+3       1300806360  37.24  141.01   670.0      19   39.0       11   44.0   
+4       1300888260  37.32  141.03   740.0      27   51.0       20   55.0   
+
+       cs137_dl   i132  ...  ce144  ce144_dl  mn54  mn54_dl  h3  h3_dl  sb125  \
+sample                  ...                                                     
+0           8.8  160.0  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+1           8.3  120.0  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+2            14    NaN  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+3            11    NaN  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+4            20  200.0  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+
+        sb125_dl ru105  ru105_dl  
+sample                            
+0            NaN   NaN       NaN  
+1            NaN   NaN       NaN  
+2            NaN   NaN       NaN  
+3            NaN   NaN       NaN  
+4            NaN  34.0      25.0  
+
+[5 rows x 48 columns]</code></pre>
+</div>
+</div>
+</section>
+<section id="retrieve-depth" class="level3">
+<h3 class="anchored" data-anchor-id="retrieve-depth">Retrieve depth</h3>
+<div id="16c52a06" class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># TO BE DONE</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Options: </span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   - GEBCO: provides raster grid at ~160m (15 arc-second) at equator. We can download it and query via GDAL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="sanitize-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="sanitize-coordinates">Sanitize coordinates</h3>
+<div id="554f8c2b" class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[FixMissingValuesCB(),</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>                            RemoveJapanaseCharCB(),</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>                            FixRangeValueStringCB(),</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>                            RenameColumnCB(),</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>                            SelectColumnsCB(),</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>                            EncodeTimeCB(cfg()),</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>                            SanitizeLonLatCB()])</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>tfm()[<span class="st">'seawater'</span>][:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">time</th>
+<th data-quarto-table-cell-role="th">lat</th>
+<th data-quarto-table-cell-role="th">lon</th>
+<th data-quarto-table-cell-role="th">i131</th>
+<th data-quarto-table-cell-role="th">i131_dl</th>
+<th data-quarto-table-cell-role="th">cs134</th>
+<th data-quarto-table-cell-role="th">cs134_dl</th>
+<th data-quarto-table-cell-role="th">cs137</th>
+<th data-quarto-table-cell-role="th">cs137_dl</th>
+<th data-quarto-table-cell-role="th">i132</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">ce144</th>
+<th data-quarto-table-cell-role="th">ce144_dl</th>
+<th data-quarto-table-cell-role="th">mn54</th>
+<th data-quarto-table-cell-role="th">mn54_dl</th>
+<th data-quarto-table-cell-role="th">h3</th>
+<th data-quarto-table-cell-role="th">h3_dl</th>
+<th data-quarto-table-cell-role="th">sb125</th>
+<th data-quarto-table-cell-role="th">sb125_dl</th>
+<th data-quarto-table-cell-role="th">ru105</th>
+<th data-quarto-table-cell-role="th">ru105_dl</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sample</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1300749300</td>
+<td>37.32</td>
+<td>141.03</td>
+<td>1100.0</td>
+<td>13</td>
+<td>48.0</td>
+<td>9.2</td>
+<td>53.0</td>
+<td>8.8</td>
+<td>160.0</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1300751100</td>
+<td>37.24</td>
+<td>141.01</td>
+<td>660.0</td>
+<td>12</td>
+<td>31.0</td>
+<td>8.7</td>
+<td>33.0</td>
+<td>8.3</td>
+<td>120.0</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>1300804080</td>
+<td>37.32</td>
+<td>141.03</td>
+<td>1100.0</td>
+<td>20</td>
+<td>46.0</td>
+<td>14</td>
+<td>40.0</td>
+<td>14</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1300806360</td>
+<td>37.24</td>
+<td>141.01</td>
+<td>670.0</td>
+<td>19</td>
+<td>39.0</td>
+<td>11</td>
+<td>44.0</td>
+<td>11</td>
+<td>NaN</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>1300888260</td>
+<td>37.32</td>
+<td>141.03</td>
+<td>740.0</td>
+<td>27</td>
+<td>51.0</td>
+<td>20</td>
+<td>55.0</td>
+<td>20</td>
+<td>200.0</td>
+<td>...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>34.0</td>
+<td>25.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 48 columns</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="encode-to-netcdf" class="level2">
+<h2 class="anchored" data-anchor-id="encode-to-netcdf">Encode to NetCDF</h2>
+<div id="30b36151" class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[FixMissingValuesCB(),</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>                            RemoveJapanaseCharCB(),</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                            FixRangeValueStringCB(),</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>                            RenameColumnCB(),</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>                            SelectColumnsCB(),</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>                            EncodeTimeCB(cfg()),</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>                            SanitizeLonLatCB()])</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>dfs_tfm <span class="op">=</span> tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="489e0019" class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>dfs_tfm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seawater':               time    lat     lon    i131 i131_dl  cs134 cs134_dl    cs137  \
+ sample                                                                       
+ 0       1300749300  37.32  141.03  1100.0      13   48.0      9.2  53.0000   
+ 1       1300751100  37.24  141.01   660.0      12   31.0      8.7  33.0000   
+ 2       1300804080  37.32  141.03  1100.0      20   46.0       14  40.0000   
+ 3       1300806360  37.24  141.01   670.0      19   39.0       11  44.0000   
+ 4       1300888260  37.32  141.03   740.0      27   51.0       20  55.0000   
+ ...            ...    ...     ...     ...     ...    ...      ...      ...   
+ 21472   1658736480  37.33  141.07     NaN     NaN    NaN   0.0013   0.0036   
+ 21473   1658736480  37.33  141.07     NaN     NaN    NaN   0.0012   0.0024   
+ 21474   1658843100  37.32  141.03     NaN     NaN    NaN   0.0014   0.0150   
+ 21475   1658825400  37.24  141.01     NaN     NaN    NaN   0.0011   0.0110   
+ 21476   1658830200  37.48  141.04     NaN     NaN    NaN   0.0014   0.0150   
+ 
+        cs137_dl   i132  ...  ce144  ce144_dl  mn54  mn54_dl  h3  h3_dl  sb125  \
+ sample                  ...                                                     
+ 0           8.8  160.0  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+ 1           8.3  120.0  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+ 2            14    NaN  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+ 3            11    NaN  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+ 4            20  200.0  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+ ...         ...    ...  ...    ...       ...   ...      ...  ..    ...    ...   
+ 21472       NaN    NaN  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+ 21473       NaN    NaN  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+ 21474       NaN    NaN  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+ 21475       NaN    NaN  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+ 21476       NaN    NaN  ...    NaN       NaN   NaN      NaN NaN    NaN    NaN   
+ 
+         sb125_dl ru105  ru105_dl  
+ sample                            
+ 0            NaN   NaN       NaN  
+ 1            NaN   NaN       NaN  
+ 2            NaN   NaN       NaN  
+ 3            NaN   NaN       NaN  
+ 4            NaN  34.0      25.0  
+ ...          ...   ...       ...  
+ 21472        NaN   NaN       NaN  
+ 21473        NaN   NaN       NaN  
+ 21474        NaN   NaN       NaN  
+ 21475        NaN   NaN       NaN  
+ 21476        NaN   NaN       NaN  
+ 
+ [21477 rows x 48 columns]}</code></pre>
+</div>
+</div>
+<div id="bb0e305e" class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>tfm.logs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>['Assign `NaN` to values equal to `ND` (not detected) - to be confirmed ',
+ 'Remove 約 (about) char',
+ 'Replace e.g `4.0E+00&lt;&amp;&lt;8.0E+00` by its mean (here 6)',
+ 'Remap to MARIS radionuclide names',
+ 'Normalizing, renaming columns',
+ 'Encode time as `int` representing seconds since xxx',
+ 'Drop row when both longitude &amp; latitude equal 0']</code></pre>
+</div>
+</div>
+<section id="feed-global-attributes" class="level3">
+<h3 class="anchored" data-anchor-id="feed-global-attributes">Feed global attributes</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/tepco.py#L181" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_attrs" class="level3">
+<h3 class="anchored" data-anchor-id="get_attrs">get_attrs</h3>
+<blockquote class="blockquote">
+<pre><code> get_attrs (tfm, zotero_key, kw=['oceanography', 'Earth Science &gt; Oceans &gt;
+            Ocean Chemistry&gt; Radionuclides', 'Earth Science &gt; Human
+            Dimensions &gt; Environmental Impacts &gt; Nuclear Radiation
+            Exposure', 'Earth Science &gt; Oceans &gt; Water Quality &gt; Ocean
+            Contaminants'])</code></pre>
+</blockquote>
+<div id="a3d2a3b2" class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>get_attrs(tfm, zotero_key<span class="op">=</span><span class="st">'26VMZZ2Q'</span>, kw<span class="op">=</span>kw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'id': '',
+ 'title': 'Environmental database - Helsinki Commission Monitoring of Radioactive Substances',
+ 'summary': 'MORS Environment database has been used to collate data resulting from monitoring of environmental radioactivity in the Baltic Sea based on HELCOM Recommendation 26/3.\n\nThe database is structured according to HELCOM Guidelines on Monitoring of Radioactive Substances (https://www.helcom.fi/wp-content/uploads/2019/08/Guidelines-for-Monitoring-of-Radioactive-Substances.pdf), which specifies reporting format, database structure, data types and obligatory parameters used for reporting data under Recommendation 26/3.\n\nThe database is updated and quality assured annually by HELCOM MORS EG.',
+ 'keywords': 'oceanography, Earth Science &gt; Oceans &gt; Ocean Chemistry&gt; Radionuclides, Earth Science &gt; Human Dimensions &gt; Environmental Impacts &gt; Nuclear Radiation Exposure, Earth Science &gt; Oceans &gt; Water Quality &gt; Ocean Contaminants',
+ 'keywords_vocabulary': 'GCMD Science Keywords',
+ 'keywords_vocabulary_url': 'https://gcmd.earthdata.nasa.gov/static/kms/',
+ 'record': '',
+ 'featureType': '',
+ 'cdm_data_type': '',
+ 'Conventions': 'CF-1.10 ACDD-1.3',
+ 'publisher_name': 'Paul MCGINNITY, Iolanda OSVATH, Florence DESCROIX-COMANDUCCI',
+ 'publisher_email': 'p.mc-ginnity@iaea.org, i.osvath@iaea.org, F.Descroix-Comanducci@iaea.org',
+ 'publisher_url': 'https://maris.iaea.org',
+ 'publisher_institution': 'International Atomic Energy Agency - IAEA',
+ 'creator_name': 'author: HELCOM MORS',
+ 'institution': '',
+ 'metadata_link': '',
+ 'creator_email': '',
+ 'creator_url': '',
+ 'references': '',
+ 'license': 'Without prejudice to the applicable Terms and Conditions (https://nucleus.iaea.org/Pages/Others/Disclaimer.aspx), I hereby agree that any use of the data will contain appropriate acknowledgement of the data source(s) and the IAEA Marine Radioactivity Information System (MARIS).',
+ 'comment': '',
+ 'geospatial_lat_min': '141.67',
+ 'geospatial_lon_min': '140.6',
+ 'geospatial_lat_max': '38.63',
+ 'geospatial_lon_max': '35.8',
+ 'geospatial_vertical_min': '',
+ 'geospatial_vertical_max': '',
+ 'geospatial_bounds': 'POLYGON ((140.6 35.8, 141.67 35.8, 141.67 38.63, 140.6 38.63, 140.6 35.8))',
+ 'geospatial_bounds_crs': 'EPSG:4326',
+ 'time_coverage_start': '2011-03-21T23:15:00',
+ 'time_coverage_end': '2022-07-26T13:45:00',
+ 'local_time_zone': '',
+ 'date_created': '',
+ 'date_modified': '',
+ 'publisher_postprocess_logs': 'Assign `NaN` to values equal to `ND` (not detected) - to be confirmed , Remove 約 (about) char, Replace e.g `4.0E+00&lt;&amp;&lt;8.0E+00` by its mean (here 6), Remap to MARIS radionuclide names, Normalizing, renaming columns, Encode time as `int` representing seconds since xxx, Drop row when both longitude &amp; latitude equal 0'}</code></pre>
+</div>
+</div>
+</section>
+<section id="encoding" class="level3">
+<h3 class="anchored" data-anchor-id="encoding">Encoding</h3>
+<div id="67f9542a" class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># encode(fname_in, fname_out, NC_TPL_PATH)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

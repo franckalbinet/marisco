@@ -1,0 +1,2729 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.551">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Creation of MARIS NetCDF template based on “pseudo” Common Data Language .toml config file.">
+
+<title>marisco - MARIS NetCDF Template</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="marisco - MARIS NetCDF Template">
+<meta property="og:description" content="Creation of MARIS NetCDF template based on “pseudo” Common Data Language .toml config file.">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="marisco - MARIS NetCDF Template">
+<meta name="twitter:description" content="Creation of MARIS NetCDF template based on “pseudo” Common Data Language .toml config file.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/callbacks.html">API</a></li><li class="breadcrumb-item"><a href="../api/nc_template.html">MARIS NetCDF Template</a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/tepco.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TEPCO</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc_template.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">MARIS NetCDF Template</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/serializers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Serializers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Utilities</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#netcdf-template-generator" id="toc-netcdf-template-generator" class="nav-link active" data-scroll-target="#netcdf-template-generator">NetCDF template generator</a>
+  <ul class="collapse">
+  <li><a href="#nctemplater" id="toc-nctemplater" class="nav-link" data-scroll-target="#nctemplater">NCTemplater</a></li>
+  <li><a href="#nctemplater.nuclide_vars" id="toc-nctemplater.nuclide_vars" class="nav-link" data-scroll-target="#nctemplater.nuclide_vars">NCTemplater.nuclide_vars</a></li>
+  <li><a href="#nctemplater.derive" id="toc-nctemplater.derive" class="nav-link" data-scroll-target="#nctemplater.derive">NCTemplater.derive</a></li>
+  <li><a href="#nctemplater.create_enum_types" id="toc-nctemplater.create_enum_types" class="nav-link" data-scroll-target="#nctemplater.create_enum_types">NCTemplater.create_enum_types</a></li>
+  <li><a href="#nctemplater.create_groups" id="toc-nctemplater.create_groups" class="nav-link" data-scroll-target="#nctemplater.create_groups">NCTemplater.create_groups</a></li>
+  <li><a href="#nctemplater.create_variables" id="toc-nctemplater.create_variables" class="nav-link" data-scroll-target="#nctemplater.create_variables">NCTemplater.create_variables</a></li>
+  <li><a href="#nctemplater.create_default_variables" id="toc-nctemplater.create_default_variables" class="nav-link" data-scroll-target="#nctemplater.create_default_variables">NCTemplater.create_default_variables</a></li>
+  <li><a href="#nctemplater.create_group_specific_variables" id="toc-nctemplater.create_group_specific_variables" class="nav-link" data-scroll-target="#nctemplater.create_group_specific_variables">NCTemplater.create_group_specific_variables</a></li>
+  <li><a href="#nctemplater.create_analyte_variables" id="toc-nctemplater.create_analyte_variables" class="nav-link" data-scroll-target="#nctemplater.create_analyte_variables">NCTemplater.create_analyte_variables</a></li>
+  <li><a href="#nctemplater.create_variable" id="toc-nctemplater.create_variable" class="nav-link" data-scroll-target="#nctemplater.create_variable">NCTemplater.create_variable</a></li>
+  <li><a href="#nctemplater.generate" id="toc-nctemplater.generate" class="nav-link" data-scroll-target="#nctemplater.generate">NCTemplater.generate</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/callbacks.html">API</a></li><li class="breadcrumb-item"><a href="../api/nc_template.html">MARIS NetCDF Template</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">MARIS NetCDF Template</h1>
+</div>
+
+<div>
+  <div class="description">
+    Creation of MARIS NetCDF template based on “pseudo” Common Data Language <code>.toml</code> config file.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="netcdf-template-generator" class="level2">
+<h2 class="anchored" data-anchor-id="netcdf-template-generator">NetCDF template generator</h2>
+<p>Generate a NetCDF4 template from the configurable <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/cdl.toml"><code>CDL.toml</code></a> file, itself generated in <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/api/configs.ipynb"><code>/api/configs.ipynb</code></a>.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/nc_template.py#L23" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="nctemplater" class="level3">
+<h3 class="anchored" data-anchor-id="nctemplater">NCTemplater</h3>
+<blockquote class="blockquote">
+<pre><code> NCTemplater (cdl:Dict, nuclide_vars_fname:str, tpl_fname:str,
+              enum_dicts:Dict, verbose=False)</code></pre>
+</blockquote>
+<p>MARIS NetCDF template generator.</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>cdl</td>
+<td>typing.Dict</td>
+<td></td>
+<td>“Pseudo CDL” (<code>.toml</code>)</td>
+</tr>
+<tr class="even">
+<td>nuclide_vars_fname</td>
+<td>str</td>
+<td></td>
+<td>File name and path of MARIS nuclide lookup table containing variable names</td>
+</tr>
+<tr class="odd">
+<td>tpl_fname</td>
+<td>str</td>
+<td></td>
+<td>File name and path of NetCDF4 file to be generated</td>
+</tr>
+<tr class="even">
+<td>enum_dicts</td>
+<td>typing.Dict</td>
+<td></td>
+<td>MARIS NetCDF enumeration types</td>
+</tr>
+<tr class="odd">
+<td>verbose</td>
+<td>bool</td>
+<td>False</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>For example, provided the configuration <code>cdl.toml</code> below, the templater gets access, among others, to its <code>dim</code> definiton section:</p>
+<div id="7cc12972" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>cdl_test <span class="op">=</span> read_toml(<span class="st">'./files/cdl.toml'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>lut_src_dir_test <span class="op">=</span> <span class="st">'./files/lut'</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>cdl_enums_test <span class="op">=</span> read_toml(<span class="st">'./files/cdl.toml'</span>)[<span class="st">'enums'</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>enums <span class="op">=</span> get_enum_dicts(lut_src_dir<span class="op">=</span>lut_src_dir_test, </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                       cdl_enums<span class="op">=</span>cdl_enums_test)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>templater <span class="op">=</span> NCTemplater(cdl<span class="op">=</span>cdl_test,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                        nuclide_vars_fname<span class="op">=</span><span class="st">'./files/lut/dbo_nuclide.xlsx'</span>, </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                        tpl_fname<span class="op">=</span><span class="st">'./files/nc/test.nc'</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                        enum_dicts<span class="op">=</span>enums)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>expected <span class="op">=</span> {<span class="st">'name'</span>: <span class="st">'sample'</span>, </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">'dtype'</span>: <span class="st">'u8'</span>, </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">'attrs'</span>: {<span class="st">'long_name'</span>: <span class="st">'Sample ID of measurement'</span>}</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>fc.test_eq(templater.dim, expected)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="266cf257" class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, v <span class="kw">in</span> enums[<span class="st">'species_t'</span>].items():</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(k,v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Aristeus antennatus 1
+Apostichopus 2
+Saccharina japonica var religiosa 3
+Siganus fuscescens 4
+Alpheus dentipes 5
+Hexagrammos agrammus 6
+Ditrema temminckii 7
+Parapristipoma trilineatum 8
+Scombrops boops 9
+Pseudopleuronectes schrenki 10
+Desmarestia ligulata 11
+Saccharina japonica 12
+Neodilsea yendoana 13
+Costaria costata 14
+Sargassum yezoense 15
+Acanthephyra pelagica 16
+Sargassum ringgoldianum 17
+Acanthephyra quadrispinosa 18
+Sargassum thunbergii 19
+Sargassum patens 20
+Asterias rubens 21
+Sargassum miyabei 22
+Homarus gammarus 23
+Acanthephyra stylorostratis 24
+Acanthocybium solandri 25
+Acanthopagrus bifasciatus 26
+Acanthophora muscoides 27
+Acanthophora spicifera 28
+Acanthurus triostegus 29
+Actinopterygii 30
+Adamussium colbecki 31
+Ahnfeltiopsis densa 32
+Alepes melanoptera 33
+Ampharetidae 34
+Anchoviella lepidentostole 35
+Anguillidae 36
+Aphroditidae 37
+Arnoglossus 38
+Aurigequula fasciata 39
+Balaenoptera musculus 40
+Balaenoptera physalus 41
+Balistes 42
+Beryciformes 43
+Bryopsis maxima 44
+Callinectes sp 45
+Callorhinus ursinus 46
+Carassius auratus auratus 47
+Carcharhinus sorrah 48
+Caridae 49
+Clupea harengus 50
+Cathorops spixii 51
+Caulerpa racemosa 52
+Caulerpa scalpelliformis 53
+Caulerpa sertularioides 54
+Cellana radiata 55
+Coscinasterias tenuispina 56
+Centroceras clavulatum 57
+Centropomus parallelus 58
+Crangon crangon 59
+Ceramium diaphanum 60
+Ceramium rubrum 61
+Chaenocephalus aceratus 62
+Chaetodipterus faber 63
+Chaetomorpha antennina 64
+Chaetomorpha linoides 65
+Chelidonichthys kumu 66
+Chelon ramada 67
+Chiloscyllium 68
+Chionodraco hamatus 69
+Chlamys islandica 70
+Chlorophyta 71
+Chondrichthyes 72
+Chrysaora 73
+Cladophora nitellopsis 74
+Cladophora vagabunda 75
+Cladophoropsis membranacea 76
+Clupea 77
+Coccotylus truncatus 78
+Codium fragile 79
+Crassostrea 80
+Cynoscion acoupa 81
+Cynoscion jamaicensis 82
+Cynoscion leiarchus 83
+Engraulis encrasicolus 84
+Cypselurus agoo agoo 85
+Cystophora cristata 86
+Cystoseira barbata 87
+Cystoseira crinita 88
+Decapodiformes 89
+Decapterus russelli 90
+Decapterus scombrinus 91
+Delphinapterus leucas 92
+Delphinus capensis 93
+Diapterus rhombeus 94
+Dicentrarchus punctatus 95
+Fucus vesiculosus 96
+Funchalia woodwardi 97
+Ecklonia bicyclis 98
+Gadus morhua 99
+Ecklonia kurome 100
+Gennadas elegans 101
+Eisenia arborea 102
+Encrasicholina devisi 103
+Enteromorpha 104
+Enteromorpha flexuosa 105
+Enteromorpha intestinalis 106
+Epinephelinae 107
+Epinephelus diacanthus 108
+Exocoetidae 109
+Saccharina latissima 110
+Gracilaria corticata 111
+Ligur ensiferus 112
+Gracilaria debilis 113
+Gracilaria edulis 114
+Gracilariales 115
+Grateloupia elliptica 116
+Grateloupia filicina 117
+Lysmata seticaudata 118
+Gymnogongrus griffithsiae 119
+Mya arenaria 120
+Halichoerus grypus 121
+Macoma balthica 122
+Marthasterias glacialis 123
+Halimeda macroloba 124
+Harengula clupeola 125
+Harpagifer antarcticus 126
+Hemifusus ternatanus 127
+Hemiramphus brasiliensis 128
+Mytilus edulis 129
+Metapenaeus affinis 130
+Heteroscleromorpha 131
+Heterosigma akashiwo 132
+Hilsa ilisha 133
+Metapenaeus monoceros 134
+Metapenaeus stebbingi 135
+Holothuria 136
+Hoplobrotula armata 137
+Hypnea musciformis 138
+Merlangius merlangus 139
+Iridaea cordata 140
+Jania rubens 141
+Meganyctiphanes norvegica 142
+Johnius glaucus 143
+Kappaphycus 144
+Kappaphycus alvarezii 145
+Laevistrombus canarium 146
+Lagenodelphis hosei 147
+Lambia 148
+Laminaria japonica 149
+Laminaria longissima 150
+Larimus breviceps 151
+Laurencia papillosa 152
+Leiognathidae 153
+Leiognathus dussumieri 154
+Lepidochelys olivacea 155
+Leptonychotes weddellii 156
+Limanda yokohamae 157
+Nephrops norvegicus 158
+Neuston 159
+Littoraria undulata 160
+Loligo vulgaris 161
+Lumbrineridae 162
+Lutjanus fulviflamma 163
+Marginisporum aberrans 164
+Megalaspis cordyla 165
+Octopus vulgaris 166
+Menticirrhus americanus 167
+Mesoplodon densirostris 168
+Palaemon longirostris 169
+Metapenaeus brevicornis 170
+Pasiphaea multidentata 171
+Pasiphaea sivado 172
+Parapenaeopsis stylifera 173
+Miichthys miiuy 174
+Mirounga leonina 175
+Brachidontes striatulus 176
+Monodon monoceros 177
+Mugil platanus 178
+Penaeus semisulcatus 179
+Mullus barbatus 180
+Mycteroperca rubra 181
+Philocheras echinulatus 182
+Myelophycus simplex 183
+Mytilus coruscus 184
+Penaeus indicus 185
+Natator depressus 186
+Pandalus jordani 187
+Melicertus kerathurus 188
+Parapenaeus longirostris 189
+Plesionika 190
+Platichthys flesus 191
+Pleuronectes platessa 192
+Nematopalaemon tenuipes 193
+Nematoscelis difficilis 194
+Nemipterus 195
+Aegaeon lacazei 196
+Nephtyidae 197
+Nereididae 198
+Netuma bilineata 199
+Nibea maculata 200
+Oceana serrulata 201
+Palaemon serratus 202
+Ocypode 203
+Odobenus rosmarus 204
+Ogcocephalus vespertilio 205
+Oligoplites saurus 206
+Onuphidae 207
+Opheliidae 208
+Opisthonema oglinum 209
+Opisthopterus tardoore 210
+Orientomysis mitsukurii 211
+Otolithes cuvieri 212
+Padina pavonica 213
+Padina tetrastromatica 214
+Padina vickersiae 215
+Pagellus affinis 216
+Pagophilus groenlandicus 217
+Paguroidea 218
+Pagurus 219
+Systellaspis debilis 220
+Sergestes 221
+Sergestes arcticus 222
+Pampus argenteus 223
+Sergestes arachnipodus 224
+Sergestes henseni 225
+Sergestes prehensilis 226
+Sergestes robustus 227
+Pangasius pangasius 228
+Panulirus homarus 229
+Paracentrotus lividus 230
+Pasiphaea sp 231
+Pectinariidae 232
+Penaeus 233
+Phoca vitulina 234
+Photopectoralis bindus 235
+Phyllospadix iwatensis 236
+Plectorhinchus mediterraneus 237
+Pleuronectes mochigarei 238
+Pleuronectes obscurus 239
+Plocamium brasiliense 240
+Polynemus paradiseus 241
+Polysiphonia 242
+Sprattus sprattus 243
+Scomber scombrus 244
+Polysiphonia fucoides 245
+Gonostomatidae 246
+Perca fluviatilis 247
+Pomadasys crocro 248
+Porphyra tenera 249
+Potamogeton pectinatus 250
+Priacanthus hamrur 251
+Pseudorhombus malayanus 252
+Pterocladiella capillacea 253
+Pusa caspica 254
+Pusa sibirica 255
+Pylaiella littoralis 256
+Sabellidae 257
+Salangichthys ishikawae 258
+Sarconema filiforme 259
+Sardinella albella 260
+Sardinella brasiliensis 261
+Sardinops melanostictus 262
+Sargassum cymosum 263
+Sargassum linearifolium 264
+Sargassum micracanthum 265
+Xiphias gladius 266
+Sargassum novae hollandiae 267
+Sargassum oligocystum 268
+Esox lucius 269
+Limanda limanda 270
+Abramis brama 271
+Anguilla anguilla 272
+Arctica islandica 273
+Cerastoderma edule 274
+Cyprinus carpio 275
+Echinodermata 276
+Fish larvae 277
+Myoxocephalus scorpius 278
+Osmerus eperlanus 279
+Plankton 280
+Scophthalmus maximus 281
+Rhodophyta 282
+Rutilus rutilus 283
+Saduria entomon 284
+Sander lucioperca 285
+Gasterosteus aculeatus 286
+Zoarces viviparus 287
+Gymnocephalus cernua 288
+Furcellaria lumbricalis 289
+Cladophora glomerata 290
+Lateolabrax japonicus 291
+Okamejei kenojei 292
+Sebastes pachycephalus 293
+Squalus acanthias 294
+Gadus macrocephalus 295
+Paralichthys olivaceus 296
+Ovalipes punctatus 297
+Pseudopleuronectes yokohamae 298
+Hemitripterus villosus 299
+Clidoderma asperrimum 300
+Microstomus achne 301
+Lepidotrigla microptera 302
+Hexagrammos otakii 303
+Kareius bicoloratus 304
+Pleuronichthys cornutus 305
+Enteroctopus dofleini 306
+Ammodytes personatus 307
+Lophius litulon 308
+Eopsetta grigorjewi 309
+Takifugu porphyreus 310
+Loliolus japonica 311
+Sepia andreana 312
+Sebastes cheni 313
+Portunus trituberculatus 314
+Sebastes schlegelii 315
+Pennahia argentata 316
+Platichthys stellatus 317
+Gadus chalcogrammus 318
+Chelidonichthys spinosus 319
+Conger myriaster 320
+Heterololigo bleekeri 321
+Stichaeus grigorjewi 322
+Pseudopleuronectes herzensteini 323
+Octopus conispadiceus 324
+Hippoglossoides dubius 325
+Cleisthenes pinetorum 326
+Glyptocephalus stelleri 327
+Tanakius kitaharae 328
+Nibea mitsukurii 329
+Dasyatis matsubarai 330
+Verasper moseri 331
+Hemitrygon akajei 332
+Triakis scyllium 333
+Trachurus japonicus 334
+Zeus faber 335
+Pagrus major 336
+Acanthopagrus schlegelii 337
+Dentex tumifrons 338
+Mustelus manazo 339
+Seriola quinqueradiata 340
+Hyperoglyphe japonica 341
+Carcharhinus 342
+Platycephalus 343
+Scomber japonicus 344
+Squatina japonica 345
+Alopias pelagicus 346
+Zenopsis nebulosa 347
+Cynoglossus joyneri 348
+Verasper variegatus 349
+Oncorhynchus keta 350
+Physiculus japonicus 351
+Oplegnathus punctatus 352
+Arothron hispidus 353
+Stereolepis doederleini 354
+Takifugu snyderi 355
+Scomber australasicus 356
+Liparis tanakae 357
+Thamnaconus modestus 358
+Gnathophis nystromi 359
+Sebastes oblongus 360
+Sebastiscus marmoratus 361
+Takifugu pardalis 362
+Mugil cephalus 363
+Ditrema temminckii temminckii 364
+Konosirus punctatus 365
+Tribolodon brandtii 366
+Oncorhynchus masou 367
+Aluterus monoceros 368
+Todarodes pacificus 369
+Myoxocephalus stelleri 370
+Myliobatis tobijei 371
+Scyliorhinus torazame 372
+Lophiomus setigerus 373
+Heterodontus japonicus 374
+Sebastes vulpes 375
+Paraplagusia japonica 376
+Ostrea edulis 377
+Melanogrammus aeglefinus 378
+Pollachius virens 379
+Pollachius pollachius 380
+Sebastes marinus 381
+Anarhichas minor 382
+Anarhichas denticulatus 383
+Reinhardtius hippoglossoides 384
+Trisopterus esmarkii 385
+Micromesistius poutassou 386
+Coryphaenoides rupestris 387
+Argentina silus 388
+Salmo salar 389
+Sebastes viviparus 390
+Buccinum undatum 391
+Fucus serratus 392
+Merluccius merluccius 393
+Littorina littorea 394
+Fucus 395
+Rhodymenia 396
+Solea solea 397
+Trachurus trachurus 398
+Eutrigla gurnardus 399
+Pelvetia canaliculata 400
+Ascophyllum nodosum 401
+Mallotus villosus 402
+Pecten maximus 403
+Hippoglossoides platessoides 404
+Sebastes mentella 405
+Modiolus modiolus 406
+Boreogadus saida 407
+Sepia 408
+Gadus 409
+Sardina pilchardus 410
+Pleuronectiformes 411
+Molva molva 412
+Patella 413
+Crassostrea gigas 414
+Dasyatis pastinaca 415
+Lophius piscatorius 416
+Porphyra umbilicalis 417
+Patella vulgata 418
+Brosme brosme 419
+Glyptocephalus cynoglossus 420
+Galeus melastomus 421
+Chimaera monstrosa 422
+Etmopterus spinax 423
+Dicentrarchus labrax 424
+Osilinus lineatus 425
+Hippoglossus hippoglossus 426
+Cyclopterus lumpus 427
+Molva dypterygia 428
+Microstomus kitt 429
+Fucus distichus 430
+Tapes 431
+Sebastes norvegicus 432
+Phycis blennoides 433
+Fucus spiralis 434
+Laminaria digitata 435
+Dipturus batis 436
+Anarhichas lupus 437
+Lumpenus lampretaeformis 438
+Lycodes vahlii 439
+Argentina sphyraena 440
+Trisopterus minutus 441
+Thunnus 442
+Hyperoplus lanceolatus 443
+Gaidropsarus argentatus 444
+Engraulis japonicus 445
+Mytilus galloprovincialis 446
+Undaria pinnatifida 447
+Chlorophthalmus albatrossis 448
+Sargassum fusiforme 449
+Eisenia bicyclis 450
+Spisula sachalinensis 451
+Strongylocentrotus nudus 452
+Haliotis discus hannai 453
+Dexistes rikuzenius 454
+Ruditapes philippinarum 455
+Apostichopus japonicus 456
+Pterothrissus gissu 457
+Helicolenus hilgendorfii 458
+Buccinum isaotakii 459
+Neptunea intersculpta 460
+Apostichopus nigripunctatus 461
+Sebastes thompsoni 462
+Oratosquilla oratoria 463
+Oncorhynchus kisutch 464
+Erimacrus isenbeckii 465
+Sillago japonica 466
+Trachysalambria curvirostris 467
+Mytilus unguiculatus 468
+Crassostrea nippona 469
+Laminariales 470
+Uroteuthis edulis 471
+Takifugu poecilonotus 472
+Neptunea arthritica 473
+Katsuwonus pelamis 474
+Doederleinia berycoides 475
+Metapenaeopsis dalei 476
+Seriola dumerili 477
+Pseudorhombus pentophthalmus 478
+Stephanolepis cirrhifer 479
+Cookeolus japonicus 480
+Panulirus japonicus 481
+Thunnus orientalis 482
+Halocynthia roretzi 483
+Etrumeus sadina 484
+Cololabis saira 485
+Coryphaena hippurus 486
+Sarda orientalis 487
+Octopus ocellatus 488
+Sardinops sagax 489
+Sphyraena pinguis 490
+Sebastes ventricosus 491
+Occella iburia 492
+Glossanodon semifasciatus 493
+Mizuhopecten yessoensis 494
+Neosalangichthys ishikawae 495
+Bothrocara tanakae 496
+Malacocottus zonurus 497
+Coelorinchus macrochir 498
+Neptunea constricta 499
+Beringius polynematicus 500
+Sebastes nivosus 501
+Pandalus eous 502
+Synaphobranchus kaupii 503
+Sebastolobus macrochir 504
+Marsupenaeus japonicus 505
+Japelion hirasei 506
+Pleurogrammus azonus 507
+Monostroma nitidum 508
+Atheresthes evermanni 509
+Takifugu rubripes 510
+Chionoecetes opilio 511
+Pandalopsis coccinata 512
+Chionoecetes japonicus 513
+Sebastes matsubarae 514
+Scombrops gilberti 515
+Hyporhamphus sajori 516
+Trichiurus lepturus 517
+Alcichthys elongatus 518
+Volutharpa perryi 519
+Mercenaria stimpsoni 520
+Berryteuthis magister 521
+Aptocyclus ventricosus 522
+Euphausia pacifica 523
+Salangichthys microdon 524
+Telmessus acutidens 525
+Ceratophyllum demersum 526
+Pandalus nipponensis 527
+Sebastes owstoni 528
+Cociella crocodilus 529
+Conger japonicus 530
+Sardinella zunasi 531
+Cheilopogon pinnatibarbatus japonicus 532
+Oplegnathus fasciatus 533
+Macridiscus aequilatera 534
+Repomucenus ornatipinnis 535
+Clupea pallasii 536
+Scorpaena neglecta 537
+Scomberomorus niphonius 538
+Leucopsarion petersii 539
+Sebastes scythropus 540
+Strongylura anastomella 541
+Laemonema longipes 542
+Fusitriton oregonensis 543
+Japelion pericochlion 544
+Sebastes steindachneri 545
+Auxis rochei 546
+Lobotes surinamensis 547
+Auxis thazard 548
+Chlorophthalmus borealis 549
+Etelis coruscans 550
+Sebastes inermis 551
+Cynoglossus interruptus 552
+Erilepis zonifer 553
+Tridentiger obscurus 554
+Caranx sexfasciatus 555
+Thunnus thynnus 556
+Takifugu stictonotus 557
+Euthynnus affinis 558
+Synagrops japonicus 559
+Okamejei schmidti 560
+Suggrundus meerdervoortii 561
+Sebastes baramenuke 562
+Pleurogrammus monopterygius 563
+Decapterus maruadsi 564
+Girella punctata 565
+Sphyraena japonica 566
+Ommastrephes bartramii 567
+Sepiella japonica 568
+Sepioteuthis lessoniana 569
+Eucleoteuthis luminosa 570
+Gloiopeltis furcata 571
+Macrobrachium nipponense 572
+Sepia kobiensis 573
+Eriocheir japonica 574
+Magallana nippona 575
+Meretrix lusoria 576
+Chondrus ocellatus 577
+Chondrus elatus 578
+Gloiopeltis 579
+Holothuroidea 580
+Corbicula japonica 581
+Sunetta menstrualis 582
+Pseudorhombus cinnamoneus 583
+Takifugu niphobles 584
+Lagocephalus gloveri 585
+Beryx splendens 586
+Parastichopus nigripunctatus 587
+Venerupis philippinarum 588
+Haliotis 589
+Liparis agassizii 590
+Seriola lalandi 591
+Niphon spinosus 592
+Pleuronichthys japonicus 593
+Sergia lucens 594
+Sphoeroides pachygaster 595
+Coryphaenoides acrolepis 596
+Pseudopleuronectes obscurus 597
+Pyropia yezoensis 598
+Isurus oxyrinchus 599
+Sargassum fulvellum 600
+Prionace glauca 601
+Kajikia audax 602
+Thunnus albacares 603
+Thunnus alalunga 604
+Thunnus obesus 605
+Lamna ditropis 606
+Glyptocidaris crenularis 607
+Asterias amurensis 608
+Sepiida 609
+Congridae 610
+Takifugu 611
+Sargassum horneri 612
+Haliotis discus 613
+Pleuronectidae 614
+Acanthogobius flavimanus 615
+Acanthogobius lactipes 616
+Pholis nebulosa 617
+Hemigrapsus penicillatus 618
+Palaemon paucidens 619
+Mysidae 620
+Zostera marina 621
+Ulva pertusa 622
+Gobiidae 623
+Atherinidae 624
+Tribolodon 625
+Alpheus 626
+Polychaeta 627
+Sebastes 628
+Charybdis japonica 629
+Hemigrapsus 630
+Favonigobius gymnauchen 631
+Palaemon 632
+Planiliza haematocheila 633
+Palaemonidae 634
+Pholis crassispina 635
+Laminaria 636
+Distolasterias nipon 637
+Lophiiformes 638
+Alpheus brevicristatus 639
+Undaria undariodes 640
+Neomysis awatschensis 641
+Alpheidae 642
+Macrobrachium 643
+Hediste 644
+Gymnogobius breunigii 645
+Luidia quinaria 646
+Rhizoprionodon acutus 647
+Carangoides equula 648
+Carcinoplax longimana 649
+Anomura 650
+Spatangoida 651
+Plesiobatis daviesi 652
+Eusphyra blochii 653
+Ruditapes variegata 654
+Sinonovacula constricta 655
+Penaeus monodon 656
+Litopenaeus vannamei 657
+Solenocera crassicornis 658
+Stomatopoda 659
+Teuthida 660
+Octopus 661
+Larimichthys polyactis 662
+Scomberomorini 663
+Channa argus 664
+Ranina ranina 665
+Lates calcarifer 666
+Scomberomorus commerson 667
+Lutjanus malabaricus 668
+Thenus parindicus 669
+Amusium pleuronectes 670
+Loligo 671
+Plectropomus leopardus 672
+Sillago ciliata 673
+Scylla serrata 674
+Pinctada maxima 675
+Lutjanus argentimaculatus 676
+Protonibea diacanthus 677
+Polydactylus macrochir 678
+Rachycentron canadum 679
+Ibacus peronii 680
+Arripis trutta 681
+Sarda australis 682
+Seriola hippos 683
+Choerodon schoenleinii 684
+Panulirus ornatus 685
+Neotrygon kuhlii 686
+Lethrinus nebulosus 687
+Parupeneus multifasciatus 688
+Saccostrea cucullata 689
+Lutjanus sebae 690
+Thunnus maccoyii 691
+Acanthopagrus butcheri 692
+Lambis lambis 693
+Gerres subfasciatus 694
+Zooplankton 695
+Phytoplankton 696
+Rapana venosa 697
+Scapharca inaequivalvis 698
+Ulva intestinalis 699
+Ulva linza 700
+Ceramium virgatum 701
+Gayralia oxysperma 702
+Vertebrata fucoides 703
+Stuckenia pectinata 704
+Rochia nilotica 705
+Ctenochaetus striatus 706
+Serranidae 707
+Turbo setosus 708
+Pandalidae 709
+Gymnosarda unicolor 710
+Epinephelini 711
+Pisces 712
+Liza klunzingeri 713
+Acanthopagrus latus 714
+Liza subviridis 715
+Sparidentex hasta 716
+Otolithes ruber 717
+Crenidens crenidens 718
+Ensis 719
+Gastropoda 720
+Euheterodonta 721
+Scomber 722
+Theragra chalcogramma 723
+Engraulidae 724
+Ostreidae 725
+Phaeophyceae 726
+Porphyra 727
+Ulva reticulata 728
+Perna viridis 729
+Fenneropenaeus indicus 730
+Merluccius 731
+Soleidae 732
+Mugilidae 733
+Marine algae 734
+Scarus rivulatus 735
+Scarus coeruleus 736
+Sardinella fimbriata 737
+Dussumieria acuta 738
+Lutjanus kasmira 739
+Lutjanus rivulatus 740
+Lutjanus bohar 741
+Priacanthus blochii 742
+Pelates quadrilineatus 743
+Epinephelus fasciatus 744
+Upeneus vittatus 745
+Lethrinus laticaudis 746
+Lethrinus lentjan 747
+Lethrinus microdon 748
+Sphyraena barracuda 749
+Alectis indica 750
+Epinephelus latifasciatus 751
+Nemipterus japonicus 752
+Raconda russeliana 753
+Lactarius lactarius 754
+Aetomylaeus bovinus 1568
+Pennahia anea 756
+Leiognathus fasciatus 757
+Sardinella longiceps 758
+Tenualosa ilisha 759
+Pellona ditchela 760
+Stolephorus indicus 761
+Setipinna breviceps 762
+Rastrelliger kanagurta 763
+Chanos chanos 764
+Lepturacanthus savala 765
+Epinephelus niveatus 766
+Lutjanus johnii 767
+Carangoides malabaricus 768
+Ablennes hians 769
+Chirocentrus dorab 770
+Scomberomorus cavalla 771
+Scomberomorus semifasciatus 772
+Scomberomorus guttatus 773
+Etrumeus teres 774
+Spondyliosoma cantharus 775
+Brama brama 776
+Dasyatis zugei 777
+Harpadon nehereus 778
+Carcharhinus melanopterus 779
+Penaeus plebejus 780
+Sepia officinalis 781
+Johnius dussumieri 782
+Lutjanus campechanus 783
+Ruditapes decussatus 784
+Carcinus aestuarii 785
+Squilla mantis 786
+Epinephelus polyphekadion 787
+Lutjanus gibbus 788
+Lethrinus mahsena 789
+Epinephelus chlorostigma 790
+Carangoides bajad 791
+Aethaloperca rogaa 792
+Atule mate 793
+Macolor niger 794
+Carangoides fulvoguttatus 795
+Plectropomus areolatus 796
+Cephalopholis argus 797
+Cephalopholis 798
+Scarus sordidus 799
+Scomberomorus tritor 800
+Triaenodon obesus 801
+Pomadasys commersonnii 802
+Monotaxis grandoculis 803
+Plectropomus maculatus 804
+Trachinotus blochii 805
+Pristipomoides filamentosus 806
+Acanthurus gahhm 807
+Acanthurus sohal 808
+Siganus argenteus 809
+Naso unicornis 810
+Chanos 811
+Oedalechilus labiosus 812
+Plectorhinchus gaterinus 813
+Mercenaria mercenaria 814
+Mytilus 815
+Turbo cornutus 816
+Decapoda 817
+Sphyraena 818
+Arius maculatus 819
+Penaeus merguiensis 820
+Tegillarca granosa 821
+Mullus barbatus barbatus 822
+Chamelea gallina 1561
+Metanephrops thomsoni 824
+Magallana gigas 825
+Branchiostegus japonicus 826
+Cephalopoda 827
+Lutjanidae 828
+Lethrinidae 829
+Sphyraena argentea 830
+Chirocentrus nudus 831
+Trachinotus 832
+Mugil auratus 833
+Euthynnus alletteratus 834
+Sparus aurata 835
+Pagrus caeruleostictus 836
+Scorpaena scrofa 837
+Pagellus erythrinus 838
+Epinephelus aeneus 839
+Dentex maroccanus 840
+Caranx rhonchus 841
+Sardinella 842
+Siganus 843
+Solea 844
+Diplodus sargus 845
+Lithognathus mormyrus 846
+Oblada melanura 847
+Siganus rivulatus 848
+Chelon labrosus 849
+Cynoscion microlepidotus 850
+Genypterus brasiliensis 851
+Myoxocephalus polyacanthocephalus 852
+Hexagrammos lagocephalus 853
+Hexagrammos decagrammus 854
+Sebastes ciliatus 855
+Lepidopsetta polyxystra 856
+Clupeiformes 857
+Gadidae 858
+Brachyura 859
+Dasyatis 860
+Carcharias 861
+Saurida 862
+Upeneus 863
+Cynoglossus 864
+Scomberomorus 865
+Terapon 866
+Leiognathus 867
+Terapontidae 868
+Caranx 869
+Diplodus 870
+Plectorhinchus flavomaculatus 871
+Salmonidae 872
+Mollusca 873
+Boops boops 874
+Sarpa salpa 875
+Pagellus acarne 876
+Spicara smaris 877
+Diplodus vulgaris 878
+Chelidonichthys lucerna 879
+Sarda sarda 880
+Serranus cabrilla 881
+Diplodus annularis 882
+Pagrus pagrus 883
+Alosa fallax 884
+Belone belone 885
+Dentex dentex 886
+Sphyraena viridensis 887
+Trisopterus capelanus 888
+Arnoglossus laterna 889
+Procambarus clarkii 890
+Nemadactylus macropterus 891
+Pagrus auratus 892
+Jasus edwardsii 893
+Perna canaliculus 894
+Pseudophycis bachus 895
+Haliotis iris 896
+Hoplostethus atlanticus 897
+Rhombosolea leporina 898
+Zygochlamys delicatula 899
+Galeorhinus galeus 900
+Parapercis colias 901
+Tiostrea chilensis 902
+Genypterus blacodes 903
+Evechinus chloroticus 904
+Austrovenus stutchburyi 905
+Micromesistius australis 906
+Macruronus novaezelandiae 907
+Nototodarus 908
+Perna perna 909
+Sepia pharaonis 910
+Turbo bruneus 911
+Portunus sanguinolentus 912
+Charybdis natator 913
+Charybdis lucifera 914
+Panulirus argus 915
+Ethmalosa fimbriata 916
+Sardinella brachysoma 917
+Thryssa mystax 918
+Plicofollis dussumieri 919
+Nibea soldado 920
+Epinephelus melanostigma 921
+Megalops cyprinoides 922
+Decapterus macarellus 923
+Drepane punctata 924
+Sillago sihama 925
+Tylosurus crocodilus crocodilus 926
+Saurida tumbil 927
+Cynoglossus macrostomus 928
+Parupeneus indicus 929
+Synechogobius hasta 930
+Busycotypus canaliculatus 931
+Pampus cinereus 932
+Pomadasys kaakan 933
+Epinephelus coioides 934
+Sepiella inermis 935
+Uroteuthis duvauceli 936
+Stomatella auricula 937
+Cerithium scabridum 938
+Marcia recens 939
+Circe intermedia 940
+Marcia opima 941
+Fulvia fragile 942
+Charybdis feriatus 943
+Charybdis annulata 944
+Atergatis integerrimus 945
+Matuta lunaris 946
+Calappa lophos 947
+Uca annulipes 948
+Chlamys varia 949
+Cololabis adocetus 950
+Seriola lalandi dorsalis 951
+Brunneifusus ternatanus 952
+Metapenaeus joyneri 953
+Epinephelus tauvina 954
+Coilia dussumieri 955
+Carcharhinus dussumieri 956
+Upeneus tragula 957
+Sartoriana spinigera 958
+Lamellidens marginalis 959
+Polydactylus sextarius 960
+Johnius macrorhynus 961
+Hexanematichthys sagor 962
+Sargassum swartzii 963
+Argyrops spinifer 964
+Synodus intermedius 965
+Muraenesox cinereus 966
+Carangoides armatus 967
+Eleutheronema tetradactylum 968
+Mustelus mosis 969
+Nemipterus bipunctatus 970
+Lutjanus quinquelineatus 971
+Platycephalus indicus 972
+Rhabdosargus haffara 973
+Argyrops filamentosus 974
+Brachirus orientalis 975
+Mene maculata 976
+Hemiramphus marginatus 977
+Encrasicholina heteroloba 978
+Trachinotus africanus 979
+Bramidae 980
+Escualosa thoracata 981
+Sepia arabica 982
+Scatophagus argus 983
+Parastromateus niger 984
+Planiliza subviridis 985
+Labeo rohita 986
+Oreochromis niloticus 987
+Cardiidae 988
+Sargassum angustifolium 989
+Pomacea bridgesii 990
+Sebastes fasciatus 991
+Batoidea 992
+Urophycis chuss 993
+Dalatias licha 994
+Trisopterus luscus 995
+Scyliorhinus canicula 996
+Ruvettus pretiosus 997
+Aphanopus carbo 998
+Alepocephalus bairdii 999
+Centroscymnus coelolepis 1000
+Loligo forbesii 1001
+Lutjanus cyanopterus 1002
+Mugil liza 1003
+Micropogonias furnieri 1004
+Balistes capriscus 1005
+Haemulidae 1006
+Stenotomus caprinus 1007
+Hemanthias leptus 1008
+Micropogonias undulatus 1009
+Cynoscion nebulosus 1010
+Rhomboplites aurorubens 1011
+Bothidae 1012
+Pogonias cromis 1013
+Lutjanus synagris 1014
+Netuma thalassina 1015
+Sillaginopsis panijus 1016
+Leptomelanosoma indicum 1017
+Therapon 1018
+Pterotolithus maculatus 1019
+Ilisha filigera 1020
+Hilsa kelee 1021
+Pampus chinensis 1022
+Palaemon styliferus 1023
+Argyrosomus regius 1024
+Lutjanus 1025
+Sciades 1026
+Mullus 1027
+Albula vulpes 1028
+Selar crumenophthalmus 1029
+Centropomus 1030
+Sardinella aurita 1031
+Harengula humeralis 1032
+Diapterus auratus 1033
+Gerres cinereus 1034
+Haemulon parra 1035
+Ocyurus chrysurus 1036
+Sphyraena guachancho 1037
+Anoplopoma fimbria 1038
+Nerita versicolor 1039
+Bulla striata 1040
+Melongena melongena 1041
+Trachycardium muricatum 1042
+Isognomon alatus 1043
+Brachidontes exustus 1044
+Crassostrea virginica 1045
+Protothaca granulata 1046
+Cittarium pica 1047
+Penaeus schmitti 1048
+Penaeus notialis 1049
+Callinectes sapidus 1050
+Callinectes danae 1051
+Dasyatidae 1052
+Caridea 1053
+Nephropidae 1054
+Sparus 1055
+Sargassum boveanum 1056
+Haliotis tuberculata 1057
+Littorinidae 1058
+Seaweed 1059
+Echinoidea 1060
+Ostreida 1061
+Donax trunculus 1062
+Scrobicularia plana 1063
+Venus verrucosa 1064
+Solen marginatus 1065
+Testudines 1066
+Mullidae 1067
+Amphipoda 1068
+Cystosphaera jacquinotii 1069
+Daption capense 1070
+Desmarestia anceps 1071
+Himantothallus grandifolius 1072
+Mirounga 1073
+Nacella concinna 1074
+Notothenia coriiceps 1075
+Pygoscelis antarcticus 1076
+Pygoscelis papua 1077
+Oncorhynchus gorbuscha 1078
+Oncorhynchus mykiss 1079
+Oncorhynchus nerka 1080
+Oncorhynchus tshawytscha 1081
+Erignathus barbatus 1082
+Pusa hispida 1083
+Hippoglossus stenolepis 1084
+Squalus suckleyi 1085
+Sargassum 1086
+Codium 1087
+Membranoptera alata 1088
+Dictyota dichotoma 1089
+Plocamium cartilagineum 1090
+Galatea paradoxa 1091
+Crassostrea tulipa 1092
+Macrobrachium sp 1093
+Portunus 1094
+Tympanotonos fuscatus 1095
+Thais 1096
+Bivalvia 1097
+Cynoglossus senegalensis 1098
+Carlarius heudelotii 1099
+Fontitrygon margarita 1100
+Chrysichthys nigrodigitatus 1101
+Acanthephyra purpurea 1102
+Actinauge abyssorum 1103
+Alaria marginata 1104
+Anadara transversa 1105
+Anthomedusae 1106
+Archosargus probatocephalus 1107
+Argyropelecus aculeatus 1108
+Ariopsis felis 1109
+Astrometis sertulifera 1110
+Astropecten 1111
+Atherina breviceps 1112
+Atolla 1113
+Aulacomya atra 1114
+Auxis rochei rochei 1115
+Auxis thazard thazard 1116
+Avicennia marina 1117
+Balaena mysticetus 1118
+Balaenoptera acutorostrata 1119
+Balanus 1120
+Berardius bairdii 1121
+Beroe 1122
+Boopsoidea inornata 1123
+Calanoida 1124
+Calanus finmarchicus finmarchicus 1125
+Callorhinchus milii 1126
+Cepphus columba 1127
+Cladonia rangiferina 1128
+Clinus superciliosus 1129
+Codium tomentosum 1130
+Copepoda 1131
+Coregonus autumnalis 1132
+Coregonus nasus 1133
+Coregonus sardinella 1134
+Coryphaenoides armatus 1135
+Coryphoblennius galerita 1136
+Creseis sp 1137
+Crinoidea 1138
+Crossota 1139
+Cryptochiton stelleri 1140
+Delphinus delphis 1141
+Diacria 1142
+Dichistius capensis 1143
+Dosinia alta 1144
+Dugong dugon 1145
+Electrona risso 1146
+Engraulis capensis 1147
+Ensis siliqua 1148
+Eryonidae 1149
+Eualaria fistulosa 1150
+Eupasiphae gilesii 1151
+Euphausiacea 1152
+Euphausiidae 1153
+Eurypharynx pelecanoides 1154
+Eurythenes gryllus 1155
+Euthynnus lineatus 1156
+Fratercula cirrhata 1157
+Galeichthys feliceps 1158
+Gelidium corneum 1159
+Gibbula umbilicalis 1160
+Gnathophausia ingens 1161
+Gonatus fabricii 1162
+Haliaeetus leucocephalus 1163
+Haliclona 1164
+Halodule uninervis 1165
+Hemilepidotus 1166
+Hemilepidotus jordani 1167
+Heterocarpus ensifer 1168
+Heterodontus portusjacksoni 1169
+Hippasteria phrygiana 1170
+Homola barbata 1171
+Hyperoodon planifrons 1172
+Hypleurochilus geminatus 1173
+Invertebrata 1174
+Isognomon bicolor 1175
+Isopoda 1176
+Kogia breviceps 1177
+Labrus bergylta 1178
+Lagenorhynchus obliquidens 1179
+Lampris guttatus 1180
+Larus glaucescens 1181
+Leander serratus 1182
+Libinia emarginata 1183
+Lichia amia 1184
+Lipophrys pholis 1185
+Lipophrys trigloides 1186
+Lithognathus lithognathus 1187
+Lithophaga aristata 1188
+Lobianchia gemellarii 1189
+Loliginidae 1190
+Loligo reynaudii 1191
+Lophius budegassa 1192
+Magallana angulata 1193
+Majoidea 1194
+Megachasma pelagios 1195
+Megaptera novaeangliae 1196
+Menippe mercenaria 1197
+Mesoplodon carlhubbsi 1198
+Mesoplodon stejnegeri 1199
+Microstomus pacificus 1200
+Morone saxatilis 1201
+Mullus surmuletus 1202
+Mycteroperca xenarcha 1203
+Myliobatis australis 1204
+Mysida 1205
+Mytilus californianus 1206
+Mytilus trossulus 1207
+Nephasoma Nephasoma flagriferum 1208
+Nudibranchia 1209
+Odobenus rosmarus divergens 1210
+Ommastrephidae 1211
+Ophiomusa lymani 1212
+Ophiothrix lineata 1213
+Orcinus orca 1214
+Ostracoda 1215
+Pagellus bogaraveo 1216
+Pandalus borealis 1217
+Paphies subtriangulata 1218
+Parabrotula 1219
+Paracalanus 1220
+Patella aspera 1221
+Periphylla 1222
+Phocoena phocoena 1223
+Phocoenoides dalli 1224
+Phronima 1225
+Physeter macrocephalus 1226
+Pinctada radiata 1227
+Plesionika edwardsii 1228
+Pododesmus macrochisma 1229
+Pomatomus saltatrix 1230
+Portunus pelagicus 1231
+Praunus 1232
+Pyrosoma 1233
+Rangifer tarandus 1234
+Rhabdosargus globiceps 1235
+Saccorhiza polyschides 1236
+Sagitta 1237
+Salpa 1238
+Salvelinus alpinus 1239
+Salvelinus malma 1240
+Sarda chiliensis 1241
+Sargassum aquifolium 1242
+Scalibregmatidae 1243
+Sebastes alutus 1244
+Sebastes melanops 1245
+Seriola dorsalis 1246
+Serranus scriba 1247
+Sigmops bathyphilus 1248
+Silicula fragilis 1249
+Sipunculidae 1250
+Somateria mollissima 1251
+Somateria spectabilis 1252
+Sparodon durbanensis 1253
+Spicara maena 1254
+Squatina australis 1255
+Striostrea margaritacea 1256
+Stromateus fiatola 1257
+Strongylocentrotus polyacanthus 1258
+Taractichthys steindachneri 1259
+Tectura scutum 1260
+Tegula viridula 1261
+Thais haemastoma 1262
+Thegrefg 1263
+Themisto 1264
+Thunnus tonggol 1265
+Trachurus picturatus 1266
+Trachurus symmetricus 1267
+Trygonorrhina fasciata 1268
+Ulva lactuca 1269
+Ursus maritimus 1270
+Vampyroteuthis infernalis 1271
+Ziphius cavirostris 1272
+Alepes kleinii 1273
+Alepes vari 1274
+Decapterus macrosoma 1275
+Lutjanus madras 1276
+Lutjanus russellii 1277
+Rastrelliger brachysoma 1278
+Rastrelliger faughni 1279
+Selar boops 1280
+Selaroides leptolepis 1281
+Sphyraena obtusata 1282
+Geloina expansa 1283
+Caesio erythrogaster 1284
+Euristhmus microceps 1285
+Pomacanthus annularis 1286
+Scylla 1287
+Plotosus lineatus 1288
+Prionotus stephanophrys 1289
+Trachurus murphyi 1290
+Dosidicus gigas 1291
+Sarda chiliensis chiliensis 1292
+Cynoscion analis 1293
+Merluccius gayi peruanus 1294
+Brotula ordwayi 1295
+Loligo gahi 1296
+Merluccius gayi 1297
+Ophichthus remiger 1298
+Penaeus sp 1299
+Trachinotus paitensis 1300
+Cheilopogon heterurus 1301
+Engraulis ringens 1302
+Sciaena deliciosa 1303
+Isacia conceptionis 1304
+Odontesthes regia 1305
+Bodianus diplotaenia 1306
+Concholepas concholepas 1307
+Diplectrum conceptione 1308
+Genypterus maculatus 1309
+Labrisomus philippii 1310
+Paralabrax humeralis 1311
+Prionotus horrens 1312
+Dasyatis akajei 1313
+Arctoscopus japonicus 1314
+Sepia esculenta 1315
+Bothrocara hollandi 1316
+Cynoglossidae 1317
+Lepidotrigla 1318
+Lepidotrigla alata 1319
+Octopus sinensis 1320
+Rhabdosargus sarba 1321
+Lophiidae 1322
+Muraenesox 1323
+Physiculus maximowiczi 1324
+Pleuronectoidei 1325
+Sciaenidae 1326
+Triglidae 1327
+Atherina presbyter 1328
+Bentheogennema intermedia 1329
+Benthesicymidae 1330
+Benthesicymus 1331
+Buccinum striatissimum 1332
+Callinectes 1333
+Cancer pagurus 1334
+Chaetognatha 1335
+Chama macerophylla 1336
+Cirripedia 1337
+Cyclosalpa 1338
+Cymopolia barbata 1339
+Cynoscion 1340
+Cystoseira amentacea 1341
+Ectocarpus siliculosus 1342
+Ellisolandia elongata 1343
+Enteromorpha linza 1344
+Euphausia superba 1345
+Gaidropsarus mediterraneus 1346
+Gennadas valens 1347
+Globicephala 1348
+Haliptilon virgatum 1349
+Halocynthia aurantium 1350
+Heliocidaris crassispina 1351
+Hymenodora gracilis 1352
+Lagodon rhomboides 1353
+Lepas Anatifa anatifera 1354
+Lobophora variegata 1355
+Macrocystis pyrifera 1356
+Maculabatis gerrardi 1357
+Nemacystus decipiens 1358
+Neptunea polycostata 1359
+Padina pavonia 1360
+Penaeidae 1361
+Petricolinae 1362
+Polynemidae 1363
+Pristipomoides aquilonaris 1364
+Pyropia fallax 1365
+Radiolaria 1366
+Salpidae 1367
+Sardinops melanosticta 1368
+Sargassum vulgare 1369
+Sciaena umbra 1370
+Scorpaena porcus 1371
+Sergestidae 1372
+Sicyonia brevirostris 1373
+Sphaerococcus coronopifolius 1374
+Stenella coeruleoalba 1375
+Stichopus japonicus 1376
+Thalia democratica 1377
+Themisto gaudichaudii 1378
+Undaria 1379
+Analipus japonicus 1380
+Sargassum yamadae 1381
+Ahnfeltiopsis paradoxa 1382
+Scytosiphon lomentaria 1383
+Chondria crassicaulis 1384
+Grateloupia lanceolata 1385
+Colpomenia sinuosa 1386
+Chondrus giganteus 1387
+Sargassum muticum 1388
+Ulva prolifera 1389
+Petalonia fascia 1390
+Balanus roseus 1391
+Chaetomorpha moniligera 1392
+Lomentaria hakodatensis 1393
+Neodilsea longissima 1394
+Polyopes affinis 1395
+Schizymenia dubyi 1396
+Dictyopteris pacifica 1397
+Ahnfeltiopsis flabelliformis 1398
+Bangia fuscopurpurea 1399
+Calliarthron 1400
+Cladophora 1401
+Cladophora albida 1402
+Dasya sessilis 1403
+Delesseria serrulata 1404
+Ecklonia cava 1405
+Gelidium elegans 1406
+Grateloupia turuturu 1407
+Hypnea asiatica 1408
+Mazzaella japonica 1409
+Pachydictyon coriaceum 1410
+Padina arborescens 1411
+Pterosiphonia pinnulata 1412
+Alatocladia yessoensis 1413
+Bryopsis plumosa 1414
+Ceramium kondoi 1415
+Chondracanthus intermedius 1416
+Codium contractum 1417
+Codium lucasii 1418
+Corallina pilulifera 1419
+Dictyopteris undulata 1420
+Gastroclonium pacificum 1421
+Gelidium amansii 1422
+Grateloupia sparsa 1423
+Laurencia okamurae 1424
+Leathesia marina 1425
+Lomentaria catenata 1426
+Meristotheca papulosa 1427
+Sargassum confusum 1428
+Sargassum siliquastrum 1429
+Tinocladia crassa 1430
+Saccharina yendoana 1431
+Thalassiophyllum clathrus 1432
+Mytilida 1433
+Pteriomorphia 1434
+Conger 1435
+Scyliorhinidae 1436
+Labrus 1437
+Algae 1438
+Necora puber 1439
+Anguilla 1440
+Rajidae 1441
+Buccinidae 1442
+Crustacea 1443
+Green algae 1444
+Ammodytes japonicus 1445
+Evynnis tumifrons 1446
+Gnathophis nystromi nystromi 1447
+Loligo bleekeri 1448
+Platichthys bicoloratus 1449
+Limanda punctatissima 1450
+Loliolus Nipponololigo japonica 1451
+Acanthopagrus schlegelii schlegelii 1452
+Sepiolina 1453
+Gelidium 1454
+Atrina pectinata 1455
+Echinocardium cordatum 1456
+Lamnidae 1457
+Meretrix lamarckii 1458
+Noctiluca scintillans 1459
+Philine argentata 1460
+Sergestes lucens 1461
+Corbicula sandai 1462
+Ulva 1463
+Actiniaria 1464
+Ctenopharyngodon idella 1465
+Ophiuroidea 1466
+Scomberoides lysan 1467
+Scomberoides tol 1468
+Sebastolobus 1469
+Selachimorpha 1470
+Selene setapinnis 1471
+Selene vomer 1472
+Sepia elliptica 1473
+Sergestes sp 1474
+Setipinna taty 1475
+Siganus canaliculatus 1476
+Sigmops gracile 1477
+Solenocera sp 1478
+Sparidae 1479
+Spermatophytina 1480
+Sphoeroides testudineus 1481
+Sphyraena jello 1482
+Spyridia hypnoides 1483
+Squaliformes 1484
+Squillidae 1485
+Stegophiura sladeni 1486
+Stenella longirostris 1487
+Stenobrachius leucopsarus 1488
+Sternaspidae 1489
+Stoechospermum polypodioides 1490
+Stolephorus commersonnii 1491
+Stromateus cinereus 1492
+Stromateus niger 1493
+Stromateus sinensis 1494
+Synidotea 1495
+Takifugu vermicularis 1496
+Telatrygon zugei 1497
+Terapon jarbua 1498
+Terebellidae 1499
+Thryssa dussumieri 1500
+Thunnini 1501
+Tibia curta 1502
+Tonna dolium 1503
+Trachinus draco 1504
+Trematomus bernacchii 1505
+Tridacna 1506
+Trinectes paulistanus 1507
+Trochus radiatus 1508
+Turbinaria 1509
+Tursiops truncatus 1510
+Ucides 1511
+Ulva compressa 1512
+Ulva fasciata 1513
+Ulva flexuosa 1514
+Ulva rigida 1515
+Upeneus taeniopterus 1516
+Upogebiidae 1517
+Uroteuthis Photololigo edulis 1518
+Valoniopsis pachynema 1519
+Veneridae 1520
+Venus foveolata 1521
+Vertebrata 1522
+Volutharpa ampullacea perryi 1523
+Zannichellia palustris 1524
+Zeus japonicus 1525
+Favites 1526
+Gadiformes 1527
+Gafrarium dispar 1528
+Galaxaura frutescens 1529
+Gelidium crinale 1530
+Genidens genidens 1531
+Girella elevata 1532
+Girella tricuspidata 1533
+Dentex hypselosomus 1534
+Saurida elongata 1535
+Pseudolabrus eoethinus 1536
+Atrobucca nibe 1537
+Diagramma pictum 1538
+Sepia lycidas 1539
+Plectorhinchus cinctus 1540
+Metapenaeopsis acclivis 1541
+Metapenaeopsis barbata 1542
+Nibea albiflora 1543
+Girella leonina 1544
+Sphyraenidae 1545
+Parapercis pulchella 1546
+Parapercis sexfasciata 1547
+Thysanoteuthis rhombus 1548
+Lepidotrigla kishinouyi 1549
+Cystoseira 1550
+Padina 1551
+Halimeda 1552
+Pacifastacus leniusculus 1553
+Salmo trutta 1554
+Chondrus crispus 1555
+Ictalurus punctatus 1556
+Acanthurus 1557
+Scombridae 1558
+Leukoma staminea 1559
+Trochidae 1560
+Protonibea 1562
+Anchoa compressa 1563
+Ensis magnus 1564
+Bolinus brandaris 1565
+Lutjanus notatus 1566
+Lethrinus olivaceus 1567
+Carassius auratus 1569
+Mugil 1570
+Gobius 1571
+Lajonkairia lajonkairii 1572
+Chrysophrys auratus 1573
+Galeorhinus australis 1574
+Nototodarus sloanii gouldi 1575
+Tylosurus crocodilus 1576
+Acanthogobius hasta 1577
+Penaeus chinensis 1578
+Ruditapes variegatus 1579
+Marcia marmorata 1580
+Rachycentron 1581
+Scomber kanagurta 1582
+Arius 1583
+Panulirus versicolor 1584
+Tilapia zillii 1585
+Schizoporella errata 1586
+Phallusia nigra 1587
+Physeter catodon 1588
+Salmo trutta trutta 1589
+Tachysurus thalassinus 1590
+Sillago domina 1591
+Otolithus argenteus 1592
+Trichiurus haumela 1593
+Otolithes maculata 1594
+Hilsa kanagurta 1595
+Oreochromis mossambicus 1596
+Siluriformes 1597
+Theodoxus euxinus 1598
+Formio niger 1599
+Rastrelliger 1600
+Nephasoma flagriferum 1601
+Ophiomusium lymani 1602
+Nematonurus armatus 1603
+Thalamitoides spinigera 1604
+Capros aper 1605
+Gadiculus argenteus thori 1606
+Phorcus lineatus 1607
+Penaeus vannamei 1608
+Raja montagui 1609
+Scophthalmus rhombus 1610</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/nc_template.py#L38" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nctemplater.nuclide_vars" class="level3">
+<h3 class="anchored" data-anchor-id="nctemplater.nuclide_vars">NCTemplater.nuclide_vars</h3>
+<blockquote class="blockquote">
+<pre><code> NCTemplater.nuclide_vars (col_varnames:str='nc_name',
+                           col_stdnames:str='nusymbol', dtype:str='f4')</code></pre>
+</blockquote>
+<p>Return the name of the radionuclide variables analysed.</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>col_varnames</td>
+<td>str</td>
+<td>nc_name</td>
+<td>Column name in the Excel lookup file containing the NetCDF variable names</td>
+</tr>
+<tr class="even">
+<td>col_stdnames</td>
+<td>str</td>
+<td>nusymbol</td>
+<td>Column name Excel lookup file containing the NetCDF standard names</td>
+</tr>
+<tr class="odd">
+<td>dtype</td>
+<td>str</td>
+<td>f4</td>
+<td>Default data type</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>list</strong></td>
+<td></td>
+<td><strong>List of nuclide variables (including their names and attributes)</strong></td>
+</tr>
+</tbody>
+</table>
+<p>For example, to retrieve the NetCDF nuclide names and associated attributes:</p>
+<div id="8ce95f56" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>templater <span class="op">=</span> NCTemplater(cdl<span class="op">=</span>cdl_test,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                        nuclide_vars_fname<span class="op">=</span><span class="st">'./files/lut/dbo_nuclide.xlsx'</span>, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                        tpl_fname<span class="op">=</span><span class="st">'./files/nc/test.nc'</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                        enum_dicts<span class="op">=</span>enums)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>expected <span class="op">=</span> [</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  {<span class="st">'name'</span>: <span class="st">'h3'</span>, <span class="st">'attrs'</span>: {<span class="st">'long_name'</span>: <span class="st">'Tritium 3'</span>, <span class="st">'standard_name'</span>: <span class="st">'3H'</span>}, <span class="st">'dtype'</span>: <span class="st">'f4'</span>},</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  {<span class="st">'name'</span>: <span class="st">'be7'</span>, <span class="st">'attrs'</span>: {<span class="st">'long_name'</span>: <span class="st">'Beryllium 7'</span>, <span class="st">'standard_name'</span>: <span class="st">'7Be'</span>}, <span class="st">'dtype'</span>: <span class="st">'f4'</span>}</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  ]</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>fc.test_eq(templater.nuclide_vars()[:<span class="dv">2</span>], expected)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/nc_template.py#L66" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nctemplater.derive" class="level3">
+<h3 class="anchored" data-anchor-id="nctemplater.derive">NCTemplater.derive</h3>
+<blockquote class="blockquote">
+<pre><code> NCTemplater.derive (nuclide:dict, suffix:dict)</code></pre>
+</blockquote>
+<p>Derive NetCDF nuclide-dependent variable names &amp; attributes as defined in CDL.</p>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>nuclide</td>
+<td>dict</td>
+<td>Nuclide variable name and associated netcdf attributes</td>
+</tr>
+<tr class="even">
+<td>suffix</td>
+<td>dict</td>
+<td>Naming rules as described in CDL (e.g <code>_unc</code>)</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>dict</strong></td>
+<td><strong>Derived variable name and associated attributes</strong></td>
+</tr>
+</tbody>
+</table>
+<p>For example, among others, the <code>cdl.toml</code> file defines the naming convention on variable names deriving from nuclides (e.g <code>h3_unc</code> for measurement uncertainty on the <code>h3</code> nuclide variable).</p>
+<div id="34990b54" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>templater <span class="op">=</span> NCTemplater(cdl<span class="op">=</span>cdl_test,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                        nuclide_vars_fname<span class="op">=</span><span class="st">'./files/lut/dbo_nuclide.xlsx'</span>, </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                        tpl_fname<span class="op">=</span><span class="st">'./files/nc/test.nc'</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                        enum_dicts<span class="op">=</span>enums)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here is below the defined Tritium NetCDF variable as specified in the <code>.cdl</code> file:</p>
+<div id="0814cde0" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>templater.nuclide_vars()[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'name': 'h3',
+ 'dtype': 'f4',
+ 'attrs': {'long_name': 'Tritium 3', 'standard_name': '3H'}}</code></pre>
+</div>
+</div>
+<div id="86e38709" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example of suffix defined in the .cdl file</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>suffix <span class="op">=</span> {</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'name'</span>: <span class="st">'unc'</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'attrs'</span>: {</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">'long_name'</span>: <span class="st">' uncertainty'</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'standard_name'</span>: <span class="st">'_uncertainty'</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'dtype'</span>: <span class="st">'f4'</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># And what we expect</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>expected <span class="op">=</span> {</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'name'</span>: <span class="st">'h3_unc'</span>,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'attrs'</span>: {</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">'long_name'</span>: <span class="st">'Tritium 3 uncertainty'</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">'standard_name'</span>: <span class="st">'3H_uncertainty'</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">'dtype'</span>: <span class="st">'f4'</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>fc.test_eq(templater.derive(templater.nuclide_vars()[<span class="dv">0</span>], suffix<span class="op">=</span>suffix), expected)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/nc_template.py#L80" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nctemplater.create_enum_types" class="level3">
+<h3 class="anchored" data-anchor-id="nctemplater.create_enum_types">NCTemplater.create_enum_types</h3>
+<blockquote class="blockquote">
+<pre><code> NCTemplater.create_enum_types ()</code></pre>
+</blockquote>
+<p>Create enumeration types</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/nc_template.py#L88" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nctemplater.create_groups" class="level3">
+<h3 class="anchored" data-anchor-id="nctemplater.create_groups">NCTemplater.create_groups</h3>
+<blockquote class="blockquote">
+<pre><code> NCTemplater.create_groups ()</code></pre>
+</blockquote>
+<p>Create NetCDF groups</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/nc_template.py#L97" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nctemplater.create_variables" class="level3">
+<h3 class="anchored" data-anchor-id="nctemplater.create_variables">NCTemplater.create_variables</h3>
+<blockquote class="blockquote">
+<pre><code> NCTemplater.create_variables (grp:netCDF4._netCDF4.Group)</code></pre>
+</blockquote>
+<p>Create variables</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>grp</td>
+<td>Group</td>
+<td>NetCDF group</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/nc_template.py#L108" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nctemplater.create_default_variables" class="level3">
+<h3 class="anchored" data-anchor-id="nctemplater.create_default_variables">NCTemplater.create_default_variables</h3>
+<blockquote class="blockquote">
+<pre><code> NCTemplater.create_default_variables (grp:netCDF4._netCDF4.Group)</code></pre>
+</blockquote>
+<p>Create Default variables</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>grp</td>
+<td>Group</td>
+<td>NetCDF group</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/nc_template.py#L117" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nctemplater.create_group_specific_variables" class="level3">
+<h3 class="anchored" data-anchor-id="nctemplater.create_group_specific_variables">NCTemplater.create_group_specific_variables</h3>
+<blockquote class="blockquote">
+<pre><code> NCTemplater.create_group_specific_variables (grp:netCDF4._netCDF4.Group)</code></pre>
+</blockquote>
+<p>Create group specific variables</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>grp</td>
+<td>Group</td>
+<td>NetCDF group</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/nc_template.py#L127" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nctemplater.create_analyte_variables" class="level3">
+<h3 class="anchored" data-anchor-id="nctemplater.create_analyte_variables">NCTemplater.create_analyte_variables</h3>
+<blockquote class="blockquote">
+<pre><code> NCTemplater.create_analyte_variables (grp:netCDF4._netCDF4.Group)</code></pre>
+</blockquote>
+<p>Create analyte variables and dependent one as uncertainty, detection limit, …</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>grp</td>
+<td>Group</td>
+<td>NetCDF group</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/nc_template.py#L138" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nctemplater.create_variable" class="level3">
+<h3 class="anchored" data-anchor-id="nctemplater.create_variable">NCTemplater.create_variable</h3>
+<blockquote class="blockquote">
+<pre><code> NCTemplater.create_variable (grp:netCDF4._netCDF4.Group, var:Dict)</code></pre>
+</blockquote>
+<p>Create NetCDF variable with proper types (standard and enums)</p>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>grp</td>
+<td>Group</td>
+<td>NetCDF group</td>
+</tr>
+<tr class="even">
+<td>var</td>
+<td>typing.Dict</td>
+<td>Variable specificiation dict with <code>name</code>, <code>dtype</code> and <code>attrs</code> keys</td>
+</tr>
+</tbody>
+</table>
+<div id="5b2c1b41" class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># class NetCDFWriter(object):</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#     def __init__(self, fname): </span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#         fc.store_attr()</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>     </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     def __enter__(self):</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.file = Dataset(self.fname, 'w', format='NETCDF4')</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">#         return self.file</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co">#     def __exit__(self, *args): </span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.file.close()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/nc_template.py#L151" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nctemplater.generate" class="level3">
+<h3 class="anchored" data-anchor-id="nctemplater.generate">NCTemplater.generate</h3>
+<blockquote class="blockquote">
+<pre><code> NCTemplater.generate ()</code></pre>
+</blockquote>
+<p>Generate CDL</p>
+<p>So in summary, to produce a template MARIS NetCDF:</p>
+<div id="f40684e0" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>templater <span class="op">=</span> NCTemplater(cdl<span class="op">=</span>cdl_test,</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                        nuclide_vars_fname<span class="op">=</span><span class="st">'./files/lut/dbo_nuclide.xlsx'</span>, </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                        tpl_fname<span class="op">=</span><span class="st">'./files/nc/template-test.nc'</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                        enum_dicts<span class="op">=</span>enums, </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                        verbose<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>templater.generate()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Creating area_t enumeration type.
+Creating bio_group_t enumeration type.
+Creating body_part_t enumeration type.
+Creating species_t enumeration type.
+Creating sed_type_t enumeration type.
+Creating unit_t enumeration type.
+Creating dl_t enumeration type.
+Creating filt_t enumeration type.
+Creating counmet_t enumeration type.
+Creating sampmet_t enumeration type.
+Creating prepmet_t enumeration type.</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

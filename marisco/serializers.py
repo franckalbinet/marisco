@@ -73,6 +73,9 @@ def _create_and_copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_d
     variable_type = self.enum_types.get(dtype_name, var_src.datatype)
     group_dest.createVariable(var_name, variable_type, var_src.dimensions, compression='zlib', complevel=9)
     
+    # TODO: if enum type then replace np.nan by default fill_value
+    # not clear what cast_verbose is doing, please clarify
+    print(variable_type)
     df_sanitized = self.cast_verbose_rf(df, var_name)
     group_dest[var_name][:] = df_sanitized.values
 
@@ -106,7 +109,7 @@ def cast_verbose_rf(self:NetCDFEncoder,
     """
     n_before = sum(df.reset_index()[col].notna())
     df_after = pd.to_numeric(df.reset_index()[col],
-                                    errors='coerce', downcast=None)
+                             errors='coerce', downcast=None)
     n_after = sum(df_after.notna())
     if n_before != n_after: 
         print(f'Failed to convert type of {col} in {n_before - n_after} occurences')

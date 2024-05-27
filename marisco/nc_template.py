@@ -43,7 +43,10 @@ def nuclide_vars(
     ) -> list[dict]: # List of nuclide variables (including their names and attributes)
     "Return the name of the radionuclide variables analysed."
     df = pd.read_excel(self.nuclide_vars_fname, index_col=0)
-    df = df[df.nuclide != 'NOT AVAILABLE']
+    
+    df = df[(df.nuclide != 'NOT AVAILABLE') & (df.nuclide != 'NOT APPLICABLE')]
+    # df = df[df.nuclide.isin(['NOT AVAILABLE', 'NOT APPLICABLE'])]
+    
     return [
         {
             'name': n,
@@ -56,7 +59,7 @@ def nuclide_vars(
         for n, nuclide, massnb, sn in zip(
             df[col_varnames],
             df['nuclide'].str.capitalize(),
-            df['massnb'].astype(str),
+            df['massnb'].astype(int),
             df[col_stdnames],
         )
     ]

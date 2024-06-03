@@ -53,12 +53,24 @@ class EncodeTimeCB(Callback):
 
 # %% ../nbs/api/callbacks.ipynb 12
 class SanitizeLonLatCB(Callback):
-    "Drop row when both longitude & latitude equal 0."
+    "Drop row when both longitude & latitude equal 0. Drop unrealistic longitude & latitude values. Convert longitude & latitude `,` separator to `.` separator."
     def __init__(self, verbose=False): fc.store_attr()
     def __call__(self, tfm):
         for grp, df in tfm.dfs.items():
-            mask = (df.lon == 0) & (df.lat == 0)
-            nZeroes = mask.sum()
+            " Convert `,` separator to `.` separator"
+            df['lon'] = [float(str(x).replace(',', '.')) for x in df['lon']]
+            df['lat'] = [float(str(x).replace(',', '.')) for x in df['lat']]
+            
+            # mask zero values
+            mask_zeroes = (df.lon == 0) & (df.lat == 0) 
+            nZeroes = mask_zeroes.sum()
             if nZeroes and self.verbose: 
                 print(f'The "{grp}" group contains {nZeroes} data points whose (lon, lat) = (0, 0)')
-            tfm.dfs[grp] = df.loc[~mask]
+            
+            # mask gps out of bounds, goob. 
+            mask_goob = (df.lon < -180) | (df.lon > 180) | (df.lat < -90) | (df.lat > 90)
+            nGoob = mask_goob.sum()
+            if nGoob and self.verbose: 
+                print(f'The "{grp}" group contains {nGoob} data points whose lon or lat are unrealistic. Outside -90 to 90 for latitude and -180 to 180 for longitude.')
+                
+            tfm.dfs[grp] = df.loc[~(mask_zeroes | mask_goob)]

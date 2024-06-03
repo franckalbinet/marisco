@@ -84,7 +84,7 @@ def create_enum_types(self:NCTemplater):
     "Create enumeration types"
     for name, enum in self.enum_dicts.items(): 
         if self.verbose: print(f'Creating {name} enumeration type')
-        self.enum_types[name] = self.nc.createEnumType(np.uint, name, enum)
+        self.enum_types[name] = self.nc.createEnumType(np.int_, name, enum)
 
 # %% ../nbs/api/nc_template.ipynb 19
 @patch

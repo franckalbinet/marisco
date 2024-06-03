@@ -166,6 +166,7 @@ class ReshapeLongToWide(Callback):
         df.reset_index(names='sample', inplace=True)
         
         idx = list(set(df.columns) - set([self.columns] + derived_coi + self.values))
+        # print(idx)
         # print('idx: ', idx)
         # print('derived_coi: ', derived_coi)
         return df.pivot_table(index=idx,
@@ -180,11 +181,11 @@ class ReshapeLongToWide(Callback):
             tfm.dfs[k] = self.pivot(tfm.dfs[k])
             tfm.dfs[k].columns = self.renamed_cols(tfm.dfs[k].columns)
             # tfm.dfs[k].index.name = 'sample'
-            tfm.dfs[k].set_index('sample', inplace=True)
+            # tfm.dfs[k].set_index('sample', inplace=True)
             # zero_cols = tfm.dfs[k].columns[tfm.dfs[k].eq(0).all()].to_list()
             # if zero_cols: print(zero_cols)
 
-# %% ../../nbs/handlers/maris_dump.ipynb 52
+# %% ../../nbs/handlers/maris_dump.ipynb 54
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -196,7 +197,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/maris_dump.ipynb 53
+# %% ../../nbs/handlers/maris_dump.ipynb 55
 def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -207,7 +208,7 @@ def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/maris_dump.ipynb 55
+# %% ../../nbs/handlers/maris_dump.ipynb 57
 def enums_xtra(tfm, vars):
     "Retrieve a subset of the lengthy enum as 'species_t' for instance"
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
@@ -218,7 +219,7 @@ def enums_xtra(tfm, vars):
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/maris_dump.ipynb 56
+# %% ../../nbs/handlers/maris_dump.ipynb 58
 def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
     df = load_dump(fname_in)
     ref_ids = kwargs.get('ref_ids', df.ref_id.unique())

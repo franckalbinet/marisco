@@ -73,7 +73,8 @@ def derive(
 ) -> dict: # Derived variable name and associated attributes
     "Derive NetCDF nuclide-dependent variable names & attributes as defined in CDL." 
     return {
-        'name': nuclide['name'] + '_' + suffix['name'],
+        # 'name': nuclide['name'] + '_' + suffix['name'],
+        'name': nuclide['name'] + suffix['name'],
         'dtype': suffix['dtype'],  # Using dtype from suffix
         'attrs': {key: nuclide['attrs'][key] + suffix['attrs'][key] for key in nuclide['attrs']}
         }

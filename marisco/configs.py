@@ -240,7 +240,7 @@ CONFIGS_CDL = {
         },
         'suffixes':  {
             'uncertainty': {
-                'name': 'unc',
+                'name': '_unc',
                 'attrs': {
                     'long_name': ' uncertainty',
                     'standard_name': '_uncertainty'
@@ -248,7 +248,7 @@ CONFIGS_CDL = {
                 'dtype': 'f4'
             },
             'detection_limit': {
-                'name': 'dl',
+                'name': '_dl',
                 'attrs': {
                     'long_name': ' detection limit',
                     'standard_name': '_detection_limit'
@@ -256,7 +256,7 @@ CONFIGS_CDL = {
                 'dtype': 'dl_t'
             },
             'volume': {
-                'name': 'vol',
+                'name': '_vol',
                 'attrs': {
                     'long_name': ' volume',
                     'standard_name': '_volume'
@@ -264,7 +264,7 @@ CONFIGS_CDL = {
                 'dtype': 'f4'
             },
             'salinity': {
-                'name': 'sal',
+                'name': '_sal',
                 'attrs': {
                     'long_name': ' salinity',
                     'standard_name': '_sal'
@@ -272,7 +272,7 @@ CONFIGS_CDL = {
                 'dtype': 'f4'
             },
             'temperature': {
-                'name': 'temp',
+                'name': '_temp',
                 'attrs': {
                     'long_name': ' temperature',
                     'standard_name': '_temp'
@@ -280,7 +280,7 @@ CONFIGS_CDL = {
                 'dtype': 'f4'
             },
             'filtered': {
-                'name': 'filt',
+                'name': '_filt',
                 'attrs': {
                     'long_name': ' filtered',
                     'standard_name': '_filtered'
@@ -288,7 +288,7 @@ CONFIGS_CDL = {
                 'dtype': 'filt_t'
             },
             'counting_method': {
-                'name': 'counmet',
+                'name': '_counmet',
                 'attrs': {
                     'long_name': ' counting method',
                     'standard_name': '_counting_method'
@@ -296,7 +296,7 @@ CONFIGS_CDL = {
                 'dtype': 'counmet_t'
             },
             'sampling_method': {
-                'name': 'sampmet',
+                'name': '_sampmet',
                 'attrs': {
                     'long_name': ' sampling method',
                     'standard_name': '_sampling_method'
@@ -304,7 +304,7 @@ CONFIGS_CDL = {
                 'dtype': 'sampmet_t'
             },
             'preparation_method': {
-                'name': 'prepmet',
+                'name': '_prepmet',
                 'attrs': {
                     'long_name': ' preparation method',
                     'standard_name': '_preparation_method'
@@ -312,7 +312,7 @@ CONFIGS_CDL = {
                 'dtype': 'prepmet_t'
             },
             'unit': {
-                'name': 'unit',
+                'name': '_unit',
                 'attrs': {
                     'long_name': ' unit',
                     'standard_name': '_unit'

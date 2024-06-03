@@ -144,7 +144,7 @@ long_name = "Sediment type"
 standard_name = "sediment_type_tbd"
 
 [vars.suffixes.uncertainty]
-name = "unc"
+name = "_unc"
 dtype = "f4"
 
 [vars.suffixes.uncertainty.attrs]
@@ -152,7 +152,7 @@ long_name = " uncertainty"
 standard_name = "_uncertainty"
 
 [vars.suffixes.detection_limit]
-name = "dl"
+name = "_dl"
 dtype = "dl_t"
 
 [vars.suffixes.detection_limit.attrs]
@@ -160,7 +160,7 @@ long_name = " detection limit"
 standard_name = "_detection_limit"
 
 [vars.suffixes.volume]
-name = "vol"
+name = "_vol"
 dtype = "f4"
 
 [vars.suffixes.volume.attrs]
@@ -168,7 +168,7 @@ long_name = " volume"
 standard_name = "_volume"
 
 [vars.suffixes.salinity]
-name = "sal"
+name = "_sal"
 dtype = "f4"
 
 [vars.suffixes.salinity.attrs]
@@ -176,7 +176,7 @@ long_name = " salinity"
 standard_name = "_sal"
 
 [vars.suffixes.temperature]
-name = "temp"
+name = "_temp"
 dtype = "f4"
 
 [vars.suffixes.temperature.attrs]
@@ -184,7 +184,7 @@ long_name = " temperature"
 standard_name = "_temp"
 
 [vars.suffixes.filtered]
-name = "filt"
+name = "_filt"
 dtype = "filt_t"
 
 [vars.suffixes.filtered.attrs]
@@ -192,7 +192,7 @@ long_name = " filtered"
 standard_name = "_filtered"
 
 [vars.suffixes.counting_method]
-name = "counmet"
+name = "_counmet"
 dtype = "counmet_t"
 
 [vars.suffixes.counting_method.attrs]
@@ -200,7 +200,7 @@ long_name = " counting method"
 standard_name = "_counting_method"
 
 [vars.suffixes.sampling_method]
-name = "sampmet"
+name = "_sampmet"
 dtype = "sampmet_t"
 
 [vars.suffixes.sampling_method.attrs]
@@ -208,7 +208,7 @@ long_name = " sampling method"
 standard_name = "_sampling_method"
 
 [vars.suffixes.preparation_method]
-name = "prepmet"
+name = "_prepmet"
 dtype = "prepmet_t"
 
 [vars.suffixes.preparation_method.attrs]
@@ -216,7 +216,7 @@ long_name = " preparation method"
 standard_name = "_preparation_method"
 
 [vars.suffixes.unit]
-name = "unit"
+name = "_unit"
 dtype = "unit_t"
 
 [vars.suffixes.unit.attrs]

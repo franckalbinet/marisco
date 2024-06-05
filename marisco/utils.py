@@ -125,16 +125,15 @@ def match_worms(
 
 # %% ../nbs/api/utils.ipynb 27
 def match_maris_species(
+    lut_path:str, # Path to MARIS species authoritative species look-up table
     name:str, # Name of species to look up 
     col_lookup:str='species', # Name of the column where the character strings match
     dist_fn:Callable=jf.levenshtein_distance, # Jellyfish distance to use
-    coi:list=['species_id', 'species', 'Taxonname', 'TaxonDBID', 
-              'AphiaID', 'scientificname', 'status', 'rank', 
-              'match_type'], # Columns of interest to display
-    nresults:int=10 # Maxiumn number of results to return
+    coi:list=['species_id', 'species', 'Taxonname', 'TaxonDBID'], # Columns of interest to display
+    nresults:int=10 # Maximum number of results to return
     ):
     "Lookup `name` in MARIS master species lookup table"
-    df = pd.read_excel(species_lut_path())
+    df = pd.read_excel(lut_path)
     df = df.dropna(subset=col_lookup)
     df = df.astype({'species_id':'int'})
     results = []

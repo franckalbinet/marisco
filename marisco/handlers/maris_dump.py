@@ -10,6 +10,7 @@ from tqdm import tqdm
 from pathlib import Path
 import fastcore.all as fc
 import pandas as pd
+import numpy as np
 
 from ..callbacks import (Callback, Transformer, SanitizeLonLatCB, EncodeTimeCB)
 from ..metadata import (GlobAttrsFeeder, BboxCB,
@@ -44,13 +45,13 @@ def get_fname(dfs):
     name = name.replace(',', '').replace('.', '').replace('-', ' ').split(' ')
     return '-'.join(([str(id)] + name)) + '.nc'
 
-# %% ../../nbs/handlers/maris_dump.ipynb 19
+# %% ../../nbs/handlers/maris_dump.ipynb 21
 def get_varnames_lut():
     fname = lut_path() / 'dbo_nuclide.xlsx'
     df_nuclide = pd.read_excel(fname, usecols=['nuclide_id', 'nc_name'])
     return df_nuclide.set_index('nuclide_id').to_dict()['nc_name']
 
-# %% ../../nbs/handlers/maris_dump.ipynb 20
+# %% ../../nbs/handlers/maris_dump.ipynb 22
 class RemapRdnNameCB(Callback):
     "Remap to MARIS radionuclide names."
     def __init__(self,
@@ -62,7 +63,7 @@ class RemapRdnNameCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k]['nuclide_id'] = tfm.dfs[k]['nuclide_id'].replace(lut)
 
-# %% ../../nbs/handlers/maris_dump.ipynb 25
+# %% ../../nbs/handlers/maris_dump.ipynb 27
 # To be added: endperiod, totdepth, lab
 def renaming_rules():
     vars = cdl_cfg()['vars']
@@ -90,7 +91,7 @@ def renaming_rules():
         'nuclide_id': 'nuclide'
     }
 
-# %% ../../nbs/handlers/maris_dump.ipynb 26
+# %% ../../nbs/handlers/maris_dump.ipynb 28
 class RenameColumnCB(Callback):
     "Renaming variables to MARIS standard names."
     def __init__(self, renaming_rules=renaming_rules): fc.store_attr()
@@ -103,7 +104,7 @@ class RenameColumnCB(Callback):
             # Rename cols
             tfm.dfs[k].rename(columns=lut, inplace=True)
 
-# %% ../../nbs/handlers/maris_dump.ipynb 29
+# %% ../../nbs/handlers/maris_dump.ipynb 31
 class DropNAColumnsCB(Callback):
     "Drop variable containing only NaN or 'Not available' (id=0 in MARIS lookup tables)."
     def __init__(self, na_value=0):
@@ -121,31 +122,32 @@ class DropNAColumnsCB(Callback):
             tfm.dfs[k] = tfm.dfs[k].dropna(axis=1, how='all')
             tfm.dfs[k] = self.dropMarisNA(tfm.dfs[k])
 
-# %% ../../nbs/handlers/maris_dump.ipynb 32
+# %% ../../nbs/handlers/maris_dump.ipynb 34
 def get_dl_lut():
     fname = lut_path() / 'dbo_detectlimit.xlsx'
     df_nuclide = pd.read_excel(fname, usecols=['name', 'id'])
     return df_nuclide.set_index('name').to_dict()['id']
 
-# %% ../../nbs/handlers/maris_dump.ipynb 34
+# %% ../../nbs/handlers/maris_dump.ipynb 36
 class SanitizeDetectionLimitCB(Callback):
     "Assign Detection Limit name to its id based on MARIS nomenclature."
     def __init__(self,
                  fn_lut=get_dl_lut):
         fc.store_attr()
+        self.var_name = cdl_cfg()['vars']['suffixes']['uncertainty']['name']
 
     def __call__(self, tfm):
         lut = self.fn_lut()
         for k in tfm.dfs.keys():
-            tfm.dfs[k]['dl'] = tfm.dfs[k]['dl'].replace(lut)
+            tfm.dfs[k][self.var_name] = tfm.dfs[k][self.var_name].replace(lut)
 
-# %% ../../nbs/handlers/maris_dump.ipynb 37
+# %% ../../nbs/handlers/maris_dump.ipynb 39
 class ParseTimeCB(Callback):
     def __call__(self, tfm):
         for k in tfm.dfs.keys():
             tfm.dfs[k]['time'] = pd.to_datetime(tfm.dfs[k].time, format='ISO8601')
 
-# %% ../../nbs/handlers/maris_dump.ipynb 41
+# %% ../../nbs/handlers/maris_dump.ipynb 42
 class ReshapeLongToWide(Callback):
     "Convert data from long to wide with renamed columns."
     def __init__(self, columns='nuclide', values=['value']):
@@ -155,7 +157,7 @@ class ReshapeLongToWide(Callback):
     
     def renamed_cols(self, cols):
         "Flatten columns name"
-        return [inner if outer == "value" else f'{inner}_{outer}'
+        return [inner if outer == "value" else f'{inner}{outer}'
                 if inner else outer
                 for outer, inner in cols]
 
@@ -166,9 +168,6 @@ class ReshapeLongToWide(Callback):
         df.reset_index(names='sample', inplace=True)
         
         idx = list(set(df.columns) - set([self.columns] + derived_coi + self.values))
-        # print(idx)
-        # print('idx: ', idx)
-        # print('derived_coi: ', derived_coi)
         return df.pivot_table(index=idx,
                               columns=self.columns,
                               values=self.values + derived_coi,
@@ -180,12 +179,8 @@ class ReshapeLongToWide(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k] = self.pivot(tfm.dfs[k])
             tfm.dfs[k].columns = self.renamed_cols(tfm.dfs[k].columns)
-            # tfm.dfs[k].index.name = 'sample'
-            # tfm.dfs[k].set_index('sample', inplace=True)
-            # zero_cols = tfm.dfs[k].columns[tfm.dfs[k].eq(0).all()].to_list()
-            # if zero_cols: print(zero_cols)
 
-# %% ../../nbs/handlers/maris_dump.ipynb 54
+# %% ../../nbs/handlers/maris_dump.ipynb 52
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -197,7 +192,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/maris_dump.ipynb 55
+# %% ../../nbs/handlers/maris_dump.ipynb 53
 def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -208,7 +203,7 @@ def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/maris_dump.ipynb 57
+# %% ../../nbs/handlers/maris_dump.ipynb 55
 def enums_xtra(tfm, vars):
     "Retrieve a subset of the lengthy enum as 'species_t' for instance"
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
@@ -219,7 +214,7 @@ def enums_xtra(tfm, vars):
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/maris_dump.ipynb 58
+# %% ../../nbs/handlers/maris_dump.ipynb 56
 def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
     df = load_dump(fname_in)
     ref_ids = kwargs.get('ref_ids', df.ref_id.unique())

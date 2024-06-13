@@ -2,7 +2,7 @@
 
 # %% auto 0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'has_valid_varname', 'get_bbox', 'download_files_in_folder', 'download_file',
-           'match_worms', 'match_maris_species', 'match_maris_sediment']
+           'match_worms', 'Match', 'match_maris_lut']
 
 # %% ../nbs/api/utils.ipynb 2
 from pathlib import Path
@@ -14,6 +14,7 @@ import numpy as np
 import requests
 from shapely import MultiPoint
 from operator import attrgetter
+from dataclasses import dataclass
 
 from .configs import species_lut_path, sediments_lut_path
 
@@ -123,43 +124,35 @@ def match_worms(
     else:
         return -1
 
-# %% ../nbs/api/utils.ipynb 27
-def match_maris_species(
-    lut_path:str, # Path to MARIS species authoritative species look-up table
-    name:str, # Name of species to look up 
-    col_lookup:str='species', # Name of the column where the character strings match
-    dist_fn:Callable=jf.levenshtein_distance, # Jellyfish distance to use
-    coi:list=['species_id', 'species', 'Taxonname', 'TaxonDBID'], # Columns of interest to display
-    nresults:int=10 # Maximum number of results to return
-    ):
-    "Lookup `name` in MARIS master species lookup table"
-    df = pd.read_excel(lut_path)
-    df = df.dropna(subset=col_lookup)
-    df = df.astype({'species_id':'int'})
-    results = []
-    for _, row in df.iterrows():
-        score = dist_fn(name.lower(), row[col_lookup].lower())
-        result = row[coi].to_dict()
-        result['score'] = score
-        results.append(result)
-    return pd.DataFrame(results).sort_values(by='score', ascending=True)[:nresults]
+# %% ../nbs/api/utils.ipynb 28
+@dataclass
+class Match:
+    matched_id: int
+    matched_maris_name: str
+    source_name: str
+    match_score: int
 
-# %% ../nbs/api/utils.ipynb 30
-def match_maris_sediment(
-    name:str, # Name of sediment to look up 
-    col_lookup:str='sedtype', # Name of the column where the character strings match
-    dist_fn:Callable=jf.levenshtein_distance, # Jellyfish distance to use
-    coi:list=['sedtype_id', 'sedtype'], # Columns of interest to display
-    nresults:int=10 # Maxiumn number of results to return
-    ):
-    "Lookup `sedtype` in MARIS master sediment lookup table"
-    df = pd.read_excel(sediments_lut_path())
-    df = df.dropna(subset=col_lookup)
-    df = df.astype({'sedtype_id':'int'})
-    results = []
-    for _, row in df.iterrows():
-        score = dist_fn(name.lower(), row[col_lookup].lower())
-        result = row[coi].to_dict()
-        result['score'] = score
-        results.append(result)
-    return pd.DataFrame(results).sort_values(by='score', ascending=True)[:nresults]
+# %% ../nbs/api/utils.ipynb 29
+def match_maris_lut(
+    lut_path: str, # Path to MARIS species authoritative species look-up table
+    data_provider_name: str, # Name of data provider nomenclature item to look up 
+    maris_id: str, # Id of MARIS lookup table nomenclature item to match
+    maris_name: str, # Name of MARIS lookup table nomenclature item to match
+    dist_fn: Callable = jf.levenshtein_distance, # Distance function
+    nresults: int = 10 # Maximum number of results to return
+) -> pd.DataFrame:
+    """
+    Fuzzy matching data provider and MARIS lookup tables (e.g biota species, sediments, ...).
+    """
+    df = pd.read_excel(lut_path)
+    df = df.dropna(subset=[maris_name])
+    df = df.astype({maris_id: 'int'})
+
+    # Vectorized operation to calculate the distance between the input name and all names in the DataFrame
+    df['score'] = df[maris_name].str.lower().apply(lambda x: dist_fn(data_provider_name.lower(), x))
+
+    # Sort the DataFrame by score and select the top nresults
+    df = df.sort_values(by='score', ascending=True)[:nresults]
+
+    # Select the id and name columns and return the DataFrame
+    return df[[maris_id, maris_name, 'score']]

@@ -169,11 +169,21 @@ CONFIGS_CDL = {
                 },
                 'dtype': 'f4'
             },
-            'depth': {
-                'name': 'depth',
+            'smp_depth': {
+                'name': 'smp_depth',
                 'attrs': {
-                    'long_name': 'Depth below seal level',
-                    'standard_name': 'depth_below_sea_floor',
+                    'long_name': 'Sample depth below seal level',
+                    'standard_name': 'sample_depth_below_sea_floor',
+                    'units': 'm',
+                    'axis': 'Z'
+                },
+                'dtype': 'f4'
+            },
+            'tot_depth': {
+                'name': 'tot_depth',
+                'attrs': {
+                    'long_name': 'Total depth below seal level',
+                    'standard_name': 'total_depth_below_sea_floor',
                     'units': 'm',
                     'axis': 'Z'
                 },

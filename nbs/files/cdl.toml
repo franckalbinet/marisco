@@ -79,13 +79,23 @@ units = "degrees_east"
 axis = "X"
 _CoordinateAxisType = "Lat"
 
-[vars.defaults.depth]
-name = "depth"
+[vars.defaults.smp_depth]
+name = "smp_depth"
 dtype = "f4"
 
-[vars.defaults.depth.attrs]
-long_name = "Depth below seal level"
-standard_name = "depth_below_sea_floor"
+[vars.defaults.smp_depth.attrs]
+long_name = "Sample depth below seal level"
+standard_name = "sample_depth_below_sea_floor"
+units = "m"
+axis = "Z"
+
+[vars.defaults.tot_depth]
+name = "tot_depth"
+dtype = "f4"
+
+[vars.defaults.tot_depth.attrs]
+long_name = "Total depth below seal level"
+standard_name = "total_depth_below_sea_floor"
 units = "m"
 axis = "Z"
 

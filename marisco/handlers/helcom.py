@@ -280,12 +280,12 @@ class LookupSedimentCB(Callback):
         
         tfm.dfs['sediment']['sed_type'] = tfm.dfs['sediment']['SEDI'].apply(lambda x: lut[x].matched_id)
 
-# %% ../../nbs/handlers/helcom.ipynb 91
+# %% ../../nbs/handlers/helcom.ipynb 96
 # Define unit names renaming rules
 renaming_unit_rules = {'VALUE_Bq/m³': 1, #'Bq/m3'
                        'VALUE_Bq/kg': 3 } #'Bq/kg'
 
-# %% ../../nbs/handlers/helcom.ipynb 92
+# %% ../../nbs/handlers/helcom.ipynb 97
 class LookupUnitCB(Callback):
     def __init__(self,
                  renaming_unit_rules=renaming_unit_rules):
@@ -297,7 +297,7 @@ class LookupUnitCB(Callback):
                     tfm.dfs[grp]['unit'] = np.where(tfm.dfs[grp].loc[:,k].notna(), np.int64(v), np.int64(0))
 
 
-# %% ../../nbs/handlers/helcom.ipynb 97
+# %% ../../nbs/handlers/helcom.ipynb 102
 # Define columns of interest by sample type
 coi_grp = {'seawater': ['NUCLIDE', 'VALUE_Bq/m³', 'ERROR%_m³', 'time',
                         'TDEPTH', 'LATITUDE (dddddd)', 'LONGITUDE (dddddd)','unit'],
@@ -309,7 +309,7 @@ coi_grp = {'seawater': ['NUCLIDE', 'VALUE_Bq/m³', 'ERROR%_m³', 'time',
                      'species_id', 'body_part','unit']}
 
 
-# %% ../../nbs/handlers/helcom.ipynb 98
+# %% ../../nbs/handlers/helcom.ipynb 103
 # Define column names renaming rules
 renaming_rules = {
     'NUCLIDE': 'nuclide',
@@ -327,7 +327,7 @@ renaming_rules = {
 }
 
 
-# %% ../../nbs/handlers/helcom.ipynb 99
+# %% ../../nbs/handlers/helcom.ipynb 104
 class RenameColumnCB(Callback):
     def __init__(self,
                  coi=coi_grp,
@@ -342,7 +342,7 @@ class RenameColumnCB(Callback):
             # Rename cols
             tfm.dfs[k].rename(columns=self.renaming_rules, inplace=True)
 
-# %% ../../nbs/handlers/helcom.ipynb 104
+# %% ../../nbs/handlers/helcom.ipynb 109
 class ReshapeLongToWide(Callback):
     def __init__(self): fc.store_attr()
 
@@ -371,7 +371,7 @@ class ReshapeLongToWide(Callback):
             # Set index
             tfm.dfs[k].index.name = 'sample'
 
-# %% ../../nbs/handlers/helcom.ipynb 117
+# %% ../../nbs/handlers/helcom.ipynb 122
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -384,7 +384,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/helcom.ipynb 118
+# %% ../../nbs/handlers/helcom.ipynb 123
 def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -395,7 +395,7 @@ def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 124
+# %% ../../nbs/handlers/helcom.ipynb 129
 def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
     dfs = load_data(fname_in)         
     tfm = Transformer(dfs, cbs=[

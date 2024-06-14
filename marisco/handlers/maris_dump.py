@@ -135,7 +135,7 @@ class SanitizeDetectionLimitCB(Callback):
     def __init__(self,
                  fn_lut=get_dl_lut):
         fc.store_attr()
-        self.var_name = cdl_cfg()['vars']['suffixes']['uncertainty']['name']
+        self.var_name = cdl_cfg()['vars']['suffixes']['detection_limit']['name']
 
     def __call__(self, tfm):
         lut = self.fn_lut()
@@ -194,7 +194,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 # %% ../../nbs/handlers/maris_dump.ipynb 53
-def get_attrs(tfm, zotero_key='26VMZZ2Q', kw=kw):
+def get_attrs(tfm, zotero_key, kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
         DepthRangeCB(),

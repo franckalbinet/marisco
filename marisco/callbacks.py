@@ -25,8 +25,17 @@ def run_cbs(cbs, obj=None):
 class Transformer():
     def __init__(self, dfs, cbs=None): 
         self.cbs = cbs
-        self.dfs = {k: v.copy() for k, v in dfs.items()}
+        #self.dfs = {k: v.copy() for k, v in dfs.items()}
+
+        self.dfs = self._copy(dfs)
+        
         self.logs = []
+
+    def _copy(self, dfs):
+        if isinstance(dfs, dict):
+            return {k: v.copy() for k, v in dfs.items()}
+        else:
+            return dfs.copy()
         
     def callback(self):
         run_cbs(self.cbs, self)

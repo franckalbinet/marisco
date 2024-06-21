@@ -496,7 +496,7 @@ class Enums():
             types[name] = lut
         return types
 
-# %% ../nbs/api/configs.ipynb 45
+# %% ../nbs/api/configs.ipynb 44
 def get_enum_dicts(
     lut_src_dir:str,
     cdl_enums:dict,

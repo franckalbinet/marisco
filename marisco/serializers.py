@@ -51,6 +51,9 @@ def process_groups(self:NetCDFEncoder):
 @patch
 def process_group(self:NetCDFEncoder, group_name, df):
     group_dest = self.dest.createGroup(group_name)
+    # Set the dimensions for each group
+    group_dest.createDimension(group_name, len(df.index))
+    
     self.copy_variables(group_name, df, group_dest)
 
 # %% ../nbs/api/serializers.ipynb 11

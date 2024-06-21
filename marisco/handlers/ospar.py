@@ -22,8 +22,8 @@ import re # provides regular expression matching operations
 from ..utils import (has_valid_varname, match_worms, match_maris_lut, Match)
 from ..callbacks import (Callback, Transformer, EncodeTimeCB, SanitizeLonLatCB)
 from ..metadata import (GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB)
-from ..configs import (base_path, nc_tpl_path, cfg, cache_path, cdl_cfg, Enums, lut_path,
-                             species_lut_path, sediments_lut_path, bodyparts_lut_path, unit_lut_path)
+from ..configs import (nc_tpl_path, cfg, cache_path, cdl_cfg, Enums, lut_path,
+                             species_lut_path, bodyparts_lut_path)
 from ..serializers import NetCDFEncoder
 
 
@@ -301,7 +301,7 @@ renaming_unit_rules = {'Bq/l': 1, #'Bq/m3'
                        'Bq/kg f.w' : 5 
                        } 
 
-# %% ../../nbs/handlers/ospar.ipynb 119
+# %% ../../nbs/handlers/ospar.ipynb 120
 class LookupUnitCB(Callback):
     def __init__(self,
                  lut=renaming_unit_rules):
@@ -310,10 +310,10 @@ class LookupUnitCB(Callback):
         for grp in tfm.dfs.keys():
             # Drop rows where 'Species' are 'nan'
             tfm.dfs[grp]=tfm.dfs[grp][tfm.dfs[grp]['Unit'].notna()]
-            # Perform lookup         
-            tfm.dfs[grp]['unit'] = tfm.dfs[grp]['Unit'].apply(lambda x: self.lut[x])
+            # Perform lookup  
+            tfm.dfs[grp]['unit'] = tfm.dfs[grp]['Unit'].apply(lambda x: np.int64(self.lut[x]))
 
-# %% ../../nbs/handlers/ospar.ipynb 125
+# %% ../../nbs/handlers/ospar.ipynb 127
 class RemapValueUncertaintyDetectionLimit(Callback):
     "Remamp activity value, activity uncertainty and detection limit to MARIS format."
     def __init__(self):
@@ -326,7 +326,7 @@ class RemapValueUncertaintyDetectionLimit(Callback):
             tfm.dfs[grp]['uncertainty'] = np.where(tfm.dfs[grp]['Value type'] == '=', tfm.dfs[grp]['Uncertainty'] , np.NaN)
 
 
-# %% ../../nbs/handlers/ospar.ipynb 130
+# %% ../../nbs/handlers/ospar.ipynb 132
 class ConvertLonLat(Callback):
     "Convert Longitude and Latitude values to DDD.DDDDD°"
     def __init__(self):
@@ -337,7 +337,7 @@ class ConvertLonLat(Callback):
             tfm.dfs[grp]['latitude'] = np.where(tfm.dfs[grp]['LatDir'].isin(['S']), ((tfm.dfs[grp]['LatD'] + tfm.dfs[grp]['LatM']/60 + tfm.dfs[grp]['LatS'] /(60*60))* (-1)), (tfm.dfs[grp]['LatD'] + tfm.dfs[grp]['LatM']/60 + tfm.dfs[grp]['LatS'] /(60*60)))
             tfm.dfs[grp]['longitude'] = np.where(tfm.dfs[grp]['LongDir'].isin(['W']), ((tfm.dfs[grp]['LongD'] + tfm.dfs[grp]['LongM']/60 + tfm.dfs[grp]['LongS'] /(60*60))* (-1)), (tfm.dfs[grp]['LongD'] + tfm.dfs[grp]['LongM']/60 + tfm.dfs[grp]['LongS'] /(60*60)))
 
-# %% ../../nbs/handlers/ospar.ipynb 137
+# %% ../../nbs/handlers/ospar.ipynb 139
 class CompareDfsAndTfm(Callback):
     "Create a dfs of dropped data. Data included in the DFS not in the TFM"
     def __init__(self, dfs_compare):
@@ -358,19 +358,18 @@ class CompareDfsAndTfm(Callback):
             
                         
 
-# %% ../../nbs/handlers/ospar.ipynb 144
+# %% ../../nbs/handlers/ospar.ipynb 146
 # Define columns of interest by sample type
-coi_grp = {'seawater': ['Nuclide', 'value', 'uncertainty','detection_limit','unit', 'time', 'Sampling depth',
+coi_grp = {'seawater': ['nuclide', 'value', 'uncertainty','detection_limit','unit', 'time', 'Sampling depth',
                         'latitude', 'longitude'],
-           'biota': ['Nuclide', 'value', 'uncertainty','detection_limit','unit', 'time', 'latitude', 'longitude',
+           'biota': ['nuclide', 'value', 'uncertainty','detection_limit','unit', 'time', 'latitude', 'longitude',
                      'species', 'body_part', 'bio_group']}
 
-# %% ../../nbs/handlers/ospar.ipynb 147
+# %% ../../nbs/handlers/ospar.ipynb 149
 def get_renaming_rules():
     vars = cdl_cfg()['vars']
     # Define column names renaming rules
     return {
-        'Nuclide': 'nuclide',
         'uncertainty': vars['suffixes']['uncertainty']['name'],
         'Sampling depth': vars['defaults']['depth']['name'],
         #'Sampling depth': vars['defaults']['smp_depth']['name'],
@@ -380,7 +379,7 @@ def get_renaming_rules():
         'detection_limit': vars['suffixes']['detection_limit']['name']
     }
 
-# %% ../../nbs/handlers/ospar.ipynb 148
+# %% ../../nbs/handlers/ospar.ipynb 150
 class RenameColumnCB(Callback):
     def __init__(self,
                  coi,
@@ -396,7 +395,7 @@ class RenameColumnCB(Callback):
             # Rename cols
             tfm.dfs[k].rename(columns=self.fn_renaming_rules(), inplace=True)
 
-# %% ../../nbs/handlers/ospar.ipynb 152
+# %% ../../nbs/handlers/ospar.ipynb 155
 class ReshapeLongToWide(Callback):
     "Convert data from long to wide with renamed columns."
     def __init__(self, columns='nuclide', values=['value']):
@@ -429,7 +428,7 @@ class ReshapeLongToWide(Callback):
             tfm.dfs[k] = self.pivot(tfm.dfs[k])
             tfm.dfs[k].columns = self.renamed_cols(tfm.dfs[k].columns)
 
-# %% ../../nbs/handlers/ospar.ipynb 160
+# %% ../../nbs/handlers/ospar.ipynb 163
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -442,7 +441,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 161
+# %% ../../nbs/handlers/ospar.ipynb 164
 def get_attrs(tfm, zotero_key, kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -453,7 +452,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/ospar.ipynb 165
+# %% ../../nbs/handlers/ospar.ipynb 168
 def enums_xtra(tfm, vars):
     "Retrieve a subset of the lengthy enum as 'species_t' for instance"
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
@@ -464,7 +463,7 @@ def enums_xtra(tfm, vars):
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/ospar.ipynb 167
+# %% ../../nbs/handlers/ospar.ipynb 170
 def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[LowerStripRdnNameCB(get_rdn_format),

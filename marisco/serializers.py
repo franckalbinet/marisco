@@ -80,7 +80,7 @@ def copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_dest):
 @patch
 def _create_and_copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_dest, dtype_name):
     variable_type = self.enum_types.get(dtype_name, var_src.datatype)
-    group_dest.createVariable(var_name, variable_type, var_src.dimensions, compression='zlib', complevel=9)
+    group_dest.createVariable(var_name, variable_type, group_dest.dimensions, compression='zlib', complevel=9)
        
     isNotEnum = type(variable_type) != netCDF4._netCDF4.EnumType
     values = df[var_name].values
@@ -122,7 +122,7 @@ def encode(self:NetCDFEncoder):
         self.copy_dimensions()
         self.process_groups()
 
-# %% ../nbs/api/serializers.ipynb 26
+# %% ../nbs/api/serializers.ipynb 33
 class OpenRefineCsvEncoder:
     "OpenRefine CSV from NetCDF."
     def __init__(self, 
@@ -132,20 +132,20 @@ class OpenRefineCsvEncoder:
                  ):
         store_attr()
 
-# %% ../nbs/api/serializers.ipynb 27
+# %% ../nbs/api/serializers.ipynb 34
 @patch
 def process_groups_to_csv(self:OpenRefineCsvEncoder):
     for grp_name, df in self.dfs.items():
         self.process_group_to_csv(grp_name, df)
 
-# %% ../nbs/api/serializers.ipynb 28
+# %% ../nbs/api/serializers.ipynb 35
 @patch
 def process_group_to_csv(self:OpenRefineCsvEncoder, group_name, df):
     filename, file_extension=os.path.splitext(self.dest_fname)
     path = filename + '_' + group_name + file_extension
     df.to_csv ( path_or_buf= path, sep=',')
 
-# %% ../nbs/api/serializers.ipynb 29
+# %% ../nbs/api/serializers.ipynb 36
 @patch
 def encode(self:OpenRefineCsvEncoder):
     "Encode OpenRefine CSV based on dataframes from NetCDF."

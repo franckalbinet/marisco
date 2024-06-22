@@ -122,7 +122,7 @@ def encode(self:NetCDFEncoder):
         self.copy_dimensions()
         self.process_groups()
 
-# %% ../nbs/api/serializers.ipynb 33
+# %% ../nbs/api/serializers.ipynb 26
 class OpenRefineCsvEncoder:
     "OpenRefine CSV from NetCDF."
     def __init__(self, 
@@ -132,20 +132,20 @@ class OpenRefineCsvEncoder:
                  ):
         store_attr()
 
-# %% ../nbs/api/serializers.ipynb 34
+# %% ../nbs/api/serializers.ipynb 27
 @patch
 def process_groups_to_csv(self:OpenRefineCsvEncoder):
     for grp_name, df in self.dfs.items():
         self.process_group_to_csv(grp_name, df)
 
-# %% ../nbs/api/serializers.ipynb 35
+# %% ../nbs/api/serializers.ipynb 28
 @patch
 def process_group_to_csv(self:OpenRefineCsvEncoder, group_name, df):
     filename, file_extension=os.path.splitext(self.dest_fname)
     path = filename + '_' + group_name + file_extension
     df.to_csv ( path_or_buf= path, sep=',')
 
-# %% ../nbs/api/serializers.ipynb 36
+# %% ../nbs/api/serializers.ipynb 29
 @patch
 def encode(self:OpenRefineCsvEncoder):
     "Encode OpenRefine CSV based on dataframes from NetCDF."

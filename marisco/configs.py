@@ -3,8 +3,8 @@
 # %% auto 0
 __all__ = ['CFG_FNAME', 'CDL_FNAME', 'NUCLIDE_LOOKUP_FNAME', 'MARISCO_CFG_DIRNAME', 'CONFIGS', 'CONFIGS_CDL',
            'NETCDF_TO_PYTHON_TYPE', 'base_path', 'cfg', 'nuc_lut_path', 'lut_path', 'cache_path', 'cdl_cfg',
-           'species_lut_path', 'bodyparts_lut_path', 'sediments_lut_path', 'name2grp', 'nc_tpl_name', 'nc_tpl_path',
-           'sanitize', 'get_lut', 'Enums', 'get_enum_dicts']
+           'species_lut_path', 'bodyparts_lut_path', 'sediments_lut_path', 'unit_lut_path', 'name2grp', 'nc_tpl_name',
+           'nc_tpl_path', 'sanitize', 'get_lut', 'Enums', 'get_enum_dicts']
 
 # %% ../nbs/api/configs.ipynb 2
 from pathlib import Path
@@ -422,13 +422,19 @@ def sediments_lut_path():
     fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'sed_type_t'][0]['fname']
     return src_dir / fname
 
-# %% ../nbs/api/configs.ipynb 24
+# %% ../nbs/api/configs.ipynb 23
+def unit_lut_path():
+    src_dir = lut_path()
+    fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'unit_type_t'][0]['fname']
+    return src_dir / fname
+
+# %% ../nbs/api/configs.ipynb 25
 NETCDF_TO_PYTHON_TYPE = {
     'u8': int,
     'f4': float
     }
 
-# %% ../nbs/api/configs.ipynb 25
+# %% ../nbs/api/configs.ipynb 26
 def name2grp(
     name:str, # Name of the group
     cdl:dict, # CDL configuration
@@ -436,18 +442,18 @@ def name2grp(
     # Reverse `cdl.toml` config group dict so that group config key can be retrieve based on its name
     return {v['name']:k  for k, v in cdl['grps'].items()}[name]
 
-# %% ../nbs/api/configs.ipynb 28
+# %% ../nbs/api/configs.ipynb 29
 def nc_tpl_name():
     p = base_path()
     return read_toml(p / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 29
+# %% ../nbs/api/configs.ipynb 30
 def nc_tpl_path():
     "Return the name of the MARIS NetCDF template as defined in `configs.toml`"
     p = base_path()
     return p / read_toml(p / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 31
+# %% ../nbs/api/configs.ipynb 32
 def sanitize(s:str # String to sanitize
              ) -> str:
     """
@@ -459,7 +465,7 @@ def sanitize(s:str # String to sanitize
     s = re.sub(r'[().]', '', s)
     return re.sub(r'[/-]', ' ', s).strip() 
 
-# %% ../nbs/api/configs.ipynb 35
+# %% ../nbs/api/configs.ipynb 36
 def get_lut(src_dir:str, # Directory containing lookup tables
             fname:str, # Excel file lookup table name
             key:str, # Excel file column name to be used as dict keys 
@@ -475,7 +481,7 @@ def get_lut(src_dir:str, # Directory containing lookup tables
     if do_sanitize: lut = {sanitize(k): v for k, v in lut.items()}
     return lut
 
-# %% ../nbs/api/configs.ipynb 38
+# %% ../nbs/api/configs.ipynb 39
 class Enums():
     "Return dictionaries of MARIS NetCDF's enumeration types"
     def __init__(self, 
@@ -496,7 +502,7 @@ class Enums():
             types[name] = lut
         return types
 
-# %% ../nbs/api/configs.ipynb 44
+# %% ../nbs/api/configs.ipynb 45
 def get_enum_dicts(
     lut_src_dir:str,
     cdl_enums:dict,

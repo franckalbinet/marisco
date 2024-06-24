@@ -25,7 +25,7 @@ from ..serializers import NetCDFEncoder
 fname_in = '../../_data/geotraces/GEOTRACES_IDP2021_v2/seawater/ascii/GEOTRACES_IDP2021_Seawater_Discrete_Sample_Data_v2.csv'
 dir_dest = '../../_data/output/'
 
-# %% ../../nbs/handlers/geotraces.ipynb 15
+# %% ../../nbs/handlers/geotraces.ipynb 14
 common_coi = ['yyyy-mm-ddThh:mm:ss.sss', 'Longitude [degrees_east]',
               'Latitude [degrees_north]', 'Bot. Depth [m]', 'DEPTH [m]']
 
@@ -42,7 +42,7 @@ class SelectColsOfInterestCB(Callback):
 
         tfm.dfs = tfm.dfs[self.common_coi + nuc_of_interest]
 
-# %% ../../nbs/handlers/geotraces.ipynb 20
+# %% ../../nbs/handlers/geotraces.ipynb 18
 class WideToLongCB(Callback):
     """
     Get Geotraces nuclide names as values not column names 
@@ -59,7 +59,7 @@ class WideToLongCB(Callback):
                           var_name=self.var_name, value_name=self.value_name)
         tfm.dfs.dropna(subset='value', inplace=True)
 
-# %% ../../nbs/handlers/geotraces.ipynb 26
+# %% ../../nbs/handlers/geotraces.ipynb 22
 class ExtractUnitCB(Callback):
     """
     Extract units from nuclide names.
@@ -75,7 +75,7 @@ class ExtractUnitCB(Callback):
     def __call__(self, tfm):
         tfm.dfs[self.unit_col_name] = tfm.dfs[self.var_name].apply(self.extract_unit)
 
-# %% ../../nbs/handlers/geotraces.ipynb 32
+# %% ../../nbs/handlers/geotraces.ipynb 26
 class ExtractFilteringStatusCB(Callback):
     """
     Extract filtering status from nuclide names.
@@ -99,7 +99,7 @@ class ExtractFilteringStatusCB(Callback):
         tfm.dfs[self.filt_col_name] = tfm.dfs[self.var_name].apply(self.extract_filt_status)
         tfm.dfs['group'] = tfm.dfs[self.var_name].apply(self.extract_group)
 
-# %% ../../nbs/handlers/geotraces.ipynb 38
+# %% ../../nbs/handlers/geotraces.ipynb 30
 class ExtractSamplingMethodCB(Callback):
     """
     Extract sampling method from nuclide names.
@@ -115,7 +115,7 @@ class ExtractSamplingMethodCB(Callback):
     def __call__(self, tfm):
         tfm.dfs[self.smp_method_col_name] = tfm.dfs[self.var_name].apply(self.extract_smp_method)
 
-# %% ../../nbs/handlers/geotraces.ipynb 44
+# %% ../../nbs/handlers/geotraces.ipynb 34
 class RenameNuclideCB(Callback):
     """
     Remap nuclides name to MARIS standard.
@@ -135,7 +135,7 @@ class RenameNuclideCB(Callback):
     def __call__(self, tfm):
         tfm.dfs[self.var_name] = tfm.dfs[self.var_name].apply(self.standardize_name)
 
-# %% ../../nbs/handlers/geotraces.ipynb 50
+# %% ../../nbs/handlers/geotraces.ipynb 39
 class StandardizeUnitCB(Callback):
     """
     Remap unit to MARIS standard ones and apply conversion where needed.
@@ -155,7 +155,7 @@ class StandardizeUnitCB(Callback):
             {k: v['id'] for k, v in self.units_lut.items()})
         
 
-# %% ../../nbs/handlers/geotraces.ipynb 57
+# %% ../../nbs/handlers/geotraces.ipynb 42
 def renaming_rules():
     vars = cdl_cfg()['vars']
     # Define column names renaming rules
@@ -167,7 +167,7 @@ def renaming_rules():
         'Bot. Depth [m]': vars['defaults']['tot_depth']['name']
     }
 
-# %% ../../nbs/handlers/geotraces.ipynb 58
+# %% ../../nbs/handlers/geotraces.ipynb 43
 class RenameColumnCB(Callback):
     "Renaming variables to MARIS standard names."
     def __init__(self, renaming_rules=renaming_rules): fc.store_attr()
@@ -176,7 +176,7 @@ class RenameColumnCB(Callback):
         new_col_names = [lut[name] if name in lut else name for name in tfm.dfs.columns]
         tfm.dfs.columns = new_col_names
 
-# %% ../../nbs/handlers/geotraces.ipynb 62
+# %% ../../nbs/handlers/geotraces.ipynb 46
 class UnshiftLongitudeCB(Callback):
     "Longitudes are coded between 0 and 360 in Geotraces. We rescale it between -180 and 180 instead."
     def __init__(self): 
@@ -185,7 +185,7 @@ class UnshiftLongitudeCB(Callback):
     def __call__(self, tfm):
         tfm.dfs[self.lon_col_name] = tfm.dfs[self.lon_col_name] - 180
 
-# %% ../../nbs/handlers/geotraces.ipynb 66
+# %% ../../nbs/handlers/geotraces.ipynb 49
 class DispatchToGroupCB(Callback):
     "Convert to a dictionary of dataframe with sample type (seawater,...) as keys."
     def __init__(self, group_name='group'): 
@@ -197,7 +197,7 @@ class DispatchToGroupCB(Callback):
             tfm.dfs[key] = tfm.dfs[key].drop(self.group_name, axis=1)
         
 
-# %% ../../nbs/handlers/geotraces.ipynb 70
+# %% ../../nbs/handlers/geotraces.ipynb 52
 class ReshapeLongToWide(Callback):
     "Convert data from long to wide with renamed columns."
     def __init__(self, columns='nuclide', values=['value']):
@@ -230,13 +230,13 @@ class ReshapeLongToWide(Callback):
             tfm.dfs[k] = self.pivot(tfm.dfs[k])
             tfm.dfs[k].columns = self.renamed_cols(tfm.dfs[k].columns)
 
-# %% ../../nbs/handlers/geotraces.ipynb 79
+# %% ../../nbs/handlers/geotraces.ipynb 55
 class ParseTimeCB(Callback):
     def __call__(self, tfm):
         for k in tfm.dfs.keys():
             tfm.dfs[k]['time'] = pd.to_datetime(tfm.dfs[k].time, format='ISO8601')
 
-# %% ../../nbs/handlers/geotraces.ipynb 93
+# %% ../../nbs/handlers/geotraces.ipynb 64
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -248,7 +248,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/geotraces.ipynb 94
+# %% ../../nbs/handlers/geotraces.ipynb 65
 def get_attrs(tfm, zotero_key, kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -259,7 +259,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/geotraces.ipynb 96
+# %% ../../nbs/handlers/geotraces.ipynb 67
 def enums_xtra(tfm, vars):
     "Retrieve a subset of the lengthy enum as 'species_t' for instance"
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
@@ -270,7 +270,8 @@ def enums_xtra(tfm, vars):
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/geotraces.ipynb 97
+# %% ../../nbs/handlers/geotraces.ipynb 68
+# TBD
 def encode(fname_in, fname_out, nc_tpl_path, **kwargs):
     df = load_dump(fname_in)
     ref_ids = kwargs.get('ref_ids', df.ref_id.unique())

@@ -124,7 +124,7 @@ def match_worms(
     else:
         return -1
 
-# %% ../nbs/api/utils.ipynb 33
+# %% ../nbs/api/utils.ipynb 31
 @dataclass
 class Match:
     matched_id: int
@@ -132,7 +132,7 @@ class Match:
     source_name: str
     match_score: int
 
-# %% ../nbs/api/utils.ipynb 34
+# %% ../nbs/api/utils.ipynb 32
 def match_maris_lut(
     lut_path: str, # Path to MARIS species authoritative species look-up table
     data_provider_name: str, # Name of data provider nomenclature item to look up 

@@ -24,6 +24,7 @@ from ..metadata import (GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, Zote
 from ..configs import (base_path, nc_tpl_path, cfg, cache_path, cdl_cfg, Enums, lut_path,
                              species_lut_path, sediments_lut_path, bodyparts_lut_path)
 from ..serializers import NetCDFEncoder
+from collections.abc import Callable
 
 # %% ../../nbs/handlers/helcom.ipynb 9
 fname_in = '../../_data/accdb/mors/csv'
@@ -147,7 +148,7 @@ def get_maris_lut(fname_in,
                   data_provider_lut:str, # Data provider lookup table name
                   data_provider_id_col:str, # Data provider lookup column id of interest
                   data_provider_name_col:str, # Data provider lookup column name of interest
-                  maris_lut:str, # MARIS source lookup table name and path
+                  maris_lut:Callable, # Function retrieving MARIS source lookup table
                   maris_id: str, # Id of MARIS lookup table nomenclature item to match
                   maris_name: str, # Name of MARIS lookup table nomenclature item to match
                   unmatched_fixes={},
@@ -156,6 +157,7 @@ def get_maris_lut(fname_in,
                  ):
     fname_cache = cache_path() / fname_cache
     lut = {}
+    maris_lut = maris_lut()
     df = pd.read_csv(Path(fname_in) / data_provider_lut)
     if overwrite or (not fname_cache.exists()):
         for _, row in tqdm(df.iterrows(), total=len(df)):
@@ -208,7 +210,7 @@ get_maris_species = partial(get_maris_lut,
                             data_provider_lut='RUBIN_NAME.csv',
                             data_provider_id_col='RUBIN',
                             data_provider_name_col='SCIENTIFIC NAME',
-                            maris_lut=species_lut_path(),
+                            maris_lut=species_lut_path,
                             maris_id='species_id',
                             maris_name='species',
                             unmatched_fixes=unmatched_fixes_biota_species,
@@ -241,7 +243,7 @@ get_maris_bodypart = partial(get_maris_lut,
                              data_provider_lut='TISSUE.csv',
                              data_provider_id_col='TISSUE',
                              data_provider_name_col='TISSUE_DESCRIPTION',
-                             maris_lut=bodyparts_lut_path(),
+                             maris_lut=bodyparts_lut_path,
                              maris_id='bodypar_id',
                              maris_name='bodypar',
                              unmatched_fixes=unmatched_fixes_biota_tissues)
@@ -260,7 +262,7 @@ get_maris_sediments = partial(
     data_provider_lut='SEDIMENT_TYPE.csv',
     data_provider_id_col='SEDI',
     data_provider_name_col='SEDIMENT TYPE',
-    maris_lut=sediments_lut_path(),
+    maris_lut=sediments_lut_path,
     maris_id='sedtype_id',
     maris_name='sedtype',
     unmatched_fixes=unmatched_fixes_sediments)

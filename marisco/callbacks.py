@@ -9,19 +9,20 @@ import fastcore.all as fc
 from operator import attrgetter
 from cftime import date2num
 import numpy as np
+import pandas as pd
 
 from .configs import cfg
 
-# %% ../nbs/api/callbacks.ipynb 4
+# %% ../nbs/api/callbacks.ipynb 3
 class Callback(): order = 0
 
-# %% ../nbs/api/callbacks.ipynb 5
+# %% ../nbs/api/callbacks.ipynb 4
 def run_cbs(cbs, obj=None):
     for cb in sorted(cbs, key=attrgetter('order')):
         if cb.__doc__: obj.logs.append(cb.__doc__)
         cb(obj)
 
-# %% ../nbs/api/callbacks.ipynb 6
+# %% ../nbs/api/callbacks.ipynb 5
 class Transformer():
     def __init__(self, dfs, cbs=None): 
         self.cbs = cbs
@@ -50,7 +51,7 @@ class Transformer():
         if self.cbs: self.callback()
         return self.dfs
 
-# %% ../nbs/api/callbacks.ipynb 11
+# %% ../nbs/api/callbacks.ipynb 10
 class EncodeTimeCB(Callback):
     "Encode time as `int` representing seconds since xxx"    
     def __init__(self, cfg): fc.store_attr()
@@ -60,7 +61,7 @@ class EncodeTimeCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k]['time'] = tfm.dfs[k]['time'].apply(format_time)
 
-# %% ../nbs/api/callbacks.ipynb 12
+# %% ../nbs/api/callbacks.ipynb 11
 class SanitizeLonLatCB(Callback):
     "Drop row when both longitude & latitude equal 0. Drop unrealistic longitude & latitude values. Convert longitude & latitude `,` separator to `.` separator."
     def __init__(self, verbose=False): fc.store_attr()

@@ -3,8 +3,9 @@ website:
     contents:
       - section: "Handlers"
         contents:
-          - handlers/tepco.ipynb
+          - handlers/geotraces.ipynb
           - handlers/helcom.ipynb
+          - handlers/maris_dump.ipynb
       - section: API
         contents:
           - api/callbacks.ipynb

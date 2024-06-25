@@ -429,13 +429,13 @@ def unit_lut_path():
     fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'unit_t'][0]['fname']
     return src_dir / fname
 
-# %% ../nbs/api/configs.ipynb 26
+# %% ../nbs/api/configs.ipynb 25
 NETCDF_TO_PYTHON_TYPE = {
     'u8': int,
     'f4': float
     }
 
-# %% ../nbs/api/configs.ipynb 27
+# %% ../nbs/api/configs.ipynb 26
 def name2grp(
     name:str, # Name of the group
     cdl:dict, # CDL configuration
@@ -443,18 +443,18 @@ def name2grp(
     # Reverse `cdl.toml` config group dict so that group config key can be retrieve based on its name
     return {v['name']:k  for k, v in cdl['grps'].items()}[name]
 
-# %% ../nbs/api/configs.ipynb 30
+# %% ../nbs/api/configs.ipynb 29
 def nc_tpl_name():
     p = base_path()
     return read_toml(p / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 31
+# %% ../nbs/api/configs.ipynb 30
 def nc_tpl_path():
     "Return the name of the MARIS NetCDF template as defined in `configs.toml`"
     p = base_path()
     return p / read_toml(p / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 33
+# %% ../nbs/api/configs.ipynb 32
 def sanitize(s:str # String to sanitize
              ) -> str:
     """
@@ -466,7 +466,7 @@ def sanitize(s:str # String to sanitize
     s = re.sub(r'[().]', '', s)
     return re.sub(r'[/-]', ' ', s).strip() 
 
-# %% ../nbs/api/configs.ipynb 37
+# %% ../nbs/api/configs.ipynb 36
 def get_lut(src_dir:str, # Directory containing lookup tables
             fname:str, # Excel file lookup table name
             key:str, # Excel file column name to be used as dict keys 
@@ -482,7 +482,7 @@ def get_lut(src_dir:str, # Directory containing lookup tables
     if do_sanitize: lut = {sanitize(k): v for k, v in lut.items()}
     return lut
 
-# %% ../nbs/api/configs.ipynb 40
+# %% ../nbs/api/configs.ipynb 39
 class Enums():
     "Return dictionaries of MARIS NetCDF's enumeration types"
     def __init__(self, 
@@ -503,7 +503,7 @@ class Enums():
             types[name] = lut
         return types
 
-# %% ../nbs/api/configs.ipynb 46
+# %% ../nbs/api/configs.ipynb 45
 def get_enum_dicts(
     lut_src_dir:str,
     cdl_enums:dict,

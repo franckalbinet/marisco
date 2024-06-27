@@ -26,6 +26,8 @@ from ..configs import (nc_tpl_path, cfg, cache_path, cdl_cfg, Enums, lut_path,
                              species_lut_path, bodyparts_lut_path, unit_lut_path, detection_limit_lut_path)
 from ..serializers import NetCDFEncoder
 
+from collections.abc import Callable
+
 # %% ../../nbs/handlers/ospar.ipynb 8
 fname_in = '../../_data/accdb/ospar/csv'
 fname_out = '../../_data/output/ospar_19950103_2021214.nc'
@@ -138,7 +140,7 @@ class ParseTimeCB(Callback):
 def get_maris_lut(df_biota,
                   fname_cache, # For instance 'species_ospar.pkl'
                   data_provider_name_col:str, # Data provider lookup column name of interest
-                  maris_lut:str, # MARIS source lookup table name and path
+                  maris_lut:Callable, # Function retrieving MARIS source lookup table
                   maris_id: str, # Id of MARIS lookup table nomenclature item to match
                   maris_name: str, # Name of MARIS lookup table nomenclature item to match
                   unmatched_fixes={},
@@ -147,6 +149,7 @@ def get_maris_lut(df_biota,
                  ):
     fname_cache = cache_path() / fname_cache
     lut = {}
+    maris_lut = maris_lut()
 
     if overwrite or (not fname_cache.exists()):        
         df = pd.DataFrame({data_provider_name_col : df_biota[data_provider_name_col].unique()})
@@ -234,7 +237,7 @@ class LookupBiotaSpeciesCB(Callback):
 get_maris_species = partial(get_maris_lut, 
                 fname_cache='species_ospar.pkl', 
                 data_provider_name_col='SCIENTIFIC NAME',
-                maris_lut=species_lut_path(),
+                maris_lut=species_lut_path,
                 maris_id='species_id',
                 maris_name='species',
                 unmatched_fixes=unmatched_fixes_biota_species,

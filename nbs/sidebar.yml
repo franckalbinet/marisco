@@ -6,6 +6,7 @@ website:
           - handlers/geotraces.ipynb
           - handlers/helcom.ipynb
           - handlers/maris_dump.ipynb
+          - handlers/ospar.ipynb
       - section: API
         contents:
           - api/callbacks.ipynb

@@ -12,11 +12,10 @@ Laboratories](https://www.iaea.org/about/organizational-structure/department-of-
 in Monaco.
 
 The current Python package offers command-line utilities for encoding
-harvested datasets into
+MARIS harvested datasets into
 [`NetCDF`](https://www.unidata.ucar.edu/software/netcdf/) or `.csv`
-formats. This allows users to easily convert their data into a format
-that is compatible with a wide range of scientific and data analysis
-tools.
+formats. This allows to convert **MARIS data into a format that is
+compatible with a wide range of scientific and data analysis tools**.
 
 ## Install
 
@@ -51,10 +50,10 @@ This command:
 >
 > For inexperienced Python users, please refers to [How to setup
 > `Marisco` with
-> Anaconda]('./install_configure_guide/windows_anaconda/README.md) or
-> [How to setup `Marisco` with Windows Subsystem for Linux (WSL) and
+> Anaconda](https://github.com/franckalbinet/marisco/tree/main/install_configure_guide/windows_anaconda)
+> or [How to setup `Marisco` with Windows Subsystem for Linux (WSL) and
 > Visual Studio Code
-> editor]('./install_configure_guide/windows_ubuntu_sub_system/README.md).
+> editor](https://github.com/franckalbinet/marisco/tree/main/install_configure_guide//windows_ubuntu_sub_system).
 
 ## Getting started
 

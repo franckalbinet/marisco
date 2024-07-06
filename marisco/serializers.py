@@ -125,7 +125,7 @@ class OpenRefineCsvEncoder:
     def __init__(self, 
                  dfs:dict[pd.DataFrame], # dict of Dataframes to encode with group name as key {'sediment': df_sed, ...}
                  dest_fname:str, # Name of output file to produce
-                 ref_id: int, # ref_id to include 
+                 ref_id = -1, # ref_id to include 
                  verbose:bool=False, # Print 
                  ):
         store_attr()

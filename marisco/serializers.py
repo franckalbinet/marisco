@@ -125,6 +125,7 @@ class OpenRefineCsvEncoder:
     def __init__(self, 
                  dfs:dict[pd.DataFrame], # dict of Dataframes to encode with group name as key {'sediment': df_sed, ...}
                  dest_fname:str, # Name of output file to produce
+                 ref_id: int, # ref_id to include 
                  verbose:bool=False, # Print 
                  ):
         store_attr()
@@ -133,6 +134,9 @@ class OpenRefineCsvEncoder:
 @patch
 def process_groups_to_csv(self:OpenRefineCsvEncoder):
     for grp_name, df in self.dfs.items():
+        # include ref_id
+        if self.ref_id != -1:
+            df['ref_id'] = self.ref_id
         self.process_group_to_csv(grp_name, df)
 
 # %% ../nbs/api/serializers.ipynb 28
@@ -146,4 +150,7 @@ def process_group_to_csv(self:OpenRefineCsvEncoder, group_name, df):
 @patch
 def encode(self:OpenRefineCsvEncoder):
     "Encode OpenRefine CSV based on dataframes from NetCDF."
+    # Include ref_id
+    
+    # Process to csv
     self.process_groups_to_csv()

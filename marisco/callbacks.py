@@ -10,7 +10,6 @@ from operator import attrgetter
 from cftime import date2num
 import numpy as np
 import pandas as pd
-
 from .configs import cfg
 
 # %% ../nbs/api/callbacks.ipynb 3
@@ -54,11 +53,25 @@ class Transformer():
 # %% ../nbs/api/callbacks.ipynb 10
 class EncodeTimeCB(Callback):
     "Encode time as `int` representing seconds since xxx"    
-    def __init__(self, cfg): fc.store_attr()
+    def __init__(self, cfg , verbose=False): fc.store_attr()
     def __call__(self, tfm): 
-        def format_time(x): return date2num(x, units=self.cfg['units']['time'])
+        def format_time(x): 
+            return date2num(x, units=self.cfg['units']['time'])
+        
+        # If verbose define a dictionary of dataframes for invalid time. 
+        if self.verbose:
+            tfm.invalid_time_dfs={}
         
         for k in tfm.dfs.keys():
+            # If invalid time entries.
+            if tfm.dfs[k]['time'].isna().any():
+                if self.verbose:
+                    invalid_time_df=tfm.dfs[k][tfm.dfs[k]['time'].isna()]
+                    tfm.invalid_time_dfs[k]=invalid_time_df
+                    print (f'{len(invalid_time_df.index)} of {len(tfm.dfs[k].index)} entries for `time` are invalid for {k}.')
+                # Filter nan values
+                tfm.dfs[k] = tfm.dfs[k][tfm.dfs[k]['time'].notna()]
+            
             tfm.dfs[k]['time'] = tfm.dfs[k]['time'].apply(format_time)
 
 # %% ../nbs/api/callbacks.ipynb 11

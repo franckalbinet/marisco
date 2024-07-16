@@ -144,7 +144,7 @@ def process_groups_to_csv(self:OpenRefineCsvEncoder):
 def process_group_to_csv(self:OpenRefineCsvEncoder, group_name, df):
     filename, file_extension=os.path.splitext(self.dest_fname)
     path = filename + '_' + group_name + file_extension
-    df.to_csv ( path_or_buf= path, sep=',')
+    df.to_csv( path_or_buf= path, sep=',', index=False)
 
 # %% ../nbs/api/serializers.ipynb 29
 @patch

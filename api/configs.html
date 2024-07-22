@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.55">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Several dictionaries used to generate .toml configuration files copied under /home/.marisco folder and associated utilities function. These .toml files can be then adapted to your specific needs if required.">
+
+<title>Configs – marisco</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="Configs – marisco">
+<meta property="og:description" content="Several dictionaries used to generate .toml configuration files copied under /home/.marisco folder and associated utilities function. These .toml files can be then adapted to your specific needs if required.">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="Configs – marisco">
+<meta name="twitter:description" content="Several dictionaries used to generate .toml configuration files copied under /home/.marisco folder and associated utilities function. These .toml files can be then adapted to your specific needs if required.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/callbacks.html">API</a></li><li class="breadcrumb-item"><a href="../api/configs.html">Configs</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Marisco</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/geotraces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geotraces</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/maris_dump.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS dump</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/ospar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OSPAR</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc_template.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS NetCDF Template</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/serializers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Serializers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Utilities</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#configuration-files" id="toc-configuration-files" class="nav-link active" data-scroll-target="#configuration-files">Configuration files</a>
+  <ul class="collapse">
+  <li><a href="#base_path" id="toc-base_path" class="nav-link" data-scroll-target="#base_path">base_path</a></li>
+  <li><a href="#cfg" id="toc-cfg" class="nav-link" data-scroll-target="#cfg">cfg</a></li>
+  <li><a href="#nuc_lut_path" id="toc-nuc_lut_path" class="nav-link" data-scroll-target="#nuc_lut_path">nuc_lut_path</a></li>
+  <li><a href="#lut_path" id="toc-lut_path" class="nav-link" data-scroll-target="#lut_path">lut_path</a></li>
+  <li><a href="#cache_path" id="toc-cache_path" class="nav-link" data-scroll-target="#cache_path">cache_path</a></li>
+  <li><a href="#cdl_cfg" id="toc-cdl_cfg" class="nav-link" data-scroll-target="#cdl_cfg">cdl_cfg</a></li>
+  <li><a href="#species_lut_path" id="toc-species_lut_path" class="nav-link" data-scroll-target="#species_lut_path">species_lut_path</a></li>
+  <li><a href="#bodyparts_lut_path" id="toc-bodyparts_lut_path" class="nav-link" data-scroll-target="#bodyparts_lut_path">bodyparts_lut_path</a></li>
+  <li><a href="#biogroup_lut_path" id="toc-biogroup_lut_path" class="nav-link" data-scroll-target="#biogroup_lut_path">biogroup_lut_path</a></li>
+  <li><a href="#sediments_lut_path" id="toc-sediments_lut_path" class="nav-link" data-scroll-target="#sediments_lut_path">sediments_lut_path</a></li>
+  <li><a href="#unit_lut_path" id="toc-unit_lut_path" class="nav-link" data-scroll-target="#unit_lut_path">unit_lut_path</a></li>
+  <li><a href="#detection_limit_lut_path" id="toc-detection_limit_lut_path" class="nav-link" data-scroll-target="#detection_limit_lut_path">detection_limit_lut_path</a></li>
+  </ul></li>
+  <li><a href="#utilities-function" id="toc-utilities-function" class="nav-link" data-scroll-target="#utilities-function">Utilities function</a>
+  <ul class="collapse">
+  <li><a href="#name2grp" id="toc-name2grp" class="nav-link" data-scroll-target="#name2grp">name2grp</a></li>
+  <li><a href="#nc_tpl_name" id="toc-nc_tpl_name" class="nav-link" data-scroll-target="#nc_tpl_name">nc_tpl_name</a></li>
+  <li><a href="#nc_tpl_path" id="toc-nc_tpl_path" class="nav-link" data-scroll-target="#nc_tpl_path">nc_tpl_path</a></li>
+  </ul></li>
+  <li><a href="#enumeration-types" id="toc-enumeration-types" class="nav-link" data-scroll-target="#enumeration-types">Enumeration types</a>
+  <ul class="collapse">
+  <li><a href="#sanitize" id="toc-sanitize" class="nav-link" data-scroll-target="#sanitize">sanitize</a></li>
+  <li><a href="#get_lut" id="toc-get_lut" class="nav-link" data-scroll-target="#get_lut">get_lut</a></li>
+  <li><a href="#enums" id="toc-enums" class="nav-link" data-scroll-target="#enums">Enums</a></li>
+  <li><a href="#get_enum_dicts" id="toc-get_enum_dicts" class="nav-link" data-scroll-target="#get_enum_dicts">get_enum_dicts</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/callbacks.html">API</a></li><li class="breadcrumb-item"><a href="../api/configs.html">Configs</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Configs</h1>
+</div>
+
+<div>
+  <div class="description">
+    Several dictionaries used to generate <code>.toml</code> configuration files copied under <code>/home/.marisco</code> folder and associated utilities function. These <code>.toml</code> files can be then adapted to your specific needs if required.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="configuration-files" class="level2">
+<h2 class="anchored" data-anchor-id="configuration-files">Configuration files</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L27" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="base_path" class="level3">
+<h3 class="anchored" data-anchor-id="base_path">base_path</h3>
+<blockquote class="blockquote">
+<pre><code> base_path ()</code></pre>
+</blockquote>
+<p>By default, we create a folder named <code>.marisco</code> under your home directory that will receive all configuration files as defined in <code>BASE_PATH</code>:</p>
+<div id="c39e2178" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>base_path()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Path('/home/marisco/.marisco')</code></pre>
+</div>
+</div>
+<p>The <code>CONFIGS</code> dictionary defines general settings:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>key</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dirs/lut</code></td>
+<td><code>/Users/franckalbinet/.marisco/lut</code></td>
+<td>Location &amp; name of the directory receiving lookup tables.</td>
+</tr>
+<tr class="even">
+<td><code>dirs/cache</code></td>
+<td><code>/Users/franckalbinet/.marisco/cache</code></td>
+<td>Location &amp; name of the directory receiving cache files such as WoRMS species retrieved.</td>
+</tr>
+<tr class="odd">
+<td><code>dirs/tmp</code></td>
+<td><code>/Users/franckalbinet/.marisco/tmp</code></td>
+<td>Location &amp; name of temporary files.</td>
+</tr>
+<tr class="even">
+<td><code>gh/owner</code></td>
+<td><code>franckalbinet</code></td>
+<td>GitHub account owner.</td>
+</tr>
+<tr class="odd">
+<td><code>gh/repo</code></td>
+<td><code>marisco</code></td>
+<td>GitHub user used to download specific files (e.g lookup tables) during installation.</td>
+</tr>
+<tr class="even">
+<td><code>names/nc_template</code></td>
+<td><code>maris-template.nc</code></td>
+<td>Name of the MARIS NetCDF4 template.</td>
+</tr>
+<tr class="odd">
+<td><code>paths_luts</code></td>
+<td><code>nbs/files/lut</code></td>
+<td>GitHub repository directory name containing lookup tables.</td>
+</tr>
+<tr class="even">
+<td><code>units_time</code></td>
+<td><code>seconds since 1970-01-01 00:00:00.0</code></td>
+<td>Reference date and time used for <a href="https://unidata.github.io/cftime/">NetCDF time encoding</a>.</td>
+</tr>
+<tr class="odd">
+<td><code>zotero/api_key</code></td>
+<td><code>your-zotero-api-key</code></td>
+<td>Zotero API key.</td>
+</tr>
+<tr class="even">
+<td><code>zotero/lib_id</code></td>
+<td><code>2432820</code></td>
+<td>Zotero library ID.</td>
+</tr>
+</tbody>
+</table>
+<p>The main <code>CONFIGS_CDL</code> dictionary, used to generate a <a href="https://www.unidata.ucar.edu/software/netcdf/workshops/2012/nc3model/Cdl.html">NetCDF CDL (Common Data Language)</a> <code>.toml</code> file. This file is then used to generate a template MARIS netcdf file. For further details refers to the <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/api/configs.ipynb"><code>configs.ipynb</code></a> file.</p>
+<p>Below, the vars/defaults section printed:</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L56" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="cfg" class="level3">
+<h3 class="anchored" data-anchor-id="cfg">cfg</h3>
+<blockquote class="blockquote">
+<pre><code> cfg ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L59" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nuc_lut_path" class="level3">
+<h3 class="anchored" data-anchor-id="nuc_lut_path">nuc_lut_path</h3>
+<blockquote class="blockquote">
+<pre><code> nuc_lut_path ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L62" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lut_path" class="level3">
+<h3 class="anchored" data-anchor-id="lut_path">lut_path</h3>
+<blockquote class="blockquote">
+<pre><code> lut_path ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L65" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="cache_path" class="level3">
+<h3 class="anchored" data-anchor-id="cache_path">cache_path</h3>
+<blockquote class="blockquote">
+<pre><code> cache_path ()</code></pre>
+</blockquote>
+<div id="1c91f897" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fc.AttrDict(CONFIGS_CDL[<span class="st">'vars'</span>][<span class="st">'defaults'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<div class="sourceCode" id="cb9"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="er">'area'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'attrs'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'long_name'</span><span class="fu">:</span> <span class="er">'Marine</span> <span class="er">area/region</span> <span class="er">id'</span><span class="fu">,</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                       <span class="er">'standard_name'</span><span class="fu">:</span> <span class="er">'area_id'</span><span class="fu">},</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>            <span class="er">'dtype'</span><span class="fu">:</span> <span class="er">'area_t'</span><span class="fu">,</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>            <span class="er">'name'</span><span class="fu">:</span> <span class="er">'area'</span><span class="fu">},</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="er">'lat'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'attrs'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'_CoordinateAxisType'</span><span class="fu">:</span> <span class="er">'Lat'</span><span class="fu">,</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                      <span class="er">'axis'</span><span class="fu">:</span> <span class="er">'X'</span><span class="fu">,</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                      <span class="er">'long_name'</span><span class="fu">:</span> <span class="er">'Measurement</span> <span class="er">latitude'</span><span class="fu">,</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                      <span class="er">'standard_name'</span><span class="fu">:</span> <span class="er">'latitude'</span><span class="fu">,</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                      <span class="er">'units'</span><span class="fu">:</span> <span class="er">'degrees_east'</span><span class="fu">},</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>           <span class="er">'dtype'</span><span class="fu">:</span> <span class="er">'f4'</span><span class="fu">,</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>           <span class="er">'name'</span><span class="fu">:</span> <span class="er">'lat'</span><span class="fu">},</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="er">'lon'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'attrs'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'_CoordinateAxisType'</span><span class="fu">:</span> <span class="er">'Lon'</span><span class="fu">,</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                      <span class="er">'axis'</span><span class="fu">:</span> <span class="er">'Y'</span><span class="fu">,</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>                      <span class="er">'long_name'</span><span class="fu">:</span> <span class="er">'Measurement</span> <span class="er">longitude'</span><span class="fu">,</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>                      <span class="er">'standard_name'</span><span class="fu">:</span> <span class="er">'longitude'</span><span class="fu">,</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                      <span class="er">'units'</span><span class="fu">:</span> <span class="er">'degrees_north'</span><span class="fu">},</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>           <span class="er">'dtype'</span><span class="fu">:</span> <span class="er">'f4'</span><span class="fu">,</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>           <span class="er">'name'</span><span class="fu">:</span> <span class="er">'lon'</span><span class="fu">},</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="er">'smp_depth'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'attrs'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'axis'</span><span class="fu">:</span> <span class="er">'Z'</span><span class="fu">,</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                            <span class="er">'long_name'</span><span class="fu">:</span> <span class="er">'Sample</span> <span class="er">depth</span> <span class="er">below</span> <span class="er">seal</span> <span class="er">level'</span><span class="fu">,</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>                            <span class="er">'standard_name'</span><span class="fu">:</span> <span class="er">'sample_depth_below_sea_floor'</span><span class="fu">,</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>                            <span class="er">'units'</span><span class="fu">:</span> <span class="er">'m'</span><span class="fu">},</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>                 <span class="er">'dtype'</span><span class="fu">:</span> <span class="er">'f4'</span><span class="fu">,</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>                 <span class="er">'name'</span><span class="fu">:</span> <span class="er">'smp_depth'</span><span class="fu">},</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="er">'time'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'attrs'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'abbreviation'</span><span class="fu">:</span> <span class="er">'Date/Time'</span><span class="fu">,</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>                       <span class="er">'axis'</span><span class="fu">:</span> <span class="er">'T'</span><span class="fu">,</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>                       <span class="er">'calendar'</span><span class="fu">:</span> <span class="er">'gregorian'</span><span class="fu">,</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>                       <span class="er">'long_name'</span><span class="fu">:</span> <span class="er">'Time</span> <span class="er">of</span> <span class="er">measurement'</span><span class="fu">,</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>                       <span class="er">'standard_name'</span><span class="fu">:</span> <span class="er">'time'</span><span class="fu">,</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>                       <span class="er">'time_origin'</span><span class="fu">:</span> <span class="er">'</span><span class="dv">1970</span><span class="er">-01-01</span> <span class="er">00:00:00'</span><span class="fu">,</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                       <span class="er">'time_zone'</span><span class="fu">:</span> <span class="er">'UTC'</span><span class="fu">,</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>                       <span class="er">'units'</span><span class="fu">:</span> <span class="er">'seconds</span> <span class="er">since</span> <span class="dv">1970</span><span class="er">-01-01</span> <span class="er">00:00:00.</span><span class="dv">0</span><span class="er">'</span><span class="fu">},</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>            <span class="er">'dtype'</span><span class="fu">:</span> <span class="er">'u8'</span><span class="fu">,</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>            <span class="er">'name'</span><span class="fu">:</span> <span class="er">'time'</span><span class="fu">},</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>  <span class="er">'tot_depth'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'attrs'</span><span class="fu">:</span> <span class="fu">{</span> <span class="er">'axis'</span><span class="fu">:</span> <span class="er">'Z'</span><span class="fu">,</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>                            <span class="er">'long_name'</span><span class="fu">:</span> <span class="er">'Total</span> <span class="er">depth</span> <span class="er">below</span> <span class="er">seal</span> <span class="er">level'</span><span class="fu">,</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>                            <span class="er">'standard_name'</span><span class="fu">:</span> <span class="er">'total_depth_below_sea_floor'</span><span class="fu">,</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>                            <span class="er">'units'</span><span class="fu">:</span> <span class="er">'m'</span><span class="fu">},</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>                 <span class="er">'dtype'</span><span class="fu">:</span> <span class="er">'f4'</span><span class="fu">,</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>                 <span class="er">'name'</span><span class="fu">:</span> <span class="er">'tot_depth'</span><span class="fu">}}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="de532f71" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>write_toml(Path(<span class="st">'./files'</span>) <span class="op">/</span> CDL_FNAME, CONFIGS_CDL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Creating files/cdl.toml</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L406" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="cdl_cfg" class="level3">
+<h3 class="anchored" data-anchor-id="cdl_cfg">cdl_cfg</h3>
+<blockquote class="blockquote">
+<pre><code> cdl_cfg ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L409" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="species_lut_path" class="level3">
+<h3 class="anchored" data-anchor-id="species_lut_path">species_lut_path</h3>
+<blockquote class="blockquote">
+<pre><code> species_lut_path ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L415" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="bodyparts_lut_path" class="level3">
+<h3 class="anchored" data-anchor-id="bodyparts_lut_path">bodyparts_lut_path</h3>
+<blockquote class="blockquote">
+<pre><code> bodyparts_lut_path ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L421" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biogroup_lut_path" class="level3">
+<h3 class="anchored" data-anchor-id="biogroup_lut_path">biogroup_lut_path</h3>
+<blockquote class="blockquote">
+<pre><code> biogroup_lut_path ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L427" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="sediments_lut_path" class="level3">
+<h3 class="anchored" data-anchor-id="sediments_lut_path">sediments_lut_path</h3>
+<blockquote class="blockquote">
+<pre><code> sediments_lut_path ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L433" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="unit_lut_path" class="level3">
+<h3 class="anchored" data-anchor-id="unit_lut_path">unit_lut_path</h3>
+<blockquote class="blockquote">
+<pre><code> unit_lut_path ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L439" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="detection_limit_lut_path" class="level3">
+<h3 class="anchored" data-anchor-id="detection_limit_lut_path">detection_limit_lut_path</h3>
+<blockquote class="blockquote">
+<pre><code> detection_limit_lut_path ()</code></pre>
+</blockquote>
+</section>
+</section>
+<section id="utilities-function" class="level2">
+<h2 class="anchored" data-anchor-id="utilities-function">Utilities function</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L451" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="name2grp" class="level3">
+<h3 class="anchored" data-anchor-id="name2grp">name2grp</h3>
+<blockquote class="blockquote">
+<pre><code> name2grp (name:str, cdl:dict)</code></pre>
+</blockquote>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>name</td>
+<td>str</td>
+<td>Name of the group</td>
+</tr>
+<tr class="even">
+<td>cdl</td>
+<td>dict</td>
+<td>CDL configuration</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div id="1f94801f" class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>name2grp(<span class="st">'seawater'</span>, cdl<span class="op">=</span>CONFIGS_CDL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>'sea'</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L459" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nc_tpl_name" class="level3">
+<h3 class="anchored" data-anchor-id="nc_tpl_name">nc_tpl_name</h3>
+<blockquote class="blockquote">
+<pre><code> nc_tpl_name ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L464" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="nc_tpl_path" class="level3">
+<h3 class="anchored" data-anchor-id="nc_tpl_path">nc_tpl_path</h3>
+<blockquote class="blockquote">
+<pre><code> nc_tpl_path ()</code></pre>
+</blockquote>
+<p><em>Return the name of the MARIS NetCDF template as defined in <code>configs.toml</code></em></p>
+</section>
+</section>
+<section id="enumeration-types" class="level2">
+<h2 class="anchored" data-anchor-id="enumeration-types">Enumeration types</h2>
+<p>Enumeration types are used to avoid using strings as NetCDF4 variable values. Instead, enumeration types (lookup tables) such as <code>{'Crustaceans': 2, 'Echinoderms': 3, ...}</code> are prepended to the NetCDF file template and associated ids (integers) are used as values.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L470" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="sanitize" class="level3">
+<h3 class="anchored" data-anchor-id="sanitize">sanitize</h3>
+<blockquote class="blockquote">
+<pre><code> sanitize (s:str)</code></pre>
+</blockquote>
+<p>*Sanitize dictionary key to comply with NetCDF enumeration type:</p>
+<ul>
+<li>remove <code>(</code>, <code>)</code>, <code>.</code>, <code>/</code>, <code>-</code><br>
+</li>
+<li>strip the string*</li>
+</ul>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>s</td>
+<td>str</td>
+<td>String to sanitize</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>str</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>For example:</p>
+<div id="c4159f54" class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>fc.test_eq(sanitize(<span class="st">'key (sanitized)'</span>), <span class="st">'key sanitized'</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>fc.test_eq(sanitize(<span class="st">'key san.itized'</span>), <span class="st">'key sanitized'</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>fc.test_eq(sanitize(<span class="st">'key-sanitized'</span>), <span class="st">'key sanitized'</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>fc.test_eq(sanitize(<span class="st">'key/sanitized'</span>), <span class="st">'key sanitized'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>NetCDF4 enumeration type seems to not accept keys containing non alphanumeric characters like parentheses, dots, slash, … As a result, MARIS lookup table needs to be sanitized.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L482" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_lut">get_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_lut (src_dir:str, fname:str, key:str, value:str,
+          do_sanitize:bool=True)</code></pre>
+</blockquote>
+<p><em>Convert MARIS db lookup table excel file to dictionary <code>{'name': id, ...}</code>.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>src_dir</td>
+<td>str</td>
+<td></td>
+<td>Directory containing lookup tables</td>
+</tr>
+<tr class="even">
+<td>fname</td>
+<td>str</td>
+<td></td>
+<td>Excel file lookup table name</td>
+</tr>
+<tr class="odd">
+<td>key</td>
+<td>str</td>
+<td></td>
+<td>Excel file column name to be used as dict keys</td>
+</tr>
+<tr class="even">
+<td>value</td>
+<td>str</td>
+<td></td>
+<td>Excel file column name to be used as dict values</td>
+</tr>
+<tr class="odd">
+<td>do_sanitize</td>
+<td>bool</td>
+<td>True</td>
+<td>Sanitization required?</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>dict</strong></td>
+<td></td>
+<td><strong>MARIS lookup table</strong></td>
+</tr>
+</tbody>
+</table>
+<p>For example:</p>
+<div id="d8719ef0" class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>lut_src_dir <span class="op">=</span> <span class="st">'./files/lut'</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>get_lut(lut_src_dir, <span class="st">'dbo_biogroup.xlsx'</span>, key<span class="op">=</span><span class="st">'biogroup'</span>, value<span class="op">=</span><span class="st">'biogroup_id'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'Not applicable': -1,
+ 'Not available': 0,
+ 'Birds': 1,
+ 'Crustaceans': 2,
+ 'Echinoderms': 3,
+ 'Fish': 4,
+ 'Mammals': 5,
+ 'Molluscs': 6,
+ 'Others': 7,
+ 'Plankton': 8,
+ 'Polychaete worms': 9,
+ 'Reptile': 10,
+ 'Seaweeds and plants': 11,
+ 'Cephalopods': 12,
+ 'Gastropods': 13,
+ 'Bivalves': 14}</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L498" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="enums" class="level3">
+<h3 class="anchored" data-anchor-id="enums">Enums</h3>
+<blockquote class="blockquote">
+<pre><code> Enums (lut_src_dir:str, cdl_enums:dict)</code></pre>
+</blockquote>
+<p><em>Return dictionaries of MARIS NetCDF’s enumeration types</em></p>
+<div id="5a7aa0a0" class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>lut_src_dir_test <span class="op">=</span> <span class="st">'./files/lut'</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>cdl_enums_test <span class="op">=</span> read_toml(<span class="st">'./files/cdl.toml'</span>)[<span class="st">'enums'</span>]</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>enums <span class="op">=</span> Enums(lut_src_dir<span class="op">=</span>lut_src_dir_test, </span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>              cdl_enums<span class="op">=</span>cdl_enums_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="f600166d" class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>enums.types[<span class="st">'dl_t'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'Not applicable': -1,
+ 'Not available': 0,
+ 'Detected value': 1,
+ 'Detection limit': 2,
+ 'Not detected': 3,
+ 'Derived': 4}</code></pre>
+</div>
+</div>
+<div id="238143e5" class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>enums.types[<span class="st">'unit_t'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'Not applicable': -1,
+ 'NOT AVAILABLE': 0,
+ 'Bq per m3': 1,
+ 'Bq per m2': 2,
+ 'Bq per kg': 3,
+ 'Bq per kgd': 4,
+ 'Bq per kgw': 5,
+ 'kg per kg': 6,
+ 'TU': 7,
+ 'DELTA per mill': 8,
+ 'atom per kg': 9,
+ 'atom per kgd': 10,
+ 'atom per kgw': 11,
+ 'atom per l': 12,
+ 'Bq per kgC': 13}</code></pre>
+</div>
+</div>
+<div id="e44b161a" class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># {f'{var}_t': enums.subset('species_t', tfm.unique(var) for var in ['species']}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="d419495a" class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># subset = {}</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co"># for var, values in [('species', [21,   50,   59,   84]),</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                     ('area', [2, 3])]:</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     # values = tfm.unique(var)</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     type_name = f'{var}_t'</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     subset[type_name] = enums.filter(type_name, [21,   50,   59,   84])</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/configs.py#L519" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_enum_dicts" class="level3">
+<h3 class="anchored" data-anchor-id="get_enum_dicts">get_enum_dicts</h3>
+<blockquote class="blockquote">
+<pre><code> get_enum_dicts (lut_src_dir:str, cdl_enums:dict, **kwargs)</code></pre>
+</blockquote>
+<p><em>Return a dict of NetCDF enumeration types</em></p>
+<p>For example:</p>
+<div id="4b41fb18" class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>lut_src_dir_test <span class="op">=</span> <span class="st">'./files/lut'</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>cdl_enums_test <span class="op">=</span> read_toml(<span class="st">'./files/cdl.toml'</span>)[<span class="st">'enums'</span>]</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>enums <span class="op">=</span> get_enum_dicts(lut_src_dir<span class="op">=</span>lut_src_dir_test, </span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                       cdl_enums<span class="op">=</span>cdl_enums_test)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>enums.keys()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>dict_keys(['area_t', 'bio_group_t', 'body_part_t', 'species_t', 'sed_type_t', 'unit_t', 'dl_t', 'filt_t', 'counmet_t', 'sampmet_t', 'prepmet_t'])</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

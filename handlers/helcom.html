@@ -1,0 +1,3793 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.55">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Data pipeline (handler) to convert HELCOM data (source) to NetCDF format">
+
+<title>HELCOM – marisco</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="HELCOM – marisco">
+<meta property="og:description" content="Data pipeline (handler) to convert HELCOM data (source) to NetCDF format">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="HELCOM – marisco">
+<meta name="twitter:description" content="Data pipeline (handler) to convert HELCOM data (source) to NetCDF format">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../handlers/geotraces.html">Handlers</a></li><li class="breadcrumb-item"><a href="../handlers/helcom.html">HELCOM</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Marisco</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/geotraces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geotraces</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/maris_dump.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS dump</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/ospar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OSPAR</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc_template.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS NetCDF Template</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/serializers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Serializers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Utilities</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#todo" id="toc-todo" class="nav-link active" data-scroll-target="#todo">TODO</a></li>
+  <li><a href="#packages-import" id="toc-packages-import" class="nav-link" data-scroll-target="#packages-import">Packages import</a></li>
+  <li><a href="#utils" id="toc-utils" class="nav-link" data-scroll-target="#utils">Utils</a>
+  <ul class="collapse">
+  <li><a href="#load_data" id="toc-load_data" class="nav-link" data-scroll-target="#load_data">load_data</a></li>
+  <li><a href="#rename_cols" id="toc-rename_cols" class="nav-link" data-scroll-target="#rename_cols">rename_cols</a></li>
+  </ul></li>
+  <li><a href="#load-tables" id="toc-load-tables" class="nav-link" data-scroll-target="#load-tables">Load tables</a></li>
+  <li><a href="#data-transformation-pipeline" id="toc-data-transformation-pipeline" class="nav-link" data-scroll-target="#data-transformation-pipeline">Data transformation pipeline</a>
+  <ul class="collapse">
+  <li><a href="#normalize-nuclide-names" id="toc-normalize-nuclide-names" class="nav-link" data-scroll-target="#normalize-nuclide-names">Normalize nuclide names</a></li>
+  <li><a href="#lowerstriprdnnamecb" id="toc-lowerstriprdnnamecb" class="nav-link" data-scroll-target="#lowerstriprdnnamecb">LowerStripRdnNameCB</a></li>
+  <li><a href="#get_unique_nuclides" id="toc-get_unique_nuclides" class="nav-link" data-scroll-target="#get_unique_nuclides">get_unique_nuclides</a></li>
+  <li><a href="#get_varnames_lut" id="toc-get_varnames_lut" class="nav-link" data-scroll-target="#get_varnames_lut">get_varnames_lut</a></li>
+  <li><a href="#remaprdnnamecb" id="toc-remaprdnnamecb" class="nav-link" data-scroll-target="#remaprdnnamecb">RemapRdnNameCB</a></li>
+  <li><a href="#parse-time" id="toc-parse-time" class="nav-link" data-scroll-target="#parse-time">Parse time</a></li>
+  <li><a href="#parsetimecb" id="toc-parsetimecb" class="nav-link" data-scroll-target="#parsetimecb">ParseTimeCB</a></li>
+  <li><a href="#normalize-uncertainty-units" id="toc-normalize-uncertainty-units" class="nav-link" data-scroll-target="#normalize-uncertainty-units">Normalize uncertainty units</a></li>
+  <li><a href="#fix_units" id="toc-fix_units" class="nav-link" data-scroll-target="#fix_units">fix_units</a></li>
+  <li><a href="#normalizeuncunitcb" id="toc-normalizeuncunitcb" class="nav-link" data-scroll-target="#normalizeuncunitcb">NormalizeUncUnitCB</a></li>
+  <li><a href="#lookup" id="toc-lookup" class="nav-link" data-scroll-target="#lookup">Lookup</a></li>
+  <li><a href="#get_maris_lut" id="toc-get_maris_lut" class="nav-link" data-scroll-target="#get_maris_lut">get_maris_lut</a></li>
+  <li><a href="#lookupbiotaspeciescb" id="toc-lookupbiotaspeciescb" class="nav-link" data-scroll-target="#lookupbiotaspeciescb">LookupBiotaSpeciesCB</a></li>
+  <li><a href="#lookupbiotabodypartcb" id="toc-lookupbiotabodypartcb" class="nav-link" data-scroll-target="#lookupbiotabodypartcb">LookupBiotaBodyPartCB</a></li>
+  <li><a href="#lookupsedimentcb" id="toc-lookupsedimentcb" class="nav-link" data-scroll-target="#lookupsedimentcb">LookupSedimentCB</a></li>
+  <li><a href="#get_biogroup_lut" id="toc-get_biogroup_lut" class="nav-link" data-scroll-target="#get_biogroup_lut">get_biogroup_lut</a></li>
+  <li><a href="#lookupbiogroupcb" id="toc-lookupbiogroupcb" class="nav-link" data-scroll-target="#lookupbiogroupcb">LookupBiogroupCB</a></li>
+  <li><a href="#capture-units" id="toc-capture-units" class="nav-link" data-scroll-target="#capture-units">Capture Units</a></li>
+  <li><a href="#lookupunitcb" id="toc-lookupunitcb" class="nav-link" data-scroll-target="#lookupunitcb">LookupUnitCB</a></li>
+  <li><a href="#rename-columns" id="toc-rename-columns" class="nav-link" data-scroll-target="#rename-columns">Rename columns</a></li>
+  <li><a href="#get_renaming_rules" id="toc-get_renaming_rules" class="nav-link" data-scroll-target="#get_renaming_rules">get_renaming_rules</a></li>
+  <li><a href="#renamecolumncb" id="toc-renamecolumncb" class="nav-link" data-scroll-target="#renamecolumncb">RenameColumnCB</a></li>
+  <li><a href="#reshape-long-to-wide" id="toc-reshape-long-to-wide" class="nav-link" data-scroll-target="#reshape-long-to-wide">Reshape: long to wide</a></li>
+  <li><a href="#reshapelongtowide" id="toc-reshapelongtowide" class="nav-link" data-scroll-target="#reshapelongtowide">ReshapeLongToWide</a></li>
+  <li><a href="#encode-time-seconds-since" id="toc-encode-time-seconds-since" class="nav-link" data-scroll-target="#encode-time-seconds-since">Encode time (seconds since …)</a></li>
+  <li><a href="#sanitize-coordinates" id="toc-sanitize-coordinates" class="nav-link" data-scroll-target="#sanitize-coordinates">Sanitize coordinates</a></li>
+  </ul></li>
+  <li><a href="#netcdf-encoder" id="toc-netcdf-encoder" class="nav-link" data-scroll-target="#netcdf-encoder">NetCDF encoder</a>
+  <ul class="collapse">
+  <li><a href="#example-change-logs" id="toc-example-change-logs" class="nav-link" data-scroll-target="#example-change-logs">Example change logs</a></li>
+  <li><a href="#feed-global-attributes" id="toc-feed-global-attributes" class="nav-link" data-scroll-target="#feed-global-attributes">Feed global attributes</a></li>
+  <li><a href="#get_attrs" id="toc-get_attrs" class="nav-link" data-scroll-target="#get_attrs">get_attrs</a></li>
+  <li><a href="#enums_xtra" id="toc-enums_xtra" class="nav-link" data-scroll-target="#enums_xtra">enums_xtra</a></li>
+  <li><a href="#encoding" id="toc-encoding" class="nav-link" data-scroll-target="#encoding">Encoding</a></li>
+  <li><a href="#encode" id="toc-encode" class="nav-link" data-scroll-target="#encode">encode</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../handlers/geotraces.html">Handlers</a></li><li class="breadcrumb-item"><a href="../handlers/helcom.html">HELCOM</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">HELCOM</h1>
+</div>
+
+<div>
+  <div class="description">
+    Data pipeline (handler) to convert HELCOM data (<a href="https://helcom.fi/about-us">source</a>) to <code>NetCDF</code> format
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<!-- ## HELCOM MORS Environment database -->
+<p><a href="https://helcom.fi/about-us">Helcom MORS data</a> is provided as a Microsoft Access database. <a href="https://github.com/mdbtools/mdbtools"><code>Mdbtools</code></a> can be used to convert the tables of the Microsoft Access database to <code>.csv</code> files on Unix-like OS.</p>
+<p>Example steps: 1. Download data (e.g.&nbsp;https://metadata.helcom.fi/geonetwork/srv/fin/catalog.search#/metadata/2fdd2d46-0329-40e3-bf96-cb08c7206a24). 2. Install mdbtools via VScode Terminal</p>
+<pre><code>```
+sudo apt-get -y install mdbtools
+````</code></pre>
+<ol start="3" type="1">
+<li><p>Install unzip via VScode Terminal</p>
+<pre><code>sudo apt-get -y install unzip</code></pre></li>
+<li><p>In VS code terminal, navigate to the marisco data folder</p>
+<pre><code>cd /home/marisco/downloads/marisco/_data/accdb/mors_19840101_20211231</code></pre></li>
+<li><p>Unzip MORS_ENVIRONMENT.zip</p>
+<pre><code>unzip MORS_ENVIRONMENT.zip </code></pre></li>
+<li><p>Run preprocess.sh to generate the required data files</p>
+<pre><code>./preprocess.sh MORS_ENVIRONMENT.zip</code></pre></li>
+<li><p>Conetens of ‘preprocess.sh’ script. ``` #!/bin/bash</p>
+<p># Example of use: ./preprocess.sh MORS_ENVIRONMENT.zip unzip <span class="math inline">\(1
+dbname=\)</span>(ls *.accdb) mkdir csv for table in <span class="math inline">\((mdb-tables -1 "\)</span>dbname”); do echo “Export table <span class="math inline">\(table"
+     mdb-export "\)</span>dbname” “<span class="math inline">\(table" &gt; "csv/\)</span>table.csv” done ```</p></li>
+</ol>
+<section id="todo" class="level2">
+<h2 class="anchored" data-anchor-id="todo">TODO</h2>
+<ul>
+<li>METHOD, FILT (seawater)</li>
+</ul>
+</section>
+<section id="packages-import" class="level2">
+<h2 class="anchored" data-anchor-id="packages-import">Packages import</h2>
+<div id="0db45fee" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload</code></pre>
+</div>
+</div>
+<div id="df103c15" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here we define the fname_in and fname_out variables. These variables are paths which are defined as relative paths. These paths are relative to the current working directory. Note that fname_in refers to the csv folder that contains the HELCOM data. fname_out defines the path and filename for the NetCDF output.</p>
+</section>
+<section id="utils" class="level2">
+<h2 class="anchored" data-anchor-id="utils">Utils</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L36" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="load_data" class="level3">
+<h3 class="anchored" data-anchor-id="load_data">load_data</h3>
+<blockquote class="blockquote">
+<pre><code> load_data (src_dir, smp_types=['SEA', 'SED', 'BIO'])</code></pre>
+</blockquote>
+<p><em>Load HELCOM data and return the data in a dictionary of dataframes with the dictionary key as the sample type</em></p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L52" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="rename_cols" class="level3">
+<h3 class="anchored" data-anchor-id="rename_cols">rename_cols</h3>
+<blockquote class="blockquote">
+<pre><code> rename_cols (cols)</code></pre>
+</blockquote>
+<p><em>Flatten multiindex columns</em></p>
+</section>
+</section>
+<section id="load-tables" class="level2">
+<h2 class="anchored" data-anchor-id="load-tables">Load tables</h2>
+<p><code>dfs</code> is a dictionary dataframes created from the Helcom dataset located at the path <code>fname_in</code>. The data to be included in each dataframe is sorted by sample type. Each dictionary is defined with a key equal to the sample type.</p>
+<div id="bb4bf289" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dfs.keys())</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Seawater cols: </span><span class="sc">{</span>dfs[<span class="st">'seawater'</span>]<span class="sc">.</span>columns<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Sediment cols: </span><span class="sc">{</span>dfs[<span class="st">'sediment'</span>]<span class="sc">.</span>columns<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Biota cols: </span><span class="sc">{</span>dfs[<span class="st">'biota'</span>]<span class="sc">.</span>columns<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>dict_keys(['seawater', 'sediment', 'biota'])
+Seawater cols: Index(['KEY', 'NUCLIDE', 'METHOD', '&lt; VALUE_Bq/m³', 'VALUE_Bq/m³', 'ERROR%_m³',
+       'DATE_OF_ENTRY_x', 'COUNTRY', 'LABORATORY', 'SEQUENCE', 'DATE', 'YEAR',
+       'MONTH', 'DAY', 'STATION', 'LATITUDE (ddmmmm)', 'LATITUDE (dddddd)',
+       'LONGITUDE (ddmmmm)', 'LONGITUDE (dddddd)', 'TDEPTH', 'SDEPTH', 'SALIN',
+       'TTEMP', 'FILT', 'MORS_SUBBASIN', 'HELCOM_SUBBASIN', 'DATE_OF_ENTRY_y'],
+      dtype='object')
+Sediment cols: Index(['KEY', 'NUCLIDE', 'METHOD', '&lt; VALUE_Bq/kg', 'VALUE_Bq/kg', 'ERROR%_kg',
+       '&lt; VALUE_Bq/m²', 'VALUE_Bq/m²', 'ERROR%_m²', 'DATE_OF_ENTRY_x',
+       'COUNTRY', 'LABORATORY', 'SEQUENCE', 'DATE', 'YEAR', 'MONTH', 'DAY',
+       'STATION', 'LATITUDE (ddmmmm)', 'LATITUDE (dddddd)',
+       'LONGITUDE (ddmmmm)', 'LONGITUDE (dddddd)', 'DEVICE', 'TDEPTH',
+       'UPPSLI', 'LOWSLI', 'AREA', 'SEDI', 'OXIC', 'DW%', 'LOI%',
+       'MORS_SUBBASIN', 'HELCOM_SUBBASIN', 'SUM_LINK', 'DATE_OF_ENTRY_y'],
+      dtype='object')
+Biota cols: Index(['KEY', 'NUCLIDE', 'METHOD', '&lt; VALUE_Bq/kg', 'VALUE_Bq/kg', 'BASIS',
+       'ERROR%', 'NUMBER', 'DATE_OF_ENTRY_x', 'COUNTRY', 'LABORATORY',
+       'SEQUENCE', 'DATE', 'YEAR', 'MONTH', 'DAY', 'STATION',
+       'LATITUDE ddmmmm', 'LATITUDE dddddd', 'LONGITUDE ddmmmm',
+       'LONGITUDE dddddd', 'SDEPTH', 'RUBIN', 'BIOTATYPE', 'TISSUE', 'NO',
+       'LENGTH', 'WEIGHT', 'DW%', 'LOI%', 'MORS_SUBBASIN', 'HELCOM_SUBBASIN',
+       'DATE_OF_ENTRY_y'],
+      dtype='object')</code></pre>
+</div>
+</div>
+<p>Show the structure of the <code>biota</code> dataframe:</p>
+<div id="2f371731-e0e8-4743-bae1-eb1de1ee19c1" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dfs[<span class="st">'seawater'</span>].FILT.unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array([nan, 'N', 'F', 'n'], dtype=object)</code></pre>
+</div>
+</div>
+<div id="1ac781a0" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>dfs[<span class="st">'biota'</span>].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">KEY</th>
+<th data-quarto-table-cell-role="th">NUCLIDE</th>
+<th data-quarto-table-cell-role="th">METHOD</th>
+<th data-quarto-table-cell-role="th">&lt; VALUE_Bq/kg</th>
+<th data-quarto-table-cell-role="th">VALUE_Bq/kg</th>
+<th data-quarto-table-cell-role="th">BASIS</th>
+<th data-quarto-table-cell-role="th">ERROR%</th>
+<th data-quarto-table-cell-role="th">NUMBER</th>
+<th data-quarto-table-cell-role="th">DATE_OF_ENTRY_x</th>
+<th data-quarto-table-cell-role="th">COUNTRY</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">BIOTATYPE</th>
+<th data-quarto-table-cell-role="th">TISSUE</th>
+<th data-quarto-table-cell-role="th">NO</th>
+<th data-quarto-table-cell-role="th">LENGTH</th>
+<th data-quarto-table-cell-role="th">WEIGHT</th>
+<th data-quarto-table-cell-role="th">DW%</th>
+<th data-quarto-table-cell-role="th">LOI%</th>
+<th data-quarto-table-cell-role="th">MORS_SUBBASIN</th>
+<th data-quarto-table-cell-role="th">HELCOM_SUBBASIN</th>
+<th data-quarto-table-cell-role="th">DATE_OF_ENTRY_y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>BVTIG2012041</td>
+<td>CS134</td>
+<td>VTIG01</td>
+<td>&lt;</td>
+<td>0.010140</td>
+<td>W</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>02/27/14 00:00:00</td>
+<td>6.0</td>
+<td>...</td>
+<td>F</td>
+<td>5</td>
+<td>16.0</td>
+<td>45.7</td>
+<td>948.0</td>
+<td>18.453</td>
+<td>92.9</td>
+<td>2.0</td>
+<td>16</td>
+<td>02/27/14 00:00:00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>BVTIG2012041</td>
+<td>K40</td>
+<td>VTIG01</td>
+<td></td>
+<td>135.300000</td>
+<td>W</td>
+<td>3.57</td>
+<td>NaN</td>
+<td>02/27/14 00:00:00</td>
+<td>6.0</td>
+<td>...</td>
+<td>F</td>
+<td>5</td>
+<td>16.0</td>
+<td>45.7</td>
+<td>948.0</td>
+<td>18.453</td>
+<td>92.9</td>
+<td>2.0</td>
+<td>16</td>
+<td>02/27/14 00:00:00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>BVTIG2012041</td>
+<td>CO60</td>
+<td>VTIG01</td>
+<td>&lt;</td>
+<td>0.013980</td>
+<td>W</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>02/27/14 00:00:00</td>
+<td>6.0</td>
+<td>...</td>
+<td>F</td>
+<td>5</td>
+<td>16.0</td>
+<td>45.7</td>
+<td>948.0</td>
+<td>18.453</td>
+<td>92.9</td>
+<td>2.0</td>
+<td>16</td>
+<td>02/27/14 00:00:00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>BVTIG2012041</td>
+<td>CS137</td>
+<td>VTIG01</td>
+<td></td>
+<td>4.338000</td>
+<td>W</td>
+<td>3.48</td>
+<td>NaN</td>
+<td>02/27/14 00:00:00</td>
+<td>6.0</td>
+<td>...</td>
+<td>F</td>
+<td>5</td>
+<td>16.0</td>
+<td>45.7</td>
+<td>948.0</td>
+<td>18.453</td>
+<td>92.9</td>
+<td>2.0</td>
+<td>16</td>
+<td>02/27/14 00:00:00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>BVTIG2012040</td>
+<td>CS134</td>
+<td>VTIG01</td>
+<td>&lt;</td>
+<td>0.009614</td>
+<td>W</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>02/27/14 00:00:00</td>
+<td>6.0</td>
+<td>...</td>
+<td>F</td>
+<td>5</td>
+<td>17.0</td>
+<td>45.9</td>
+<td>964.0</td>
+<td>18.458</td>
+<td>92.9</td>
+<td>2.0</td>
+<td>16</td>
+<td>02/27/14 00:00:00</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 33 columns</p>
+</div>
+</div>
+</div>
+<p>Show the structure of the <code>sediment</code> dataframe:</p>
+<div id="b6013611" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>dfs[<span class="st">'sediment'</span>].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">KEY</th>
+<th data-quarto-table-cell-role="th">NUCLIDE</th>
+<th data-quarto-table-cell-role="th">METHOD</th>
+<th data-quarto-table-cell-role="th">&lt; VALUE_Bq/kg</th>
+<th data-quarto-table-cell-role="th">VALUE_Bq/kg</th>
+<th data-quarto-table-cell-role="th">ERROR%_kg</th>
+<th data-quarto-table-cell-role="th">&lt; VALUE_Bq/m²</th>
+<th data-quarto-table-cell-role="th">VALUE_Bq/m²</th>
+<th data-quarto-table-cell-role="th">ERROR%_m²</th>
+<th data-quarto-table-cell-role="th">DATE_OF_ENTRY_x</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">LOWSLI</th>
+<th data-quarto-table-cell-role="th">AREA</th>
+<th data-quarto-table-cell-role="th">SEDI</th>
+<th data-quarto-table-cell-role="th">OXIC</th>
+<th data-quarto-table-cell-role="th">DW%</th>
+<th data-quarto-table-cell-role="th">LOI%</th>
+<th data-quarto-table-cell-role="th">MORS_SUBBASIN</th>
+<th data-quarto-table-cell-role="th">HELCOM_SUBBASIN</th>
+<th data-quarto-table-cell-role="th">SUM_LINK</th>
+<th data-quarto-table-cell-role="th">DATE_OF_ENTRY_y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>SKRIL2012048</td>
+<td>RA226</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>35.0</td>
+<td>26.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>08/20/14 00:00:00</td>
+<td>...</td>
+<td>20.0</td>
+<td>0.006</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>11.0</td>
+<td>11.0</td>
+<td>NaN</td>
+<td>08/20/14 00:00:00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>SKRIL2012049</td>
+<td>RA226</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>36.0</td>
+<td>22.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>08/20/14 00:00:00</td>
+<td>...</td>
+<td>27.0</td>
+<td>0.006</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>11.0</td>
+<td>11.0</td>
+<td>NaN</td>
+<td>08/20/14 00:00:00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>SKRIL2012050</td>
+<td>RA226</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>38.0</td>
+<td>24.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>08/20/14 00:00:00</td>
+<td>...</td>
+<td>2.0</td>
+<td>0.006</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>11.0</td>
+<td>11.0</td>
+<td>NaN</td>
+<td>08/20/14 00:00:00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>SKRIL2012051</td>
+<td>RA226</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>36.0</td>
+<td>25.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>08/20/14 00:00:00</td>
+<td>...</td>
+<td>4.0</td>
+<td>0.006</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>11.0</td>
+<td>11.0</td>
+<td>NaN</td>
+<td>08/20/14 00:00:00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>SKRIL2012052</td>
+<td>RA226</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>30.0</td>
+<td>23.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>08/20/14 00:00:00</td>
+<td>...</td>
+<td>6.0</td>
+<td>0.006</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>11.0</td>
+<td>11.0</td>
+<td>NaN</td>
+<td>08/20/14 00:00:00</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 35 columns</p>
+</div>
+</div>
+</div>
+</section>
+<section id="data-transformation-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="data-transformation-pipeline">Data transformation pipeline</h2>
+<section id="normalize-nuclide-names" class="level3">
+<h3 class="anchored" data-anchor-id="normalize-nuclide-names">Normalize nuclide names</h3>
+<section id="lower-strip" class="level4">
+<h4 class="anchored" data-anchor-id="lower-strip">Lower &amp; strip</h4>
+<p>Create a callback <a href="https://franckalbinet.github.io/marisco/handlers/ospar.html#lowerstriprdnnamecb"><code>LowerStripRdnNameCB</code></a> that receives a dictionary of dataframes. For each dataframe in the dictionary of dataframes it converts the contents of the nuclide name column, <code>Nuclides</code>, to lowercase and strips any leading or trailing whitespace(s).</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L83" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+</section>
+<section id="lowerstriprdnnamecb" class="level3">
+<h3 class="anchored" data-anchor-id="lowerstriprdnnamecb">LowerStripRdnNameCB</h3>
+<blockquote class="blockquote">
+<pre><code> LowerStripRdnNameCB ()</code></pre>
+</blockquote>
+<p><em>Convert nuclide names to lowercase &amp; strip any trailing space(s)</em></p>
+<p>Here we apply the transform <a href="https://franckalbinet.github.io/marisco/handlers/ospar.html#lowerstriprdnnamecb"><code>LowerStripRdnNameCB</code></a>. Then print the nuclide names that are unique from the column, <code>NUCLIDE</code>, of each dataframe include in the dictionary of dataframes, dfs.</p>
+<div id="8a3fa068" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB()])</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'seawater nuclides: '</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'seawater'</span>][<span class="st">'NUCLIDE'</span>].unique())</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'biota nuclides: '</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'biota'</span>][<span class="st">'NUCLIDE'</span>].unique())</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'sediment nuclides: '</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'sediment'</span>][<span class="st">'NUCLIDE'</span>].unique())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>seawater nuclides: 
+['cs137' 'sr90' 'h3' 'cs134' 'pu238' 'pu239240' 'am241' 'cm242' 'cm244'
+ 'tc99' 'k40' 'ru103' 'sr89' 'sb125' 'nb95' 'ru106' 'zr95' 'ag110m'
+ 'cm243244' 'ba140' 'ce144' 'u234' 'u238' 'co60' 'pu239' 'pb210' 'po210'
+ 'np237' 'pu240' 'mn54']
+biota nuclides: 
+['cs134' 'k40' 'co60' 'cs137' 'sr90' 'ag108m' 'mn54' 'co58' 'ag110m'
+ 'zn65' 'sb125' 'pu239240' 'ru106' 'be7' 'ce144' 'pb210' 'po210' 'sb124'
+ 'sr89' 'zr95' 'te129m' 'ru103' 'nb95' 'ce141' 'la140' 'i131' 'ba140'
+ 'pu238' 'u235' 'bi214' 'pb214' 'pb212' 'tl208' 'ac228' 'ra223' 'eu155'
+ 'ra226' 'gd153' 'sn113' 'fe59' 'tc99' 'co57' 'sn117m' 'eu152' 'sc46'
+ 'rb86' 'ra224' 'th232' 'cs134137' 'am241' 'ra228' 'th228' 'k-40' 'cs138'
+ 'cs139' 'cs140' 'cs141' 'cs142' 'cs143' 'cs144' 'cs145' 'cs146']
+sediment nuclides: 
+['ra226' 'cs137' 'ra228' 'k40' 'sr90' 'cs134137' 'cs134' 'pu239240'
+ 'pu238' 'co60' 'ru103' 'ru106' 'sb125' 'ag110m' 'ce144' 'am241' 'be7'
+ 'th228' 'pb210' 'co58' 'mn54' 'zr95' 'ba140' 'po210' 'ra224' 'nb95'
+ 'pu238240' 'pu241' 'pu239' 'eu155' 'ir192' 'th232' 'cd109' 'sb124' 'zn65'
+ 'th234' 'tl208' 'pb212' 'pb214' 'bi214' 'ac228' 'ra223' 'u235' 'bi212']</code></pre>
+</div>
+</div>
+<section id="remap-to-maris-nuclide-names" class="level4">
+<h4 class="anchored" data-anchor-id="remap-to-maris-nuclide-names">Remap to MARIS nuclide names</h4>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L98" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+</section>
+<section id="get_unique_nuclides" class="level3">
+<h3 class="anchored" data-anchor-id="get_unique_nuclides">get_unique_nuclides</h3>
+<blockquote class="blockquote">
+<pre><code> get_unique_nuclides (dfs)</code></pre>
+</blockquote>
+<p><em>Get list of unique radionuclide types measured across samples.</em></p>
+<p>The marisco package includes a template that defines the permitted structure of the data. This includes a list of permitted nuclide names. This template is located at <a href="https://franckalbinet.github.io/marisco/api/configs.html#nc_tpl_path"><code>nc_tpl_path</code></a> and is a <code>NetCDF</code> file ,<code>*.nc</code> format. This template is created using <a href="../api/nc_template.html"><code>nc_template.ipynb</code> notebook</a>. The template is created with reference to two files, <code>cdl.toml</code> and <code>configs.toml</code>. The <code>cdl.toml</code> file includes all the permitted nuclide names.</p>
+<p>Here we check if the nuclide names included in the dfs are listed in the template that defines the permitted structures:</p>
+<div id="a68dacd0" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if these variable names consistent with MARIS CDL</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>has_valid_varname(get_unique_nuclides(tfm.dfs), nc_tpl_path())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>"pu239240" variable name not found in MARIS CDL
+"cm243244" variable name not found in MARIS CDL
+"cs134137" variable name not found in MARIS CDL
+"pu239240" variable name not found in MARIS CDL
+"pu238240" variable name not found in MARIS CDL
+"pu239240" variable name not found in MARIS CDL
+"cs134137" variable name not found in MARIS CDL
+"k-40" variable name not found in MARIS CDL
+"cs138" variable name not found in MARIS CDL
+"cs139" variable name not found in MARIS CDL
+"cs140" variable name not found in MARIS CDL
+"cs141" variable name not found in MARIS CDL
+"cs142" variable name not found in MARIS CDL
+"cs143" variable name not found in MARIS CDL
+"cs144" variable name not found in MARIS CDL
+"cs145" variable name not found in MARIS CDL
+"cs146" variable name not found in MARIS CDL</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>False</code></pre>
+</div>
+</div>
+<p>Many nuclide names are not listed in the MARIS CDL (i.e.&nbsp;<code>cdl.toml</code>). Create a look up table, <code>varnames_lut_updates</code>, which will be used to correct the nuclide names in the dictionary of dataframes (i.e.&nbsp;dfs) that are not compatible with the template at <a href="https://franckalbinet.github.io/marisco/api/configs.html#nc_tpl_path"><code>nc_tpl_path</code></a></p>
+<p>Create a function, <a href="https://franckalbinet.github.io/marisco/handlers/ospar.html#get_varnames_lut"><code>get_varnames_lut</code></a>, which returns a dictionary of nuclide names. This dictionary of nuclide names includes the <code>NUCLIDE</code> names in the dictionary of dataframes (i.e.&nbsp;dfs) with the corrections included in varnames_lut_updates:</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L110" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_varnames_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_varnames_lut">get_varnames_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_varnames_lut (dfs, lut={'k-40': 'k40', 'cm243244': 'cm243_244_tot',
+                   'cs134137': 'cs134_137_tot', 'pu239240':
+                   'pu239_240_tot', 'pu238240': 'pu238_240_tot', 'cs138':
+                   'cs137', 'cs139': 'cs137', 'cs140': 'cs137', 'cs141':
+                   'cs137', 'cs142': 'cs137', 'cs143': 'cs137', 'cs144':
+                   'cs137', 'cs145': 'cs137', 'cs146': 'cs137'})</code></pre>
+</blockquote>
+<p>Create a callback that remaps the nuclide names in the dfs to those in <code>varnames_lut_updates</code>:</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L116" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="remaprdnnamecb" class="level3">
+<h3 class="anchored" data-anchor-id="remaprdnnamecb">RemapRdnNameCB</h3>
+<blockquote class="blockquote">
+<pre><code> RemapRdnNameCB (fn_lut=functools.partial(&lt;function get_varnames_lut at
+                 0x7fec4e1a40d0&gt;, lut={'k-40': 'k40', 'cm243244':
+                 'cm243_244_tot', 'cs134137': 'cs134_137_tot', 'pu239240':
+                 'pu239_240_tot', 'pu238240': 'pu238_240_tot', 'cs138':
+                 'cs137', 'cs139': 'cs137', 'cs140': 'cs137', 'cs141':
+                 'cs137', 'cs142': 'cs137', 'cs143': 'cs137', 'cs144':
+                 'cs137', 'cs145': 'cs137', 'cs146': 'cs137'}))</code></pre>
+</blockquote>
+<p><em>Remap to MARIS radionuclide names.</em></p>
+<p>Apply the transformers <a href="https://franckalbinet.github.io/marisco/handlers/ospar.html#lowerstriprdnnamecb"><code>LowerStripRdnNameCB</code></a> and <a href="https://franckalbinet.github.io/marisco/handlers/ospar.html#remaprdnnamecb"><code>RemapRdnNameCB</code></a>. Print the unique nuclides for each dataframe included in the dictionary of dataframes:</p>
+<div id="1c075d97" class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB()])</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'seawater nuclides: '</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'seawater'</span>][<span class="st">'NUCLIDE'</span>].unique())</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'biota nuclides: '</span>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'biota'</span>][<span class="st">'NUCLIDE'</span>].unique())</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'sediment nuclides: '</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'sediment'</span>][<span class="st">'NUCLIDE'</span>].unique())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>seawater nuclides: 
+['cs137' 'sr90' 'h3' 'cs134' 'pu238' 'pu239_240_tot' 'am241' 'cm242'
+ 'cm244' 'tc99' 'k40' 'ru103' 'sr89' 'sb125' 'nb95' 'ru106' 'zr95'
+ 'ag110m' 'cm243_244_tot' 'ba140' 'ce144' 'u234' 'u238' 'co60' 'pu239'
+ 'pb210' 'po210' 'np237' 'pu240' 'mn54']
+biota nuclides: 
+['cs134' 'k40' 'co60' 'cs137' 'sr90' 'ag108m' 'mn54' 'co58' 'ag110m'
+ 'zn65' 'sb125' 'pu239_240_tot' 'ru106' 'be7' 'ce144' 'pb210' 'po210'
+ 'sb124' 'sr89' 'zr95' 'te129m' 'ru103' 'nb95' 'ce141' 'la140' 'i131'
+ 'ba140' 'pu238' 'u235' 'bi214' 'pb214' 'pb212' 'tl208' 'ac228' 'ra223'
+ 'eu155' 'ra226' 'gd153' 'sn113' 'fe59' 'tc99' 'co57' 'sn117m' 'eu152'
+ 'sc46' 'rb86' 'ra224' 'th232' 'cs134_137_tot' 'am241' 'ra228' 'th228']
+sediment nuclides: 
+['ra226' 'cs137' 'ra228' 'k40' 'sr90' 'cs134_137_tot' 'cs134'
+ 'pu239_240_tot' 'pu238' 'co60' 'ru103' 'ru106' 'sb125' 'ag110m' 'ce144'
+ 'am241' 'be7' 'th228' 'pb210' 'co58' 'mn54' 'zr95' 'ba140' 'po210'
+ 'ra224' 'nb95' 'pu238_240_tot' 'pu241' 'pu239' 'eu155' 'ir192' 'th232'
+ 'cd109' 'sb124' 'zn65' 'th234' 'tl208' 'pb212' 'pb214' 'bi214' 'ac228'
+ 'ra223' 'u235' 'bi212']</code></pre>
+</div>
+</div>
+<p>Check that all nuclide varnames are valid. Returns <code>True</code> if all are valid:</p>
+<div id="3c644322" class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>has_valid_varname(get_unique_nuclides(tfm.dfs), nc_tpl_path())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>True</code></pre>
+</div>
+</div>
+</section>
+<section id="parse-time" class="level3">
+<h3 class="anchored" data-anchor-id="parse-time">Parse time</h3>
+<p>Create a class that remaps the time format in the dictionary of dataframes (i.e.&nbsp;<code>%m/%d/%y %H:%M:%S</code>):</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L130" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="parsetimecb" class="level3">
+<h3 class="anchored" data-anchor-id="parsetimecb">ParseTimeCB</h3>
+<blockquote class="blockquote">
+<pre><code> ParseTimeCB ()</code></pre>
+</blockquote>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<div id="f2b90d07" class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB()])</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'seawater'</span>][<span class="st">'time'</span>][:<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0   2012-05-23
+1   2012-05-23
+2   2012-06-17
+3   2012-05-24
+4   2012-05-24
+Name: time, dtype: datetime64[ns]</code></pre>
+</div>
+</div>
+</section>
+<section id="normalize-uncertainty-units" class="level3">
+<h3 class="anchored" data-anchor-id="normalize-uncertainty-units">Normalize uncertainty units</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/helcom.py#L124" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="fix_units" class="level3">
+<h3 class="anchored" data-anchor-id="fix_units">fix_units</h3>
+<blockquote class="blockquote">
+<pre><code> fix_units (df, meas_col, unc_col)</code></pre>
+</blockquote>
+<p>For each sample type of the Helcom dataset the uncertainty is provided as a relative uncertainty to the value. The column names for each sample type differ. The <code>coi_units_unc</code> defines the column name of the Value and Uncertainty for each sample type.</p>
+<p>Normalize the uncertainty. The relative error is converted to the uncertainty with the same units as the value.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/helcom.py#L134" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="normalizeuncunitcb" class="level3">
+<h3 class="anchored" data-anchor-id="normalizeuncunitcb">NormalizeUncUnitCB</h3>
+<blockquote class="blockquote">
+<pre><code> NormalizeUncUnitCB (coi=[('seawater', 'VALUE_Bq/m³', 'ERROR%_m³'),
+                     ('biota', 'VALUE_Bq/kg', 'ERROR%'), ('sediment',
+                     'VALUE_Bq/kg', 'ERROR%_kg')])</code></pre>
+</blockquote>
+<p><em>Convert from relative error % to uncertainty of activity unit</em></p>
+<div id="fd9e14e2" class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>                            NormalizeUncUnitCB()])</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'seawater'</span>][[<span class="st">'VALUE_Bq/m³'</span>, <span class="st">'ERROR%_m³'</span>]][:<span class="dv">5</span>])</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'biota'</span>][[<span class="st">'VALUE_Bq/kg'</span>, <span class="st">'ERROR%'</span>]][:<span class="dv">5</span>])</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'sediment'</span>][[<span class="st">'VALUE_Bq/kg'</span>, <span class="st">'ERROR%_kg'</span>]][:<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   VALUE_Bq/m³  ERROR%_m³
+0          5.3      1.696
+1         19.9      3.980
+2         25.5      5.100
+3         17.0      4.930
+4         22.2      3.996
+   VALUE_Bq/kg    ERROR%
+0     0.010140       NaN
+1   135.300000  6.535274
+2     0.013980       NaN
+3     4.338000  0.006549
+4     0.009614       NaN
+   VALUE_Bq/kg  ERROR%_kg
+0         35.0   1.114750
+1         36.0   1.026432
+2         38.0   1.316928
+3         36.0   1.166400
+4         30.0   0.621000</code></pre>
+</div>
+</div>
+</section>
+<section id="lookup" class="level3">
+<h3 class="anchored" data-anchor-id="lookup">Lookup</h3>
+<section id="biota-species" class="level4">
+<h4 class="anchored" data-anchor-id="biota-species">Biota species</h4>
+<p>Get a list of rubin names included in the Helcom data i.e.( <code>RUBIN_NAME.csv</code>):</p>
+<div id="bdd0d17e" class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>df_rubin <span class="op">=</span> pd.read_csv(Path(fname_in) <span class="op">/</span> <span class="st">'RUBIN_NAME.csv'</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>df_rubin.head(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">RUBIN_ID</th>
+<th data-quarto-table-cell-role="th">RUBIN</th>
+<th data-quarto-table-cell-role="th">SCIENTIFIC NAME</th>
+<th data-quarto-table-cell-role="th">ENGLISH NAME</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>11</td>
+<td>ABRA BRA</td>
+<td>ABRAMIS BRAMA</td>
+<td>BREAM</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>12</td>
+<td>ANGU ANG</td>
+<td>ANGUILLA ANGUILLA</td>
+<td>EEL</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>13</td>
+<td>ARCT ISL</td>
+<td>ARCTICA ISLANDICA</td>
+<td>ISLAND CYPRINE</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>14</td>
+<td>ASTE RUB</td>
+<td>ASTERIAS RUBENS</td>
+<td>COMMON STARFISH</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>15</td>
+<td>CARD EDU</td>
+<td>CARDIUM EDULE</td>
+<td>COCKLE</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="e09cbea0-535c-4f50-8f40-20e7417cb3bd" class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>df_rubin[[<span class="st">'RUBIN'</span>, <span class="st">'SCIENTIFIC NAME'</span>]].drop_duplicates().head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">RUBIN</th>
+<th data-quarto-table-cell-role="th">SCIENTIFIC NAME</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>ABRA BRA</td>
+<td>ABRAMIS BRAMA</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>ANGU ANG</td>
+<td>ANGUILLA ANGUILLA</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>ARCT ISL</td>
+<td>ARCTICA ISLANDICA</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>ASTE RUB</td>
+<td>ASTERIAS RUBENS</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>CARD EDU</td>
+<td>CARDIUM EDULE</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L140" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+</section>
+<section id="get_maris_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_maris_lut">get_maris_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_maris_lut (fname_in, fname_cache, data_provider_lut:str,
+                data_provider_id_col:str, data_provider_name_col:str,
+                maris_lut:collections.abc.Callable, maris_id:str,
+                maris_name:str, unmatched_fixes={}, as_dataframe=False,
+                overwrite=False)</code></pre>
+</blockquote>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fname_in</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>fname_cache</td>
+<td></td>
+<td></td>
+<td>For instance ‘species_helcom.pkl’</td>
+</tr>
+<tr class="odd">
+<td>data_provider_lut</td>
+<td>str</td>
+<td></td>
+<td>Data provider lookup table name</td>
+</tr>
+<tr class="even">
+<td>data_provider_id_col</td>
+<td>str</td>
+<td></td>
+<td>Data provider lookup column id of interest</td>
+</tr>
+<tr class="odd">
+<td>data_provider_name_col</td>
+<td>str</td>
+<td></td>
+<td>Data provider lookup column name of interest</td>
+</tr>
+<tr class="even">
+<td>maris_lut</td>
+<td>Callable</td>
+<td></td>
+<td>Function retrieving MARIS source lookup table</td>
+</tr>
+<tr class="odd">
+<td>maris_id</td>
+<td>str</td>
+<td></td>
+<td>Id of MARIS lookup table nomenclature item to match</td>
+</tr>
+<tr class="even">
+<td>maris_name</td>
+<td>str</td>
+<td></td>
+<td>Name of MARIS lookup table nomenclature item to match</td>
+</tr>
+<tr class="odd">
+<td>unmatched_fixes</td>
+<td>dict</td>
+<td>{}</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>as_dataframe</td>
+<td>bool</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>overwrite</td>
+<td>bool</td>
+<td>False</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div id="2adaa417-6b01-45d8-80d7-2e3d97cb0f72" class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>species_lut_df <span class="op">=</span> get_maris_lut(fname_in, fname_cache<span class="op">=</span><span class="st">'species_helcom.pkl'</span>, </span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                               data_provider_lut<span class="op">=</span><span class="st">'RUBIN_NAME.csv'</span>,</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                               data_provider_id_col<span class="op">=</span><span class="st">'RUBIN'</span>,</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>                               data_provider_name_col<span class="op">=</span><span class="st">'SCIENTIFIC NAME'</span>,</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>                               maris_lut<span class="op">=</span>species_lut_path,</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>                               maris_id<span class="op">=</span><span class="st">'species_id'</span>,</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>                               maris_name<span class="op">=</span><span class="st">'species'</span>,</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>                               unmatched_fixes<span class="op">=</span>unmatched_fixes_biota_species,</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>                               as_dataframe<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>                               overwrite<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 46/46 [00:06&lt;00:00,  7.04it/s]</code></pre>
+</div>
+</div>
+<p>Show <code>species_lut</code> as a dataframe:</p>
+<div id="c341f814-3343-47b7-958c-5df7d34a683d" class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>species_lut_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">matched_id</th>
+<th data-quarto-table-cell-role="th">matched_maris_name</th>
+<th data-quarto-table-cell-role="th">source_name</th>
+<th data-quarto-table-cell-role="th">match_score</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">source_id</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ENCH CIM</td>
+<td>276</td>
+<td>Echinodermata</td>
+<td>ENCHINODERMATA CIM</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">MACO BAL</td>
+<td>122</td>
+<td>Macoma balthica</td>
+<td>MACOMA BALTICA</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">STUC PEC</td>
+<td>704</td>
+<td>Stuckenia pectinata</td>
+<td>STUCKENIA PECTINATE</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">STIZ LUC</td>
+<td>285</td>
+<td>Sander lucioperca</td>
+<td>STIZOSTEDION LUCIOPERCA</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ABRA BRA</td>
+<td>271</td>
+<td>Abramis brama</td>
+<td>ABRAMIS BRAMA</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">RHODOPHY</td>
+<td>282</td>
+<td>Rhodophyta</td>
+<td>RHODOPHYTA</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">OSME EPE</td>
+<td>279</td>
+<td>Osmerus eperlanus</td>
+<td>OSMERUS EPERLANUS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PERC FLU</td>
+<td>247</td>
+<td>Perca fluviatilis</td>
+<td>PERCA FLUVIATILIS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">PLANKTON</td>
+<td>280</td>
+<td>Plankton</td>
+<td>PLANKTON</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PLAT FLE</td>
+<td>191</td>
+<td>Platichthys flesus</td>
+<td>PLATICHTHYS FLESUS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">PLEU PLA</td>
+<td>192</td>
+<td>Pleuronectes platessa</td>
+<td>PLEURONECTES PLATESSA</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">POLY FUC</td>
+<td>245</td>
+<td>Polysiphonia fucoides</td>
+<td>POLYSIPHONIA FUCOIDES</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">PSET MAX</td>
+<td>281</td>
+<td>Scophthalmus maximus</td>
+<td>PSETTA MAXIMA</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">SADU ENT</td>
+<td>284</td>
+<td>Saduria entomon</td>
+<td>SADURIA ENTOMON</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">RUTI RUT</td>
+<td>283</td>
+<td>Rutilus rutilus</td>
+<td>RUTILUS RUTILUS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">MYOX SCO</td>
+<td>278</td>
+<td>Myoxocephalus scorpius</td>
+<td>MYOXOCEPHALUS SCORPIUS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">SCOM SCO</td>
+<td>244</td>
+<td>Scomber scombrus</td>
+<td>SCOMBER SCOMBRUS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">SOLE SOL</td>
+<td>397</td>
+<td>Solea solea</td>
+<td>SOLEA SOLEA</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">SPRA SPR</td>
+<td>243</td>
+<td>Sprattus sprattus</td>
+<td>SPRATTUS SPRATTUS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">VERT FUCO</td>
+<td>703</td>
+<td>Vertebrata fucoides</td>
+<td>VERTEBRATA FUCOIDES</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ZANN PALU</td>
+<td>1524</td>
+<td>Zannichellia palustris</td>
+<td>ZANNICHELLIA PALUSTRIS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ZOAR VIV</td>
+<td>287</td>
+<td>Zoarces viviparus</td>
+<td>ZOARCES VIVIPARUS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ZOST MARI</td>
+<td>621</td>
+<td>Zostera marina</td>
+<td>ZOSTERA MARINA</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">MYTI EDU</td>
+<td>129</td>
+<td>Mytilus edulis</td>
+<td>MYTILUS EDULIS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MYA ARE</td>
+<td>120</td>
+<td>Mya arenaria</td>
+<td>MYA ARENARIA</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ANGU ANG</td>
+<td>272</td>
+<td>Anguilla anguilla</td>
+<td>ANGUILLA ANGUILLA</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ENGR ENC</td>
+<td>84</td>
+<td>Engraulis encrasicolus</td>
+<td>ENGRAULIS ENCRASICOLUS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ARCT ISL</td>
+<td>273</td>
+<td>Arctica islandica</td>
+<td>ARCTICA ISLANDICA</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ASTE RUB</td>
+<td>21</td>
+<td>Asterias rubens</td>
+<td>ASTERIAS RUBENS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">CARD EDU</td>
+<td>274</td>
+<td>Cerastoderma edule</td>
+<td>CARDIUM EDULE</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">CH HI;BA</td>
+<td>1611</td>
+<td>Chara baltica</td>
+<td>CHARA BALTICA</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">CLAD GLO</td>
+<td>290</td>
+<td>Cladophora glomerata</td>
+<td>CLADOPHORA GLOMERATA</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">CLUP HAR</td>
+<td>50</td>
+<td>Clupea harengus</td>
+<td>CLUPEA HARENGUS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">CRAN CRA</td>
+<td>59</td>
+<td>Crangon crangon</td>
+<td>CRANGON CRANGON</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">CYPR CAR</td>
+<td>275</td>
+<td>Cyprinus carpio</td>
+<td>CYPRINUS CARPIO</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ESOX LUC</td>
+<td>269</td>
+<td>Esox lucius</td>
+<td>ESOX LUCIUS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MERL MNG</td>
+<td>139</td>
+<td>Merlangius merlangus</td>
+<td>MERLANGIUS MERLANGUS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">FISHLARVAE</td>
+<td>277</td>
+<td>Fish larvae</td>
+<td>FISH LARVAE</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">FUCU VES</td>
+<td>96</td>
+<td>Fucus vesiculosus</td>
+<td>FUCUS VESICULOSUS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">FURC LUM</td>
+<td>289</td>
+<td>Furcellaria lumbricalis</td>
+<td>FURCELLARIA LUMBRICALIS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">GADU MOR</td>
+<td>99</td>
+<td>Gadus morhua</td>
+<td>GADUS MORHUA</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">GAST ACU</td>
+<td>286</td>
+<td>Gasterosteus aculeatus</td>
+<td>GASTEROSTEUS ACULEATUS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">GYMN CER</td>
+<td>288</td>
+<td>Gymnocephalus cernua</td>
+<td>GYMNOCEPHALUS CERNUA</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">LAMI SAC</td>
+<td>110</td>
+<td>Saccharina latissima</td>
+<td>LAMINARIA SACCHARINA</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">LIMA LIM</td>
+<td>270</td>
+<td>Limanda limanda</td>
+<td>LIMANDA LIMANDA</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">CERA DIAP</td>
+<td>60</td>
+<td>Ceramium diaphanum</td>
+<td>CERAMIUM DIAPHANUM</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Show maris_species_lut where match_type is not a perfect match ( i.e.&nbsp;not equal 0).</p>
+<div id="657f297a" class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>species_lut_df[species_lut_df[<span class="st">'match_score'</span>] <span class="op">&gt;</span> <span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">matched_id</th>
+<th data-quarto-table-cell-role="th">matched_maris_name</th>
+<th data-quarto-table-cell-role="th">source_name</th>
+<th data-quarto-table-cell-role="th">match_score</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">source_id</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ENCH CIM</td>
+<td>276</td>
+<td>Echinodermata</td>
+<td>ENCHINODERMATA CIM</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L218" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lookupbiotaspeciescb" class="level3">
+<h3 class="anchored" data-anchor-id="lookupbiotaspeciescb">LookupBiotaSpeciesCB</h3>
+<blockquote class="blockquote">
+<pre><code> LookupBiotaSpeciesCB (fn_lut)</code></pre>
+</blockquote>
+<p><em>Biota species remapped to MARIS db: CARD EDU: Cerastoderma edule LAMI SAC: Saccharina latissima PSET MAX: Scophthalmus maximus STIZ LUC: Sander luciopercas</em></p>
+<div id="b83ffe12" class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaSpeciesCB(get_maris_species)</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="co">#print(tfm()['biota'][['RUBIN', 'species']][:10])</span></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'biota'</span>][<span class="st">'species'</span>].unique())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[  99  243   50  139  270  192  191  284   84  269  122   96  287  279
+  278  288  286  244  129  275  271  285  283  247  120   59  280  274
+  273  290  289  272  277  276   21  282  110  281  245  704 1524  703
+ 1611  621   60]</code></pre>
+</div>
+</div>
+<section id="biota-tissues" class="level4">
+<h4 class="anchored" data-anchor-id="biota-tissues">Biota tissues</h4>
+<div id="a38df50b-46a9-4a2d-9379-e670eb0d0bb6" class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>pd.read_csv(<span class="st">'../../_data/accdb/mors/csv/TISSUE.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">TISSUE</th>
+<th data-quarto-table-cell-role="th">TISSUE_DESCRIPTION</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>WHOLE FISH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>WHOLE FISH WITHOUT ENTRAILS</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>WHOLE FISH WITHOUT HEAD AND ENTRAILS</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>FLESH WITH BONES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>FLESH WITHOUT BONES (FILETS)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>HEAD</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>FINS</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>8</td>
+<td>SKIN/EPIDERMIS</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>9</td>
+<td>SCALES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>10</td>
+<td>BONES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>11</td>
+<td>GILLS</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>12</td>
+<td>ENTRAILS</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>13</td>
+<td>STOMACH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>14</td>
+<td>INTESTINE</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>15</td>
+<td>STOMACH + INTESTINE</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>16</td>
+<td>HEART</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>17</td>
+<td>BLOOD</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>18</td>
+<td>LIVER</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">18</td>
+<td>19</td>
+<td>KIDNEY</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">19</td>
+<td>20</td>
+<td>OVARY</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20</td>
+<td>21</td>
+<td>TESTES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">21</td>
+<td>41</td>
+<td>WHOLE ANIMALS</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">22</td>
+<td>42</td>
+<td>SHELLS/CARAPACE</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">23</td>
+<td>43</td>
+<td>SOFT PARTS</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">24</td>
+<td>51</td>
+<td>WHOLE HAPTOPHYTIC PLANTS</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">25</td>
+<td>52</td>
+<td>LOOSE-DRIFTING PLANTS</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">26</td>
+<td>53</td>
+<td>GROWING TIPS</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">27</td>
+<td>54</td>
+<td>UPPER PARTS OF PLANTS</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">28</td>
+<td>55</td>
+<td>LOWER PARTS OF PLANTS</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="2d2a502e-3826-404c-84e1-0d60b4be0b04" class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>tissues_lut_df <span class="op">=</span> get_maris_lut(fname_in, </span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>                               fname_cache<span class="op">=</span><span class="st">'tissues_helcom.pkl'</span>, </span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>                               data_provider_lut<span class="op">=</span><span class="st">'TISSUE.csv'</span>,</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>                               data_provider_id_col<span class="op">=</span><span class="st">'TISSUE'</span>,</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>                               data_provider_name_col<span class="op">=</span><span class="st">'TISSUE_DESCRIPTION'</span>,</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>                               maris_lut<span class="op">=</span>bodyparts_lut_path,</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>                               maris_id<span class="op">=</span><span class="st">'bodypar_id'</span>,</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>                               maris_name<span class="op">=</span><span class="st">'bodypar'</span>,</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>                               unmatched_fixes<span class="op">=</span>unmatched_fixes_biota_tissues,</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>                               as_dataframe<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>                               overwrite<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 29/29 [00:00&lt;00:00, 140.26it/s]</code></pre>
+</div>
+</div>
+<div id="967c1a7d-ba91-4400-ba0a-bad180eee1d1" class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>tissues_lut_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">matched_id</th>
+<th data-quarto-table-cell-role="th">matched_maris_name</th>
+<th data-quarto-table-cell-role="th">source_name</th>
+<th data-quarto-table-cell-role="th">match_score</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">source_id</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>52</td>
+<td>Flesh without bones</td>
+<td>WHOLE FISH WITHOUT ENTRAILS</td>
+<td>13</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>52</td>
+<td>Flesh without bones</td>
+<td>FLESH WITHOUT BONES (FILETS)</td>
+<td>9</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>Whole animal</td>
+<td>WHOLE FISH</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>53</td>
+<td>Stomach and intestine</td>
+<td>STOMACH + INTESTINE</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">41</td>
+<td>1</td>
+<td>Whole animal</td>
+<td>WHOLE ANIMALS</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>4</td>
+<td>Flesh with bones</td>
+<td>FLESH WITH BONES</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">18</td>
+<td>25</td>
+<td>Liver</td>
+<td>LIVER</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">54</td>
+<td>57</td>
+<td>Upper parts of plants</td>
+<td>UPPER PARTS OF PLANTS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">53</td>
+<td>56</td>
+<td>Growing tips</td>
+<td>GROWING TIPS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">52</td>
+<td>55</td>
+<td>Loose-drifting plants</td>
+<td>LOOSE-DRIFTING PLANTS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">51</td>
+<td>54</td>
+<td>Whole haptophytic plants</td>
+<td>WHOLE HAPTOPHYTIC PLANTS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">43</td>
+<td>19</td>
+<td>Soft parts</td>
+<td>SOFT PARTS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">42</td>
+<td>59</td>
+<td>Shells/carapace</td>
+<td>SHELLS/CARAPACE</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">21</td>
+<td>39</td>
+<td>Testes</td>
+<td>TESTES</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20</td>
+<td>38</td>
+<td>Ovary</td>
+<td>OVARY</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">19</td>
+<td>27</td>
+<td>Kidney</td>
+<td>KIDNEY</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">17</td>
+<td>5</td>
+<td>Blood</td>
+<td>BLOOD</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6</td>
+<td>13</td>
+<td>Head</td>
+<td>HEAD</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>32</td>
+<td>Heart</td>
+<td>HEART</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3</td>
+<td>Whole animal eviscerated without head</td>
+<td>WHOLE FISH WITHOUT HEAD AND ENTRAILS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>26</td>
+<td>Intestine</td>
+<td>INTESTINE</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>21</td>
+<td>Stomach</td>
+<td>STOMACH</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>20</td>
+<td>Viscera</td>
+<td>ENTRAILS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>36</td>
+<td>Gills</td>
+<td>GILLS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>7</td>
+<td>Bones</td>
+<td>BONES</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>47</td>
+<td>Scales</td>
+<td>SCALES</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>12</td>
+<td>Skin</td>
+<td>SKIN/EPIDERMIS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>16</td>
+<td>Fins</td>
+<td>FINS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">55</td>
+<td>58</td>
+<td>Lower parts of plants</td>
+<td>LOWER PARTS OF PLANTS</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L288" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+</section>
+<section id="lookupbiotabodypartcb" class="level3">
+<h3 class="anchored" data-anchor-id="lookupbiotabodypartcb">LookupBiotaBodyPartCB</h3>
+<blockquote class="blockquote">
+<pre><code> LookupBiotaBodyPartCB (fn_lut)</code></pre>
+</blockquote>
+<p><em>Update bodypart id based on MARIS dbo_bodypar.xlsx: - 3: ‘Whole animal eviscerated without head’, - 12: ‘Viscera’, - 8: ‘Skin’</em></p>
+<div id="c17be44b-86ed-4584-b255-eedb4e1a429d" class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>tissues_lut_df <span class="op">=</span> get_maris_lut(fname_in, </span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>                               fname_cache<span class="op">=</span><span class="st">'tissues_helcom.pkl'</span>, </span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>                               data_provider_lut<span class="op">=</span><span class="st">'TISSUE.csv'</span>,</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>                               data_provider_id_col<span class="op">=</span><span class="st">'TISSUE'</span>,</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>                               data_provider_name_col<span class="op">=</span><span class="st">'TISSUE_DESCRIPTION'</span>,</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>                               maris_lut<span class="op">=</span>bodyparts_lut_path,</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>                               maris_id<span class="op">=</span><span class="st">'bodypar_id'</span>,</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>                               maris_name<span class="op">=</span><span class="st">'bodypar'</span>,</span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>                               unmatched_fixes<span class="op">=</span>unmatched_fixes_biota_tissues,</span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>                               as_dataframe<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>                               overwrite<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 29/29 [00:00&lt;00:00, 139.22it/s]</code></pre>
+</div>
+</div>
+<div id="53a195f8" class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaBodyPartCB(get_maris_bodypart)</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'biota'</span>][[<span class="st">'TISSUE'</span>, <span class="st">'body_part'</span>]][:<span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   TISSUE  body_part
+0       5         52
+1       5         52
+2       5         52
+3       5         52
+4       5         52</code></pre>
+</div>
+</div>
+<section id="sediment-types" class="level4">
+<h4 class="anchored" data-anchor-id="sediment-types">Sediment types</h4>
+<div id="bf7665a6" class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>df_sediment <span class="op">=</span> pd.read_csv(Path(fname_in) <span class="op">/</span> <span class="st">'SEDIMENT_TYPE.csv'</span>)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>df_sediment</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">SEDI</th>
+<th data-quarto-table-cell-role="th">SEDIMENT TYPE</th>
+<th data-quarto-table-cell-role="th">RECOMMENDED TO BE USED</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>-99</td>
+<td>NO DATA</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0</td>
+<td>GRAVEL</td>
+<td>YES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>1</td>
+<td>SAND</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2</td>
+<td>FINE SAND</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>3</td>
+<td>SILT</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>4</td>
+<td>CLAY</td>
+<td>YES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>5</td>
+<td>MUD</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>6</td>
+<td>GLACIAL</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>7</td>
+<td>SOFT</td>
+<td>NO</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>8</td>
+<td>SULPHIDIC</td>
+<td>NO (ONLY TO USE AS ADJECTIVE)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>9</td>
+<td>Fe-Mg CONCRETIONS</td>
+<td>NO (ONLY TO USE AS ADJECTIVE)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>10</td>
+<td>SAND AND GRAVEL</td>
+<td>YES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>11</td>
+<td>PURE SAND</td>
+<td>NO</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>12</td>
+<td>SAND AND FINE SAND</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>13</td>
+<td>SAND AND SILT</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>14</td>
+<td>SAND AND CLAY</td>
+<td>YES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>15</td>
+<td>SAND AND MUD</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>20</td>
+<td>FINE SAND AND GRAVEL</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">18</td>
+<td>21</td>
+<td>FINE SAND AND SAND</td>
+<td>NO</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">19</td>
+<td>22</td>
+<td>PURE FINE SAND</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20</td>
+<td>23</td>
+<td>FINE SAND AND SILT</td>
+<td>NO</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">21</td>
+<td>24</td>
+<td>FINE SAND AND CLAY</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">22</td>
+<td>25</td>
+<td>FINE SAND AND MUD</td>
+<td>NO</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">23</td>
+<td>30</td>
+<td>SILT AND GRAVEL</td>
+<td>YES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">24</td>
+<td>31</td>
+<td>SILT AND SAND</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">25</td>
+<td>32</td>
+<td>SILT AND FINE SAND</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">26</td>
+<td>33</td>
+<td>PURE SILT</td>
+<td>NO</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">27</td>
+<td>34</td>
+<td>SILT AND CLAY</td>
+<td>YES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">28</td>
+<td>35</td>
+<td>SILT AND MUD</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">29</td>
+<td>40</td>
+<td>CLAY AND GRAVEL</td>
+<td>YES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">30</td>
+<td>41</td>
+<td>CLAY AND SAND</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">31</td>
+<td>42</td>
+<td>CLAY AND FINE SAND</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">32</td>
+<td>43</td>
+<td>CLAY AND SILT</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">33</td>
+<td>44</td>
+<td>PURE CLAY</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">34</td>
+<td>45</td>
+<td>CLAY AND MUD</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">35</td>
+<td>46</td>
+<td>CLACIAL CLAY</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">36</td>
+<td>47</td>
+<td>SOFT CLAY</td>
+<td>NO</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">37</td>
+<td>48</td>
+<td>SULPHIDIC CLAY</td>
+<td>YES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">38</td>
+<td>49</td>
+<td>CLAY AND Fe-Mg CONCRETIONS</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">39</td>
+<td>50</td>
+<td>MUD AND GARVEL</td>
+<td>YES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">40</td>
+<td>51</td>
+<td>MUD AND SAND</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">41</td>
+<td>52</td>
+<td>MUD AND FINE SAND</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">42</td>
+<td>54</td>
+<td>MUD AND CLAY</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">43</td>
+<td>55</td>
+<td>PURE MUD</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">44</td>
+<td>57</td>
+<td>SOFT MUD</td>
+<td>NO</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">45</td>
+<td>58</td>
+<td>SULPHIDIC MUD</td>
+<td>YES</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">46</td>
+<td>59</td>
+<td>MUD AND Fe-Mg CONCRETIONS</td>
+<td>YES</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="480c716f-d2de-455f-b58f-22af28ca01b7" class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>sediments_lut_df <span class="op">=</span> get_maris_lut(</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>    fname_in, </span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>    fname_cache<span class="op">=</span><span class="st">'sediments_helcom.pkl'</span>, </span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>    data_provider_lut<span class="op">=</span><span class="st">'SEDIMENT_TYPE.csv'</span>,</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>    data_provider_id_col<span class="op">=</span><span class="st">'SEDI'</span>,</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>    data_provider_name_col<span class="op">=</span><span class="st">'SEDIMENT TYPE'</span>,</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>    maris_lut<span class="op">=</span>sediments_lut_path,</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>    maris_id<span class="op">=</span><span class="st">'sedtype_id'</span>,</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>    maris_name<span class="op">=</span><span class="st">'sedtype'</span>,</span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>    unmatched_fixes<span class="op">=</span>unmatched_fixes_sediments,</span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>    as_dataframe<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>    overwrite<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 47/47 [00:00&lt;00:00, 146.47it/s]</code></pre>
+</div>
+</div>
+<div id="7a9a8ca6-9fc9-441e-aad3-5eb0a86758af" class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>sediments_lut_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">matched_id</th>
+<th data-quarto-table-cell-role="th">matched_maris_name</th>
+<th data-quarto-table-cell-role="th">source_name</th>
+<th data-quarto-table-cell-role="th">match_score</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">source_id</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">50</td>
+<td>54</td>
+<td>Mud and gravel</td>
+<td>MUD AND GARVEL</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">46</td>
+<td>50</td>
+<td>Glacial clay</td>
+<td>CLACIAL CLAY</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">-99</td>
+<td>0</td>
+<td>(Not available)</td>
+<td>NO DATA</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">33</td>
+<td>42</td>
+<td>Pure silt</td>
+<td>PURE SILT</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">34</td>
+<td>10</td>
+<td>Silt and clay</td>
+<td>SILT AND CLAY</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">35</td>
+<td>43</td>
+<td>Silt and mud</td>
+<td>SILT AND MUD</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">40</td>
+<td>44</td>
+<td>Clay and gravel</td>
+<td>CLAY AND GRAVEL</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">41</td>
+<td>45</td>
+<td>Clay and sand</td>
+<td>CLAY AND SAND</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">42</td>
+<td>46</td>
+<td>Clay and fine sand</td>
+<td>CLAY AND FINE SAND</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">43</td>
+<td>48</td>
+<td>Clay and silt</td>
+<td>CLAY AND SILT</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">44</td>
+<td>47</td>
+<td>Pure clay</td>
+<td>PURE CLAY</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">45</td>
+<td>49</td>
+<td>Clay and mud</td>
+<td>CLAY AND MUD</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">47</td>
+<td>51</td>
+<td>Soft clay</td>
+<td>SOFT CLAY</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">31</td>
+<td>40</td>
+<td>Silt and sand</td>
+<td>SILT AND SAND</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">48</td>
+<td>52</td>
+<td>Sulphidic clay</td>
+<td>SULPHIDIC CLAY</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">49</td>
+<td>53</td>
+<td>Clay and Fe-Mg concretions</td>
+<td>CLAY AND Fe-Mg CONCRETIONS</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">51</td>
+<td>55</td>
+<td>Mud and sand</td>
+<td>MUD AND SAND</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">52</td>
+<td>56</td>
+<td>Mud and fine sand</td>
+<td>MUD AND FINE SAND</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">54</td>
+<td>57</td>
+<td>Mud and clay</td>
+<td>MUD AND CLAY</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">55</td>
+<td>58</td>
+<td>Pure mud</td>
+<td>PURE MUD</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">57</td>
+<td>59</td>
+<td>Soft mud</td>
+<td>SOFT MUD</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">58</td>
+<td>60</td>
+<td>Sulphidic mud</td>
+<td>SULPHIDIC MUD</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">32</td>
+<td>41</td>
+<td>Silt and fine sand</td>
+<td>SILT AND FINE SAND</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">30</td>
+<td>11</td>
+<td>Silt and gravel</td>
+<td>SILT AND GRAVEL</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2</td>
+<td>Gravel</td>
+<td>GRAVEL</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">10</td>
+<td>29</td>
+<td>Sand and gravel</td>
+<td>SAND AND GRAVEL</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>6</td>
+<td>Sand</td>
+<td>SAND</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>7</td>
+<td>Fine sand</td>
+<td>FINE SAND</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>12</td>
+<td>Silt</td>
+<td>SILT</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>1</td>
+<td>Clay</td>
+<td>CLAY</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>4</td>
+<td>Mud</td>
+<td>MUD</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6</td>
+<td>25</td>
+<td>Glacial</td>
+<td>GLACIAL</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7</td>
+<td>26</td>
+<td>Soft</td>
+<td>SOFT</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">8</td>
+<td>27</td>
+<td>Sulphidic</td>
+<td>SULPHIDIC</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">9</td>
+<td>28</td>
+<td>Fe-Mg concretions</td>
+<td>Fe-Mg CONCRETIONS</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>30</td>
+<td>Pure sand</td>
+<td>PURE SAND</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25</td>
+<td>39</td>
+<td>Fine sand and mud</td>
+<td>FINE SAND AND MUD</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">12</td>
+<td>31</td>
+<td>Sand and fine sand</td>
+<td>SAND AND FINE SAND</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">13</td>
+<td>62</td>
+<td>Sand and silt</td>
+<td>SAND AND SILT</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">14</td>
+<td>32</td>
+<td>Sand and clay</td>
+<td>SAND AND CLAY</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">15</td>
+<td>33</td>
+<td>Sand and mud</td>
+<td>SAND AND MUD</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">20</td>
+<td>34</td>
+<td>Fine sand and gravel</td>
+<td>FINE SAND AND GRAVEL</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">21</td>
+<td>35</td>
+<td>Fine sand and sand</td>
+<td>FINE SAND AND SAND</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">22</td>
+<td>36</td>
+<td>Pure fine sand</td>
+<td>PURE FINE SAND</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">23</td>
+<td>37</td>
+<td>Fine sand and silt</td>
+<td>FINE SAND AND SILT</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">24</td>
+<td>38</td>
+<td>Fine sand and clay</td>
+<td>FINE SAND AND CLAY</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">59</td>
+<td>61</td>
+<td>Mud and Fe-Mg concretions</td>
+<td>MUD AND Fe-Mg CONCRETIONS</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/helcom.py#L271" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+</section>
+<section id="lookupsedimentcb" class="level3">
+<h3 class="anchored" data-anchor-id="lookupsedimentcb">LookupSedimentCB</h3>
+<blockquote class="blockquote">
+<pre><code> LookupSedimentCB (fn_lut)</code></pre>
+</blockquote>
+<p><em>Update sediment id based on MARIS dbo_sedtype.xlsx -99: ‘(Not available)’ - na: ‘(Not available)’ - 56: ‘(Not available)’ - 73: ‘(Not available)’</em></p>
+<div id="beaa9754" class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>dfs[<span class="st">'sediment'</span>][<span class="st">'SEDI'</span>].unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array([ nan, -99.,   0.,  55.,  11.,  57.,  51.,  52.,  22.,  10.,  44.,
+         5.,  50.,  15.,   1.,  40.,  33.,  43.,  59.,  54.,   9.,  45.,
+        14.,  41.,  25.,  42.,  24.,  12.,  58.,  13.,   7.,  49.,  48.,
+         4.,  47.,  23.,  20.,  46.,   2.,  34.,  32.,  56.,  35.,  73.,
+        21.])</code></pre>
+</div>
+</div>
+<div id="16d42cb0" class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>                            LookupSedimentCB(get_maris_sediments)</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'sediment'</span>][[<span class="st">'SEDI'</span>, <span class="st">'sed_type'</span>]][:<span class="dv">5</span>])</span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   SEDI  sed_type
+0   -99         0
+1   -99         0
+2   -99         0
+3   -99         0
+4   -99         0
+{'seawater':                 KEY NUCLIDE METHOD &lt; VALUE_Bq/m³  VALUE_Bq/m³  ERROR%_m³  \
+0      WKRIL2012003   cs137    NaN           NaN          5.3  32.000000   
+1      WKRIL2012004   cs137    NaN           NaN         19.9  20.000000   
+2      WKRIL2012005   cs137    NaN           NaN         25.5  20.000000   
+3      WKRIL2012006   cs137    NaN           NaN         17.0  29.000000   
+4      WKRIL2012007   cs137    NaN           NaN         22.2  18.000000   
+...             ...     ...    ...           ...          ...        ...   
+21211  WSSSM2021005      h3  SSM45           NaN       1030.0  93.203883   
+21212  WSSSM2021006      h3  SSM45           NaN       2240.0  43.303571   
+21213  WSSSM2021007      h3  SSM45           NaN       2060.0  47.087379   
+21214  WSSSM2021008      h3  SSM45           NaN       2300.0  43.478261   
+21215  WSSSM2021004      h3  SSM45             &lt;          NaN        NaN   
+
+         DATE_OF_ENTRY_x  COUNTRY LABORATORY   SEQUENCE  ...  \
+0      08/20/14 00:00:00     90.0       KRIL  2012003.0  ...   
+1      08/20/14 00:00:00     90.0       KRIL  2012004.0  ...   
+2      08/20/14 00:00:00     90.0       KRIL  2012005.0  ...   
+3      08/20/14 00:00:00     90.0       KRIL  2012006.0  ...   
+4      08/20/14 00:00:00     90.0       KRIL  2012007.0  ...   
+...                  ...      ...        ...        ...  ...   
+21211  09/06/22 00:00:00     77.0       SSSM   202105.0  ...   
+21212  09/06/22 00:00:00     77.0       SSSM   202106.0  ...   
+21213  09/06/22 00:00:00     77.0       SSSM   202107.0  ...   
+21214  09/06/22 00:00:00     77.0       SSSM   202108.0  ...   
+21215  09/06/22 00:00:00     77.0       SSSM   202104.0  ...   
+
+      LONGITUDE (dddddd)  TDEPTH  SDEPTH  SALIN TTEMP  FILT  MORS_SUBBASIN  \
+0                29.3333     NaN     0.0    NaN   NaN   NaN           11.0   
+1                29.3333     NaN    29.0    NaN   NaN   NaN           11.0   
+2                23.1500     NaN     0.0    NaN   NaN   NaN           11.0   
+3                27.9833     NaN     0.0    NaN   NaN   NaN           11.0   
+4                27.9833     NaN    39.0    NaN   NaN   NaN           11.0   
+...                  ...     ...     ...    ...   ...   ...            ...   
+21211            18.3572     NaN     1.0    NaN   NaN     N            1.0   
+21212            17.0000     NaN     1.0    NaN   NaN     N           10.0   
+21213            11.9452     NaN     1.0    NaN   NaN     N           12.0   
+21214            11.9452     NaN     1.0    NaN   NaN     N           12.0   
+21215            11.2450     NaN     1.0    NaN   NaN     N           15.0   
+
+       HELCOM_SUBBASIN    DATE_OF_ENTRY_y       time  
+0                 11.0  08/20/14 00:00:00 2012-05-23  
+1                 11.0  08/20/14 00:00:00 2012-05-23  
+2                  3.0  08/20/14 00:00:00 2012-06-17  
+3                 11.0  08/20/14 00:00:00 2012-05-24  
+4                 11.0  08/20/14 00:00:00 2012-05-24  
+...                ...                ...        ...  
+21211              8.0  09/06/22 00:00:00 2021-10-15  
+21212             10.0  09/06/22 00:00:00 2021-11-04  
+21213             12.0  09/06/22 00:00:00 2021-10-15  
+21214             12.0  09/06/22 00:00:00 2021-05-17  
+21215             18.0  09/06/22 00:00:00 2021-05-13  
+
+[21216 rows x 28 columns], 'sediment':                 KEY NUCLIDE  METHOD &lt; VALUE_Bq/kg  VALUE_Bq/kg  ERROR%_kg  \
+0      SKRIL2012048   ra226     NaN           NaN         35.0      26.00   
+1      SKRIL2012049   ra226     NaN           NaN         36.0      22.00   
+2      SKRIL2012050   ra226     NaN           NaN         38.0      24.00   
+3      SKRIL2012051   ra226     NaN           NaN         36.0      25.00   
+4      SKRIL2012052   ra226     NaN           NaN         30.0      23.00   
+...             ...     ...     ...           ...          ...        ...   
+39812  SSSSM2020029   ac228  SSSM43           NaN         37.5       5.00   
+39813  SSSSM2020030     k40  SSSM43           NaN        526.0       1.72   
+39814  SSSSM2020030   cs137  SSSM43           NaN         17.2       2.21   
+39815  SSSSM2020031     k40  SSSM43           NaN       1000.0       1.80   
+39816  SSSSM2020031   cs137  SSSM43           NaN         64.0       1.20   
+
+      &lt; VALUE_Bq/m²  VALUE_Bq/m²  ERROR%_m²    DATE_OF_ENTRY_x  ...  SEDI  \
+0               NaN          NaN        NaN  08/20/14 00:00:00  ...   -99   
+1               NaN          NaN        NaN  08/20/14 00:00:00  ...   -99   
+2               NaN          NaN        NaN  08/20/14 00:00:00  ...   -99   
+3               NaN          NaN        NaN  08/20/14 00:00:00  ...   -99   
+4               NaN          NaN        NaN  08/20/14 00:00:00  ...   -99   
+...             ...          ...        ...                ...  ...   ...   
+39812           NaN        255.0       28.0  04/22/22 00:00:00  ...     0   
+39813           NaN       5690.0        2.0  04/22/22 00:00:00  ...     0   
+39814           NaN        186.0        2.0  04/22/22 00:00:00  ...     0   
+39815           NaN      16000.0        2.0  04/22/22 00:00:00  ...     0   
+39816           NaN       1020.0        1.0  04/22/22 00:00:00  ...     0   
+
+      OXIC    DW%  LOI%  MORS_SUBBASIN  HELCOM_SUBBASIN  SUM_LINK  \
+0      NaN    NaN   NaN           11.0             11.0       NaN   
+1      NaN    NaN   NaN           11.0             11.0       NaN   
+2      NaN    NaN   NaN           11.0             11.0       NaN   
+3      NaN    NaN   NaN           11.0             11.0       NaN   
+4      NaN    NaN   NaN           11.0             11.0       NaN   
+...    ...    ...   ...            ...              ...       ...   
+39812    O  28.73  14.0           13.0             13.0       NaN   
+39813    O  32.03   NaN           12.0             12.0       NaN   
+39814    O  32.03   NaN           12.0             12.0       NaN   
+39815    O  48.77   NaN            1.0              8.0       NaN   
+39816    O  48.77   NaN            1.0              8.0       NaN   
+
+         DATE_OF_ENTRY_y       time sed_type  
+0      08/20/14 00:00:00 2012-06-17        0  
+1      08/20/14 00:00:00 2012-06-17        0  
+2      08/20/14 00:00:00 2012-08-10        0  
+3      08/20/14 00:00:00 2012-08-10        0  
+4      08/20/14 00:00:00 2012-08-10        0  
+...                  ...        ...      ...  
+39812  04/22/22 00:00:00 2020-09-29        2  
+39813  04/22/22 00:00:00 2020-09-01        2  
+39814  04/22/22 00:00:00 2020-09-01        2  
+39815  04/22/22 00:00:00 2020-10-26        2  
+39816  04/22/22 00:00:00 2020-10-26        2  
+
+[39817 rows x 37 columns], 'biota':                 KEY NUCLIDE  METHOD &lt; VALUE_Bq/kg  VALUE_Bq/kg BASIS  ERROR%  \
+0      BVTIG2012041   cs134  VTIG01             &lt;     0.010140     W     NaN   
+1      BVTIG2012041     k40  VTIG01                 135.300000     W    3.57   
+2      BVTIG2012041    co60  VTIG01             &lt;     0.013980     W     NaN   
+3      BVTIG2012041   cs137  VTIG01                   4.338000     W    3.48   
+4      BVTIG2012040   cs134  VTIG01             &lt;     0.009614     W     NaN   
+...             ...     ...     ...           ...          ...   ...     ...   
+15822  BSSSM2020016     k40  SSSM42           NaN    65.000000     D   10.20   
+15823  BSSSM2020016   cs137  SSSM42           NaN     4.500000     D    6.20   
+15824  BSSSM2020017     be7  SSSM42           NaN    94.000000     D    3.40   
+15825  BSSSM2020017     k40  SSSM42           NaN  1100.000000     D    1.60   
+15826  BSSSM2020017   cs137  SSSM42           NaN    13.000000     D    2.50   
+
+       NUMBER    DATE_OF_ENTRY_x  COUNTRY  ... TISSUE     NO LENGTH  WEIGHT  \
+0         NaN  02/27/14 00:00:00      6.0  ...      5   16.0   45.7   948.0   
+1         NaN  02/27/14 00:00:00      6.0  ...      5   16.0   45.7   948.0   
+2         NaN  02/27/14 00:00:00      6.0  ...      5   16.0   45.7   948.0   
+3         NaN  02/27/14 00:00:00      6.0  ...      5   16.0   45.7   948.0   
+4         NaN  02/27/14 00:00:00      6.0  ...      5   17.0   45.9   964.0   
+...       ...                ...      ...  ...    ...    ...    ...     ...   
+15822     NaN  04/22/22 00:00:00     77.0  ...     41  319.0    NaN     NaN   
+15823     NaN  04/22/22 00:00:00     77.0  ...     41  319.0    NaN     NaN   
+15824     NaN  04/22/22 00:00:00     77.0  ...     51    NaN    NaN     NaN   
+15825     NaN  04/22/22 00:00:00     77.0  ...     51    NaN    NaN     NaN   
+15826     NaN  04/22/22 00:00:00     77.0  ...     51    NaN    NaN     NaN   
+
+          DW%  LOI% MORS_SUBBASIN  HELCOM_SUBBASIN    DATE_OF_ENTRY_y  \
+0      18.453  92.9           2.0               16  02/27/14 00:00:00   
+1      18.453  92.9           2.0               16  02/27/14 00:00:00   
+2      18.453  92.9           2.0               16  02/27/14 00:00:00   
+3      18.453  92.9           2.0               16  02/27/14 00:00:00   
+4      18.458  92.9           2.0               16  02/27/14 00:00:00   
+...       ...   ...           ...              ...                ...   
+15822  41.000   0.0           1.0                8  04/22/22 00:00:00   
+15823  41.000   0.0           1.0                8  04/22/22 00:00:00   
+15824  21.000   0.0           1.0                8  04/22/22 00:00:00   
+15825  21.000   0.0           1.0                8  04/22/22 00:00:00   
+15826  21.000   0.0           1.0                8  04/22/22 00:00:00   
+
+            time  
+0     2012-09-23  
+1     2012-09-23  
+2     2012-09-23  
+3     2012-09-23  
+4     2012-09-23  
+...          ...  
+15822 2020-10-09  
+15823 2020-10-09  
+15824 2020-10-26  
+15825 2020-10-26  
+15826 2020-10-26  
+
+[15827 rows x 34 columns]}</code></pre>
+</div>
+</div>
+<section id="biogroup" class="level4">
+<h4 class="anchored" data-anchor-id="biogroup">Biogroup</h4>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L308" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+</section>
+<section id="get_biogroup_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_biogroup_lut">get_biogroup_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_biogroup_lut (maris_lut)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L313" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lookupbiogroupcb" class="level3">
+<h3 class="anchored" data-anchor-id="lookupbiogroupcb">LookupBiogroupCB</h3>
+<blockquote class="blockquote">
+<pre><code> LookupBiogroupCB (fn_lut)</code></pre>
+</blockquote>
+<p><em>Update biogroup id based on MARIS dbo_species.xlsx</em></p>
+<div id="861d0034-d4ac-4fa3-a82c-031e1f0c69a7" class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaSpeciesCB(get_maris_species),</span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>                            LookupBiogroupCB(partial(get_biogroup_lut, species_lut_path()))</span>
+<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'biota'</span>][<span class="st">'bio_group'</span>].unique())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[ 4  2 14 11  8  3]</code></pre>
+</div>
+</div>
+</section>
+<section id="capture-units" class="level3">
+<h3 class="anchored" data-anchor-id="capture-units">Capture Units</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L334" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lookupunitcb" class="level3">
+<h3 class="anchored" data-anchor-id="lookupunitcb">LookupUnitCB</h3>
+<blockquote class="blockquote">
+<pre><code> LookupUnitCB (renaming_unit_rules={'VALUE_Bq/m³': 1, 'VALUE_Bq/kg': 3})</code></pre>
+</blockquote>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<div id="aa0f0abf" class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>                            NormalizeUncUnitCB(),</span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>                            LookupUnitCB()])</span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'seawater'</span>].unit.unique())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1 0]</code></pre>
+</div>
+</div>
+</section>
+<section id="rename-columns" class="level3">
+<h3 class="anchored" data-anchor-id="rename-columns">Rename columns</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L411" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_renaming_rules" class="level3">
+<h3 class="anchored" data-anchor-id="get_renaming_rules">get_renaming_rules</h3>
+<blockquote class="blockquote">
+<pre><code> get_renaming_rules ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L425" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="renamecolumncb" class="level3">
+<h3 class="anchored" data-anchor-id="renamecolumncb">RenameColumnCB</h3>
+<blockquote class="blockquote">
+<pre><code> RenameColumnCB (coi, fn_renaming_rules)</code></pre>
+</blockquote>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<div id="9a4a8682-672f-4188-9091-821b727b4764" class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaSpeciesCB(get_maris_species),</span>
+<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaBodyPartCB(get_maris_bodypart),</span>
+<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>                            LookupSedimentCB(get_maris_sediments),</span>
+<span id="cb74-8"><a href="#cb74-8" aria-hidden="true" tabindex="-1"></a>                            LookupBiogroupCB(partial(get_biogroup_lut, species_lut_path())),</span>
+<span id="cb74-9"><a href="#cb74-9" aria-hidden="true" tabindex="-1"></a>                            LookupUnitCB(),</span>
+<span id="cb74-10"><a href="#cb74-10" aria-hidden="true" tabindex="-1"></a>                            RenameColumnCB(coi_grp, get_renaming_rules)</span>
+<span id="cb74-11"><a href="#cb74-11" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb74-12"><a href="#cb74-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb74-13"><a href="#cb74-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'seawater'</span>].head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  nuclide  value  _unc       time  tot_depth  smp_depth      lat      lon  \
+0   cs137    5.3  32.0 2012-05-23        NaN        0.0  60.0833  29.3333   
+1   cs137   19.9  20.0 2012-05-23        NaN       29.0  60.0833  29.3333   
+2   cs137   25.5  20.0 2012-06-17        NaN        0.0  59.4333  23.1500   
+3   cs137   17.0  29.0 2012-05-24        NaN        0.0  60.2500  27.9833   
+4   cs137   22.2  18.0 2012-05-24        NaN       39.0  60.2500  27.9833   
+
+   _unit  _sal  _temp  
+0      1   NaN    NaN  
+1      1   NaN    NaN  
+2      1   NaN    NaN  
+3      1   NaN    NaN  
+4      1   NaN    NaN  </code></pre>
+</div>
+</div>
+</section>
+<section id="reshape-long-to-wide" class="level3">
+<h3 class="anchored" data-anchor-id="reshape-long-to-wide">Reshape: long to wide</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L441" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="reshapelongtowide" class="level3">
+<h3 class="anchored" data-anchor-id="reshapelongtowide">ReshapeLongToWide</h3>
+<blockquote class="blockquote">
+<pre><code> ReshapeLongToWide (columns='nuclide', values=['value'])</code></pre>
+</blockquote>
+<p><em>Convert data from long to wide with renamed columns.</em></p>
+<div id="0a330905" class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaSpeciesCB(get_maris_species),</span>
+<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaBodyPartCB(get_maris_bodypart),</span>
+<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>                            LookupSedimentCB(get_maris_sediments),</span>
+<span id="cb77-8"><a href="#cb77-8" aria-hidden="true" tabindex="-1"></a>                            LookupBiogroupCB(partial(get_biogroup_lut, species_lut_path())),</span>
+<span id="cb77-9"><a href="#cb77-9" aria-hidden="true" tabindex="-1"></a>                            LookupUnitCB(),</span>
+<span id="cb77-10"><a href="#cb77-10" aria-hidden="true" tabindex="-1"></a>                            RenameColumnCB(coi_grp, get_renaming_rules),</span>
+<span id="cb77-11"><a href="#cb77-11" aria-hidden="true" tabindex="-1"></a>                            ReshapeLongToWide()</span>
+<span id="cb77-12"><a href="#cb77-12" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb77-13"><a href="#cb77-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-14"><a href="#cb77-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'biota'</span>].head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     lon       time  species  body_part  bio_group  sample    lat  smp_depth  \
+0   9.41 2011-12-11       50         52          4     192  54.31        2.0   
+1   9.41 2011-12-11       50         52          4     193  54.31        2.0   
+2   9.41 2011-12-11       50         52          4     194  54.31        2.0   
+3   9.41 2011-12-11       50         52          4     195  54.31        2.0   
+4  10.00 2011-12-13       99         52          4     184  54.45        4.0   
+
+   ac228_unc  ag108m_unc  ...  sr89  sr90  tc99  te129m  th228  th232  tl208  \
+0        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+1        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+2        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+3        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+4        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+
+   u235  zn65  zr95  
+0   NaN   NaN   NaN  
+1   NaN   NaN   NaN  
+2   NaN   NaN   NaN  
+3   NaN   NaN   NaN  
+4   NaN   NaN   NaN  
+
+[5 rows x 160 columns]</code></pre>
+</div>
+</div>
+</section>
+<section id="encode-time-seconds-since" class="level3">
+<h3 class="anchored" data-anchor-id="encode-time-seconds-since">Encode time (seconds since …)</h3>
+<div id="0c92dd07" class="cell">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaSpeciesCB(get_maris_species),</span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaBodyPartCB(get_maris_bodypart),</span>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>                            LookupSedimentCB(get_maris_sediments),</span>
+<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a>                            LookupBiogroupCB(partial(get_biogroup_lut, species_lut_path())),</span>
+<span id="cb79-9"><a href="#cb79-9" aria-hidden="true" tabindex="-1"></a>                            LookupUnitCB(),</span>
+<span id="cb79-10"><a href="#cb79-10" aria-hidden="true" tabindex="-1"></a>                            RenameColumnCB(coi_grp, get_renaming_rules),</span>
+<span id="cb79-11"><a href="#cb79-11" aria-hidden="true" tabindex="-1"></a>                            ReshapeLongToWide(),</span>
+<span id="cb79-12"><a href="#cb79-12" aria-hidden="true" tabindex="-1"></a>                            EncodeTimeCB(cfg())</span>
+<span id="cb79-13"><a href="#cb79-13" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb79-14"><a href="#cb79-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-15"><a href="#cb79-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'biota'</span>].head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     lon        time  species  body_part  bio_group  sample    lat  smp_depth  \
+0   9.41  1323561600       50         52          4     192  54.31        2.0   
+1   9.41  1323561600       50         52          4     193  54.31        2.0   
+2   9.41  1323561600       50         52          4     194  54.31        2.0   
+3   9.41  1323561600       50         52          4     195  54.31        2.0   
+4  10.00  1323734400       99         52          4     184  54.45        4.0   
+
+   ac228_unc  ag108m_unc  ...  sr89  sr90  tc99  te129m  th228  th232  tl208  \
+0        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+1        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+2        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+3        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+4        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+
+   u235  zn65  zr95  
+0   NaN   NaN   NaN  
+1   NaN   NaN   NaN  
+2   NaN   NaN   NaN  
+3   NaN   NaN   NaN  
+4   NaN   NaN   NaN  
+
+[5 rows x 160 columns]</code></pre>
+</div>
+</div>
+</section>
+<section id="sanitize-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="sanitize-coordinates">Sanitize coordinates</h3>
+<div id="3dee4406" class="cell">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaSpeciesCB(get_maris_species),</span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaBodyPartCB(get_maris_bodypart),</span>
+<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>                            LookupSedimentCB(get_maris_sediments),</span>
+<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>                            LookupBiogroupCB(partial(get_biogroup_lut, species_lut_path())),</span>
+<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a>                            LookupUnitCB(),</span>
+<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a>                            RenameColumnCB(coi_grp, get_renaming_rules),</span>
+<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>                            ReshapeLongToWide(),</span>
+<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a>                            EncodeTimeCB(cfg()),</span>
+<span id="cb81-13"><a href="#cb81-13" aria-hidden="true" tabindex="-1"></a>                            SanitizeLonLatCB()</span>
+<span id="cb81-14"><a href="#cb81-14" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb81-15"><a href="#cb81-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-16"><a href="#cb81-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tfm()[<span class="st">'biota'</span>].head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     lon        time  species  body_part  bio_group  sample    lat  smp_depth  \
+0   9.41  1323561600       50         52          4     192  54.31        2.0   
+1   9.41  1323561600       50         52          4     193  54.31        2.0   
+2   9.41  1323561600       50         52          4     194  54.31        2.0   
+3   9.41  1323561600       50         52          4     195  54.31        2.0   
+4  10.00  1323734400       99         52          4     184  54.45        4.0   
+
+   ac228_unc  ag108m_unc  ...  sr89  sr90  tc99  te129m  th228  th232  tl208  \
+0        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+1        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+2        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+3        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+4        NaN         NaN  ...   NaN   NaN   NaN     NaN    NaN    NaN    NaN   
+
+   u235  zn65  zr95  
+0   NaN   NaN   NaN  
+1   NaN   NaN   NaN  
+2   NaN   NaN   NaN  
+3   NaN   NaN   NaN  
+4   NaN   NaN   NaN  
+
+[5 rows x 160 columns]</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="netcdf-encoder" class="level2">
+<h2 class="anchored" data-anchor-id="netcdf-encoder">NetCDF encoder</h2>
+<section id="example-change-logs" class="level3">
+<h3 class="anchored" data-anchor-id="example-change-logs">Example change logs</h3>
+<div id="75d1968d" class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data(fname_in)</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripRdnNameCB(),</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>                            RemapRdnNameCB(),</span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>                            ParseTimeCB(),</span>
+<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaSpeciesCB(get_maris_species),</span>
+<span id="cb83-6"><a href="#cb83-6" aria-hidden="true" tabindex="-1"></a>                            LookupBiotaBodyPartCB(get_maris_bodypart),</span>
+<span id="cb83-7"><a href="#cb83-7" aria-hidden="true" tabindex="-1"></a>                            LookupSedimentCB(get_maris_sediments),</span>
+<span id="cb83-8"><a href="#cb83-8" aria-hidden="true" tabindex="-1"></a>                            LookupBiogroupCB(partial(get_biogroup_lut, species_lut_path())),</span>
+<span id="cb83-9"><a href="#cb83-9" aria-hidden="true" tabindex="-1"></a>                            LookupUnitCB(),</span>
+<span id="cb83-10"><a href="#cb83-10" aria-hidden="true" tabindex="-1"></a>                            RenameColumnCB(coi_grp, get_renaming_rules),</span>
+<span id="cb83-11"><a href="#cb83-11" aria-hidden="true" tabindex="-1"></a>                            ReshapeLongToWide(),</span>
+<span id="cb83-12"><a href="#cb83-12" aria-hidden="true" tabindex="-1"></a>                            EncodeTimeCB(cfg()),</span>
+<span id="cb83-13"><a href="#cb83-13" aria-hidden="true" tabindex="-1"></a>                            SanitizeLonLatCB()</span>
+<span id="cb83-14"><a href="#cb83-14" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb83-15"><a href="#cb83-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-16"><a href="#cb83-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Transform</span></span>
+<span id="cb83-17"><a href="#cb83-17" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb83-18"><a href="#cb83-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-19"><a href="#cb83-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Check transformation logs</span></span>
+<span id="cb83-20"><a href="#cb83-20" aria-hidden="true" tabindex="-1"></a>tfm.logs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>['Convert nuclide names to lowercase &amp; strip any trailing space(s)',
+ 'Remap to MARIS radionuclide names.',
+ '\n    Biota species remapped to MARIS db:\n        CARD EDU: Cerastoderma edule\n        LAMI SAC: Saccharina latissima\n        PSET MAX: Scophthalmus maximus\n        STIZ LUC: Sander luciopercas\n    ',
+ "\n    Update bodypart id based on MARIS dbo_bodypar.xlsx:\n        - 3: 'Whole animal eviscerated without head',\n        - 12: 'Viscera',\n        - 8: 'Skin'\n    ",
+ "\n    Update sediment id  based on MARIS dbo_sedtype.xlsx\n        -99: '(Not available)'\n        - na: '(Not available)'\n        - 56: '(Not available)'\n        - 73: '(Not available)'\n    ",
+ '\n    Update biogroup id  based on MARIS dbo_species.xlsx\n    ',
+ 'Convert data from long to wide with renamed columns.',
+ 'Encode time as `int` representing seconds since xxx',
+ 'Drop row when both longitude &amp; latitude equal 0. Drop unrealistic longitude &amp; latitude values. Convert longitude &amp; latitude `,` separator to `.` separator.']</code></pre>
+</div>
+</div>
+</section>
+<section id="feed-global-attributes" class="level3">
+<h3 class="anchored" data-anchor-id="feed-global-attributes">Feed global attributes</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L487" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_attrs" class="level3">
+<h3 class="anchored" data-anchor-id="get_attrs">get_attrs</h3>
+<blockquote class="blockquote">
+<pre><code> get_attrs (tfm, zotero_key, kw=['oceanography', 'Earth Science &gt; Oceans &gt;
+            Ocean Chemistry&gt; Radionuclides', 'Earth Science &gt; Human
+            Dimensions &gt; Environmental Impacts &gt; Nuclear Radiation
+            Exposure', 'Earth Science &gt; Oceans &gt; Ocean Chemistry &gt; Ocean
+            Tracers, Earth Science &gt; Oceans &gt; Marine Sediments', 'Earth
+            Science &gt; Oceans &gt; Ocean Chemistry, Earth Science &gt; Oceans &gt;
+            Sea Ice &gt; Isotopes', 'Earth Science &gt; Oceans &gt; Water Quality &gt;
+            Ocean Contaminants', 'Earth Science &gt; Biological
+            Classification &gt; Animals/Vertebrates &gt; Fish', 'Earth Science &gt;
+            Biosphere &gt; Ecosystems &gt; Marine Ecosystems', 'Earth Science &gt;
+            Biological Classification &gt; Animals/Invertebrates &gt; Mollusks',
+            'Earth Science &gt; Biological Classification &gt;
+            Animals/Invertebrates &gt; Arthropods &gt; Crustaceans', 'Earth
+            Science &gt; Biological Classification &gt; Plants &gt; Macroalgae
+            (Seaweeds)'])</code></pre>
+</blockquote>
+<div id="c2e8aad3" class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>get_attrs(tfm, zotero_key<span class="op">=</span><span class="st">'26VMZZ2Q'</span>, kw<span class="op">=</span>kw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'geospatial_lat_min': '31.1667',
+ 'geospatial_lat_max': '65.6347',
+ 'geospatial_lon_min': '9.41',
+ 'geospatial_lon_max': '53.458',
+ 'geospatial_bounds': 'POLYGON ((9.41 53.458, 31.1667 53.458, 31.1667 65.6347, 9.41 65.6347, 9.41 53.458))',
+ 'time_coverage_start': '1984-01-10T00:00:00',
+ 'time_coverage_end': '2021-12-06T00:00:00',
+ 'title': 'Environmental database - Helsinki Commission Monitoring of Radioactive Substances',
+ 'summary': 'MORS Environment database has been used to collate data resulting from monitoring of environmental radioactivity in the Baltic Sea based on HELCOM Recommendation 26/3.\n\nThe database is structured according to HELCOM Guidelines on Monitoring of Radioactive Substances (https://www.helcom.fi/wp-content/uploads/2019/08/Guidelines-for-Monitoring-of-Radioactive-Substances.pdf), which specifies reporting format, database structure, data types and obligatory parameters used for reporting data under Recommendation 26/3.\n\nThe database is updated and quality assured annually by HELCOM MORS EG.',
+ 'creator_name': '[{"creatorType": "author", "name": "HELCOM MORS"}]',
+ 'keywords': 'oceanography, Earth Science &gt; Oceans &gt; Ocean Chemistry&gt; Radionuclides, Earth Science &gt; Human Dimensions &gt; Environmental Impacts &gt; Nuclear Radiation Exposure, Earth Science &gt; Oceans &gt; Ocean Chemistry &gt; Ocean Tracers, Earth Science &gt; Oceans &gt; Marine Sediments, Earth Science &gt; Oceans &gt; Ocean Chemistry, Earth Science &gt; Oceans &gt; Sea Ice &gt; Isotopes, Earth Science &gt; Oceans &gt; Water Quality &gt; Ocean Contaminants, Earth Science &gt; Biological Classification &gt; Animals/Vertebrates &gt; Fish, Earth Science &gt; Biosphere &gt; Ecosystems &gt; Marine Ecosystems, Earth Science &gt; Biological Classification &gt; Animals/Invertebrates &gt; Mollusks, Earth Science &gt; Biological Classification &gt; Animals/Invertebrates &gt; Arthropods &gt; Crustaceans, Earth Science &gt; Biological Classification &gt; Plants &gt; Macroalgae (Seaweeds)',
+ 'publisher_postprocess_logs': "Convert nuclide names to lowercase &amp; strip any trailing space(s), Remap to MARIS radionuclide names., \n    Biota species remapped to MARIS db:\n        CARD EDU: Cerastoderma edule\n        LAMI SAC: Saccharina latissima\n        PSET MAX: Scophthalmus maximus\n        STIZ LUC: Sander luciopercas\n    , \n    Update bodypart id based on MARIS dbo_bodypar.xlsx:\n        - 3: 'Whole animal eviscerated without head',\n        - 12: 'Viscera',\n        - 8: 'Skin'\n    , \n    Update sediment id  based on MARIS dbo_sedtype.xlsx\n        -99: '(Not available)'\n        - na: '(Not available)'\n        - 56: '(Not available)'\n        - 73: '(Not available)'\n    , \n    Update biogroup id  based on MARIS dbo_species.xlsx\n    , Convert data from long to wide with renamed columns., Encode time as `int` representing seconds since xxx, Drop row when both longitude &amp; latitude equal 0. Drop unrealistic longitude &amp; latitude values. Convert longitude &amp; latitude `,` separator to `.` separator."}</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L498" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="enums_xtra" class="level3">
+<h3 class="anchored" data-anchor-id="enums_xtra">enums_xtra</h3>
+<blockquote class="blockquote">
+<pre><code> enums_xtra (tfm, vars)</code></pre>
+</blockquote>
+<p><em>Retrieve a subset of the lengthy enum as ‘species_t’ for instance</em></p>
+</section>
+<section id="encoding" class="level3">
+<h3 class="anchored" data-anchor-id="encoding">Encoding</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/handlers/ospar.py#L509" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="encode" class="level3">
+<h3 class="anchored" data-anchor-id="encode">encode</h3>
+<blockquote class="blockquote">
+<pre><code> encode (fname_in, fname_out, nc_tpl_path, **kwargs)</code></pre>
+</blockquote>
+<div id="5fd973e4" class="cell">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>encode(fname_in, fname_out, nc_tpl_path(), verbose<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

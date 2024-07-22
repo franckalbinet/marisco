@@ -79,7 +79,7 @@ def copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_dest):
 @patch
 def _create_and_copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_dest, dtype_name):
     variable_type = self.enum_types.get(dtype_name, var_src.datatype)
-    # use the group_dest dimensions
+    # Use the group_dest dimensions
     group_dest.createVariable(var_name, variable_type, group_dest.dimensions, compression='zlib', complevel=9)            
     isNotEnum = type(variable_type) != netCDF4._netCDF4.EnumType
     values = df[var_name].values

@@ -45,21 +45,37 @@ class Transformer():
 
 # %% ../nbs/api/utils.ipynb 8
 def has_valid_varname(
-    var_names:list, # variable (nuclide) names
+    var_names:list, # variable names
     cdl_path:str, # Path to MARIS CDL file (point of truth)
+    group = None, # Check if the variable names is contained in the group
 ):
     "Check that proposed variable names are in MARIS CDL"
     has_valid = True
-    with Dataset(cdl_path) as nc:
-        grp = nc.groups[list(nc.groups.keys())[0]] # get any group
-        for name in var_names:
-            if name not in grp.variables.keys():
-                has_valid = False
-                print(f'"{name}" variable name not found in MARIS CDL')
     
-    return has_valid
+    if group != None:
+        with Dataset(cdl_path) as nc:
+            # Get variable names for group in CDL 
+            grp_keys = nc.groups[group].variables.keys() # get any group
+    else:
+        with Dataset(cdl_path) as nc:
+            # Get variable names in CDL for all groups
+            grp_keys=[]
+            for grp in nc.groups.values():
+                grp_keys.extend(list(grp.variables.keys()))
+            # Get unique 
+            grp_keys = list(set(grp_keys))        
+        
+    # Check if var_names is in keys
+    for name in var_names:
+        if name not in grp_keys:
+            has_valid = False
+            if group != None:
+                print(f'"{name}" variable name not found in group "{group}" of MARIS CDL')
+            else:
+                print(f'"{name}" variable name not found in MARIS CDL')
+        return has_valid             
 
-# %% ../nbs/api/utils.ipynb 12
+# %% ../nbs/api/utils.ipynb 15
 def get_bbox(df,
              coord_cols=('lon', 'lat')
             ):
@@ -67,7 +83,7 @@ def get_bbox(df,
     arr = [(row[x], row[y]) for _, row in df.iterrows()]
     return MultiPoint(arr).envelope
 
-# %% ../nbs/api/utils.ipynb 19
+# %% ../nbs/api/utils.ipynb 22
 def download_files_in_folder(owner:str, 
                              repo:str, 
                              src_dir:str, 
@@ -101,7 +117,7 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
     else:
         print(f"Error: {response.status_code}")
 
-# %% ../nbs/api/utils.ipynb 21
+# %% ../nbs/api/utils.ipynb 24
 def match_worms(
     name:str # Name of species to look up in WoRMS
     ):
@@ -124,7 +140,7 @@ def match_worms(
     else:
         return -1
 
-# %% ../nbs/api/utils.ipynb 31
+# %% ../nbs/api/utils.ipynb 34
 @dataclass
 class Match:
     matched_id: int
@@ -132,7 +148,138 @@ class Match:
     source_name: str
     match_score: int
 
-# %% ../nbs/api/utils.ipynb 32
+# %% ../nbs/api/utils.ipynb 35
+def match_maris_lut(
+    lut_path: str, # Path to MARIS species authoritative species look-up table
+    data_provider_name: str, # Name of data provider nomenclature item to look up 
+    maris_id: str, # Id of MARIS lookup table nomenclature item to match
+    maris_name: str, # Name of MARIS lookup table nomenclature item to match
+    dist_fn: Callable = jf.levenshtein_distance, # Distance function
+    nresults: int = 10 # Maximum number of results to return
+) -> pd.DataFrame:
+    """
+    Fuzzy matching data provider and MARIS lookup tables (e.g biota species, sediments, ...).
+    """
+    df = pd.read_excel(lut_path)
+    df = df.dropna(subset=[maris_name])
+    df = df.astype({maris_id: 'int'})
+
+    # Vectorized operation to calculate the distance between the input name and all names in the DataFrame
+    df['score'] = df[maris_name].str.lower().apply(lambda x: dist_fn(data_provider_name.lower(), x))
+
+    # Sort the DataFrame by score and select the top nresults
+    df = df.sort_values(by='score', ascending=True)[:nresults]
+
+    # Select the id and name columns and return the DataFrame
+    return df[[maris_id, maris_name, 'score']]
+
+# %% ../nbs/api/utils.ipynb 44
+def has_valid_varname(
+    var_names:list, # variable names
+    cdl_path:str, # Path to MARIS CDL file (point of truth)
+    group = None, # Check if the variable names is contained in the group
+):
+    "Check that proposed variable names are in MARIS CDL"
+    has_valid = True
+    with Dataset(cdl_path) as nc:
+        cdl_vars={}
+        all_vars=[]
+        # get variable names in CDL 
+        for grp in nc.groups.values():
+            # Create a list of var for each group
+            vars = list(grp.variables.keys())
+            cdl_vars[grp.name] = vars
+            all_vars.extend(vars)
+        
+    if group != None:
+        allowed_vars= cdl_vars[group]
+    else: 
+        # get unique 
+        allowed_vars = list(set(all_vars))
+        
+    for name in var_names:
+        if name not in allowed_vars:
+            has_valid = False
+            if group != None:
+                print(f'"{name}" variable name not found in group "{group}" of MARIS CDL')
+            else:
+                print(f'"{name}" variable name not found in MARIS CDL')
+    return has_valid    
+
+# %% ../nbs/api/utils.ipynb 50
+def get_bbox(df,
+             coord_cols=('lon', 'lat')
+            ):
+    x, y = coord_cols        
+    arr = [(row[x], row[y]) for _, row in df.iterrows()]
+    return MultiPoint(arr).envelope
+
+# %% ../nbs/api/utils.ipynb 57
+def download_files_in_folder(owner:str, 
+                             repo:str, 
+                             src_dir:str, 
+                             dest_dir:str
+                             ):
+    "Make a GET request to the GitHub API to get the contents of the folder"
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{src_dir}"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        contents = response.json()
+
+        # Iterate over the files and download them
+        for item in contents:
+            if item["type"] == "file":
+                fname = item["name"]
+                download_file(owner, repo, src_dir, dest_dir, fname)
+    else:
+        print(f"Error: {response.status_code}")
+
+def download_file(owner, repo, src_dir, dest_dir, fname):
+    # Make a GET request to the GitHub API to get the raw file contents
+    url = f"https://raw.githubusercontent.com/{owner}/{repo}/master/{src_dir}/{fname}"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        # Save the file locally
+        with open(Path(dest_dir) / fname, "wb") as file:
+            file.write(response.content)
+        print(f"{fname} downloaded successfully.")
+    else:
+        print(f"Error: {response.status_code}")
+
+# %% ../nbs/api/utils.ipynb 59
+def match_worms(
+    name:str # Name of species to look up in WoRMS
+    ):
+    "Lookup `name` in WoRMS (fuzzy match)"
+    url = 'https://www.marinespecies.org/rest/AphiaRecordsByMatchNames'
+    params = {
+        'scientificnames[]': [name],
+        'marine_only': 'true'
+    }
+    headers = {
+        'accept': 'application/json'
+    }
+    
+    response = requests.get(url, params=params, headers=headers)
+    
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        data = response.json()
+        return data
+    else:
+        return -1
+
+# %% ../nbs/api/utils.ipynb 69
+@dataclass
+class Match:
+    matched_id: int
+    matched_maris_name: str
+    source_name: str
+    match_score: int
+
+# %% ../nbs/api/utils.ipynb 70
 def match_maris_lut(
     lut_path: str, # Path to MARIS species authoritative species look-up table
     data_provider_name: str, # Name of data provider nomenclature item to look up 

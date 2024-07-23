@@ -5,7 +5,7 @@ __all__ = ['fname_in', 'fname_out', 'ref_id', 'netcdf4_to_df', 'ReshapeWideToLon
            'GetSampleTypeCB', 'get_nucnames_lut', 'LookupNuclideByIdCB', 'deg_to_dms', 'ConvertLonLatCB',
            'get_unitnames_lut', 'LookupUnitByIdCB', 'get_detectionlimitnames_lut', 'LookupValueTypeByIdCB',
            'get_species_lut', 'LookupSpeciesByIdCB', 'get_bodypart_lut', 'LookupBodypartByIdCB', 'get_sediments_lut',
-           'LookupSedimentTypeByIdCB', 'get_renaming_rules_netcdf2OpenRefine', 'SelectAndRenameColumnCB', 'encode']
+           'LookupSedimentTypeByIdCB', 'get_renaming_rules_netcdf2OpenRefine', 'encode']
 
 # %% ../nbs/handlers/netcdf_to_csv.ipynb 4
 from pathlib import Path # This module offers classes representing filesystem paths
@@ -343,29 +343,6 @@ def get_renaming_rules_netcdf2OpenRefine():
                                 #'Drying Method' : drying_method
                                 }
                     }
-
-# %% ../nbs/handlers/netcdf_to_csv.ipynb 72
-class SelectAndRenameColumnCB(Callback):
-    def __init__(self,
-                 fn_renaming_rules,
-                ):
-        fc.store_attr()
-    def __call__(self, tfm):
-        renaming = self.fn_renaming_rules()
-        for grp in tfm.dfs.keys():            
-            # get columns related to the grp (e.g. 'biota').
-            coi = [v for k, v in renaming.items() if grp in k]
-            # Join cols of interest
-            coi_rename = {}
-            for d in coi:
-                for k, v in d.items(): 
-                    coi_rename[k]=v
-            # list cols
-            cols = list(coi_rename.keys()) 
-            # select cols in df 
-            tfm.dfs[grp] = tfm.dfs[grp].loc[:, cols]
-            # Rename cols
-            tfm.dfs[grp].rename(columns=coi_rename, inplace=True)
 
 # %% ../nbs/handlers/netcdf_to_csv.ipynb 76
 def encode(fname_in, fname_out, ref_id=-1, **kwargs):

@@ -9,8 +9,9 @@ __all__ = ['fname_in', 'fname_out_nc', 'fname_out_csv', 'zotero_key', 'ref_id', 
            'LookupBiotaBodyPartCB', 'get_biogroup_lut', 'LookupBiogroupCB', 'preprocess_sedi', 'LookupSedimentCB',
            'LookupUnitCB', 'get_detectionlimit_lut', 'LookupDetectionLimitCB', 'RemapDataProviderSampleIdCB',
            'get_filtered_lut', 'LookupFiltCB', 'RemapStationIdCB', 'RemapProfileIdCB', 'RemapSedSliceTopBottomCB',
-           'LookupDryWetRatio', 'ddmmmm2dddddd', 'FormatCoordinates', 'get_renaming_rules', 'SelectAndRenameColumnCB',
-           'ReshapeLongToWide', 'get_attrs', 'enums_xtra', 'encode']
+           'RemapTaxonRepNameCB', 'LookupDryWetRatio', 'ddmmmm2dddddd', 'FormatCoordinates', 'get_renaming_rules',
+           'SelectAndRenameColumnCB', 'ReshapeLongToWide', 'get_attrs', 'enums_xtra', 'encode',
+           'LookupTimeFromEncodedTimeCB', 'GetSampleTypeCB', 'get_nucnames_lut', 'LookupNuclideByIdCB']
 
 # %% ../../nbs/handlers/helcom.ipynb 7
 import pandas as pd # Python package that provides fast, flexible, and expressive data structures.
@@ -25,7 +26,7 @@ from typing import List, Dict, Callable, Optional, Tuple
 from ..utils import (has_valid_varname, match_worms, match_maris_lut, Match)
 from ..callbacks import (Callback, Transformer, EncodeTimeCB, SanitizeLonLatCB)
 from ..metadata import (GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB)
-from ..configs import (base_path, nc_tpl_path, cfg, cache_path, cdl_cfg, Enums, lut_path,
+from ..configs import (base_path,nuc_lut_path, nc_tpl_path, cfg, cache_path, cdl_cfg, Enums, lut_path,
                              species_lut_path, sediments_lut_path, bodyparts_lut_path, 
                              detection_limit_lut_path, filtered_lut_path, area_lut_path)
 from ..serializers import NetCDFEncoder
@@ -799,7 +800,7 @@ class LookupFiltCB(Callback):
         df['FILT'] = df['FILT'].apply(lambda x: rules.get(x, 'Not available'))
         
         # Perform lookup
-        df['FILT'] = df['FILT'].map(lambda x: lut.get(x, 'Not Available'))
+        df['FILT'] = df['FILT'].map(lambda x: lut.get(x, 0))
 
 
 # %% ../../nbs/handlers/helcom.ipynb 233
@@ -892,7 +893,45 @@ class RemapSedSliceTopBottomCB(Callback):
         df['top'] = df['UPPSLI']
 
 
-# %% ../../nbs/handlers/helcom.ipynb 256
+# %% ../../nbs/handlers/helcom.ipynb 258
+class RemapTaxonRepNameCB(Callback):
+    """
+    A callback to remap the 'TaxonRepName' column to the 'RUBIN' column in the 'biota' DataFrame.
+    This is done to conform to the MARIS format.
+    """
+    
+    def __init__(self):
+        """
+        Initialize the RemapTaxonRepNameCB callback.
+        """
+        fc.store_attr()
+
+    def __call__(self, tfm: 'Transformer'):
+        """
+        Apply the taxon representation name remapping to the DataFrame in the transformer.
+
+        Args:
+            tfm (Transformer): The transformer object containing DataFrames.
+        """
+        # Check if 'biota' DataFrame exists in the transformer
+        if 'biota' in tfm.dfs:
+            self._remap_taxon_rep_name(tfm.dfs['biota'])
+
+    def _remap_taxon_rep_name(self, df: pd.DataFrame):
+        """
+        Remap the 'TaxonRepName' column to the 'RUBIN' column values.
+
+        Args:
+            df (pd.DataFrame): The DataFrame to modify.
+        """
+        # Ensure both columns exist before attempting to remap
+        if 'RUBIN' in df.columns:
+            df['TaxonRepName'] = df['RUBIN']
+        else:
+            print("Warning: 'RUBIN' column not found in DataFrame.")
+
+
+# %% ../../nbs/handlers/helcom.ipynb 264
 class LookupDryWetRatio(Callback):
     "Lookup dry-wet ratio and format for MARIS."
 
@@ -925,7 +964,7 @@ class LookupDryWetRatio(Callback):
         df.loc[df['dry_wet_ratio'] == 0, 'dry_wet_ratio'] = np.NaN
 
 
-# %% ../../nbs/handlers/helcom.ipynb 263
+# %% ../../nbs/handlers/helcom.ipynb 271
 # Columns of interest coordinates
 coi_coordinates = {
     'seawater': {
@@ -948,7 +987,7 @@ coi_coordinates = {
     }
 }
 
-# %% ../../nbs/handlers/helcom.ipynb 264
+# %% ../../nbs/handlers/helcom.ipynb 272
 def ddmmmm2dddddd(ddmmmm):
     """
     Convert coordinates from 'ddmmmm' format to 'dddddd' format.
@@ -967,7 +1006,7 @@ def ddmmmm2dddddd(ddmmmm):
     return round(int(degs) + (mins / 60), 6)
 
 
-# %% ../../nbs/handlers/helcom.ipynb 265
+# %% ../../nbs/handlers/helcom.ipynb 273
 class FormatCoordinates(Callback):
     """
     Format coordinates for MARIS. Converts coordinates from 'ddmmmm' to 'dddddd' format if needed.
@@ -1029,7 +1068,7 @@ class FormatCoordinates(Callback):
         )
 
 
-# %% ../../nbs/handlers/helcom.ipynb 281
+# %% ../../nbs/handlers/helcom.ipynb 289
 # Define columns of interest (keys) and renaming rules (values).
 def get_renaming_rules(encoding_type='netcdf'):
     vars = cdl_cfg()['vars']
@@ -1054,7 +1093,7 @@ def get_renaming_rules(encoding_type='netcdf'):
                 # SEAWATER
                 'SALIN': vars['suffixes']['salinity']['name'],
                 'SDEPTH': vars['defaults']['smp_depth']['name'],
-                'FILT': vars['suffixes']['filtered']['name'],
+                #'FILT': vars['suffixes']['filtered']['name'], Need to fix
                 'TTEMP': vars['suffixes']['temperature']['name'],
                 'TDEPTH': vars['defaults']['tot_depth']['name'],
 
@@ -1077,67 +1116,68 @@ def get_renaming_rules(encoding_type='netcdf'):
         return {
             ('seawater', 'biota', 'sediment'): {
                 # DEFAULT
-                'latitude': 'lat',
-                'longitude': 'lon',
-                'begperiod': 'time',
-                'endperiod': 'endperiod',
-                'nuclide_id': 'NUCLIDE',
-                'detection': 'detection_limit',
-                'unit_id': 'unit',
-                'activity': 'value',
-                'uncertaint': 'uncertainty',
-                'vartype': 'vartype',
-                'rangelow': 'rangelow',
-                'rangeupp': 'rangeupp',
-                'rl_detection': 'rl_detection',
-                'ru_detection': 'ru_detection',
-                'freq': 'freq',
-                'sampdepth': 'SDEPTH',
-                'samparea': 'samparea',
-                'salinity': 'SALIN',
-                'temperatur': 'TTEMP',
-                'filtered': 'FILT',
-                'oxygen': 'oxygen',
-                'sampquality': 'sampquality',
-                'station': 'station',
-                'samplabcode': 'samplabcode',
-                'profile': 'profile',
-                'transect': 'transect',
-                'IODE_QualityFlag': 'IODE_QualityFlag',
-                'totdepth': 'TDEPTH',
-                'counting_method': 'counmet_id',
-                'sampling_method': 'sampmet_id',
-                'preparation_method': 'prepmet_id',
+                'lat': 'latitude',
+                'lon': 'longitude',
+                'time': 'begperiod',
+                #'endperiod': 'endperiod',
+                'NUCLIDE': 'nuclide_id',
+                'detection_limit': 'detection',
+                'unit': 'unit_id',
+                'value': 'activity',
+                'uncertainty': 'uncertaint',
+                #'vartype': 'vartype',
+                #'rangelow': 'rangelow',
+                #'rangeupp': 'rangeupp',
+                #'rl_detection': 'rl_detection',
+                #'ru_detection': 'ru_detection',
+                #'freq': 'freq',
+                'SDEPTH': 'sampdepth',
+                #'samparea': 'samparea',
+                'SALIN': 'salinity',
+                'TTEMP': 'temperatur',
+                'FILT': 'filtered',
+                #'oxygen': 'oxygen',
+                #'sampquality': 'sampquality',
+                #'station': 'station',
+                #'samplabcode': 'samplabcode',
+                #'profile': 'profile',
+                #'transect': 'transect',
+                #'IODE_QualityFlag': 'IODE_QualityFlag',
+                'TDEPTH': 'totdepth',
+                #'counmet_id': 'counting_method',
+                #'sampmet_id': 'sampling_method',
+                #'prepmet_id': 'preparation_method',
                 'sampnote': 'sampnote',
                 'measurenote': 'measurenote'
             },
             ('seawater',): {
                 # SEAWATER
-                'volume': 'volume',
-                'filtpore': 'filtpore',
-                'acid': 'acid'
+                #'volume': 'volume',
+                #'filtpore': 'filtpore',
+                #'acid': 'acid'
             },
             ('biota',): {
                 # BIOTA
-                'TaxonRepName': 'TaxonRepName',
-                'species_id': 'species',
-                'bodypar_id': 'body_part',
-                'drywt': 'drywt',
-                'wetwt': 'wetwt',
-                'percentwt': 'percentwt',
-                'drymet_id': 'drymet_id'
+                #'TaxonRepName': 'TaxonRepName',
+                'species': 'species_id',
+                'body_part': 'bodypar_id',
+                #'drywt': 'drywt',
+                #'wetwt': 'wetwt',
+                #'percentwt': 'percentwt',
+                #'drymet_id': 'drymet_id'
             },
             ('sediment',): {
                 # SEDIMENT
-                'sedtype_id': 'sed_type',
-                'sedtrap': 'sedtrap',
-                'sliceup': 'sliceup',
-                'slicedown': 'slicedown',
-                'SedRepName': 'SedRepName',
-                'drywt': 'drywt',
-                'wetwt': 'wetwt',
-                'percentwt': 'percentwt',
-                'drymet_id': 'drymet_id'
+                'sed_type': 'sedtype_id',
+                #'sedtrap': 'sedtrap',
+                'top': 'sliceup',
+                'bottom': 'slicedown',
+                #'SedRepName': 'SedRepName',
+                #'drywt': 'drywt',
+                #'wetwt': 'wetwt',
+                #'percentwt': 'percentwt',
+                #'drymet_id': 'drymet_id'
+                
             }
         }
     
@@ -1146,7 +1186,7 @@ def get_renaming_rules(encoding_type='netcdf'):
         return None
 
 
-# %% ../../nbs/handlers/helcom.ipynb 283
+# %% ../../nbs/handlers/helcom.ipynb 291
 class SelectAndRenameColumnCB(Callback):
     """
     A callback to select and rename columns in a DataFrame based on provided renaming rules
@@ -1154,16 +1194,16 @@ class SelectAndRenameColumnCB(Callback):
     because their keys were not found in the DataFrame.
     """
     
-    def __init__(self, fn_renaming_rules, encoding_type='netcdf'):
+    def __init__(self, fn_renaming_rules, encoding_type='netcdf', verbose=False):
         """
         Initialize the SelectAndRenameColumnCB callback.
 
         Args:
             fn_renaming_rules (function): A function that returns a dictionary of renaming rules.
             encoding_type (str): The encoding type ('netcdf' or 'openrefine') to determine which renaming rules to use.
+            verbose (bool): Whether to print out renaming rules that were not applied.
         """
-        self.fn_renaming_rules = fn_renaming_rules
-        self.encoding_type = encoding_type
+        fc.store_attr()
 
     def __call__(self, tfm):
         """
@@ -1175,7 +1215,7 @@ class SelectAndRenameColumnCB(Callback):
         try:
             renaming_rules = self.fn_renaming_rules(self.encoding_type)
         except ValueError as e:
-            print(e)
+            print(f"Error fetching renaming rules: {e}")
             return
 
         for group in tfm.dfs.keys():
@@ -1186,10 +1226,12 @@ class SelectAndRenameColumnCB(Callback):
                 continue
 
             # Apply renaming rules and track keys not found in the DataFrame
-            not_found_keys = self._apply_renaming(tfm.dfs[group], group_rules)
+            df = tfm.dfs[group]
+            df, not_found_keys = self._apply_renaming(df, group_rules)
+            tfm.dfs[group] = df
             
             # Print any renaming rules that were not used
-            if not_found_keys:
+            if not_found_keys and self.verbose:
                 print(f"\nGroup '{group}' has the following renaming rules not applied:")
                 for old_col in not_found_keys:
                     print(f"Key '{old_col}' from renaming rules was not found in the DataFrame.")
@@ -1220,20 +1262,27 @@ class SelectAndRenameColumnCB(Callback):
             rename_rules (dict): Dictionary of column renaming rules.
 
         Returns:
-            set: A set of column names from renaming rules that were not found in the DataFrame.
+            tuple: A tuple containing:
+                - The DataFrame with columns renamed and filtered.
+                - A set of column names from renaming rules that were not found in the DataFrame.
         """
         existing_columns = set(df.columns)
         valid_rules = {old_col: new_col for old_col, new_col in rename_rules.items() if old_col in existing_columns}
 
+        # Ensure that columns to keep includes both existing and valid new columns
+        columns_to_keep = set(valid_rules.keys()).union(valid_rules.values())
+        columns_to_keep = columns_to_keep.intersection(existing_columns)
+        df = df[list(columns_to_keep)]
+        
         # Apply renaming
         df.rename(columns=valid_rules, inplace=True)
 
         # Determine which keys were not found
         not_found_keys = set(rename_rules.keys()) - existing_columns
-        return not_found_keys
+        return df, not_found_keys
 
 
-# %% ../../nbs/handlers/helcom.ipynb 288
+# %% ../../nbs/handlers/helcom.ipynb 296
 class ReshapeLongToWide(Callback):
     "Convert data from long to wide with renamed columns."
     def __init__(self, columns=['nuclide'], values=['value']):
@@ -1250,15 +1299,14 @@ class ReshapeLongToWide(Callback):
     def pivot(self, df):
         # Among all possible 'derived cols' select the ones present in df
         derived_coi = [col for col in self.derived_cols if col in df.columns]
-        
+        df.index.name = 'org_index'
         df=df.reset_index()
-        
         idx = list(set(df.columns) - set(self.columns + derived_coi + self.values))
         
         # Create a fill_value to replace NaN values in the columns used as the index in the pivot table.
         # Check if num_fill_value is already in the dataframe index values. If num_fill_value already exists
         # then increase num_fill_value by 1 until a value is found for num_fill_value that is not in the dataframe. 
-        num_fill_value = 99999999999999
+        num_fill_value = -999
         while (df[idx] == num_fill_value).any().any():
             num_fill_value += 1
         # Fill in nan values for each col found in idx. 
@@ -1277,20 +1325,23 @@ class ReshapeLongToWide(Callback):
                               aggfunc=lambda x: x
                               ).reset_index()
         
-        pivot_df.index.name = 'sample'
-        pivot_df=pivot_df.reset_index('sample')
-        
+
         # Replace fill_value  with  np.nan
         pivot_df[idx]=pivot_df[idx].replace({'NOT AVAILABLE': np.nan,
                                              num_fill_value : np.nan})
+        # Set the index to be the org_index
+        pivot_df = pivot_df.set_index('org_index')
+                
         return (pivot_df)
 
     def __call__(self, tfm):
         for grp in tfm.dfs.keys():
             tfm.dfs[grp] = self.pivot(tfm.dfs[grp])
             tfm.dfs[grp].columns = self.renamed_cols(tfm.dfs[grp].columns)
+            
+    
 
-# %% ../../nbs/handlers/helcom.ipynb 295
+# %% ../../nbs/handlers/helcom.ipynb 305
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -1303,7 +1354,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/helcom.ipynb 296
+# %% ../../nbs/handlers/helcom.ipynb 306
 def get_attrs(tfm, zotero_key, kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -1314,7 +1365,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 298
+# %% ../../nbs/handlers/helcom.ipynb 308
 def enums_xtra(tfm, vars):
     "Retrieve a subset of the lengthy enum as 'species_t' for instance"
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
@@ -1325,29 +1376,30 @@ def enums_xtra(tfm, vars):
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/helcom.ipynb 300
+# %% ../../nbs/handlers/helcom.ipynb 310
 def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[LowerStripRdnNameCB(),
                                 RemapRdnNameCB(),
                                 ParseTimeCB(),
                                 EncodeTimeCB(cfg()),                             
-                                NormalizeUncUnitCB(),
+                                NormalizeUncCB(),
+                                SanitizeValue(coi_val),                       
                                 LookupBiotaSpeciesCB(get_maris_species),
-                                LookupBiotaBodyPartCB(get_maris_bodypart), 
+                                LookupBiotaBodyPartCB(get_maris_bodypart),                          
                                 LookupBiogroupCB(partial(get_biogroup_lut, species_lut_path())),
                                 LookupSedimentCB(get_maris_sediments),
                                 LookupUnitCB(),
-                                LookupDetectionLimitCB(),
+                                LookupDetectionLimitCB(),    
                                 RemapDataProviderSampleIdCB(),
                                 RemapStationIdCB(),
                                 RemapProfileIdCB(), 
                                 RemapSedSliceTopBottomCB(),
+                                RemapTaxonRepNameCB(),
                                 LookupDryWetRatio(),
                                 FormatCoordinates(coi_coordinates, ddmmmm2dddddd),
                                 SanitizeLonLatCB(),
-                                SanitizeValue(coi_val),
-                                SelectAndRenameColumnCB(get_renaming_rules_netcdf),
+                                SelectAndRenameColumnCB(get_renaming_rules, encoding_type='netcdf'),
                                 ReshapeLongToWide()
                                 ])
     tfm()
@@ -1359,3 +1411,136 @@ def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
                             enums_xtra=enums_xtra(tfm, vars=['species', 'body_part'])
                            )
     encoder.encode()
+
+# %% ../../nbs/handlers/helcom.ipynb 318
+class LookupTimeFromEncodedTimeCB(Callback):
+    """
+    A callback to convert encoded time into a combined date and time column.
+    """
+
+    def __init__(self, cfg):
+        """
+        Initialize the LookupTimeFromEncodedTime callback.
+
+        Args:
+            cfg (dict): Configuration dictionary containing time units.
+        """
+        fc.store_attr()
+
+    def __call__(self, tfm):
+        """
+        Apply the conversion to DataFrames in the transformer to create a combined date and time column.
+
+        Args:
+            tfm (Transformer): The transformer object containing DataFrames.
+        """
+        for grp in tfm.dfs.keys():
+            # Apply format_date and format_time to 'time' column, and combine into a single 'begperiod' column
+            tfm.dfs[grp]['begperiod'] = tfm.dfs[grp]['begperiod'].apply(lambda x: self.format_datetime(x))
+
+    def format_datetime(self, x):
+        """
+        Convert encoded time to a combined date and time string.
+
+        Args:
+            x (float): Encoded time value.
+
+        Returns:
+            str: Combined date and time string in 'dd-MMM-yyyy HH:mm:ss' format.
+        """
+        date_time = num2pydate(x, units=self.cfg['units']['time'])
+        return date_time.strftime('%d/%b/%Y %H:%M:%S')
+
+
+# %% ../../nbs/handlers/helcom.ipynb 323
+class GetSampleTypeCB(Callback):
+    """
+    A callback to set the 'Sample type' column in DataFrames based on a lookup table.
+    If the 'type_lut' is provided, it will use it to map group names to sample types.
+    Otherwise, it defaults to using the group name in uppercase.
+    """
+    
+    def __init__(self, type_lut=None):
+        """
+        Initialize the GetSampleTypeCB callback.
+
+        Args:
+            type_lut (dict, optional): A lookup table to map group names to sample types.
+        """
+        fc.store_attr()
+
+    def __call__(self, tfm):
+        """
+        Apply the sample type lookup to DataFrames in the transformer.
+
+        Args:
+            tfm (Transformer): The transformer object containing DataFrames.
+        """
+        for key in tfm.dfs.keys():
+            df = tfm.dfs[key]
+            
+            # Determine the sample type
+            sample_type = self._get_sample_type(key)
+            
+            # Set the 'Sample type' column
+            df['Sample type'] = sample_type
+
+    def _get_sample_type(self, group_name):
+        """
+        Determine the sample type for a given group name using the lookup table.
+
+        Args:
+            group_name (str): The name of the group.
+
+        Returns:
+            str: The sample type.
+        """
+        
+        # Return the sample type from the lookup table
+        return self.type_lut[group_name.upper()]
+
+
+# %% ../../nbs/handlers/helcom.ipynb 327
+def get_nucnames_lut():
+    df = pd.read_excel(nuc_lut_path(), usecols=['nc_name','nuclide_id'])
+    return df.set_index('nc_name').to_dict()['nuclide_id']
+
+# %% ../../nbs/handlers/helcom.ipynb 328
+class LookupNuclideByIdCB(Callback):
+    """
+    A callback to lookup and clean MARIS nuclide identifiers by replacing `nuclide` IDs
+    with corresponding names from a lookup table.
+    """
+    
+    def __init__(self, fn_lut=get_nucnames_lut):
+        """
+        Initialize the LookupNuclideByIdCB callback.
+
+        Args:
+            fn_lut (function): A function that returns a lookup table for nuclide names.
+        """
+        fc.store_attr()
+
+    def __call__(self, tfm):
+        """
+        Apply the nuclide lookup to DataFrames in the transformer.
+
+        Args:
+            tfm (Transformer): The transformer object containing DataFrames.
+        """
+        lut = self.fn_lut()
+        for key in tfm.dfs.keys():
+            df = tfm.dfs[key]
+            self._lookup_and_clean_nuclides(df, lut)
+
+    def _lookup_and_clean_nuclides(self, df, lut):
+        """
+        Replace nuclide IDs with names from the lookup table and clean the 'Nuclide' column.
+
+        Args:
+            df (pd.DataFrame): The DataFrame to process.
+            lut (dict): The lookup table for nuclide names.
+        """
+        # Replace nuclide IDs with names from the lookup table
+        df['nuclide_id'] = df['nuclide_id'].replace(lut)
+

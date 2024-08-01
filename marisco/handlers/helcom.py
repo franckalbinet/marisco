@@ -11,7 +11,7 @@ __all__ = ['fname_in', 'fname_out_nc', 'fname_out_csv', 'zotero_key', 'ref_id', 
            'get_detectionlimit_lut', 'LookupDetectionLimitCB', 'RemapDataProviderSampleIdCB', 'get_filtered_lut',
            'LookupFiltCB', 'get_helcom_method_desc', 'RecordMeasurementNoteCB', 'RemapStationIdCB',
            'RemapSedSliceTopBottomCB', 'LookupDryWetRatio', 'ddmmmm2dddddd', 'FormatCoordinates', 'get_renaming_rules',
-           'SelectAndRenameColumnCB', 'ReshapeLongToWide', 'get_attrs', 'enums_xtra', 'encode']
+           'SelectAndRenameColumnCB', 'ReshapeLongToWide', 'get_attrs', 'enums_xtra', 'encode', 'encode_or']
 
 # %% ../../nbs/handlers/helcom.ipynb 10
 import pandas as pd # Python package that provides fast, flexible, and expressive data structures.
@@ -993,7 +993,7 @@ class RecordMeasurementNoteCB(Callback):
         df['measurenote'] = df['METHOD'].map(lut)
         
 
-# %% ../../nbs/handlers/helcom.ipynb 232
+# %% ../../nbs/handlers/helcom.ipynb 231
 class RemapStationIdCB(Callback):
     """Remap Station ID to MARIS format."""
 
@@ -1022,7 +1022,7 @@ class RemapStationIdCB(Callback):
         """
         df['station'] = df['STATION']
 
-# %% ../../nbs/handlers/helcom.ipynb 239
+# %% ../../nbs/handlers/helcom.ipynb 238
 class RemapSedSliceTopBottomCB(Callback):
     """Remap Sediment slice top and bottom to MARIS format."""
 
@@ -1053,7 +1053,7 @@ class RemapSedSliceTopBottomCB(Callback):
         df['top'] = df['UPPSLI']
 
 
-# %% ../../nbs/handlers/helcom.ipynb 246
+# %% ../../nbs/handlers/helcom.ipynb 245
 class LookupDryWetRatio(Callback):
     """Lookup dry-wet ratio and format for MARIS."""
 
@@ -1086,7 +1086,7 @@ class LookupDryWetRatio(Callback):
         df.loc[df['dry_wet_ratio'] == 0, 'dry_wet_ratio'] = np.NaN
 
 
-# %% ../../nbs/handlers/helcom.ipynb 254
+# %% ../../nbs/handlers/helcom.ipynb 253
 # Columns of interest coordinates
 coi_coordinates = {
     'seawater': {
@@ -1109,7 +1109,7 @@ coi_coordinates = {
     }
 }
 
-# %% ../../nbs/handlers/helcom.ipynb 255
+# %% ../../nbs/handlers/helcom.ipynb 254
 def ddmmmm2dddddd(ddmmmm):
     """
     Convert coordinates from 'ddmmmm' format to 'dddddd' format.
@@ -1128,7 +1128,7 @@ def ddmmmm2dddddd(ddmmmm):
     return round(int(degs) + (mins / 60), 6)
 
 
-# %% ../../nbs/handlers/helcom.ipynb 256
+# %% ../../nbs/handlers/helcom.ipynb 255
 class FormatCoordinates(Callback):
     """Format coordinates for MARIS. Converts coordinates from 'ddmmmm' to 'dddddd' format if needed.
 
@@ -1217,7 +1217,7 @@ def get_renaming_rules(encoding_type='netcdf'):
     vars = cdl_cfg()['vars']
     
     if encoding_type == 'netcdf':
-        return {
+        return OrderedDict({
             ('seawater', 'biota', 'sediment'): {
                 # DEFAULT
                 'lat': vars['defaults']['lat']['name'],
@@ -1253,10 +1253,10 @@ def get_renaming_rules(encoding_type='netcdf'):
                 'sed_type': vars['sed']['sed_type']['name'],
                 'TDEPTH': vars['defaults']['tot_depth']['name'],
             }
-        }
+        })
     
     elif encoding_type == 'openrefine':
-        return {
+        return OrderedDict({
             ('seawater', 'biota', 'sediment'): {
                 # DEFAULT
                 'lat': 'latitude',
@@ -1315,14 +1315,14 @@ def get_renaming_rules(encoding_type='netcdf'):
                 #'sedtrap': 'sedtrap',
                 'top': 'sliceup',
                 'bottom': 'slicedown',
-                #'SedRepName': 'SedRepName',
+                'SedRepName': 'SedRepName',
                 #'drywt': 'drywt',
                 #'wetwt': 'wetwt',
                 'dry_wet_ratio': 'percentwt',
                 #'drymet_id': 'drymet_id'
                 
             }
-        }
+        })
     
     else:
         print("Invalid encoding_type provided. Please use 'netcdf' or 'openrefine'.")
@@ -1353,11 +1353,9 @@ class SelectAndRenameColumnCB(Callback):
         Args:
             tfm (Transformer): The transformer object containing DataFrames.
         """
-        try:
-            renaming_rules = self.fn_renaming_rules(self.encoding_type)
-        except ValueError as e:
-            print(f"Error fetching renaming rules: {e}")
-            return
+        
+        renaming_rules = self.fn_renaming_rules(self.encoding_type)
+
 
         for group in tfm.dfs.keys():
             # Get relevant renaming rules for the current group
@@ -1534,6 +1532,7 @@ def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
                                 LookupUnitCB(),
                                 LookupDetectionLimitCB(),    
                                 RemapDataProviderSampleIdCB(),
+                                RecordMeasurementNoteCB(get_helcom_method_desc),
                                 LookupFiltCB(),
                                 RemapStationIdCB(),
                                 RemapSedSliceTopBottomCB(),
@@ -1551,4 +1550,42 @@ def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
                             verbose=kwargs.get('verbose', False),
                             enums_xtra=enums_xtra(tfm, vars=['species', 'body_part'])
                            )
+    encoder.encode()
+
+# %% ../../nbs/handlers/helcom.ipynb 301
+def encode_or(fname_in, fname_out_csv, ref_id, **kwargs):
+    dfs = load_data(fname_in)
+    tfm = Transformer(dfs, cbs=[
+                                GetSampleTypeCB(type_lut),
+                                LowerStripRdnNameCB(),
+                                RemapRdnNameCB(),
+                                ParseTimeCB(),
+                                EncodeTimeCB(cfg()),        
+                                SanitizeValue(coi_val),                       
+                                NormalizeUncCB(),
+                                LookupBiotaSpeciesCB(get_maris_species),
+                                LookupBiotaBodyPartCB(get_maris_bodypart),                          
+                                LookupBiogroupCB(partial(get_biogroup_lut, species_lut_path())),
+                                LookupTaxonInformationCB(partial(get_taxon_info_lut, species_lut_path())),
+                                LookupSedimentCB(get_maris_sediments),
+                                LookupUnitCB(),
+                                LookupDetectionLimitCB(),    
+                                RemapDataProviderSampleIdCB(),
+                                RecordMeasurementNoteCB(get_helcom_method_desc),
+                                LookupFiltCB(),
+                                RemapStationIdCB(),
+                                RemapSedSliceTopBottomCB(),
+                                LookupDryWetRatio(),
+                                FormatCoordinates(coi_coordinates, ddmmmm2dddddd),
+                                SanitizeLonLatCB(),
+                                SelectAndRenameColumnCB(get_renaming_rules, encoding_type='openrefine'),
+                                CompareDfsAndTfmCB(dfs)
+                                ])
+    tfm()
+
+    encoder = OpenRefineCsvEncoder(tfm.dfs, 
+                                    dest_fname=fname_out_csv, 
+                                    ref_id = ref_id,
+                                    verbose = True
+                                )
     encoder.encode()

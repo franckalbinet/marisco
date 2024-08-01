@@ -10,7 +10,7 @@ __all__ = ['fname_in', 'fname_out_nc', 'fname_out_csv', 'zotero_key', 'ref_id', 
            'get_taxon_info_lut', 'LookupTaxonInformationCB', 'preprocess_sedi', 'LookupSedimentCB', 'LookupUnitCB',
            'get_detectionlimit_lut', 'LookupDetectionLimitCB', 'RemapDataProviderSampleIdCB', 'get_filtered_lut',
            'LookupFiltCB', 'get_helcom_method_desc', 'RecordMeasurementNoteCB', 'RemapStationIdCB',
-           'RemapSedSliceTopBottomCB', 'LookupDryWetRatio', 'ddmmmm2dddddd', 'FormatCoordinates', 'get_renaming_rules',
+           'RemapSedSliceTopBottomCB', 'LookupDryWetRatio', 'ddmmmm2dddddd', 'FormatCoordinates',
            'SelectAndRenameColumnCB', 'ReshapeLongToWide', 'get_attrs', 'enums_xtra', 'encode', 'encode_or']
 
 # %% ../../nbs/handlers/helcom.ipynb 10
@@ -24,11 +24,13 @@ from dataclasses import asdict
 from typing import List, Dict, Callable,  Tuple
 from math import modf
 from cftime import num2pydate 
+from collections import OrderedDict
+
 
 from ..utils import (has_valid_varname, match_worms, match_maris_lut, Match)
 from ..callbacks import (Callback, Transformer, EncodeTimeCB, SanitizeLonLatCB)
 from ..metadata import (GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB)
-from ..configs import (base_path,nuc_lut_path, nc_tpl_path, cfg, cache_path, cdl_cfg, Enums, lut_path,
+from ..configs import (nuc_lut_path, nc_tpl_path, cfg, cache_path, cdl_cfg, Enums, lut_path,
                              species_lut_path, sediments_lut_path, bodyparts_lut_path, 
                              detection_limit_lut_path, filtered_lut_path, area_lut_path)
 from ..serializers import NetCDFEncoder,  OpenRefineCsvEncoder
@@ -1259,26 +1261,29 @@ def get_renaming_rules(encoding_type='netcdf'):
         return OrderedDict({
             ('seawater', 'biota', 'sediment'): {
                 # DEFAULT
+                'samptype_id' : 'samptype_id'
                 'lat': 'latitude',
                 'lon': 'longitude',
-                'time': 'begperiod',
+                'station' : 'station',
+                'begperiod': 'begperiod',
+                'samplabcode' : 'samplabcode',
                 #'endperiod': 'endperiod',
-                'NUCLIDE': 'nuclide_id',
-                'detection_limit': 'detection',
-                'unit': 'unit_id',
-                'value': 'activity',
-                'uncertainty': 'uncertaint',
+                'nuclide_id' : 'nuclide_id',
+                'detection_limit' : 'detection',
+                'unit' : 'unit_id',
+                'value' : 'activity',
+                'uncertainty' : 'uncertaint',
                 #'vartype': 'vartype',
                 #'rangelow': 'rangelow',
                 #'rangeupp': 'rangeupp',
                 #'rl_detection': 'rl_detection',
                 #'ru_detection': 'ru_detection',
                 #'freq': 'freq',
-                'SDEPTH': 'sampdepth',
+                'SDEPTH' : 'sampdepth',
                 #'samparea': 'samparea',
-                'SALIN': 'salinity',
-                'TTEMP': 'temperatur',
-                'FILT': 'filtered',
+                'SALIN' : 'salinity',
+                'TTEMP' : 'temperatur',
+                'FILT' : 'filtered',
                 #'oxygen': 'oxygen',
                 #'sampquality': 'sampquality',
                 #'station': 'station',
@@ -1301,8 +1306,9 @@ def get_renaming_rules(encoding_type='netcdf'):
             },
             ('biota',): {
                 # BIOTA
-                #'TaxonRepName': 'TaxonRepName',
                 'species': 'species_id',
+                'Taxonname' : 'Taxonname',
+                'TaxonRepName': 'TaxonRepName',
                 'body_part': 'bodypar_id',
                 #'drywt': 'drywt',
                 #'wetwt': 'wetwt',
@@ -1340,7 +1346,7 @@ class SelectAndRenameColumnCB(Callback):
         Initialize the SelectAndRenameColumnCB callback.
 
         Args:
-            fn_renaming_rules (function): A function that returns a dictionary of renaming rules.
+            fn_renaming_rules (function): A function that returns an OrderedDict of renaming rules.
             encoding_type (str): The encoding type ('netcdf' or 'openrefine') to determine which renaming rules to use.
             verbose (bool): Whether to print out renaming rules that were not applied.
         """
@@ -1353,9 +1359,11 @@ class SelectAndRenameColumnCB(Callback):
         Args:
             tfm (Transformer): The transformer object containing DataFrames.
         """
-        
-        renaming_rules = self.fn_renaming_rules(self.encoding_type)
-
+        try:
+            renaming_rules = self.fn_renaming_rules(self.encoding_type)
+        except ValueError as e:
+            print(f"Error fetching renaming rules: {e}")
+            return
 
         for group in tfm.dfs.keys():
             # Get relevant renaming rules for the current group
@@ -1380,25 +1388,26 @@ class SelectAndRenameColumnCB(Callback):
         Retrieve and merge renaming rules for the specified group based on the encoding type.
 
         Args:
-            renaming_rules (dict): Dictionary of all renaming rules.
+            renaming_rules (OrderedDict): OrderedDict of all renaming rules.
             group (str): Group name to filter rules.
 
         Returns:
-            dict: A dictionary of renaming rules applicable to the specified group.
+            OrderedDict: An OrderedDict of renaming rules applicable to the specified group.
         """
         relevant_rules = [rules for key, rules in renaming_rules.items() if group in key]
-        merged_rules = {}
+        merged_rules = OrderedDict()
         for rules in relevant_rules:
             merged_rules.update(rules)
         return merged_rules
 
     def _apply_renaming(self, df, rename_rules):
         """
-        Select columns based on renaming rules and apply renaming, only for existing columns.
+        Select columns based on renaming rules and apply renaming, only for existing columns,
+        while maintaining the order of the dictionary columns.
 
         Args:
             df (pd.DataFrame): DataFrame to modify.
-            rename_rules (dict): Dictionary of column renaming rules.
+            rename_rules (OrderedDict): OrderedDict of column renaming rules.
 
         Returns:
             tuple: A tuple containing:
@@ -1406,13 +1415,14 @@ class SelectAndRenameColumnCB(Callback):
                 - A set of column names from renaming rules that were not found in the DataFrame.
         """
         existing_columns = set(df.columns)
-        valid_rules = {old_col: new_col for old_col, new_col in rename_rules.items() if old_col in existing_columns}
+        valid_rules = OrderedDict((old_col, new_col) for old_col, new_col in rename_rules.items() if old_col in existing_columns)
 
-        # Ensure that columns to keep includes both existing and valid new columns
-        columns_to_keep = set(valid_rules.keys()).union(valid_rules.values())
-        columns_to_keep = columns_to_keep.intersection(existing_columns)
-        df = df[list(columns_to_keep)]
-        
+        # Create a list to maintain the order of columns
+        columns_to_keep = [col for col in rename_rules.keys() if col in existing_columns]
+        columns_to_keep += [new_col for old_col, new_col in valid_rules.items() if new_col in df.columns]
+
+        df = df[list(OrderedDict.fromkeys(columns_to_keep))]
+
         # Apply renaming
         df.rename(columns=valid_rules, inplace=True)
 

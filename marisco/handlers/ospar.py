@@ -3,13 +3,14 @@
 # %% auto 0
 __all__ = ['fname_in', 'fname_out_nc', 'fname_out_csv', 'zotero_key', 'ref_id', 'varnames_lut_updates',
            'unmatched_fixes_biota_species', 'get_maris_species', 'whole_animal_plant', 'unmatched_fixes_biota_tissues',
-           'renaming_unit_rules', 'load_data', 'CompareDfsAndTfmCB', 'GetSampleTypeCB', 'LowerStripRdnNameCB',
+           'renaming_unit_rules', 'kw', 'load_data', 'CompareDfsAndTfmCB', 'GetSampleTypeCB', 'LowerStripRdnNameCB',
            'get_unique_nuclides', 'get_varnames_lut', 'get_nuc_id_lut', 'RemapRdnNameCB', 'ParseTimeCB',
            'SanitizeValue', 'unc_exp2stan', 'get_maris_lut', 'LookupBiotaSpeciesCB', 'CorrectWholeBodyPartCB',
            'LookupBiotaBodyPartCB', 'get_biogroup_lut', 'LookupBiogroupCB', 'get_taxon_info_lut',
            'LookupTaxonInformationCB', 'LookupUnitCB', 'LookupDetectionLimitCB', 'RemapDataProviderSampleIdCB',
            'RemapStationIdCB', 'RecordMeasurementNoteCB', 'RecordRefNoteCB', 'RecordSampleNoteCB', 'ConvertLonLatCB',
-           'get_renaming_rules', 'SelectAndRenameColumnCB', 'ReshapeLongToWide']
+           'get_renaming_rules', 'SelectAndRenameColumnCB', 'ReshapeLongToWide', 'get_attrs', 'enums_xtra', 'encode',
+           'encode_or']
 
 # %% ../../nbs/handlers/ospar.ipynb 11
 import pandas as pd # Python package that provides fast, flexible, and expressive data structures.
@@ -34,8 +35,8 @@ import warnings
 
 # %% ../../nbs/handlers/ospar.ipynb 16
 fname_in = '../../_data/accdb/ospar/csv'
-fname_out_nc = '../../_data/output/ospar_19950103_2021214.nc'
-fname_out_csv = '../../_data/output/100-HELCOM-MORS-2024.csv'
+fname_out_nc = '../../_data/output/191-OSPAR-2024.nc'
+fname_out_csv = '../../_data/output/191-OSPAR-2024.csv'
 zotero_key ='LQRA4MMK'
 ref_id = 191
 
@@ -618,9 +619,7 @@ whole_animal_plant = {'whole' : ['Whole','WHOLE', 'WHOLE FISH', 'Whole fisk', 'W
 
 # %% ../../nbs/handlers/ospar.ipynb 134
 class CorrectWholeBodyPartCB(Callback):
-    """
-    Update body parts labeled as 'whole' to either 'Whole animal' or 'Whole plant'.
-    """
+    """Update body parts labeled as 'whole' to either 'Whole animal' or 'Whole plant'."""
     
     def __init__(self, wap: Dict[str, List[str]] = whole_animal_plant):
         fc.store_attr()
@@ -883,9 +882,7 @@ class LookupUnitCB(Callback):
 
 # %% ../../nbs/handlers/ospar.ipynb 184
 class LookupDetectionLimitCB(Callback):
-    """
-    Remap activity value, activity uncertainty, and detection limit to MARIS format.
-
+    """Remap activity value, activity uncertainty, and detection limit to MARIS format.
     This class performs the following operations:
     - Reads a lookup table from an Excel file.
     - Copies and processes the 'Value type' column.
@@ -1011,7 +1008,7 @@ class RemapDataProviderSampleIdCB(Callback):
         df['samplabcode'] = df['Sample ID']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 198
+# %% ../../nbs/handlers/ospar.ipynb 201
 class RemapStationIdCB(Callback):
     """Remap Station ID to MARIS format."""
 
@@ -1038,9 +1035,9 @@ class RemapStationIdCB(Callback):
         Args:
             df (pd.DataFrame): The DataFrame to modify.
         """
-        df['station'] = df['Station ID']
+        df['station'] = df['Station ID'] + ', ' + df['Contracting Party']
 
-# %% ../../nbs/handlers/ospar.ipynb 204
+# %% ../../nbs/handlers/ospar.ipynb 207
 class RecordMeasurementNoteCB(Callback):
     """Record measurement notes by adding a 'measurenote' column to DataFrames."""
     
@@ -1081,7 +1078,7 @@ class RecordMeasurementNoteCB(Callback):
         df['measurenote'] = df['Measurement Comment']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 210
+# %% ../../nbs/handlers/ospar.ipynb 213
 class RecordRefNoteCB(Callback):
     """Record reference notes by adding a 'refnote' column to DataFrames."""
     
@@ -1122,7 +1119,7 @@ class RecordRefNoteCB(Callback):
         df['refnote'] = df['Reference Comment']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 217
+# %% ../../nbs/handlers/ospar.ipynb 220
 class RecordSampleNoteCB(Callback):
     """Record sample notes by adding a 'sampnote' column to DataFrames."""
     
@@ -1163,15 +1160,10 @@ class RecordSampleNoteCB(Callback):
         df['sampnote'] = df['Sample Comment']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 225
+# %% ../../nbs/handlers/ospar.ipynb 228
 class ConvertLonLatCB(Callback):
-    """
-    Convert Longitude and Latitude values to decimal degrees (DDD.DDDDD°).
-
-    This class processes DataFrames to convert latitude and longitude from degrees, minutes, and seconds 
-    (DMS) format with direction indicators to decimal degrees format.
-    """
-
+    """Convert Longitude and Latitude values to decimal degrees (DDD.DDDDD°). This class processes DataFrames to convert latitude and longitude from degrees, minutes, and seconds 
+    (DMS) format with direction indicators to decimal degrees format."""
     def __init__(self):
         """
         Initialize the ConvertLonLatCB class.
@@ -1238,7 +1230,7 @@ class ConvertLonLatCB(Callback):
         return degrees + minutes / 60 + seconds / 3600
 
 
-# %% ../../nbs/handlers/ospar.ipynb 241
+# %% ../../nbs/handlers/ospar.ipynb 244
 # Define columns of interest (keys) and renaming rules (values).
 def get_renaming_rules(encoding_type='netcdf'):
     vars = cdl_cfg()['vars']
@@ -1312,7 +1304,7 @@ def get_renaming_rules(encoding_type='netcdf'):
         print("Invalid encoding_type provided. Please use 'netcdf' or 'openrefine'.")
         return None
 
-# %% ../../nbs/handlers/ospar.ipynb 242
+# %% ../../nbs/handlers/ospar.ipynb 245
 class SelectAndRenameColumnCB(Callback):
     """A callback to select and rename columns in a DataFrame based on provided renaming rules
     for a specified encoding type. It also prints renaming rules that were not applied
@@ -1408,7 +1400,7 @@ class SelectAndRenameColumnCB(Callback):
         return df, not_found_keys
 
 
-# %% ../../nbs/handlers/ospar.ipynb 247
+# %% ../../nbs/handlers/ospar.ipynb 250
 class ReshapeLongToWide(Callback):
     "Convert data from long to wide with renamed columns."
     def __init__(self, columns=['nuclide'], values=['value']):
@@ -1464,3 +1456,113 @@ class ReshapeLongToWide(Callback):
         for grp in tfm.dfs.keys():
             tfm.dfs[grp] = self.pivot(tfm.dfs[grp])
             tfm.dfs[grp].columns = self.renamed_cols(tfm.dfs[grp].columns)
+
+# %% ../../nbs/handlers/ospar.ipynb 259
+kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
+      'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
+      'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
+      'Earth Science > Oceans > Ocean Chemistry, Earth Science > Oceans > Sea Ice > Isotopes',
+      'Earth Science > Oceans > Water Quality > Ocean Contaminants',
+      'Earth Science > Biological Classification > Animals/Vertebrates > Fish',
+      'Earth Science > Biosphere > Ecosystems > Marine Ecosystems',
+      'Earth Science > Biological Classification > Animals/Invertebrates > Mollusks',
+      'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
+      'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
+
+
+# %% ../../nbs/handlers/ospar.ipynb 260
+def get_attrs(tfm, zotero_key, kw=kw):
+    return GlobAttrsFeeder(tfm.dfs, cbs=[
+        BboxCB(),
+        DepthRangeCB(),
+        TimeRangeCB(cfg()),
+        ZoteroCB(zotero_key, cfg=cfg()),
+        KeyValuePairCB('keywords', ', '.join(kw)),
+        KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
+        ])()
+
+# %% ../../nbs/handlers/ospar.ipynb 262
+def enums_xtra(tfm, vars):
+    "Retrieve a subset of the lengthy enum as 'species_t' for instance"
+    enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
+    xtras = {}
+    for var in vars:
+        unique_vals = tfm.unique(var)
+        if unique_vals.any():
+            xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
+    return xtras
+
+# %% ../../nbs/handlers/ospar.ipynb 264
+def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
+    dfs = load_data(fname_in)
+    tfm = Transformer(dfs, cbs=[
+                                GetSampleTypeCB(type_lut),
+                                LowerStripRdnNameCB(),
+                                RemapRdnNameCB(),
+                                ParseTimeCB(),
+                                EncodeTimeCB(cfg()),        
+                                SanitizeValue(),                       
+                                NormalizeUncCB(unc_exp2stan),
+                                LookupBiotaSpeciesCB(get_maris_species, unmatched_fixes_biota_species),
+                                CorrectWholeBodyPartCB(),
+                                LookupBiotaBodyPartCB(get_maris_bodypart, unmatched_fixes_biota_tissues),
+                                LookupBiogroupCB(partial(get_biogroup_lut, species_lut_path())),
+                                LookupTaxonInformationCB(partial(get_taxon_info_lut, species_lut_path())),
+                                LookupUnitCB(renaming_unit_rules),
+                                LookupDetectionLimitCB(detection_limit_lut_path()),
+                                RemapDataProviderSampleIdCB(),
+                                RemapStationIdCB(),
+                                RecordMeasurementNoteCB(),
+                                RecordRefNoteCB(),
+                                RecordSampleNoteCB(),   
+                                ConvertLonLatCB(),                    
+                                SanitizeLonLatCB(),
+                                SelectAndRenameColumnCB(get_renaming_rules, encoding_type='netcdf'),
+                                ReshapeLongToWide(),
+                                ])
+    tfm()
+    encoder = NetCDFEncoder(tfm.dfs, 
+                            src_fname=nc_tpl_path,
+                            dest_fname=fname_out_nc, 
+                            global_attrs=get_attrs(tfm, zotero_key=zotero_key, kw=kw),
+                            verbose=kwargs.get('verbose', False),
+                            enums_xtra=enums_xtra(tfm, vars=['species', 'body_part'])
+                           )
+    encoder.encode()
+
+# %% ../../nbs/handlers/ospar.ipynb 273
+def encode_or(fname_in, fname_out_csv, ref_id, **kwargs):
+    dfs = load_data(fname_in)
+    tfm = Transformer(dfs, cbs=[
+                                GetSampleTypeCB(type_lut),
+                                LowerStripRdnNameCB(),
+                                RemapRdnNameCB(),
+                                ParseTimeCB(),
+                                EncodeTimeCB(cfg()),        
+                                SanitizeValue(),                       
+                                NormalizeUncCB(unc_exp2stan),
+                                LookupBiotaSpeciesCB(get_maris_species, unmatched_fixes_biota_species),
+                                CorrectWholeBodyPartCB(),
+                                LookupBiotaBodyPartCB(get_maris_bodypart, unmatched_fixes_biota_tissues),
+                                LookupBiogroupCB(partial(get_biogroup_lut, species_lut_path())),
+                                LookupTaxonInformationCB(partial(get_taxon_info_lut, species_lut_path())),
+                                LookupUnitCB(renaming_unit_rules),
+                                LookupDetectionLimitCB(detection_limit_lut_path()),
+                                RemapDataProviderSampleIdCB(),
+                                RemapStationIdCB(),
+                                RecordMeasurementNoteCB(),
+                                RecordRefNoteCB(),
+                                RecordSampleNoteCB(),   
+                                ConvertLonLatCB(),                    
+                                SanitizeLonLatCB(),
+                                SelectAndRenameColumnCB(get_renaming_rules, encoding_type='openrefine', verbose=True),
+                                CompareDfsAndTfmCB(dfs)
+                                ])
+    tfm()
+
+    encoder = OpenRefineCsvEncoder(tfm.dfs, 
+                                    dest_fname=fname_out_csv, 
+                                    ref_id = ref_id,
+                                    verbose = True
+                                )
+    encoder.encode()

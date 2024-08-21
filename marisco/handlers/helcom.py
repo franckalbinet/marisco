@@ -25,7 +25,6 @@ from typing import List, Dict, Callable,  Tuple
 from math import modf
 from collections import OrderedDict
 
-
 from ..utils import (has_valid_varname, match_worms, match_maris_lut, Match)
 from ..callbacks import (Callback, Transformer, EncodeTimeCB, SanitizeLonLatCB)
 from ..metadata import (GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB)
@@ -316,6 +315,8 @@ class ParseTimeCB(Callback):
             df = tfm.dfs[grp]
             self._process_dates(df)
             self._define_beg_period(df)
+            self._remove_nan(df)
+
 
     def _process_dates(self, df: pd.DataFrame):
         """
@@ -350,6 +351,16 @@ class ParseTimeCB(Callback):
             df (pd.DataFrame): DataFrame containing the 'time' column.
         """
         df['begperiod'] = df['time']
+        
+    def _remove_nan(self, df: pd.DataFrame):
+        """
+        Remove rows with NaN entries in the 'time' column.
+        
+        Args:
+            df (pd.DataFrame): DataFrame containing the 'time' column.
+        """
+        df.dropna(subset=['time'], inplace=True)
+
 
 # %% ../../nbs/handlers/helcom.ipynb 90
 # Columns of interest

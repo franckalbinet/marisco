@@ -12,7 +12,7 @@ __all__ = ['fname_in', 'fname_out_nc', 'fname_out_csv', 'zotero_key', 'ref_id', 
            'LookupDetectionLimitCB', 'RemapDataProviderSampleIdCB', 'get_filtered_lut', 'LookupFiltCB',
            'get_helcom_method_desc', 'RecordMeasurementNoteCB', 'RemapStationIdCB', 'RemapSedSliceTopBottomCB',
            'LookupDryWetRatio', 'ddmmmm2dddddd', 'FormatCoordinates', 'get_renaming_rules', 'SelectAndRenameColumnCB',
-           'ReshapeLongToWide', 'get_attrs', 'enums_xtra', 'encode', 'encode_or']
+           'get_attrs', 'enums_xtra', 'encode', 'encode_or']
 
 # %% ../../nbs/handlers/helcom.ipynb 8
 import pandas as pd 
@@ -27,7 +27,7 @@ from math import modf
 from collections import OrderedDict
 
 from ..utils import (has_valid_varname, match_worms, match_maris_lut, Match, CompareDfsAndTfmCB)
-from ..callbacks import (Callback, Transformer, EncodeTimeCB, SanitizeLonLatCB)
+from ..callbacks import (Callback, Transformer, EncodeTimeCB, SanitizeLonLatCB, ReshapeLongToWide)
 from ..metadata import (GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB)
 from ..configs import (nuc_lut_path, nc_tpl_path, cfg, cache_path, cdl_cfg, Enums, lut_path,
                              species_lut_path, sediments_lut_path, bodyparts_lut_path, 
@@ -1089,64 +1089,7 @@ class SelectAndRenameColumnCB(Callback):
         return df, not_found_keys
 
 
-# %% ../../nbs/handlers/helcom.ipynb 247
-class ReshapeLongToWide(Callback):
-    def __init__(self, columns=['nuclide'], values=['value']):
-        "Convert data from long to wide with renamed columns."
-        fc.store_attr()
-        # Retrieve all possible derived vars (e.g 'unc', 'dl', ...) from configs
-        self.derived_cols = [value['name'] for value in cdl_cfg()['vars']['suffixes'].values()]
-    
-    def renamed_cols(self, cols):
-        "Flatten columns name"
-        return [inner if outer == "value" else f'{inner}{outer}'
-                if inner else outer
-                for outer, inner in cols]
-
-    def pivot(self, df):
-        # Among all possible 'derived cols' select the ones present in df
-        derived_coi = [col for col in self.derived_cols if col in df.columns]
-        df.index.name = 'org_index'
-        df=df.reset_index()
-        idx = list(set(df.columns) - set(self.columns + derived_coi + self.values))
-        
-        # Create a fill_value to replace NaN values in the columns used as the index in the pivot table.
-        # Check if num_fill_value is already in the dataframe index values. If num_fill_value already exists
-        # then increase num_fill_value by 1 until a value is found for num_fill_value that is not in the dataframe. 
-        num_fill_value = -999
-        while (df[idx] == num_fill_value).any().any():
-            num_fill_value += 1
-        # Fill in nan values for each col found in idx. 
-        for col in idx:   
-            if pd.api.types.is_numeric_dtype(df[col]):
-                fill_value = num_fill_value
-            if pd.api.types.is_string_dtype(df[col]):
-                fill_value = 'NOT AVAILABLE'
-                
-            df[col]=df[col].fillna(fill_value)
-
-        pivot_df=df.pivot_table(index=idx,
-                              columns=self.columns,
-                              values=self.values + derived_coi,
-                              fill_value=np.nan,
-                              aggfunc=lambda x: x
-                              ).reset_index()
-        
-
-        # Replace fill_value  with  np.nan
-        pivot_df[idx]=pivot_df[idx].replace({'NOT AVAILABLE': np.nan,
-                                             num_fill_value : np.nan})
-        # Set the index to be the org_index
-        pivot_df = pivot_df.set_index('org_index')
-                
-        return (pivot_df)
-
-    def __call__(self, tfm):
-        for grp in tfm.dfs.keys():
-            tfm.dfs[grp] = self.pivot(tfm.dfs[grp])
-            tfm.dfs[grp].columns = self.renamed_cols(tfm.dfs[grp].columns)
-
-# %% ../../nbs/handlers/helcom.ipynb 254
+# %% ../../nbs/handlers/helcom.ipynb 253
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -1158,7 +1101,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 255
+# %% ../../nbs/handlers/helcom.ipynb 254
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve all global attributes."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -1170,7 +1113,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 257
+# %% ../../nbs/handlers/helcom.ipynb 256
 def enums_xtra(tfm, vars):
     "Retrieve a subset of the lengthy enum as `species_t` for instance."
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
@@ -1181,7 +1124,7 @@ def enums_xtra(tfm, vars):
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/helcom.ipynb 259
+# %% ../../nbs/handlers/helcom.ipynb 258
 def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[
@@ -1220,7 +1163,7 @@ def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
                            )
     encoder.encode()
 
-# %% ../../nbs/handlers/helcom.ipynb 267
+# %% ../../nbs/handlers/helcom.ipynb 266
 def encode_or(fname_in, fname_out_csv, ref_id, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[

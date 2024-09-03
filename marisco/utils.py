@@ -4,7 +4,7 @@
 
 # %% auto 0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'has_valid_varname', 'CompareDfsAndTfmCB', 'get_bbox',
-           'download_files_in_folder', 'download_file', 'match_worms', 'Match', 'match_maris_lut']
+           'download_files_in_folder', 'download_file', 'match_worms', 'Match', 'match_maris_lut', 'test_dfs']
 
 # %% ../nbs/api/utils.ipynb 2
 from pathlib import Path
@@ -344,3 +344,13 @@ def match_maris_lut(
 
     # Select the id and name columns and return the DataFrame
     return df[[maris_id, maris_name, 'score']]
+
+# %% ../nbs/api/utils.ipynb 83
+def test_dfs(
+    dfs1:dict, # First dictionary of DataFrames to compare 
+    dfs2:dict # Second dictionary of DataFrames to compare
+    ) -> None: # It raises an `AssertionError` if the DataFrames are not equal
+    "Compare two dictionaries of DataFrames for equality (also ensuring that columns are in the same order)."
+    for grp in dfs1.keys():
+        df1, df2 = (df.sort_index() for df in (dfs1[grp], dfs2[grp]))
+        fc.test_eq(df1, df2.reindex(columns=df1.columns))

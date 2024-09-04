@@ -13,6 +13,7 @@ __all__ = ['CFG_FNAME', 'CDL_FNAME', 'NUCLIDE_LOOKUP_FNAME', 'MARISCO_CFG_DIRNAM
 from pathlib import Path
 import re
 from functools import partial
+from typing import Union
 
 from .inout import read_toml, write_toml
 import pandas as pd
@@ -481,32 +482,38 @@ def nc_tpl_path():
     return p / read_toml(p / 'configs.toml')['names']['nc_template']
 
 # %% ../nbs/api/configs.ipynb 36
-def sanitize(s:str # String to sanitize
-             ) -> str:
+def sanitize(s:Union[str, float] # String to sanitize
+            ) -> str: # Sanitized string
     """
     Sanitize dictionary key to comply with NetCDF enumeration type: 
     
         - remove `(`, `)`, `.`, `/`, `-`  
         - strip the string
     """
-    s = re.sub(r'[().]', '', s)
-    return re.sub(r'[/-]', ' ', s).strip() 
+    if isinstance(s, str):
+        s = re.sub(r'[().]', '', s)
+        return re.sub(r'[/-]', ' ', s).strip()
+    elif pd.isna(s):  # This covers np.nan, None, and pandas NaT
+        return s
+    else:
+        return str(s).strip()
 
 # %% ../nbs/api/configs.ipynb 40
 def get_lut(src_dir:str, # Directory containing lookup tables
             fname:str, # Excel file lookup table name
             key:str, # Excel file column name to be used as dict keys 
             value:str, # Excel file column name to be used as dict values 
-            do_sanitize:bool=True # Sanitization required?
-            ) -> dict: # MARIS lookup table
-    "Convert MARIS db lookup table excel file to dictionary `{'name': id, ...}`."
+            do_sanitize:bool=True, # Sanitization required?
+            reverse:bool=False # Reverse lookup table (value, key)
+            ) -> dict: # MARIS lookup table (key, value)
+    "Convert MARIS db lookup table excel file to dictionary `{'name': id, ...}` or `{id: name, ...}` if `reverse` is True."
     fname = Path(src_dir) / fname
     df = pd.read_excel(fname, usecols=[key, value]).dropna(subset=value)
     df[value] = df[value].astype('int')
     df = df.set_index(key)
     lut = df[value].to_dict()
     if do_sanitize: lut = {sanitize(k): v for k, v in lut.items()}
-    return lut
+    return {v: k for k,v in lut.items()} if reverse else lut
 
 # %% ../nbs/api/configs.ipynb 43
 class Enums():

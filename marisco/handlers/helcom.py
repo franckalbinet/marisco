@@ -129,9 +129,9 @@ varnames_lut_updates = {
 
 # %% ../../nbs/handlers/helcom.ipynb 48
 def get_varnames_lut(
-    dfs: Dict[str, pd.DataFrame], # Data to transform
-    lut: Dict[str, str]=varnames_lut_updates # Lut to fix not found nuclide names
-) -> Dict[str, str]: 
+    dfs:dict, # Data to transform
+    lut:dict=varnames_lut_updates # Lut to fix not found nuclide names
+) -> dict: 
     "Generate a lookup table for radionuclide names, updating with provided mappings."
     unique_nuclides = get_unique_nuclides(dfs)
     base_lut = {name: name for name in unique_nuclides}

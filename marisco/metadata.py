@@ -12,8 +12,8 @@ from cftime import num2date
 from pyzotero import zotero, zotero_errors
 import json
 
-from .utils import get_bbox, Callback, run_cbs
-from .configs import CONFIGS
+from .utils import get_bbox, run_cbs
+from .callbacks import Callback, CompareDfsAndTfmCB
 
 # %% ../nbs/api/metadata.ipynb 3
 class GlobAttrsFeeder:

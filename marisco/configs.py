@@ -11,13 +11,13 @@ __all__ = ['CFG_FNAME', 'CDL_FNAME', 'NUCLIDE_LOOKUP_FNAME', 'MARISCO_CFG_DIRNAM
 
 # %% ../nbs/api/configs.ipynb 2
 from pathlib import Path
+import os
 import re
 from functools import partial
 from typing import Union
 
 from .inout import read_toml, write_toml
 import pandas as pd
-
 import fastcore.all as fc
 
 # %% ../nbs/api/configs.ipynb 4
@@ -50,7 +50,7 @@ CONFIGS = {
         'time': 'seconds since 1970-01-01 00:00:00.0'
     },
     'zotero': {
-        'api_key': '7nuMByrm19RP7reiQtYJwgPk',
+        'api_key': os.getenv('ZOTERO_API_KEY'),
         'lib_id': '2432820'
     }
 }

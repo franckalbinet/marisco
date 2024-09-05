@@ -101,8 +101,9 @@ class ZoteroItem:
         return json.dumps(self.item, indent=4) 
 
 # %% ../nbs/api/metadata.ipynb 8
+# TBD: put it in callback module
 class ZoteroCB(Callback):
-    "Retrieve Zotero metadata"
+    "Retrieve Zotero metadata."
     def __init__(self, itemId, cfg): fc.store_attr()
     def __call__(self, obj):
         item = ZoteroItem(self.itemId, self.cfg['zotero'])

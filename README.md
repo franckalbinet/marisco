@@ -55,6 +55,14 @@ This command:
 > Visual Studio Code
 > editor](https://github.com/franckalbinet/marisco/tree/main/install_configure_guide//windows_ubuntu_sub_system).
 
+### Zotero API key
+
+Upon conversion, `marisco` will automatically retrieve the bibliographic
+metadata of each MARIS dataset from [Zotero](https://www.zotero.org/).
+To do so, you need to define the following environment variable
+`ZOTERO_API_KEY` containing the MARIS Zotero API key. Please contact the
+MARIS team to get your API key.
+
 ## Getting started
 
 ### Command line utilities

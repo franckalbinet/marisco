@@ -56,7 +56,7 @@ def has_valid_varname(
                 print(f'"{name}" variable name not found in MARIS CDL')
         return has_valid             
 
-# %% ../nbs/api/utils.ipynb 11
+# %% ../nbs/api/utils.ipynb 8
 def get_bbox(df,
              coord_cols=('lon', 'lat')
             ):
@@ -64,7 +64,7 @@ def get_bbox(df,
     arr = [(row[x], row[y]) for _, row in df.iterrows()]
     return MultiPoint(arr).envelope
 
-# %% ../nbs/api/utils.ipynb 18
+# %% ../nbs/api/utils.ipynb 15
 def download_files_in_folder(owner:str, 
                              repo:str, 
                              src_dir:str, 
@@ -98,7 +98,7 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
     else:
         print(f"Error: {response.status_code}")
 
-# %% ../nbs/api/utils.ipynb 20
+# %% ../nbs/api/utils.ipynb 17
 def match_worms(
     name:str # Name of species to look up in WoRMS
     ):
@@ -121,7 +121,7 @@ def match_worms(
     else:
         return -1
 
-# %% ../nbs/api/utils.ipynb 30
+# %% ../nbs/api/utils.ipynb 27
 @dataclass
 class Match:
     matched_id: int
@@ -129,7 +129,7 @@ class Match:
     source_name: str
     match_score: int
 
-# %% ../nbs/api/utils.ipynb 31
+# %% ../nbs/api/utils.ipynb 28
 def match_maris_lut(
     lut_path: str, # Path to MARIS species authoritative species look-up table
     data_provider_name: str, # Name of data provider nomenclature item to look up 
@@ -154,7 +154,7 @@ def match_maris_lut(
     # Select the id and name columns and return the DataFrame
     return df[[maris_id, maris_name, 'score']]
 
-# %% ../nbs/api/utils.ipynb 40
+# %% ../nbs/api/utils.ipynb 37
 def has_valid_varname(
     var_names:list, # variable names
     cdl_path:str, # Path to MARIS CDL file (point of truth)
@@ -187,7 +187,7 @@ def has_valid_varname(
                 print(f'"{name}" variable name not found in MARIS CDL')
     return has_valid    
 
-# %% ../nbs/api/utils.ipynb 46
+# %% ../nbs/api/utils.ipynb 43
 def get_bbox(df,
              coord_cols=('lon', 'lat')
             ):
@@ -195,7 +195,7 @@ def get_bbox(df,
     arr = [(row[x], row[y]) for _, row in df.iterrows()]
     return MultiPoint(arr).envelope
 
-# %% ../nbs/api/utils.ipynb 53
+# %% ../nbs/api/utils.ipynb 50
 def download_files_in_folder(owner:str, 
                              repo:str, 
                              src_dir:str, 
@@ -229,7 +229,7 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
     else:
         print(f"Error: {response.status_code}")
 
-# %% ../nbs/api/utils.ipynb 55
+# %% ../nbs/api/utils.ipynb 52
 def match_worms(
     name:str # Name of species to look up in WoRMS
     ):
@@ -252,7 +252,7 @@ def match_worms(
     else:
         return -1
 
-# %% ../nbs/api/utils.ipynb 65
+# %% ../nbs/api/utils.ipynb 62
 @dataclass
 class Match:
     matched_id: int
@@ -260,7 +260,7 @@ class Match:
     source_name: str
     match_score: int
 
-# %% ../nbs/api/utils.ipynb 66
+# %% ../nbs/api/utils.ipynb 63
 def match_maris_lut(
     lut_path: str, # Path to MARIS species authoritative species look-up table
     data_provider_name: str, # Name of data provider nomenclature item to look up 
@@ -285,7 +285,7 @@ def match_maris_lut(
     # Select the id and name columns and return the DataFrame
     return df[[maris_id, maris_name, 'score']]
 
-# %% ../nbs/api/utils.ipynb 76
+# %% ../nbs/api/utils.ipynb 73
 def test_dfs(
     dfs1:dict, # First dictionary of DataFrames to compare 
     dfs2:dict # Second dictionary of DataFrames to compare

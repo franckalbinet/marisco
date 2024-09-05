@@ -5,14 +5,13 @@
 # %% auto 0
 __all__ = ['fname_in', 'fname_out_nc', 'fname_out_csv', 'zotero_key', 'ref_id', 'varnames_lut_updates',
            'unmatched_fixes_biota_species', 'get_maris_species', 'whole_animal_plant', 'unmatched_fixes_biota_tissues',
-           'renaming_unit_rules', 'kw', 'load_data', 'CompareDfsAndTfmCB', 'GetSampleTypeCB', 'LowerStripRdnNameCB',
-           'get_unique_nuclides', 'get_varnames_lut', 'get_nuc_id_lut', 'RemapRdnNameCB', 'ParseTimeCB',
-           'SanitizeValue', 'unc_exp2stan', 'get_maris_lut', 'LookupBiotaSpeciesCB', 'CorrectWholeBodyPartCB',
-           'LookupBiotaBodyPartCB', 'get_biogroup_lut', 'LookupBiogroupCB', 'get_taxon_info_lut',
-           'LookupTaxonInformationCB', 'LookupUnitCB', 'LookupDetectionLimitCB', 'RemapDataProviderSampleIdCB',
-           'RemapStationIdCB', 'RecordMeasurementNoteCB', 'RecordRefNoteCB', 'RecordSampleNoteCB', 'ConvertLonLatCB',
-           'get_renaming_rules', 'SelectAndRenameColumnCB', 'ReshapeLongToWide', 'get_attrs', 'enums_xtra', 'encode',
-           'encode_or']
+           'renaming_unit_rules', 'kw', 'load_data', 'GetSampleTypeCB', 'LowerStripRdnNameCB', 'get_unique_nuclides',
+           'get_varnames_lut', 'get_nuc_id_lut', 'RemapRdnNameCB', 'ParseTimeCB', 'SanitizeValue', 'unc_exp2stan',
+           'get_maris_lut', 'LookupBiotaSpeciesCB', 'CorrectWholeBodyPartCB', 'LookupBiotaBodyPartCB',
+           'get_biogroup_lut', 'LookupBiogroupCB', 'get_taxon_info_lut', 'LookupTaxonInformationCB', 'LookupUnitCB',
+           'LookupDetectionLimitCB', 'RemapDataProviderSampleIdCB', 'RemapStationIdCB', 'RecordMeasurementNoteCB',
+           'RecordRefNoteCB', 'RecordSampleNoteCB', 'ConvertLonLatCB', 'get_renaming_rules', 'SelectAndRenameColumnCB',
+           'ReshapeLongToWide', 'get_attrs', 'enums_xtra', 'encode', 'encode_or']
 
 # %% ../../nbs/handlers/ospar.ipynb 11
 import pandas as pd # Python package that provides fast, flexible, and expressive data structures.
@@ -27,7 +26,7 @@ from math import modf
 from collections import OrderedDict
 
 from ..utils import (has_valid_varname, match_worms, match_maris_lut, Match)
-from ..callbacks import (Callback, Transformer, EncodeTimeCB, SanitizeLonLatCB)
+from ..callbacks import (Callback, Transformer, EncodeTimeCB, SanitizeLonLatCB, CompareDfsAndTfmCB)
 from ..metadata import (GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB)
 from ..configs import (nuc_lut_path, nc_tpl_path, cfg, cache_path, cdl_cfg, Enums, lut_path,
                              species_lut_path, sediments_lut_path, bodyparts_lut_path, 
@@ -62,59 +61,7 @@ def load_data(src_dir: str, smp_types: List[str] = ['SEA', 'SED', 'BIO']) -> Dic
         dfs[v] = df
     return dfs
 
-# %% ../../nbs/handlers/ospar.ipynb 35
-class CompareDfsAndTfmCB(Callback):
-    "Create a dataframe of dropped data. Data included in the `dfs` not in the `tfm`."
-    
-    def __init__(self, dfs: Dict[str, pd.DataFrame]):
-        fc.store_attr()
-    
-    def __call__(self, tfm: Transformer) -> None:
-        self._initialize_tfm_attributes(tfm)
-        for grp in tfm.dfs.keys():
-            dropped_df = self._get_dropped_data(grp, tfm)
-            tfm.dfs_dropped[grp] = dropped_df
-            tfm.compare_stats[grp] = self._compute_stats(grp, tfm)
-
-    def _initialize_tfm_attributes(self, tfm: Transformer) -> None:
-        """Initialize attributes in `tfm`."""
-        tfm.dfs_dropped = {}
-        tfm.compare_stats = {}
-
-    def _get_dropped_data(self, grp: str, tfm: Transformer) -> pd.DataFrame:
-        """
-        Get the data that is present in `dfs` but not in `tfm.dfs`.
-        
-        Args:
-        grp (str): The group key.
-        tfm (Transformer): The transformation object containing `dfs`.
-        
-        Returns:
-        pd.DataFrame: Dataframe with dropped rows.
-        """
-        index_diff = self.dfs[grp].index.difference(tfm.dfs[grp].index)
-        return self.dfs[grp].loc[index_diff]
-    
-    def _compute_stats(self, grp: str, tfm: Transformer) -> Dict[str, int]:
-        """
-        Compute comparison statistics between `dfs` and `tfm.dfs`.
-        
-        Args:
-        grp (str): The group key.
-        tfm (Transformer): The transformation object containing `dfs`.
-        
-        Returns:
-        Dict[str, int]: Dictionary with comparison statistics.
-        """
-        return {
-            'Number of rows in dfs': len(self.dfs[grp].index),
-            'Number of rows in tfm.dfs': len(tfm.dfs[grp].index),
-            'Number of dropped rows': len(tfm.dfs_dropped[grp].index),
-            'Number of rows in tfm.dfs + Number of dropped rows': len(tfm.dfs[grp].index) + len(tfm.dfs_dropped[grp].index)
-        }
-
-
-# %% ../../nbs/handlers/ospar.ipynb 41
+# %% ../../nbs/handlers/ospar.ipynb 39
 class GetSampleTypeCB(Callback):
     """Set the 'Sample type' column in the DataFrames based on a lookup table."""
     
@@ -158,7 +105,7 @@ class GetSampleTypeCB(Callback):
         return self.type_lut[group_name.upper()]
 
 
-# %% ../../nbs/handlers/ospar.ipynb 50
+# %% ../../nbs/handlers/ospar.ipynb 48
 class LowerStripRdnNameCB(Callback):
     """Convert nuclide names to lowercase and strip any trailing spaces."""
 
@@ -179,7 +126,7 @@ class LowerStripRdnNameCB(Callback):
             return nuclide.lower().strip()
         return nuclide
 
-# %% ../../nbs/handlers/ospar.ipynb 55
+# %% ../../nbs/handlers/ospar.ipynb 53
 def get_unique_nuclides(dfs: Dict[str, pd.DataFrame]) -> List[str]:
     """
     Get a list of unique radionuclide types measured across samples.
@@ -197,7 +144,7 @@ def get_unique_nuclides(dfs: Dict[str, pd.DataFrame]) -> List[str]:
 
     return list(nuclides)
 
-# %% ../../nbs/handlers/ospar.ipynb 58
+# %% ../../nbs/handlers/ospar.ipynb 56
 varnames_lut_updates = {
             "239, 240 pu" :  'pu239_240_tot',
             "cs-137" :  'cs137',
@@ -215,7 +162,7 @@ varnames_lut_updates = {
             "ra-226" : 'ra226',
             "210po" : 'po210'}
 
-# %% ../../nbs/handlers/ospar.ipynb 60
+# %% ../../nbs/handlers/ospar.ipynb 58
 def get_varnames_lut(
     dfs: Dict[str, pd.DataFrame], 
     lut: Dict[str, str] = varnames_lut_updates
@@ -239,12 +186,12 @@ def get_varnames_lut(
     
     return base_lut
 
-# %% ../../nbs/handlers/ospar.ipynb 62
+# %% ../../nbs/handlers/ospar.ipynb 60
 def get_nuc_id_lut():
     df = pd.read_excel(nuc_lut_path(), usecols=['nc_name','nuclide_id'])
     return df.set_index('nc_name').to_dict()['nuclide_id']
 
-# %% ../../nbs/handlers/ospar.ipynb 64
+# %% ../../nbs/handlers/ospar.ipynb 62
 class RemapRdnNameCB(Callback):
     """Remap and standardize radionuclide names to MARIS radionuclide names and define nuclide ids."""
     
@@ -306,7 +253,7 @@ class RemapRdnNameCB(Callback):
             print(f"No 'NUCLIDE' column found in DataFrame of group {df.name}")
 
 
-# %% ../../nbs/handlers/ospar.ipynb 77
+# %% ../../nbs/handlers/ospar.ipynb 75
 class ParseTimeCB(Callback):
     def __init__(self):
         fc.store_attr()
@@ -353,7 +300,7 @@ class ParseTimeCB(Callback):
 
 
 
-# %% ../../nbs/handlers/ospar.ipynb 90
+# %% ../../nbs/handlers/ospar.ipynb 88
 class SanitizeValue(Callback):
     "Sanitize value by removing blank entries."
 
@@ -387,7 +334,7 @@ class SanitizeValue(Callback):
             df['value'] = df[value_col]
             
 
-# %% ../../nbs/handlers/ospar.ipynb 98
+# %% ../../nbs/handlers/ospar.ipynb 96
 # Make measurement and uncertainty units consistent
 def unc_exp2stan(df: pd.DataFrame, unc_col: str) -> pd.Series:
     """
@@ -403,7 +350,7 @@ def unc_exp2stan(df: pd.DataFrame, unc_col: str) -> pd.Series:
     k = 2
     return df[unc_col] / k
 
-# %% ../../nbs/handlers/ospar.ipynb 106
+# %% ../../nbs/handlers/ospar.ipynb 104
 def get_maris_lut(df_biota,
                   fname_cache,  # For instance 'species_ospar.pkl'
                   data_provider_name_col: str,  # Data provider lookup column name of interest
@@ -499,12 +446,12 @@ def _convert_lut_to_dataframe(lut):
     return df_lut.sort_values(by='match_score', ascending=False)
 
 
-# %% ../../nbs/handlers/ospar.ipynb 110
+# %% ../../nbs/handlers/ospar.ipynb 108
 # key equals name in dfs['biota']. 
 # value equals replacement name to use in match_maris_lut (i.e. name_to_match)
 unmatched_fixes_biota_species = {}
 
-# %% ../../nbs/handlers/ospar.ipynb 116
+# %% ../../nbs/handlers/ospar.ipynb 114
 # LookupBiotaSpeciesCB filters 'Not available'. 
 unmatched_fixes_biota_species = {'RHODYMENIA PSEUDOPALAMATA & PALMARIA PALMATA': 'Not available', # mix
  'Mixture of green, red and brown algae': 'Not available', #mix 
@@ -536,7 +483,7 @@ unmatched_fixes_biota_species = {'RHODYMENIA PSEUDOPALAMATA & PALMARIA PALMATA':
  'PLUERONECTES PLATESSA': 'Pleuronectes platessa',
  'Gaidropsarus argenteus': 'Gaidropsarus argentatus'}
 
-# %% ../../nbs/handlers/ospar.ipynb 125
+# %% ../../nbs/handlers/ospar.ipynb 123
 class LookupBiotaSpeciesCB(Callback):
     """Remap biota species to MARIS database format.This class updates the 'Species' column in the biota DataFrame by:
     - Replacing 'NaN' or 'Not available' values with corresponding biological groups.
@@ -603,7 +550,7 @@ class LookupBiotaSpeciesCB(Callback):
         return df
 
 
-# %% ../../nbs/handlers/ospar.ipynb 126
+# %% ../../nbs/handlers/ospar.ipynb 124
 get_maris_species = partial(get_maris_lut, 
                 fname_cache='species_ospar.pkl', 
                 data_provider_name_col='SCIENTIFIC NAME',
@@ -614,12 +561,12 @@ get_maris_species = partial(get_maris_lut,
                 as_dataframe=False,
                 overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 133
+# %% ../../nbs/handlers/ospar.ipynb 131
 whole_animal_plant = {'whole' : ['Whole','WHOLE', 'WHOLE FISH', 'Whole fisk', 'Whole fish'],
                       'Whole animal' : ['Molluscs','Fish','FISH','molluscs','fish','MOLLUSCS'],
                       'Whole plant' : ['Seaweed','seaweed','SEAWEED'] }
 
-# %% ../../nbs/handlers/ospar.ipynb 134
+# %% ../../nbs/handlers/ospar.ipynb 132
 class CorrectWholeBodyPartCB(Callback):
     """Update body parts labeled as 'whole' to either 'Whole animal' or 'Whole plant'."""
     
@@ -639,10 +586,10 @@ class CorrectWholeBodyPartCB(Callback):
         df.loc[mask, 'body_part'] = new_value
 
 
-# %% ../../nbs/handlers/ospar.ipynb 137
+# %% ../../nbs/handlers/ospar.ipynb 135
 unmatched_fixes_biota_tissues = {}
 
-# %% ../../nbs/handlers/ospar.ipynb 144
+# %% ../../nbs/handlers/ospar.ipynb 142
 unmatched_fixes_biota_tissues = {
 'Mix of muscle and whole fish without liver' : 'Not available', # Drop
  'Whole without head' : 'Whole animal eviscerated without head', # Drop? eviscerated? ,
@@ -653,7 +600,7 @@ unmatched_fixes_biota_tissues = {
  'FLESH WITHOUT BONE' : 'Flesh without bones'
 }
 
-# %% ../../nbs/handlers/ospar.ipynb 148
+# %% ../../nbs/handlers/ospar.ipynb 146
 class LookupBiotaBodyPartCB(Callback):
     """Update body part id based on MARIS dbo_bodypar.xlsx"""
 
@@ -697,7 +644,7 @@ class LookupBiotaBodyPartCB(Callback):
         df['body_part'] = df['body_part'].apply(lambda x: lut[x].matched_id if x in lut else x)
 
 
-# %% ../../nbs/handlers/ospar.ipynb 156
+# %% ../../nbs/handlers/ospar.ipynb 154
 def get_biogroup_lut(maris_lut: str) -> dict:
     """
     Retrieve a lookup table for biogroup ids from a MARIS lookup table.
@@ -712,7 +659,7 @@ def get_biogroup_lut(maris_lut: str) -> dict:
     return species[['species_id', 'biogroup_id']].set_index('species_id').to_dict()['biogroup_id']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 158
+# %% ../../nbs/handlers/ospar.ipynb 156
 class LookupBiogroupCB(Callback):
     """Update biogroup id based on MARIS dbo_species.xlsx."""
 
@@ -734,7 +681,7 @@ class LookupBiogroupCB(Callback):
         df['bio_group'] = df['species'].apply(lambda x: lut.get(x, -1))
 
 
-# %% ../../nbs/handlers/ospar.ipynb 168
+# %% ../../nbs/handlers/ospar.ipynb 166
 def get_taxon_info_lut(maris_lut: str) -> dict:
     """
     Retrieve a lookup table for Taxonname from a MARIS lookup table.
@@ -750,7 +697,7 @@ def get_taxon_info_lut(maris_lut: str) -> dict:
 
 # TODO include Commonname field after next MARIS data reconciling process.
 
-# %% ../../nbs/handlers/ospar.ipynb 169
+# %% ../../nbs/handlers/ospar.ipynb 167
 class LookupTaxonInformationCB(Callback):
     """Update taxon names based on MARIS species LUT (dbo_species.xlsx)."""
     def __init__(self, fn_lut: Callable[[], dict]):
@@ -813,7 +760,7 @@ class LookupTaxonInformationCB(Callback):
         return name
 
 
-# %% ../../nbs/handlers/ospar.ipynb 176
+# %% ../../nbs/handlers/ospar.ipynb 174
 # Define unit names renaming rules
 renaming_unit_rules = {'Bq/l': 1, #'Bq/m3'
                        'Bq/L': 1,
@@ -824,7 +771,7 @@ renaming_unit_rules = {'Bq/l': 1, #'Bq/m3'
                        'Bq/kg f.w' : 5 
                        } 
 
-# %% ../../nbs/handlers/ospar.ipynb 177
+# %% ../../nbs/handlers/ospar.ipynb 175
 class LookupUnitCB(Callback):
     """Update the 'unit' column in DataFrames based on a lookup table.
     The class handles:
@@ -882,7 +829,7 @@ class LookupUnitCB(Callback):
         df['unit'] = df['Unit'].apply(lambda x: self.lut.get(x, 'Unknown'))
 
 
-# %% ../../nbs/handlers/ospar.ipynb 184
+# %% ../../nbs/handlers/ospar.ipynb 182
 class LookupDetectionLimitCB(Callback):
     """Remap activity value, activity uncertainty, and detection limit to MARIS format.
     This class performs the following operations:
@@ -980,7 +927,7 @@ class LookupDetectionLimitCB(Callback):
         df['detection_limit'] = df['detection_limit'].apply(lambda x: lut.get(x, 0))
 
 
-# %% ../../nbs/handlers/ospar.ipynb 191
+# %% ../../nbs/handlers/ospar.ipynb 189
 class RemapDataProviderSampleIdCB(Callback):
     """Remap 'KEY' column to 'samplabcode' in each DataFrame."""
 
@@ -1010,7 +957,7 @@ class RemapDataProviderSampleIdCB(Callback):
         df['samplabcode'] = df['Sample ID']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 201
+# %% ../../nbs/handlers/ospar.ipynb 199
 class RemapStationIdCB(Callback):
     """Remap Station ID to MARIS format."""
 
@@ -1039,7 +986,7 @@ class RemapStationIdCB(Callback):
         """
         df['station'] = df['Station ID'] + ', ' + df['Contracting Party']
 
-# %% ../../nbs/handlers/ospar.ipynb 207
+# %% ../../nbs/handlers/ospar.ipynb 205
 class RecordMeasurementNoteCB(Callback):
     """Record measurement notes by adding a 'measurenote' column to DataFrames."""
     
@@ -1080,7 +1027,7 @@ class RecordMeasurementNoteCB(Callback):
         df['measurenote'] = df['Measurement Comment']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 213
+# %% ../../nbs/handlers/ospar.ipynb 211
 class RecordRefNoteCB(Callback):
     """Record reference notes by adding a 'refnote' column to DataFrames."""
     
@@ -1121,7 +1068,7 @@ class RecordRefNoteCB(Callback):
         df['refnote'] = df['Reference Comment']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 220
+# %% ../../nbs/handlers/ospar.ipynb 218
 class RecordSampleNoteCB(Callback):
     """Record sample notes by adding a 'sampnote' column to DataFrames."""
     
@@ -1162,7 +1109,7 @@ class RecordSampleNoteCB(Callback):
         df['sampnote'] = df['Sample Comment']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 228
+# %% ../../nbs/handlers/ospar.ipynb 226
 class ConvertLonLatCB(Callback):
     """Convert Longitude and Latitude values to decimal degrees (DDD.DDDDD°). This class processes DataFrames to convert latitude and longitude from degrees, minutes, and seconds 
     (DMS) format with direction indicators to decimal degrees format."""
@@ -1232,7 +1179,7 @@ class ConvertLonLatCB(Callback):
         return degrees + minutes / 60 + seconds / 3600
 
 
-# %% ../../nbs/handlers/ospar.ipynb 244
+# %% ../../nbs/handlers/ospar.ipynb 242
 # Define columns of interest (keys) and renaming rules (values).
 def get_renaming_rules(encoding_type='netcdf'):
     vars = cdl_cfg()['vars']
@@ -1306,7 +1253,7 @@ def get_renaming_rules(encoding_type='netcdf'):
         print("Invalid encoding_type provided. Please use 'netcdf' or 'openrefine'.")
         return None
 
-# %% ../../nbs/handlers/ospar.ipynb 245
+# %% ../../nbs/handlers/ospar.ipynb 243
 class SelectAndRenameColumnCB(Callback):
     """A callback to select and rename columns in a DataFrame based on provided renaming rules
     for a specified encoding type. It also prints renaming rules that were not applied
@@ -1402,7 +1349,7 @@ class SelectAndRenameColumnCB(Callback):
         return df, not_found_keys
 
 
-# %% ../../nbs/handlers/ospar.ipynb 250
+# %% ../../nbs/handlers/ospar.ipynb 248
 class ReshapeLongToWide(Callback):
     "Convert data from long to wide with renamed columns."
     def __init__(self, columns=['nuclide'], values=['value']):
@@ -1459,7 +1406,7 @@ class ReshapeLongToWide(Callback):
             tfm.dfs[grp] = self.pivot(tfm.dfs[grp])
             tfm.dfs[grp].columns = self.renamed_cols(tfm.dfs[grp].columns)
 
-# %% ../../nbs/handlers/ospar.ipynb 259
+# %% ../../nbs/handlers/ospar.ipynb 257
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -1472,7 +1419,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 260
+# %% ../../nbs/handlers/ospar.ipynb 258
 def get_attrs(tfm, zotero_key, kw=kw):
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -1483,7 +1430,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/ospar.ipynb 262
+# %% ../../nbs/handlers/ospar.ipynb 260
 def enums_xtra(tfm, vars):
     "Retrieve a subset of the lengthy enum as 'species_t' for instance"
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
@@ -1494,7 +1441,7 @@ def enums_xtra(tfm, vars):
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/ospar.ipynb 264
+# %% ../../nbs/handlers/ospar.ipynb 262
 def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[
@@ -1532,7 +1479,7 @@ def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
                            )
     encoder.encode()
 
-# %% ../../nbs/handlers/ospar.ipynb 273
+# %% ../../nbs/handlers/ospar.ipynb 271
 def encode_or(fname_in, fname_out_csv, ref_id, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[

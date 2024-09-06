@@ -4,9 +4,8 @@ website:
       - index.ipynb
       - section: "Handlers"
         contents:
-          - handlers/geotraces.ipynb
           - handlers/helcom.ipynb
-          - handlers/maris_dump.ipynb
+          - handlers/maris_legacy.ipynb
           - handlers/ospar.ipynb
       - section: API
         contents:

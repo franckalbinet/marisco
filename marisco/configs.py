@@ -72,16 +72,20 @@ CONFIGS_CDL = {
     'placeholder': '_to_be_filled_in_',
     'grps': {
         'sea': {
-            'name': 'seawater'
+            'name': 'seawater',
+            'id': 1
         },
         'bio': {
-            'name': 'biota'
+            'name': 'biota',
+            'id': 2
         },
         'sed': {
-            'name': 'sediment'
+            'name': 'sediment',
+            'id': 3
         },
         'sus': {
-            'name': 'suspended-matter'
+            'name': 'suspended-matter',
+            'id': 4
         }
     },
     'global_attrs': {

@@ -3,65 +3,65 @@
 The MARIS data is converted to a standardized CSV format for importing into the MARIS database using Open Refine. The standardized variable names for Open Refine are provided in Table 1, and a detailed description of each variable is given below. Additionally, MARIS data is available in NetCDF4 format. The standardized variable names for NetCDF4 are also provided in Table 1, with descriptions for each variable included below.
 
 ## Table 1: Standardized Variable Names (Open Refine and NetCDF)
-| Friendly Name           | Open Refine Name    | NetCDF Name                    |
-|-------------------------|---------------------|--------------------------------|
-| Sample quality          | sampquality         |                                |
-| Sample type ID          | samptype_id         | *Sample type included as netcdf.group* |
-| Laboratory ID           | lab_id              |                                |
-| Latitude                | latitude            | lat                            |
-| Longitude               | longitude           | lon                            |
-| Station                 | station             |                                |
-| Sample lab code         | samplabcode         |                                |
-| Profile ID              | profile_id          |                                |
-| Transect ID             | transect_id         |                                |
-| Sampling depth          | sampdepth           | smp_depth                      |
-| Total depth             | totdepth            | tot_depth                      |
-| Begin period            | begperiod           | time                           |
-| End period              | endperiod           |                                |
-| Nuclide ID              | nuclide_id          | nuclide                        |
-| Detection               | detection           | detection_limit                |
-| Activity                | activity            | value                          |
-| Uncertainty             | uncertaint          | uncertainty                    |
-| Unit ID                 | unit_id             | unit                           |
-| Variable type           | vartype             |                                |
-| Frequency               | freq                |                                |
-| Range low detection     | rl_detection        |                                |
-| Range low               | rangelow            |                                |
-| Range upper             | rangeupp            |                                |
-| Species ID              | species_id          | species                        |
-| Biological group        |                     | bio_group                      |
-| Taxon name              | Taxonname           |                                |
-| Taxon reported name     | TaxonRepName        |                                |
-| Common name             | Commonname          |                                |
-| Taxon rank              | Taxonrank           |                                |
-| Taxon database          | TaxonDB             |                                |
-| Taxon database ID       | TaxonDBID           |                                |
-| Taxon database URL      | TaxonDBURL          |                                |
-| Body part ID            | bodypar_id          | body_part                      |
-| Slice up                | sliceup             |                                |
-| Slice down              | slicedown           |                                |
-| Sediment type ID        | sedtype_id          | sed_type                       |
-| Sediment reported name  | SedRepName          |                                |
-| Volume                  | volume              |                                |
-| Salinity                | salinity            | salinity                       |
-| Temperature             | temperatur          | temperature                    |
-| Filtered                | filtered            | filtered                       |
-| Filter pore             | filtpore            |                                |
-| Acidified               | acid                |                                |
-| Oxygen                  | oxygen              |                                |
-| Sample area             | samparea            |                                |
-| Dry weight              | drywt               |                                |
-| Wet weight              | wetwt               |                                |
-| Percent weight          | percentwt           |                                |
-| Sampling method ID      | sampmet_id          | sampling_method                |
-| Drying method ID        | drymet_id           |                                |
-| Preparation method ID   | prepmet_id          | preparation_method             |
-| Counting method ID      | counmet_id          | counting_method                |
-| Reference ID            | ref_id              |                                |
-| Reference note          | refnote             |                                |
-| Sample note             | sampnote            |                                |
-| Measurement note        | measurenote         |                                |
-| Good for export         | gfe                 |                                |
+| Friendly Name          | Open Refine Name | NetCDF Name                            |
+| ---------------------- | ---------------- | -------------------------------------- |
+| Sample quality         | sampquality      |                                        |
+| Sample type ID         | samptype_id      | *Sample type included as netcdf.group* |
+| Laboratory ID          | lab_id           |                                        |
+| Latitude               | latitude         | lat                                    |
+| Longitude              | longitude        | lon                                    |
+| Station                | station          |                                        |
+| Sample lab code        | samplabcode      |                                        |
+| Profile ID             | profile_id       |                                        |
+| Transect ID            | transect_id      |                                        |
+| Sampling depth         | sampdepth        | smp_depth                              |
+| Total depth            | totdepth         | tot_depth                              |
+| Begin period           | begperiod        | time                                   |
+| End period             | endperiod        |                                        |
+| Nuclide ID             | nuclide_id       | nuclide                                |
+| Detection              | detection        | detection_limit                        |
+| Activity               | activity         | value                                  |
+| Uncertainty            | uncertaint       | uncertainty                            |
+| Unit ID                | unit_id          | unit                                   |
+| Variable type          | vartype          |                                        |
+| Frequency              | freq             |                                        |
+| Range low detection    | rl_detection     |                                        |
+| Range low              | rangelow         |                                        |
+| Range upper            | rangeupp         |                                        |
+| Species ID             | species_id       | species                                |
+| Biological group       |                  | bio_group                              |
+| Taxon name             | Taxonname        |                                        |
+| Taxon reported name    | TaxonRepName     |                                        |
+| Common name            | Commonname       |                                        |
+| Taxon rank             | Taxonrank        |                                        |
+| Taxon database         | TaxonDB          |                                        |
+| Taxon database ID      | TaxonDBID        |                                        |
+| Taxon database URL     | TaxonDBURL       |                                        |
+| Body part ID           | bodypar_id       | body_part                              |
+| Slice up               | sliceup          |                                        |
+| Slice down             | slicedown        |                                        |
+| Sediment type ID       | sedtype_id       | sed_type                               |
+| Sediment reported name | SedRepName       |                                        |
+| Volume                 | volume           |                                        |
+| Salinity               | salinity         | salinity                               |
+| Temperature            | temperatur       | temperature                            |
+| Filtered               | filtered         | filtered                               |
+| Filter pore            | filtpore         |                                        |
+| Acidified              | acid             |                                        |
+| Oxygen                 | oxygen           |                                        |
+| Sample area            | samparea         |                                        |
+| Dry weight             | drywt            |                                        |
+| Wet weight             | wetwt            |                                        |
+| Percent weight         | percentwt        |                                        |
+| Sampling method ID     | sampmet_id       | sampling_method                        |
+| Drying method ID       | drymet_id        |                                        |
+| Preparation method ID  | prepmet_id       | preparation_method                     |
+| Counting method ID     | counmet_id       | counting_method                        |
+| Reference ID           | ref_id           |                                        |
+| Reference note         | refnote          |                                        |
+| Sample note            | sampnote         |                                        |
+| Measurement note       | measurenote      |                                        |
+| Good for export        | gfe              |                                        |
 
 
 <h2 style="text-align: center;">Variable Descriptions</h2>

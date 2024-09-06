@@ -1,0 +1,2384 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.554">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>readme</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="README_files/libs/clipboard/clipboard.min.js"></script>
+<script src="README_files/libs/quarto-html/quarto.js"></script>
+<script src="README_files/libs/quarto-html/popper.min.js"></script>
+<script src="README_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="README_files/libs/quarto-html/anchor.min.js"></script>
+<link href="README_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="README_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="README_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="README_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="README_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="maris-data-formats" class="level1">
+<h1>MARIS Data Formats</h1>
+<p>The MARIS data is converted to a standardized CSV format for importing into the MARIS database using Open Refine. The standardized variable names for Open Refine are provided in Table 1, and a detailed description of each variable is given below. Additionally, MARIS data is available in NetCDF4 format. The standardized variable names for NetCDF4 are also provided in Table 1, with descriptions for each variable included below.</p>
+<section id="table-1-standardized-variable-names-open-refine-and-netcdf" class="level2">
+<h2 class="anchored" data-anchor-id="table-1-standardized-variable-names-open-refine-and-netcdf">Table 1: Standardized Variable Names (Open Refine and NetCDF)</h2>
+<table class="table">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 21%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Friendly Name</th>
+<th>Open Refine Name</th>
+<th>NetCDF Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sample quality</td>
+<td>sampquality</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Sample type ID</td>
+<td>samptype_id</td>
+<td><em>Sample type included as netcdf.group</em></td>
+</tr>
+<tr class="odd">
+<td>Laboratory ID</td>
+<td>lab_id</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Latitude</td>
+<td>latitude</td>
+<td>lat</td>
+</tr>
+<tr class="odd">
+<td>Longitude</td>
+<td>longitude</td>
+<td>lon</td>
+</tr>
+<tr class="even">
+<td>Station</td>
+<td>station</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Sample lab code</td>
+<td>samplabcode</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Profile ID</td>
+<td>profile_id</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Transect ID</td>
+<td>transect_id</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Sampling depth</td>
+<td>sampdepth</td>
+<td>smp_depth</td>
+</tr>
+<tr class="odd">
+<td>Total depth</td>
+<td>totdepth</td>
+<td>tot_depth</td>
+</tr>
+<tr class="even">
+<td>Begin period</td>
+<td>begperiod</td>
+<td>time</td>
+</tr>
+<tr class="odd">
+<td>End period</td>
+<td>endperiod</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Nuclide ID</td>
+<td>nuclide_id</td>
+<td>nuclide</td>
+</tr>
+<tr class="odd">
+<td>Detection</td>
+<td>detection</td>
+<td>detection_limit</td>
+</tr>
+<tr class="even">
+<td>Activity</td>
+<td>activity</td>
+<td>value</td>
+</tr>
+<tr class="odd">
+<td>Uncertainty</td>
+<td>uncertaint</td>
+<td>uncertainty</td>
+</tr>
+<tr class="even">
+<td>Unit ID</td>
+<td>unit_id</td>
+<td>unit</td>
+</tr>
+<tr class="odd">
+<td>Variable type</td>
+<td>vartype</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Frequency</td>
+<td>freq</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Range low detection</td>
+<td>rl_detection</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Range low</td>
+<td>rangelow</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Range upper</td>
+<td>rangeupp</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Species ID</td>
+<td>species_id</td>
+<td>species</td>
+</tr>
+<tr class="odd">
+<td>Biological group</td>
+<td></td>
+<td>bio_group</td>
+</tr>
+<tr class="even">
+<td>Taxon name</td>
+<td>Taxonname</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Taxon reported name</td>
+<td>TaxonRepName</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Common name</td>
+<td>Commonname</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Taxon rank</td>
+<td>Taxonrank</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Taxon database</td>
+<td>TaxonDB</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Taxon database ID</td>
+<td>TaxonDBID</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Taxon database URL</td>
+<td>TaxonDBURL</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Body part ID</td>
+<td>bodypar_id</td>
+<td>body_part</td>
+</tr>
+<tr class="even">
+<td>Slice up</td>
+<td>sliceup</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Slice down</td>
+<td>slicedown</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Sediment type ID</td>
+<td>sedtype_id</td>
+<td>sed_type</td>
+</tr>
+<tr class="odd">
+<td>Sediment reported name</td>
+<td>SedRepName</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Volume</td>
+<td>volume</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Salinity</td>
+<td>salinity</td>
+<td>salinity</td>
+</tr>
+<tr class="even">
+<td>Temperature</td>
+<td>temperatur</td>
+<td>temperature</td>
+</tr>
+<tr class="odd">
+<td>Filtered</td>
+<td>filtered</td>
+<td>filtered</td>
+</tr>
+<tr class="even">
+<td>Filter pore</td>
+<td>filtpore</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Acidified</td>
+<td>acid</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Oxygen</td>
+<td>oxygen</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Sample area</td>
+<td>samparea</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Dry weight</td>
+<td>drywt</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Wet weight</td>
+<td>wetwt</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Percent weight</td>
+<td>percentwt</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Sampling method ID</td>
+<td>sampmet_id</td>
+<td>sampling_method</td>
+</tr>
+<tr class="even">
+<td>Drying method ID</td>
+<td>drymet_id</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Preparation method ID</td>
+<td>prepmet_id</td>
+<td>preparation_method</td>
+</tr>
+<tr class="even">
+<td>Counting method ID</td>
+<td>counmet_id</td>
+<td>counting_method</td>
+</tr>
+<tr class="odd">
+<td>Reference ID</td>
+<td>ref_id</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Reference note</td>
+<td>refnote</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Sample note</td>
+<td>sampnote</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Measurement note</td>
+<td>measurenote</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Good for export</td>
+<td>gfe</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 style="text-align: center;" class="anchored">
+Variable Descriptions
+</h2>
+</section>
+<section id="sample-quality" class="level2">
+<h2 class="anchored" data-anchor-id="sample-quality">Sample Quality</h2>
+<section id="description" class="level3">
+<h3 class="anchored" data-anchor-id="description">Description:</h3>
+<p>Defines the quality of the sample. Examples include: Good (G), Caution (C), Fail (F).</p>
+</section>
+<section id="lookup-table-lut-in-use" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use">Lookup Table (LUT) in use:</h3>
+<p>No.&nbsp;</p>
+</section>
+<section id="open-refine-variable-name" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name">Open Refine Variable Name:</h3>
+<p><code>sampquality</code></p>
+</section>
+<section id="open-refine-data-type" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF</p>
+</section>
+<section id="netcdf-data-type" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type">NetCDF Data Type:</h3>
+<p>Not included in NetCDF</p>
+<hr>
+</section>
+</section>
+<section id="sample-type-id" class="level2">
+<h2 class="anchored" data-anchor-id="sample-type-id">Sample Type ID</h2>
+<section id="description-1" class="level3">
+<h3 class="anchored" data-anchor-id="description-1">Description:</h3>
+<p>In MARIS, samples are categorized by type into WATER, BIOTA, SEDIMENT, and SUSPENDED types. The NetCDF data format separates MARIS data into ‘NetCDF groups’ by the sample type. Open Refine formats MARIS data into separate CSV files by sample type.</p>
+<ul>
+<li><strong>SEAWATER</strong> includes seawater and brackish water.</li>
+<li><strong>BIOTA</strong> includes various types of biota.</li>
+<li><strong>SEDIMENT</strong> includes various types of sediments.</li>
+<li><strong>SUSPENDED</strong> includes various types of suspended matter.</li>
+</ul>
+</section>
+<section id="lookup-table-lut-in-use-1" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-1">Lookup Table (LUT) in use:</h3>
+<p>No.</p>
+</section>
+<section id="open-refine-variable-name-1" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-1">Open Refine Variable Name:</h3>
+<p><code>samptype_id</code></p>
+</section>
+<section id="open-refine-data-type-1" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-1">Open Refine Data Type:</h3>
+<p>An integer value : - 1 : <code>SEAWATER</code> - 2 : <code>BIOTA</code> - 3 : <code>SEDIMENT</code> - 4 : <code>SUSPENDED</code></p>
+</section>
+<section id="netcdf-variable-name-1" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-1">NetCDF Variable Name:</h3>
+<p><em>Sample type is included as netcdf.group</em></p>
+</section>
+<section id="netcdf-data-type-1" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-1">NetCDF Data Type:</h3>
+<p>string</p>
+<hr>
+</section>
+</section>
+<section id="laboratory-id" class="level2">
+<h2 class="anchored" data-anchor-id="laboratory-id">Laboratory ID</h2>
+<section id="description-2" class="level3">
+<h3 class="anchored" data-anchor-id="description-2">Description:</h3>
+<p>The Laboratory ID identifies the laboratory that processed the sample.</p>
+</section>
+<section id="lookup-table-lut-in-use-2" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-2">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_lab.xlsx">dbo_lab.xlsx</a></p>
+</section>
+<section id="open-refine-variable-name-2" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-2">Open Refine Variable Name:</h3>
+<p><code>lab_id</code></p>
+</section>
+<section id="open-refine-data-type-2" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-2">Open Refine Data Type:</h3>
+<p>An integer value (the ‘id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-2" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-2">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-2" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-2">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="latitude-decimal" class="level2">
+<h2 class="anchored" data-anchor-id="latitude-decimal">Latitude Decimal</h2>
+<section id="description-3" class="level3">
+<h3 class="anchored" data-anchor-id="description-3">Description:</h3>
+<p>Latitude in decimal format (DDD.DDDDD°) with ranges from -90° to 90°.</p>
+</section>
+<section id="lookup-table-lut-in-use-3" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-3">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-3" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-3">Open Refine Variable Name:</h3>
+<p><code>latitude</code></p>
+</section>
+<section id="open-refine-data-type-3" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-3">Open Refine Data Type:</h3>
+<p>Float with values between -90° to 90°.</p>
+</section>
+<section id="netcdf-variable-name-3" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-3">NetCDF Variable Name:</h3>
+<p><code>lat</code></p>
+</section>
+<section id="netcdf-data-type-3" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-3">NetCDF Data Type:</h3>
+<p>Float with values between -90° to 90°.</p>
+<hr>
+</section>
+</section>
+<section id="longitude-decimal" class="level2">
+<h2 class="anchored" data-anchor-id="longitude-decimal">Longitude Decimal</h2>
+<section id="description-4" class="level3">
+<h3 class="anchored" data-anchor-id="description-4">Description:</h3>
+<p>Longitude in decimal format (DDD.DDDDD°) with ranges from -180° to 180°.</p>
+</section>
+<section id="lookup-table-lut-in-use-4" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-4">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-4" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-4">Open Refine Variable Name:</h3>
+<p><code>longitude</code></p>
+</section>
+<section id="open-refine-data-type-4" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-4">Open Refine Data Type:</h3>
+<p>Float with values between -180° to 180°.</p>
+</section>
+<section id="netcdf-variable-name-4" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-4">NetCDF Variable Name:</h3>
+<p><code>lon</code></p>
+</section>
+<section id="netcdf-data-type-4" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-4">NetCDF Data Type:</h3>
+<p>Float with values between -180° to 180°.</p>
+<hr>
+</section>
+</section>
+<section id="station" class="level2">
+<h2 class="anchored" data-anchor-id="station">Station</h2>
+<section id="description-5" class="level3">
+<h3 class="anchored" data-anchor-id="description-5">Description:</h3>
+<p>The name of the station where the sample was collected.</p>
+</section>
+<section id="lookup-table-lut-in-use-5" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-5">Lookup Table (LUT) in use:</h3>
+<p>No.</p>
+</section>
+<section id="open-refine-variable-name-5" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-5">Open Refine Variable Name:</h3>
+<p><code>station</code></p>
+</section>
+<section id="open-refine-data-type-5" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-5">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-5" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-5">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-5" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-5">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="sample-lab-code" class="level2">
+<h2 class="anchored" data-anchor-id="sample-lab-code">Sample Lab Code</h2>
+<section id="description-6" class="level3">
+<h3 class="anchored" data-anchor-id="description-6">Description:</h3>
+<p>The data provider’s sample laboratory code should be stored exactly as provided, without any modifications.</p>
+</section>
+<section id="lookup-table-lut-in-use-6" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-6">Lookup Table (LUT) in use:</h3>
+<p>No.</p>
+</section>
+<section id="open-refine-variable-name-6" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-6">Open Refine Variable Name:</h3>
+<p><code>samplabcode</code></p>
+</section>
+<section id="open-refine-data-type-6" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-6">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-6" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-6">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-6" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-6">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="profile-id" class="level2">
+<h2 class="anchored" data-anchor-id="profile-id">Profile ID</h2>
+<section id="description-7" class="level3">
+<h3 class="anchored" data-anchor-id="description-7">Description:</h3>
+<p>Profile ID is provided as is by the data provider and is an identifier for linking data which are part of a sequence, i.e., a vertical profile.</p>
+</section>
+<section id="lookup-table-lut-in-use-7" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-7">Lookup Table (LUT) in use:</h3>
+<p>No.</p>
+</section>
+<section id="open-refine-variable-name-7" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-7">Open Refine Variable Name:</h3>
+<p><code>profile_id</code></p>
+</section>
+<section id="open-refine-data-type-7" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-7">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-7" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-7">NetCDF Variable Name:</h3>
+<p>Not defined in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-7" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-7">NetCDF Data Type:</h3>
+<p>Not defined in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="transect-id" class="level2">
+<h2 class="anchored" data-anchor-id="transect-id">Transect ID</h2>
+<section id="description-8" class="level3">
+<h3 class="anchored" data-anchor-id="description-8">Description:</h3>
+<p>Transect ID is provided as is by the data provider and is an identifier for linking data which are part of a sequence, i.e., a horizontal transect.</p>
+</section>
+<section id="lookup-table-lut-in-use-8" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-8">Lookup Table (LUT) in use:</h3>
+<p>No.</p>
+</section>
+<section id="open-refine-variable-name-8" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-8">Open Refine Variable Name:</h3>
+<p><code>transect_id</code></p>
+</section>
+<section id="open-refine-data-type-8" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-8">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-8" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-8">NetCDF Variable Name:</h3>
+<p>Not defined in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-8" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-8">NetCDF Data Type:</h3>
+<p>Not defined in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="sampling-depth" class="level2">
+<h2 class="anchored" data-anchor-id="sampling-depth">Sampling Depth</h2>
+<section id="description-9" class="level3">
+<h3 class="anchored" data-anchor-id="description-9">Description:</h3>
+<p>Depth from the water surface in meters at which the sample was taken. A value of “0” indicates that the sample was collected at the surface. A value of “-1” indicates that sample depth information is not available.</p>
+</section>
+<section id="lookup-table-lut-in-use-9" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-9">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-9" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-9">Open Refine Variable Name:</h3>
+<p><code>sampdepth</code></p>
+</section>
+<section id="open-refine-data-type-9" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-9">Open Refine Data Type:</h3>
+<p>Float</p>
+</section>
+<section id="netcdf-variable-name-9" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-9">NetCDF Variable Name:</h3>
+<p><code>smp_depth</code></p>
+</section>
+<section id="netcdf-data-type-9" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-9">NetCDF Data Type:</h3>
+<p>Float</p>
+<hr>
+</section>
+</section>
+<section id="total-depth" class="level2">
+<h2 class="anchored" data-anchor-id="total-depth">Total Depth</h2>
+<section id="description-10" class="level3">
+<h3 class="anchored" data-anchor-id="description-10">Description:</h3>
+<p>Total water column depth in meters (m).</p>
+</section>
+<section id="lookup-table-lut-in-use-10" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-10">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-10" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-10">Open Refine Variable Name:</h3>
+<p><code>totdepth</code></p>
+</section>
+<section id="open-refine-data-type-10" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-10">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-10" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-10">NetCDF Variable Name:</h3>
+<p><code>tot_depth</code></p>
+</section>
+<section id="netcdf-data-type-10" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-10">NetCDF Data Type:</h3>
+<p>float</p>
+<hr>
+</section>
+</section>
+<section id="begin-period" class="level2">
+<h2 class="anchored" data-anchor-id="begin-period">Begin Period</h2>
+<section id="description-11" class="level3">
+<h3 class="anchored" data-anchor-id="description-11">Description:</h3>
+<p>‘Begin Period’ refers to the date when the collection of sample(s) began. If only a year is provided in the dataset, set the date to January 1st of that year (e.g., 2024 becomes 2024-01-01). If both a year and month are provided, set the date to the first day of that month (e.g., May 2024 becomes 2024-05-01). Date format of yyyy-mm-dd.</p>
+</section>
+<section id="lookup-table-lut-in-use-11" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-11">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-11" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-11">Open Refine Variable Name:</h3>
+<p><code>begperiod</code></p>
+</section>
+<section id="open-refine-data-type-11" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-11">Open Refine Data Type:</h3>
+<p>DATETIME string in the format (yyyy-mm-dd hh:mm:ss)</p>
+</section>
+<section id="netcdf-variable-name-11" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-11">NetCDF Variable Name:</h3>
+<p><code>time</code></p>
+</section>
+<section id="netcdf-data-type-11" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-11">NetCDF Data Type:</h3>
+<p>DATETIME string in the format (yyyy-mm-dd hh:mm:ss)</p>
+<hr>
+</section>
+</section>
+<section id="end-period" class="level2">
+<h2 class="anchored" data-anchor-id="end-period">End Period</h2>
+<section id="description-12" class="level3">
+<h3 class="anchored" data-anchor-id="description-12">Description:</h3>
+<p>‘End Period’ refers to the date when the collection of sample(s) ended. If only a year is provided in the dataset, set the date to January 1st of that year (e.g., 2024 becomes 2024-01-01). If both a year and month are provided, set the date to the first day of that month (e.g., May 2024 becomes 2024-05-01). Date format of yyyy-mm-dd.</p>
+</section>
+<section id="lookup-table-lut-in-use-12" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-12">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-12" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-12">Open Refine Variable Name:</h3>
+<p><code>endperiod</code></p>
+</section>
+<section id="open-refine-data-type-12" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-12">Open Refine Data Type:</h3>
+<p>DATETIME string in the format (yyyy-mm-dd hh:mm:ss)</p>
+</section>
+<section id="netcdf-variable-name-12" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-12">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-12" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-12">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="nuclide-id" class="level2">
+<h2 class="anchored" data-anchor-id="nuclide-id">Nuclide ID</h2>
+<section id="description-13" class="level3">
+<h3 class="anchored" data-anchor-id="description-13">Description:</h3>
+<p>Identifier for a specific nuclide (isotope) within the MARIS database.</p>
+</section>
+<section id="lookup-table-lut-in-use-13" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-13">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_nuclide.xlsx">dbo_nuclide.xlsx</a></p>
+</section>
+<section id="open-refine-variable-name-13" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-13">Open Refine Variable Name:</h3>
+<p><code>nuclide_id</code></p>
+</section>
+<section id="open-refine-data-type-13" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-13">Open Refine Data Type:</h3>
+<p>An integer value (the ‘id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-13" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-13">NetCDF Variable Name:</h3>
+<p><code>nuclide</code></p>
+</section>
+<section id="netcdf-data-type-13" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-13">NetCDF Data Type:</h3>
+<p>string</p>
+<hr>
+</section>
+</section>
+<section id="detection-limit" class="level2">
+<h2 class="anchored" data-anchor-id="detection-limit">Detection Limit</h2>
+<section id="description-14" class="level3">
+<h3 class="anchored" data-anchor-id="description-14">Description:</h3>
+<p>The detection limit variable describes the Activity variable as follows:</p>
+<p>‘&lt;’: The reported value for the Activity variable is the Minimum Detectable Activity (MDA) or ISO11029 detection limit. ‘=’: The Activity variable represents the measured value, and an associated uncertainty should be provided. ‘ND’: Indicates that neither an activity value nor an MDA (or detection limit) is reported. ‘DE’: When the reported Activity variable is an aggregation of multiple samples, the detection limit variable is defined as Derived (DE), see Variable Type for more information related to aggregation of activity reported.</p>
+</section>
+<section id="lookup-table-lut-in-use-14" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-14">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_detectlimit.xlsx">dbo_detectlimit.xlsx</a>.</p>
+</section>
+<section id="open-refine-variable-name-14" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-14">Open Refine Variable Name:</h3>
+<p><code>detection</code></p>
+</section>
+<section id="open-refine-data-type-14" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-14">Open Refine Data Type:</h3>
+<p>An integer value (the ‘id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-14" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-14">NetCDF Variable Name:</h3>
+<p><code>detection_limit</code></p>
+</section>
+<section id="netcdf-data-type-14" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-14">NetCDF Data Type:</h3>
+<p>An integer value (the ‘id’ defined in the LUT).</p>
+<hr>
+</section>
+</section>
+<section id="activity" class="level2">
+<h2 class="anchored" data-anchor-id="activity">Activity</h2>
+<section id="description-15" class="level3">
+<h3 class="anchored" data-anchor-id="description-15">Description:</h3>
+<p>The measured activity value or MDA for the nuclide reported. Several variables are used to describe the Activity variable, including:</p>
+<p><strong>Nuclide ID</strong>: Describes the nuclide for which the activity is reported. <strong>Detection Limit</strong>: Indicates whether the reported Activity value is a measured activity value or below the detection limit. <strong>Unit ID</strong>: Describes the unit associated with the reported Activity variable. <strong>Uncertainty</strong>: The associated uncertainty of the Activity variable. <strong>Variable Type</strong>: Describes whether the reported Activity variable is an aggregate, sum, mean, median, etc.</p>
+</section>
+<section id="lookup-table-lut-in-use-15" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-15">Lookup Table (LUT) in use:</h3>
+<p>No.</p>
+</section>
+<section id="open-refine-variable-name-15" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-15">Open Refine Variable Name:</h3>
+<p><code>activity</code></p>
+</section>
+<section id="open-refine-data-type-15" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-15">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-15" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-15">NetCDF Variable Name:</h3>
+<p><code>value</code></p>
+</section>
+<section id="netcdf-data-type-15" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-15">NetCDF Data Type:</h3>
+<p>float</p>
+<hr>
+</section>
+</section>
+<section id="uncertainty" class="level2">
+<h2 class="anchored" data-anchor-id="uncertainty">Uncertainty</h2>
+<section id="description-16" class="level3">
+<h3 class="anchored" data-anchor-id="description-16">Description:</h3>
+<p>The uncertainty associated with the measurement of the activity must be reported as a 1 sigma (k=1) measurement uncertainty. This uncertainty should be expressed in the same units as the activity variable.</p>
+</section>
+<section id="lookup-table-lut-in-use-16" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-16">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-16" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-16">Open Refine Variable Name:</h3>
+<p><code>uncertaint</code></p>
+</section>
+<section id="open-refine-data-type-16" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-16">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-16" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-16">NetCDF Variable Name:</h3>
+<p><code>uncertainty</code></p>
+</section>
+<section id="netcdf-data-type-16" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-16">NetCDF Data Type:</h3>
+<p>float</p>
+<hr>
+</section>
+</section>
+<section id="unit-id" class="level2">
+<h2 class="anchored" data-anchor-id="unit-id">Unit ID</h2>
+<section id="description-17" class="level3">
+<h3 class="anchored" data-anchor-id="description-17">Description:</h3>
+<p>Represents the ID value from the Lookup Table (LUT) corresponding to the unit of measurement for both the activity variable and the uncertainty variable (if applicable). For seawater measurements, ensure that the unit is converted from ‘Bq L⁻¹’ to ‘Bq m⁻³’, and use the corresponding LUT value for ‘Bq m⁻³’.</p>
+</section>
+<section id="lookup-table-lut-in-use-17" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-17">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_unit.xlsx">dbo_unit.xlsx</a>.</p>
+</section>
+<section id="open-refine-variable-name-17" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-17">Open Refine Variable Name:</h3>
+<p><code>unit_id</code></p>
+</section>
+<section id="open-refine-data-type-17" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-17">Open Refine Data Type:</h3>
+<p>An integer value (the ‘id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-17" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-17">NetCDF Variable Name:</h3>
+<p><code>unit</code></p>
+</section>
+<section id="netcdf-data-type-17" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-17">NetCDF Data Type:</h3>
+<p>An integer value (the ‘id’ defined in the LUT).</p>
+<hr>
+</section>
+</section>
+<section id="variable-type" class="level2">
+<h2 class="anchored" data-anchor-id="variable-type">Variable Type</h2>
+<section id="description-18" class="level3">
+<h3 class="anchored" data-anchor-id="description-18">Description:</h3>
+<p>Describes the type of aggregation applied to the measurements if they are not reported as individual values. Possible values include:</p>
+<p>AM: Arithmetic Mean GM: Geometric Mean MED: Median MAX: Maximum MIN: Minimum</p>
+</section>
+<section id="lookup-table-lut-in-use-18" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-18">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-18" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-18">Open Refine Variable Name:</h3>
+<p><code>vartype</code></p>
+</section>
+<section id="open-refine-data-type-18" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-18">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-18" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-18">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-18" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-18">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="frequency" class="level2">
+<h2 class="anchored" data-anchor-id="frequency">Frequency</h2>
+<section id="description-19" class="level3">
+<h3 class="anchored" data-anchor-id="description-19">Description:</h3>
+<p>Indicates how often the sample is taken or the measurement is recorded. This variable helps to understand the regularity of data collection and can include details such as daily, weekly, monthly, or any other specified time interval.</p>
+</section>
+<section id="lookup-table-lut-in-use-19" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-19">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-19" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-19">Open Refine Variable Name:</h3>
+<p><code>freq</code></p>
+</section>
+<section id="open-refine-data-type-19" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-19">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-19" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-19">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-19" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-19">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="range-low-detection" class="level2">
+<h2 class="anchored" data-anchor-id="range-low-detection">Range Low Detection</h2>
+<section id="description-20" class="level3">
+<h3 class="anchored" data-anchor-id="description-20">Description:</h3>
+<p>If aggregation occurred when evaluating the Activity variable, the ‘Range Low Detection’ value describes the ‘Range Low’ variable as follows:</p>
+<ul>
+<li>‘&lt;’: The reported value for the Activity variable is the Minimum Detectable Activity (MDA) or ISO11029 detection limit.</li>
+<li>‘=’: The Activity variable represents the measured value, with an associated uncertainty provided.</li>
+<li>‘ND’: Indicates that neither an activity value nor an MDA (or detection limit) is reported.</li>
+<li>‘DE’: When the reported Activity variable is an aggregation of multiple samples, the detection limit variable is defined as Derived (DE). See the Variable Type section for more details on aggregation of reported activity.</li>
+</ul>
+</section>
+<section id="lookup-table-lut-in-use-20" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-20">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_detectlimit.xlsx">dbo_detectlimit.xlsx</a>.</p>
+</section>
+<section id="open-refine-variable-name-20" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-20">Open Refine Variable Name:</h3>
+<p><code>rl_detection</code></p>
+</section>
+<section id="open-refine-data-type-20" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-20">Open Refine Data Type:</h3>
+<p>An integer value (the ‘id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-20" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-20">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-20" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-20">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="range-low" class="level2">
+<h2 class="anchored" data-anchor-id="range-low">Range Low</h2>
+<section id="description-21" class="level3">
+<h3 class="anchored" data-anchor-id="description-21">Description:</h3>
+<p>If aggregation is applied to the measurements, the ‘Range Low’ variable represents the smallest activity measured within the aggregated dataset. This value should be reported in a format consistent with the unit specified by the Unit ID variable.</p>
+</section>
+<section id="lookup-table-lut-in-use-21" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-21">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-21" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-21">Open Refine Variable Name:</h3>
+<p><code>rangelow</code></p>
+</section>
+<section id="open-refine-data-type-21" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-21">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-21" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-21">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-21" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-21">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="range-upper" class="level2">
+<h2 class="anchored" data-anchor-id="range-upper">Range Upper</h2>
+<section id="description-22" class="level3">
+<h3 class="anchored" data-anchor-id="description-22">Description:</h3>
+<p>If aggregation is applied to the measurements, the ‘Range Upper’ variable represents the largest activity measured within the aggregated dataset. This value should be reported in a format consistent with the unit specified by the Unit ID variable.</p>
+</section>
+<section id="lookup-table-lut-in-use-22" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-22">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-22" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-22">Open Refine Variable Name:</h3>
+<p><code>rangeupp</code></p>
+</section>
+<section id="open-refine-data-type-22" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-22">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-22" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-22">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-22" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-22">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="species-id" class="level2">
+<h2 class="anchored" data-anchor-id="species-id">Species ID</h2>
+<section id="description-23" class="level3">
+<h3 class="anchored" data-anchor-id="description-23">Description:</h3>
+<p>Represents the identifier for the species included in the sample. If a specific species is not provided but a biological group (e.g., ‘Fish’) is specified, use this group information to define the species.</p>
+</section>
+<section id="lookup-table-lut-in-use-23" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-23">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_species.xlsx">dbo_species.xlsx</a>.</p>
+</section>
+<section id="open-refine-variable-name-23" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-23">Open Refine Variable Name:</h3>
+<p><code>species_id</code></p>
+</section>
+<section id="open-refine-data-type-23" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-23">Open Refine Data Type:</h3>
+<p>An integer value (the ‘species_id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-23" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-23">NetCDF Variable Name:</h3>
+<p><code>species</code></p>
+</section>
+<section id="netcdf-data-type-23" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-23">NetCDF Data Type:</h3>
+<p>An integer value (the ‘species_id’ defined in the LUT).</p>
+<hr>
+</section>
+</section>
+<section id="biological-group" class="level2">
+<h2 class="anchored" data-anchor-id="biological-group">Biological Group</h2>
+<section id="description-24" class="level3">
+<h3 class="anchored" data-anchor-id="description-24">Description:</h3>
+<p>The biological group of the sample, if applicable. Grouping of related species (e.g.&nbsp;crustaceans, molluscs, fish etc.).</p>
+</section>
+<section id="lookup-table-lut-in-use-24" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-24">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_species.xlsx">dbo_species.xlsx</a> includes a “biogroup_id” for all species which links to the <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_biogroup.xlsx">dbo_biogroup.xlsx</a> look-up.</p>
+</section>
+<section id="open-refine-variable-name-24" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-24">Open Refine Variable Name:</h3>
+<p>None</p>
+</section>
+<section id="open-refine-data-type-24" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-24">Open Refine Data Type:</h3>
+<p>None</p>
+</section>
+<section id="netcdf-variable-name-24" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-24">NetCDF Variable Name:</h3>
+<p><code>bio_group</code></p>
+</section>
+<section id="netcdf-data-type-24" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-24">NetCDF Data Type:</h3>
+<p>An integer value (the ‘biogroup_id’ defined in the LUT).</p>
+<hr>
+</section>
+</section>
+<section id="taxon-name" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-name">Taxon Name</h2>
+<section id="description-25" class="level3">
+<h3 class="anchored" data-anchor-id="description-25">Description:</h3>
+<p>Scientific name of the taxon.</p>
+</section>
+<section id="lookup-table-lut-in-use-25" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-25">Lookup Table (LUT) in use:</h3>
+<p>No, ‘Taxon Name’ is defined for each species in the <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_specie%20s.xlsx">dbo_species.xlsx</a> look-up.</p>
+</section>
+<section id="open-refine-variable-name-25" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-25">Open Refine Variable Name:</h3>
+<p><code>Taxonname</code></p>
+</section>
+<section id="open-refine-data-type-25" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-25">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-25" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-25">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-25" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-25">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="taxon-reported-name" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-reported-name">Taxon Reported Name</h2>
+<section id="description-26" class="level3">
+<h3 class="anchored" data-anchor-id="description-26">Description:</h3>
+<p>Taxon name reported by the data provider.</p>
+</section>
+<section id="lookup-table-lut-in-use-26" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-26">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-26" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-26">Open Refine Variable Name:</h3>
+<p><code>TaxonRepName</code></p>
+</section>
+<section id="open-refine-data-type-26" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-26">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-26" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-26">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-26" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-26">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="common-name" class="level2">
+<h2 class="anchored" data-anchor-id="common-name">Common Name</h2>
+<section id="description-27" class="level3">
+<h3 class="anchored" data-anchor-id="description-27">Description:</h3>
+<p>Common name of the species or organism.</p>
+</section>
+<section id="lookup-table-lut-in-use-27" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-27">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-27" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-27">Open Refine Variable Name:</h3>
+<p><code>Commonname</code></p>
+</section>
+<section id="open-refine-data-type-27" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-27">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-27" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-27">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-27" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-27">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="taxon-rank" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-rank">Taxon Rank</h2>
+<section id="description-28" class="level3">
+<h3 class="anchored" data-anchor-id="description-28">Description:</h3>
+<p>Rank of the taxon in the biological classification system.</p>
+</section>
+<section id="lookup-table-lut-in-use-28" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-28">Lookup Table (LUT) in use:</h3>
+<p>No, ‘Taxon Rank’ is defined for each species in the <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_specie%20s.xlsx">dbo_species.xlsx</a> look-up.</p>
+</section>
+<section id="open-refine-variable-name-28" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-28">Open Refine Variable Name:</h3>
+<p><code>Taxonrank</code></p>
+</section>
+<section id="open-refine-data-type-28" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-28">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-28" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-28">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-28" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-28">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="taxon-database" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-database">Taxon Database</h2>
+<section id="description-29" class="level3">
+<h3 class="anchored" data-anchor-id="description-29">Description:</h3>
+<p>Database or repository where taxon information is stored.</p>
+</section>
+<section id="lookup-table-lut-in-use-29" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-29">Lookup Table (LUT) in use:</h3>
+<p>No, ‘Taxon Database’ is defined for each species in the <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_specie%20s.xlsx">dbo_species.xlsx</a> look-up.</p>
+</section>
+<section id="open-refine-variable-name-29" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-29">Open Refine Variable Name:</h3>
+<p><code>TaxonDB</code></p>
+</section>
+<section id="open-refine-data-type-29" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-29">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-29" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-29">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-29" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-29">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="taxon-database-id" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-database-id">Taxon Database ID</h2>
+<section id="description-30" class="level3">
+<h3 class="anchored" data-anchor-id="description-30">Description:</h3>
+<p>Identifier for the taxon in the taxon database.</p>
+</section>
+<section id="lookup-table-lut-in-use-30" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-30">Lookup Table (LUT) in use:</h3>
+<p>No, ‘Taxon Database ID’ is defined for each species in the <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_specie%20s.xlsx">dbo_species.xlsx</a> look-up.</p>
+</section>
+<section id="open-refine-variable-name-30" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-30">Open Refine Variable Name:</h3>
+<p><code>TaxonDBID</code></p>
+</section>
+<section id="open-refine-data-type-30" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-30">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-30" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-30">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-30" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-30">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="taxon-database-url" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-database-url">Taxon Database URL</h2>
+<section id="description-31" class="level3">
+<h3 class="anchored" data-anchor-id="description-31">Description:</h3>
+<p>URL the taxon database.</p>
+</section>
+<section id="lookup-table-lut-in-use-31" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-31">Lookup Table (LUT) in use:</h3>
+<p>No, ‘Taxon Database URL’ is defined for each species in the <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_specie%20s.xlsx">dbo_species.xlsx</a> look-up.</p>
+</section>
+<section id="open-refine-variable-name-31" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-31">Open Refine Variable Name:</h3>
+<p><code>TaxonDBURL</code></p>
+</section>
+<section id="open-refine-data-type-31" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-31">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-31" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-31">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-31" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-31">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="body-part-id" class="level2">
+<h2 class="anchored" data-anchor-id="body-part-id">Body Part ID</h2>
+<section id="description-32" class="level3">
+<h3 class="anchored" data-anchor-id="description-32">Description:</h3>
+<p>Represents the identifier for the specific body part of the sample.</p>
+</section>
+<section id="lookup-table-lut-in-use-32" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-32">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_bodypar.xlsx">dbo_bodypar.xlsx</a>.</p>
+</section>
+<section id="open-refine-variable-name-32" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-32">Open Refine Variable Name:</h3>
+<p><code>bodypar_id</code></p>
+</section>
+<section id="open-refine-data-type-32" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-32">Open Refine Data Type:</h3>
+<p>An integer value (the ‘bodypar_id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-32" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-32">NetCDF Variable Name:</h3>
+<p><code>body_part</code></p>
+</section>
+<section id="netcdf-data-type-32" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-32">NetCDF Data Type:</h3>
+<p>An integer value (the ‘bodypar_id’ defined in the LUT).</p>
+<hr>
+</section>
+</section>
+<section id="slice-up" class="level2">
+<h2 class="anchored" data-anchor-id="slice-up">Slice Up</h2>
+<section id="description-33" class="level3">
+<h3 class="anchored" data-anchor-id="description-33">Description:</h3>
+<p>Top of sediment core interval relative to the water-sediment interface (cm).</p>
+</section>
+<section id="lookup-table-lut-in-use-33" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-33">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-33" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-33">Open Refine Variable Name:</h3>
+<p><code>sliceup</code></p>
+</section>
+<section id="open-refine-data-type-33" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-33">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-33" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-33">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-33" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-33">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="slice-down" class="level2">
+<h2 class="anchored" data-anchor-id="slice-down">Slice Down</h2>
+<section id="description-34" class="level3">
+<h3 class="anchored" data-anchor-id="description-34">Description:</h3>
+<p>Bottom of sediment core interval relative to the water-sediment interface (cm).</p>
+</section>
+<section id="lookup-table-lut-in-use-34" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-34">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-34" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-34">Open Refine Variable Name:</h3>
+<p><code>slicedown</code></p>
+</section>
+<section id="open-refine-data-type-34" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-34">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-34" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-34">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-34" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-34">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="sediment-type-id" class="level2">
+<h2 class="anchored" data-anchor-id="sediment-type-id">Sediment Type ID</h2>
+<section id="description-35" class="level3">
+<h3 class="anchored" data-anchor-id="description-35">Description:</h3>
+<p>Represents the classification of sediment according to the Udden-Wentworth scale.</p>
+</section>
+<section id="lookup-table-lut-in-use-35" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-35">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_sedtype.xlsx">dbo_sedtype.xlsx</a>.</p>
+</section>
+<section id="open-refine-variable-name-35" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-35">Open Refine Variable Name:</h3>
+<p><code>sedtype_id</code></p>
+</section>
+<section id="open-refine-data-type-35" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-35">Open Refine Data Type:</h3>
+<p>An integer value (the ‘sedtype_id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-35" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-35">NetCDF Variable Name:</h3>
+<p><code>sed_type</code></p>
+</section>
+<section id="netcdf-data-type-35" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-35">NetCDF Data Type:</h3>
+<p>An integer value (the ‘sedtype_id’ defined in the LUT).</p>
+<hr>
+</section>
+</section>
+<section id="sediment-reported-name" class="level2">
+<h2 class="anchored" data-anchor-id="sediment-reported-name">Sediment Reported Name</h2>
+<section id="description-36" class="level3">
+<h3 class="anchored" data-anchor-id="description-36">Description:</h3>
+<p>Name of the sediment as reported by the data provider. The sediment name should be stored exactly as provided, without any modifications.</p>
+</section>
+<section id="lookup-table-lut-in-use-36" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-36">Lookup Table (LUT) in use:</h3>
+<p>No.</p>
+</section>
+<section id="open-refine-variable-name-36" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-36">Open Refine Variable Name:</h3>
+<p><code>SedRepName</code></p>
+</section>
+<section id="open-refine-data-type-36" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-36">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-36" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-36">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-36" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-36">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="volume" class="level2">
+<h2 class="anchored" data-anchor-id="volume">Volume</h2>
+<section id="description-37" class="level3">
+<h3 class="anchored" data-anchor-id="description-37">Description:</h3>
+<p>Volume of the sample.</p>
+</section>
+<section id="lookup-table-lut-in-use-37" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-37">Lookup Table (LUT) in use:</h3>
+<p>No.</p>
+</section>
+<section id="open-refine-variable-name-37" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-37">Open Refine Variable Name:</h3>
+<p><code>volume</code></p>
+</section>
+<section id="open-refine-data-type-37" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-37">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-37" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-37">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-37" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-37">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="salinity" class="level2">
+<h2 class="anchored" data-anchor-id="salinity">Salinity</h2>
+<section id="description-38" class="level3">
+<h3 class="anchored" data-anchor-id="description-38">Description:</h3>
+<p>Salinity of the sample, expressed in practical salinity units (PSU).If required, consult TEOS-10 guidelines (www.teos-10.org/) for converting from Absolute Salinity (g/kg) to Practical Salinity.</p>
+</section>
+<section id="lookup-table-lut-in-use-38" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-38">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-38" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-38">Open Refine Variable Name:</h3>
+<p><code>salinity</code></p>
+</section>
+<section id="open-refine-data-type-38" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-38">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-38" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-38">NetCDF Variable Name:</h3>
+<p><code>salinity</code></p>
+</section>
+<section id="netcdf-data-type-38" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-38">NetCDF Data Type:</h3>
+<p>float</p>
+<hr>
+</section>
+</section>
+<section id="temperature" class="level2">
+<h2 class="anchored" data-anchor-id="temperature">Temperature</h2>
+<section id="description-39" class="level3">
+<h3 class="anchored" data-anchor-id="description-39">Description:</h3>
+<p>Temperature of the sample (°C).</p>
+</section>
+<section id="lookup-table-lut-in-use-39" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-39">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-39" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-39">Open Refine Variable Name:</h3>
+<p><code>temperatur</code></p>
+</section>
+<section id="open-refine-data-type-39" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-39">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-39" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-39">NetCDF Variable Name:</h3>
+<p><code>temperature</code></p>
+</section>
+<section id="netcdf-data-type-39" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-39">NetCDF Data Type:</h3>
+<p>float</p>
+<hr>
+</section>
+</section>
+<section id="filtered" class="level2">
+<h2 class="anchored" data-anchor-id="filtered">Filtered</h2>
+<section id="description-40" class="level3">
+<h3 class="anchored" data-anchor-id="description-40">Description:</h3>
+<p>Indicates whether the sample was filtered: - Y : Sample was filtered. - N : Sample was not filtered. - NA : Not applicable or information not available.</p>
+</section>
+<section id="lookup-table-lut-in-use-40" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-40">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-40" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-40">Open Refine Variable Name:</h3>
+<p><code>filtered</code></p>
+</section>
+<section id="open-refine-data-type-40" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-40">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-40" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-40">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-40" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-40">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="filter-pore-mesh-size" class="level2">
+<h2 class="anchored" data-anchor-id="filter-pore-mesh-size">Filter Pore Mesh size</h2>
+<section id="description-41" class="level3">
+<h3 class="anchored" data-anchor-id="description-41">Description:</h3>
+<p>The pore size of the filter used, if applicable, expressed in micrometers (µm).</p>
+</section>
+<section id="lookup-table-lut-in-use-41" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-41">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-41" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-41">Open Refine Variable Name:</h3>
+<p><code>filtpore</code></p>
+</section>
+<section id="open-refine-data-type-41" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-41">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-41" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-41">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-41" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-41">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="acidified" class="level2">
+<h2 class="anchored" data-anchor-id="acidified">Acidified</h2>
+<section id="description-42" class="level3">
+<h3 class="anchored" data-anchor-id="description-42">Description:</h3>
+<p>Indicates if the sample was acidified. - A: Sample acidified - NA: Sample not acidified</p>
+</section>
+<section id="lookup-table-lut-in-use-42" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-42">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-42" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-42">Open Refine Variable Name:</h3>
+<p><code>acid</code></p>
+</section>
+<section id="open-refine-data-type-42" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-42">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-42" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-42">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-42" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-42">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="oxygen" class="level2">
+<h2 class="anchored" data-anchor-id="oxygen">Oxygen</h2>
+<section id="description-43" class="level3">
+<h3 class="anchored" data-anchor-id="description-43">Description:</h3>
+<p>Dissolved oxygen concentration.</p>
+</section>
+<section id="lookup-table-lut-in-use-43" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-43">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-43" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-43">Open Refine Variable Name:</h3>
+<p><code>oxygen</code></p>
+</section>
+<section id="open-refine-data-type-43" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-43">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-43" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-43">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-43" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-43">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="sample-area" class="level2">
+<h2 class="anchored" data-anchor-id="sample-area">Sample Area</h2>
+<section id="description-44" class="level3">
+<h3 class="anchored" data-anchor-id="description-44">Description:</h3>
+<p>Sample surface area of sediment (cm2).</p>
+</section>
+<section id="lookup-table-lut-in-use-44" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-44">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-44" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-44">Open Refine Variable Name:</h3>
+<p><code>samparea</code></p>
+</section>
+<section id="open-refine-data-type-44" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-44">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-44" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-44">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-44" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-44">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="dry-weight" class="level2">
+<h2 class="anchored" data-anchor-id="dry-weight">Dry Weight</h2>
+<section id="description-45" class="level3">
+<h3 class="anchored" data-anchor-id="description-45">Description:</h3>
+<p>Dry weight of the sample, expressed in grams (g).</p>
+</section>
+<section id="lookup-table-lut-in-use-45" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-45">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-45" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-45">Open Refine Variable Name:</h3>
+<p><code>drywt</code></p>
+</section>
+<section id="open-refine-data-type-45" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-45">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-45" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-45">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-45" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-45">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="wet-weight" class="level2">
+<h2 class="anchored" data-anchor-id="wet-weight">Wet Weight</h2>
+<section id="description-46" class="level3">
+<h3 class="anchored" data-anchor-id="description-46">Description:</h3>
+<p>Wet weight of the sample, expressed in grams (g).</p>
+</section>
+<section id="lookup-table-lut-in-use-46" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-46">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-46" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-46">Open Refine Variable Name:</h3>
+<p><code>wetwt</code></p>
+</section>
+<section id="open-refine-data-type-46" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-46">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-46" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-46">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-46" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-46">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="percent-weight" class="level2">
+<h2 class="anchored" data-anchor-id="percent-weight">Percent Weight</h2>
+<section id="description-47" class="level3">
+<h3 class="anchored" data-anchor-id="description-47">Description:</h3>
+<p>Expressed as a percentage. This is calculated by dividing the dry weight by the wet weight and then multiplying by 100. The reported value should be greater than 0 and less than 100.</p>
+</section>
+<section id="lookup-table-lut-in-use-47" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-47">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-47" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-47">Open Refine Variable Name:</h3>
+<p><code>percentwt</code></p>
+</section>
+<section id="open-refine-data-type-47" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-47">Open Refine Data Type:</h3>
+<p>float</p>
+</section>
+<section id="netcdf-variable-name-47" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-47">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-47" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-47">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="sampling-method-id" class="level2">
+<h2 class="anchored" data-anchor-id="sampling-method-id">Sampling Method ID</h2>
+<section id="description-48" class="level3">
+<h3 class="anchored" data-anchor-id="description-48">Description:</h3>
+<p>Identifier for the method used to collect the sample.</p>
+</section>
+<section id="lookup-table-lut-in-use-48" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-48">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_sampmet.xlsx">dbo_sampmet.xlsx</a>.</p>
+</section>
+<section id="open-refine-variable-name-48" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-48">Open Refine Variable Name:</h3>
+<p><code>sampmet_id</code></p>
+</section>
+<section id="open-refine-data-type-48" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-48">Open Refine Data Type:</h3>
+<p>An integer value (the ‘sampmet_id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-48" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-48">NetCDF Variable Name:</h3>
+<p><code>sampling_method</code></p>
+</section>
+<section id="netcdf-data-type-48" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-48">NetCDF Data Type:</h3>
+<p>An integer value (the ‘sampmet_id’ defined in the LUT).</p>
+<hr>
+</section>
+</section>
+<section id="drying-method-id" class="level2">
+<h2 class="anchored" data-anchor-id="drying-method-id">Drying Method ID</h2>
+<section id="description-49" class="level3">
+<h3 class="anchored" data-anchor-id="description-49">Description:</h3>
+<p>Identifier for the method used to dry the sample.</p>
+</section>
+<section id="lookup-table-lut-in-use-49" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-49">Lookup Table (LUT) in use:</h3>
+<p>Yes, [dbo_sampmet.xlsx]</p>
+</section>
+<section id="open-refine-variable-name-49" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-49">Open Refine Variable Name:</h3>
+<p><code>drymet_id</code></p>
+</section>
+<section id="open-refine-data-type-49" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-49">Open Refine Data Type:</h3>
+<p>An integer value (the ‘id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-49" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-49">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-49" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-49">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="preparation-method-id" class="level2">
+<h2 class="anchored" data-anchor-id="preparation-method-id">Preparation Method ID</h2>
+<section id="description-50" class="level3">
+<h3 class="anchored" data-anchor-id="description-50">Description:</h3>
+<p>Identifier for the method used to prepare the sample.</p>
+</section>
+<section id="lookup-table-lut-in-use-50" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-50">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_prepmet.xlsx">dbo_prepmet.xlsx</a>. ### Open Refine Variable Name: <code>prepmet_id</code></p>
+</section>
+<section id="open-refine-data-type-50" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-50">Open Refine Data Type:</h3>
+<p>An integer value (the ‘prepmet_id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-50" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-50">NetCDF Variable Name:</h3>
+<p><code>preparation_method</code></p>
+</section>
+<section id="netcdf-data-type-50" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-50">NetCDF Data Type:</h3>
+<p>An integer value (the ‘prepmet_id’ defined in the LUT).</p>
+<hr>
+</section>
+</section>
+<section id="counting-method-id" class="level2">
+<h2 class="anchored" data-anchor-id="counting-method-id">Counting Method ID</h2>
+<section id="description-51" class="level3">
+<h3 class="anchored" data-anchor-id="description-51">Description:</h3>
+<p>Identifier for the method used to count the sample.</p>
+</section>
+<section id="lookup-table-lut-in-use-51" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-51">Lookup Table (LUT) in use:</h3>
+<p>Yes, <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_counmet.xlsx">dbo_counmet.xlsx</a>.</p>
+</section>
+<section id="open-refine-variable-name-50" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-50">Open Refine Variable Name:</h3>
+<p><code>counmet_id</code></p>
+</section>
+<section id="open-refine-data-type-51" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-51">Open Refine Data Type:</h3>
+<p>An integer value (the ‘counmet_id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-51" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-51">NetCDF Variable Name:</h3>
+<p><code>counting_method</code></p>
+</section>
+<section id="netcdf-data-type-51" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-51">NetCDF Data Type:</h3>
+<p>An integer value (the ‘counmet_id’ defined in the LUT).</p>
+<hr>
+</section>
+</section>
+<section id="reference-id" class="level2">
+<h2 class="anchored" data-anchor-id="reference-id">Reference ID</h2>
+<section id="description-52" class="level3">
+<h3 class="anchored" data-anchor-id="description-52">Description:</h3>
+<p>Identifier which identifies the source provider of the data.</p>
+</section>
+<section id="lookup-table-lut-in-use-52" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-52">Lookup Table (LUT) in use:</h3>
+<p>Yes, [dbo_ref.xlsx]</p>
+</section>
+<section id="open-refine-variable-name-51" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-51">Open Refine Variable Name:</h3>
+<p><code>ref_id</code></p>
+</section>
+<section id="open-refine-data-type-52" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-52">Open Refine Data Type:</h3>
+<p>An integer value (the ‘id’ defined in the LUT).</p>
+</section>
+<section id="netcdf-variable-name-52" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-52">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-52" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-52">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="reference-note" class="level2">
+<h2 class="anchored" data-anchor-id="reference-note">Reference Note</h2>
+<section id="description-53" class="level3">
+<h3 class="anchored" data-anchor-id="description-53">Description:</h3>
+<p>Notes or comments related to the reference or source.</p>
+</section>
+<section id="lookup-table-lut-in-use-53" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-53">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-52" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-52">Open Refine Variable Name:</h3>
+<p><code>refnote</code></p>
+</section>
+<section id="open-refine-data-type-53" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-53">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-53" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-53">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-53" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-53">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="sample-note" class="level2">
+<h2 class="anchored" data-anchor-id="sample-note">Sample Note</h2>
+<section id="description-54" class="level3">
+<h3 class="anchored" data-anchor-id="description-54">Description:</h3>
+<p>Notes or comments related to the sample.</p>
+</section>
+<section id="lookup-table-lut-in-use-54" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-54">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-53" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-53">Open Refine Variable Name:</h3>
+<p><code>sampnote</code></p>
+</section>
+<section id="open-refine-data-type-54" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-54">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-54" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-54">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-54" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-54">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="measurement-note" class="level2">
+<h2 class="anchored" data-anchor-id="measurement-note">Measurement Note</h2>
+<section id="description-55" class="level3">
+<h3 class="anchored" data-anchor-id="description-55">Description:</h3>
+<p>Notes or comments related to the measurement process.</p>
+</section>
+<section id="lookup-table-lut-in-use-55" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-55">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-54" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-54">Open Refine Variable Name:</h3>
+<p><code>measurenote</code></p>
+</section>
+<section id="open-refine-data-type-55" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-55">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-55" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-55">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-55" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-55">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+<section id="good-for-export" class="level2">
+<h2 class="anchored" data-anchor-id="good-for-export">Good for Export</h2>
+<section id="description-56" class="level3">
+<h3 class="anchored" data-anchor-id="description-56">Description:</h3>
+<p>Indicates if the sample data is deemed good for export.</p>
+</section>
+<section id="lookup-table-lut-in-use-56" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-table-lut-in-use-56">Lookup Table (LUT) in use:</h3>
+<p>No</p>
+</section>
+<section id="open-refine-variable-name-55" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-variable-name-55">Open Refine Variable Name:</h3>
+<p><code>gfe</code></p>
+</section>
+<section id="open-refine-data-type-56" class="level3">
+<h3 class="anchored" data-anchor-id="open-refine-data-type-56">Open Refine Data Type:</h3>
+<p>string</p>
+</section>
+<section id="netcdf-variable-name-56" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-variable-name-56">NetCDF Variable Name:</h3>
+<p>Not included in NetCDF.</p>
+</section>
+<section id="netcdf-data-type-56" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf-data-type-56">NetCDF Data Type:</h3>
+<p>Not included in NetCDF.</p>
+<hr>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

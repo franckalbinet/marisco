@@ -15,36 +15,42 @@ import pandas as pd
 from .configs import cfg, cdl_cfg
 from typing import List, Dict, Callable, Tuple
 
-# %% ../nbs/api/callbacks.ipynb 5
-class Callback(): order = 0
-
 # %% ../nbs/api/callbacks.ipynb 6
+class Callback(): 
+    "Base class for callbacks."
+    order = 0
+
+# %% ../nbs/api/callbacks.ipynb 7
 def run_cbs(cbs, obj=None):
+    "Run the callbacks in the order they are specified."
     for cb in sorted(cbs, key=attrgetter('order')):
         if cb.__doc__: obj.logs.append(cb.__doc__)
         cb(obj)
 
-# %% ../nbs/api/callbacks.ipynb 7
+# %% ../nbs/api/callbacks.ipynb 8
 class Transformer():
-    def __init__(self, dfs, cbs=None, inplace=False): 
+    def __init__(self, 
+                 dfs:pd.DataFrame, # Dictionary of DataFrames to transform
+                 cbs:list=None, # List of callbacks to run
+                 inplace:bool=False # Whether to modify the dataframes in place
+                 ): 
+        "Transform the dataframes according to the specified callbacks."
         fc.store_attr()
         self.dfs = dfs if inplace else {k: v.copy() for k, v in dfs.items()}
         self.logs = []
-        
-    def callback(self):
-        run_cbs(self.cbs, self)
-        
+            
     def unique(self, col_name):
-        "Distinct values of a specific column present in all groups"
+        "Distinct values of a specific column present in all groups."
         columns = [df.get(col_name) for df in self.dfs.values() if df.get(col_name) is not None]
         values = np.concatenate(columns) if columns else []
         return np.unique(values)
         
     def __call__(self):
-        if self.cbs: self.callback()
+        "Transform the dataframes according to the specified callbacks."
+        if self.cbs: run_cbs(self.cbs, self)
         return self.dfs
 
-# %% ../nbs/api/callbacks.ipynb 12
+# %% ../nbs/api/callbacks.ipynb 15
 class SanitizeLonLatCB(Callback):
     "Drop row when both longitude & latitude equal 0. Drop unrealistic longitude & latitude values. Convert longitude & latitude `,` separator to `.` separator."
     def __init__(self, verbose=False): fc.store_attr()
@@ -68,7 +74,7 @@ class SanitizeLonLatCB(Callback):
                 
             tfm.dfs[grp] = df.loc[~(mask_zeroes | mask_goob)]
 
-# %% ../nbs/api/callbacks.ipynb 19
+# %% ../nbs/api/callbacks.ipynb 23
 class ReshapeLongToWide(Callback):
     def __init__(self, columns=['nuclide'], values=['value'], 
                  num_fill_value=-999, str_fill_value='STR FILL VALUE'):
@@ -122,7 +128,7 @@ class ReshapeLongToWide(Callback):
             tfm.dfs[grp] = self.pivot(tfm.dfs[grp])
             tfm.dfs[grp].columns = self.renamed_cols(tfm.dfs[grp].columns)
 
-# %% ../nbs/api/callbacks.ipynb 21
+# %% ../nbs/api/callbacks.ipynb 25
 class CompareDfsAndTfmCB(Callback):
     def __init__(self, dfs: Dict[str, pd.DataFrame]): 
         "Create a dataframe of dropped data. Data included in the `dfs` not in the `tfm`."
@@ -159,7 +165,7 @@ class CompareDfsAndTfmCB(Callback):
             'Number of rows in tfm.dfs + Number of dropped rows': len(tfm.dfs[grp].index) + len(tfm.dfs_dropped[grp].index)
         }
 
-# %% ../nbs/api/callbacks.ipynb 25
+# %% ../nbs/api/callbacks.ipynb 30
 class EncodeTimeCB(Callback):
     "Encode time as `int` representing seconds since xxx"    
     def __init__(self, cfg , verbose=False): fc.store_attr()

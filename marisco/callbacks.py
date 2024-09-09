@@ -78,12 +78,12 @@ class SanitizeLonLatCB(Callback):
 # %% ../nbs/api/callbacks.ipynb 21
 class AddSampleTypeIdColumnCB(Callback):
     def __init__(self, 
-                 cdl_cfg:dict=cdl_cfg(),
+                 cdl_cfg:Callable=cdl_cfg, # Callable to get the CDL config dictionary
                  col_name:str='samptype_id'
                  ): 
         "Add a column with the sample type id as defined in the CDL."
         fc.store_attr()
-        self.lut = {v['name']: v['id'] for v in cdl_cfg['grps'].values()}
+        self.lut = {v['name']: v['id'] for v in cdl_cfg()['grps'].values()}
         
     def __call__(self, tfm):
         for grp, df in tfm.dfs.items(): df[self.col_name] = self.lut[grp]

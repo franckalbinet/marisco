@@ -471,8 +471,8 @@ coi_dl = {'seawater' : {'val' : 'VALUE_Bq/m³',
 # TO BE REFACTORED
 class RemapDetectionLimitCB(Callback):
     def __init__(self, 
-                 coi:dict=coi_dl, # Configuration options for column names
-                 fn_lut:Callable=get_detectionlimit_lut # Function that returns a lookup table
+                 coi:dict, # Configuration options for column names
+                 fn_lut:callable # Function that returns a lookup table
                 ):
         "Remap value type to MARIS format."
         fc.store_attr()
@@ -518,8 +518,6 @@ lut_filtered = {
 class RemapFiltCB(Callback):
     def __init__(self,
                  lut_filtered:dict=lut_filtered, # Dictionary mapping FILT codes to their corresponding names
-                #  rules=renaming_rules, # Dictionary mapping FILT codes to their corresponding names
-                #  fn_lut=get_filtered_lut # Function that returns the lookup table dictionary
                 ):
         "Lookup FILT value in dataframe using the lookup table."
         fc.store_attr()
@@ -545,7 +543,7 @@ lut_method = lambda: pd.read_csv(Path(fname_in) / 'ANALYSIS_METHOD.csv').set_ind
 # %% ../../nbs/handlers/helcom.ipynb 166
 class AddMeasurementNoteCB(Callback):
     def __init__(self, 
-                 fn_lut: Callable # Function that returns the lookup dictionary with `METHOD` as key and `DESCRIPTION` as value
+                 fn_lut:callable # Function that returns the lookup dictionary with `METHOD` as key and `DESCRIPTION` as value
                 ):
         "Record measurement notes by adding a 'measurenote' column to DataFrames."
         fc.store_attr()

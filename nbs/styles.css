@@ -53,10 +53,10 @@ div.description {
     background-image: url('./img/logo.png');
     background-repeat: no-repeat;
     background-position: left center;
-    background-size: 65px 65px;
+    background-size: 70px 70px;
     /* Increased logo size */
 
-    padding-left: 60px;
+    padding-left: 65px;
     /* Increased to add more space between logo and text */
     height: 40px;
     line-height: 40px;

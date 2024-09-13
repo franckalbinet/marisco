@@ -35,7 +35,7 @@ class NCTemplater:
         self.dim = cdl['dim']
         self.enum_types = {}
 
-# %% ../nbs/api/nc_template.ipynb 9
+# %% ../nbs/api/nc_template.ipynb 8
 @patch
 def nuclide_vars(
     self:NCTemplater,
@@ -66,7 +66,7 @@ def nuclide_vars(
         )
     ]
 
-# %% ../nbs/api/nc_template.ipynb 12
+# %% ../nbs/api/nc_template.ipynb 11
 @patch
 def derive(
     self:NCTemplater,
@@ -81,7 +81,7 @@ def derive(
         'attrs': {key: nuclide['attrs'][key] + suffix['attrs'][key] for key in nuclide['attrs']}
         }
 
-# %% ../nbs/api/nc_template.ipynb 18
+# %% ../nbs/api/nc_template.ipynb 17
 @patch
 def create_enum_types(self:NCTemplater):
     "Create enumeration types"
@@ -89,7 +89,7 @@ def create_enum_types(self:NCTemplater):
         if self.verbose: print(f'Creating {name} enumeration type')
         self.enum_types[name] = self.nc.createEnumType(np.int_, name, enum)
 
-# %% ../nbs/api/nc_template.ipynb 19
+# %% ../nbs/api/nc_template.ipynb 18
 @patch
 def create_groups(self:NCTemplater):
     "Create NetCDF groups"
@@ -98,7 +98,7 @@ def create_groups(self:NCTemplater):
         grp = self.nc.createGroup(grp_name)
         self.create_variables(grp)
 
-# %% ../nbs/api/nc_template.ipynb 20
+# %% ../nbs/api/nc_template.ipynb 19
 @patch
 def create_variables(self:NCTemplater, 
                      grp:netCDF4.Group, # NetCDF group
@@ -109,7 +109,7 @@ def create_variables(self:NCTemplater,
         self.create_group_specific_variables(grp)
         self.create_analyte_variables(grp)
 
-# %% ../nbs/api/nc_template.ipynb 21
+# %% ../nbs/api/nc_template.ipynb 20
 @patch
 def create_default_variables(self:NCTemplater, 
                              grp:netCDF4.Group, # NetCDF group
@@ -118,7 +118,7 @@ def create_default_variables(self:NCTemplater,
         vars = self.cdl['vars']['defaults'].values()
         for var in vars: self.create_variable(grp, var)
 
-# %% ../nbs/api/nc_template.ipynb 22
+# %% ../nbs/api/nc_template.ipynb 21
 @patch
 def create_group_specific_variables(self:NCTemplater, 
                              grp:netCDF4.Group, # NetCDF group
@@ -128,7 +128,7 @@ def create_group_specific_variables(self:NCTemplater,
         for var in vars.get(name2grp(grp.name, self.cdl), {}).values(): 
             self.create_variable(grp, var)
 
-# %% ../nbs/api/nc_template.ipynb 23
+# %% ../nbs/api/nc_template.ipynb 22
 @patch
 def create_analyte_variables(self:NCTemplater, 
                              grp:netCDF4.Group, # NetCDF group
@@ -139,7 +139,7 @@ def create_analyte_variables(self:NCTemplater,
         for v in self.cdl['vars']['suffixes'].values(): 
             self.create_variable(grp, self.derive(var, v))
 
-# %% ../nbs/api/nc_template.ipynb 24
+# %% ../nbs/api/nc_template.ipynb 23
 @patch
 def create_variable(self:NCTemplater, 
                     grp:netCDF4.Group, # NetCDF group
@@ -152,7 +152,7 @@ def create_variable(self:NCTemplater,
                                 self.dim['name'])
     nc_var.setncatts(attrs) 
 
-# %% ../nbs/api/nc_template.ipynb 26
+# %% ../nbs/api/nc_template.ipynb 24
 @patch
 def generate(self:NCTemplater):
     "Generate CDL"

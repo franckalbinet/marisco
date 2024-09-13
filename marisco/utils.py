@@ -42,6 +42,7 @@ def get_unique_across_dfs(dfs:dict,  # Dictionary of dataframes
 
 # %% ../nbs/api/utils.ipynb 12
 class Remapper():
+    "Remap a data provider lookup table to a MARIS lookup table using fuzzy matching."
     def __init__(self,
                  provider_lut_df:pd.DataFrame, # Data provider lookup table to be remapped
                  maris_lut_fn:callable, # Function that returns the MARIS lookup table path
@@ -51,7 +52,6 @@ class Remapper():
                  provider_col_key, # Data provider lookup table column name for the key
                  fname_cache  # Cache file name
                  ):
-        "Remap a data provider lookup table to a MARIS lookup table using fuzzy matching."
         fc.store_attr()
         self.cache_file = cache_path() / fname_cache
         self.maris_lut = maris_lut_fn()
@@ -140,6 +140,7 @@ def has_valid_varname(
 def get_bbox(df,
              coord_cols=('lon', 'lat')
             ):
+    "Get the bounding box of a DataFrame."
     x, y = coord_cols        
     arr = [(row[x], row[y]) for _, row in df.iterrows()]
     return MultiPoint(arr).envelope
@@ -150,7 +151,7 @@ def download_files_in_folder(owner:str,
                              src_dir:str, 
                              dest_dir:str
                              ):
-    "Make a GET request to the GitHub API to get the contents of the folder"
+    "Make a GET request to the GitHub API to get the contents of the folder."
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{src_dir}"
     response = requests.get(url)
 
@@ -182,7 +183,7 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
 def match_worms(
     name:str # Name of species to look up in WoRMS
     ):
-    "Lookup `name` in WoRMS (fuzzy match)"
+    "Lookup `name` in WoRMS (fuzzy match)."
     url = 'https://www.marinespecies.org/rest/AphiaRecordsByMatchNames'
     params = {
         'scientificnames[]': [name],
@@ -201,15 +202,16 @@ def match_worms(
     else:
         return -1
 
-# %% ../nbs/api/utils.ipynb 37
+# %% ../nbs/api/utils.ipynb 32
 @dataclass
 class Match:
+    "Match between a data provider name and a MARIS lookup table."
     matched_id: int
     matched_maris_name: str
     source_name: str
     match_score: int
 
-# %% ../nbs/api/utils.ipynb 38
+# %% ../nbs/api/utils.ipynb 33
 def match_maris_lut(
     lut_path: str, # Path to MARIS species authoritative species look-up table
     data_provider_name: str, # Name of data provider nomenclature item to look up 
@@ -226,7 +228,7 @@ def match_maris_lut(
     df = df.sort_values(by='score', ascending=True)[:nresults]
     return df[[maris_id, maris_name, 'score']]
 
-# %% ../nbs/api/utils.ipynb 45
+# %% ../nbs/api/utils.ipynb 40
 def get_bbox(df,
              coord_cols=('lon', 'lat')
             ):
@@ -234,7 +236,7 @@ def get_bbox(df,
     arr = [(row[x], row[y]) for _, row in df.iterrows()]
     return MultiPoint(arr).envelope
 
-# %% ../nbs/api/utils.ipynb 52
+# %% ../nbs/api/utils.ipynb 47
 def download_files_in_folder(owner:str, 
                              repo:str, 
                              src_dir:str, 
@@ -268,7 +270,7 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
     else:
         print(f"Error: {response.status_code}")
 
-# %% ../nbs/api/utils.ipynb 54
+# %% ../nbs/api/utils.ipynb 49
 def match_worms(
     name:str # Name of species to look up in WoRMS
     ):
@@ -291,7 +293,7 @@ def match_worms(
     else:
         return -1
 
-# %% ../nbs/api/utils.ipynb 65
+# %% ../nbs/api/utils.ipynb 54
 def test_dfs(
     dfs1:dict, # First dictionary of DataFrames to compare 
     dfs2:dict # Second dictionary of DataFrames to compare

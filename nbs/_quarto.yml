@@ -10,11 +10,16 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
-    toc-depth: 4
+    toc-depth: 6
     code-tools: true
     code-block-bg: true
     code-block-border-left: "#31BAE9"
     highlight-style: arrow
+    grid:
+      sidebar-width: 180px
+      body-width: 980px
+      margin-width: 300px
+      gutter-width: 1.0rem
 
 website:
   title: "marisco"

@@ -92,7 +92,7 @@ class AddSampleTypeIdColumnCB(Callback):
     def __call__(self, tfm):
         for grp, df in tfm.dfs.items(): df[self.col_name] = self.lut[grp]
 
-# %% ../nbs/api/callbacks.ipynb 25
+# %% ../nbs/api/callbacks.ipynb 23
 class AddNuclideIdColumnCB(Callback):
     def __init__(self, 
                  col_value:str, # Column name containing the nuclide name
@@ -108,7 +108,7 @@ class AddNuclideIdColumnCB(Callback):
         for grp, df in tfm.dfs.items(): 
             df[self.col_name] = df[self.col_value].map(self.lut)
 
-# %% ../nbs/api/callbacks.ipynb 28
+# %% ../nbs/api/callbacks.ipynb 26
 class LowerStripNameCB(Callback):
     def __init__(self, 
                  col_src:str, # Source column name e.g. 'Nuclide'
@@ -128,7 +128,7 @@ class LowerStripNameCB(Callback):
         for key in tfm.dfs.keys():
             tfm.dfs[key][self.col_dst] = tfm.dfs[key][self.col_src].apply(self._safe_transform)
 
-# %% ../nbs/api/callbacks.ipynb 34
+# %% ../nbs/api/callbacks.ipynb 32
 class ReshapeLongToWide(Callback):
     def __init__(self, columns=['nuclide'], values=['value'], 
                  num_fill_value=-999, str_fill_value='STR FILL VALUE'):
@@ -182,7 +182,7 @@ class ReshapeLongToWide(Callback):
             tfm.dfs[grp] = self.pivot(tfm.dfs[grp])
             tfm.dfs[grp].columns = self.renamed_cols(tfm.dfs[grp].columns)
 
-# %% ../nbs/api/callbacks.ipynb 36
+# %% ../nbs/api/callbacks.ipynb 34
 class CompareDfsAndTfmCB(Callback):
     def __init__(self, dfs: Dict[str, pd.DataFrame]): 
         "Create a dataframe of dropped data. Data included in the `dfs` not in the `tfm`."
@@ -219,7 +219,7 @@ class CompareDfsAndTfmCB(Callback):
             'Number of rows in tfm.dfs + Number of dropped rows': len(tfm.dfs[grp].index) + len(tfm.dfs_dropped[grp].index)
         }
 
-# %% ../nbs/api/callbacks.ipynb 41
+# %% ../nbs/api/callbacks.ipynb 39
 class EncodeTimeCB(Callback):
     "Encode time as `int` representing seconds since xxx"    
     def __init__(self, cfg , verbose=False): fc.store_attr()

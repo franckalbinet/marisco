@@ -152,7 +152,7 @@ def create_variable(self:NCTemplater,
                                 self.dim['name'])
     nc_var.setncatts(attrs) 
 
-# %% ../nbs/api/nc_template.ipynb 27
+# %% ../nbs/api/nc_template.ipynb 26
 @patch
 def generate(self:NCTemplater):
     "Generate CDL"

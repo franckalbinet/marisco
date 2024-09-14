@@ -36,9 +36,8 @@ We’ve adopted a Literate Programming approach, which means:
 
 ### Powered by nbdev
 
-To achieve this, we leverage
-[nbdev](https://nbdev.readthedocs.io/en/latest/), a powerful tool that
-allows us to:
+To achieve this, we leverage [nbdev](https://nbdev.fast.ai), a powerful
+tool that allows us to:
 
 1.  Write code within Jupyter notebooks
 2.  Automatically export relevant parts as dedicated Python modules
@@ -50,7 +49,18 @@ ensuring they remain in sync.
 
 For a concrete example of this approach, check out our [HELCOM dataset
 handler
-implementation](https://github.com/franckalbinet/marisco/blob/main/nbs/api/handlers/helcom.ipynb).
+implementation](https://fr.anckalbi.net/marisco/handlers/helcom.html).
+
+Please note that this project is **still under development**.
+
+We have implemented the [MARIS Legacy
+handler](https://fr.anckalbi.net/marisco/handlers/maris_legacy.html) to
+convert all existing datasets from the MARIS master database into NetCDF
+format. For datasets that are frequently updated, such as
+[HELCOM](https://fr.anckalbi.net/marisco/handlers/helcom.html),
+[OSPAR](https://www.ospar.org/), and TEPCO/Fukushima-related datasets,
+individual handlers are currently being developed and will be available
+soon.
 
 ## Install
 

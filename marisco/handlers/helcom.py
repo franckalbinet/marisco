@@ -4,12 +4,12 @@
 __all__ = ['fname_in', 'fname_out_nc', 'fname_out_csv', 'zotero_key', 'ref_id', 'default_smp_types', 'fixes_nuclide_names',
            'lut_nuclides', 'coi_val', 'coi_units_unc', 'fixes_biota_species', 'lut_biota', 'fixes_biota_tissues',
            'lut_tissues', 'lut_biogroup', 'lut_taxon', 'fixes_sediments', 'lut_sediments', 'lut_units', 'lut_dl',
-           'coi_dl', 'lut_filtered', 'lut_method', 'coi_coordinates', 'kw', 'load_data', 'RemapNuclideNameCB',
-           'ParseTimeCB', 'SanitizeValue', 'unc_rel2stan', 'NormalizeUncCB', 'RemapBiotaSpeciesCB',
-           'RemapBiotaBodyPartCB', 'RemapBiogroupCB', 'get_taxon_info_lut', 'RemapTaxonInformationCB',
-           'RemapSedimentCB', 'RemapUnitCB', 'RemapDetectionLimitCB', 'RemapFiltCB', 'AddSampleLabCodeCB',
-           'AddMeasurementNoteCB', 'RemapStationIdCB', 'RemapSedSliceTopBottomCB', 'LookupDryWetRatio', 'ddmmmm2dddddd',
-           'FormatCoordinates', 'get_renaming_rules', 'SelectAndRenameColumnCB', 'get_attrs', 'enums_xtra', 'encode']
+           'coi_dl', 'lut_filtered', 'lut_method', 'kw', 'load_data', 'RemapNuclideNameCB', 'ParseTimeCB',
+           'SanitizeValue', 'unc_rel2stan', 'NormalizeUncCB', 'RemapBiotaSpeciesCB', 'RemapBiotaBodyPartCB',
+           'RemapBiogroupCB', 'get_taxon_info_lut', 'RemapTaxonInformationCB', 'RemapSedimentCB', 'RemapUnitCB',
+           'RemapDetectionLimitCB', 'RemapFiltCB', 'AddSampleLabCodeCB', 'AddMeasurementNoteCB', 'RemapStationIdCB',
+           'RemapSedSliceTopBottomCB', 'LookupDryWetRatio', 'ParseCoordinates', 'get_renaming_rules',
+           'SelectAndRenameColumnCB', 'get_attrs', 'enums_xtra', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb 6
 import pandas as pd 
@@ -18,11 +18,10 @@ from functools import partial
 import fastcore.all as fc 
 from pathlib import Path 
 from dataclasses import asdict
-from typing import List, Dict, Callable, Tuple
-from math import modf
+from typing import List, Dict, Callable, Tuple, Any 
 from collections import OrderedDict
 
-from ..utils import (has_valid_varname, match_worms, Remapper, 
+from ..utils import (has_valid_varname, match_worms, Remapper, ddmm_to_dd,
                            match_maris_lut, Match, get_unique_across_dfs)
 from ..callbacks import (Callback, Transformer, EncodeTimeCB, AddSampleTypeIdColumnCB,
                                AddNuclideIdColumnCB, LowerStripNameCB, SanitizeLonLatCB, 
@@ -140,7 +139,7 @@ class ParseTimeCB(Callback):
         
         condition = df['DATE'].isna() # if 'DATE' is nan. 
         df['time']  = np.where(condition,
-                                            # 'coerce', then invalid parsing will be set as NaT. NaT will result if the number of days are not valid for the month.
+                                        # 'coerce', then invalid parsing will be set as NaT. NaT will result if the number of days are not valid for the month.
                                         pd.to_datetime(df[['YEAR', 'MONTH', 'DAY']], format='%y%m%d', errors='coerce'),  
                                         pd.to_datetime(df['DATE'], format='%m/%d/%y %H:%M:%S'))
         
@@ -587,99 +586,55 @@ class LookupDryWetRatio(Callback):
         df.loc[df['dry_wet_ratio'] == 0, 'dry_wet_ratio'] = np.NaN
 
 
-# %% ../../nbs/handlers/helcom.ipynb 176
-coi_coordinates = {
-    'seawater': {
-        'lon_d': 'LONGITUDE (dddddd)',
-        'lat_d': 'LATITUDE (dddddd)',
-        'lon_m': 'LONGITUDE (ddmmmm)',
-        'lat_m': 'LATITUDE (ddmmmm)'
-    },
-    'biota': {
-        'lon_d': 'LONGITUDE dddddd',
-        'lat_d': 'LATITUDE dddddd',
-        'lon_m': 'LONGITUDE ddmmmm',
-        'lat_m': 'LATITUDE ddmmmm'
-    },
-    'sediment': {
-        'lon_d': 'LONGITUDE (dddddd)',
-        'lat_d': 'LATITUDE (dddddd)',
-        'lon_m': 'LONGITUDE (ddmmmm)',
-        'lat_m': 'LATITUDE (ddmmmm)'
-    }
-}
-
-# %% ../../nbs/handlers/helcom.ipynb 177
-def ddmmmm2dddddd(
-    ddmmmm:float # Coordinates in `ddmmmm` format where `dd` are degrees and `mmmm`` are minutes
-    ) -> float: # Coordinates in `dddddd`` format
-    # Split into degrees and minutes
-    mins, degs = modf(ddmmmm)
-    # Convert minutes to decimal
-    mins = mins * 100
-    # Convert to 'dddddd' format
-    return round(int(degs) + (mins / 60), 6)
-
-# %% ../../nbs/handlers/helcom.ipynb 178
-class FormatCoordinates(Callback):
-    "Format coordinates for MARIS. Converts coordinates from 'ddmmmm' to 'dddddd' format if needed."
-    def __init__(self, 
-                 coi:dict, # Column names mapping for coordinates
-                 fn_convert_cor:Callable # Function to convert coordinates
-                 ):
-        fc.store_attr()
+# %% ../../nbs/handlers/helcom.ipynb 179
+class ParseCoordinates(Callback):
+    """
+    Get geographical coordinates from columns expressed in degrees decimal format 
+    or from columns in degrees/minutes decimal format where degrees decimal format is missing.
+    """
+    def __init__(self, fn_convert_cor:Callable):
+        self.fn_convert_cor = fn_convert_cor
 
     def __call__(self, tfm:Transformer):
-        "Apply formatting to coordinates in the DataFrame."
-        for grp in tfm.dfs.keys():
-            self._format_coordinates(tfm.dfs[grp], grp)
+        for df in tfm.dfs.values():
+            self._format_coordinates(df)
 
-    def _format_coordinates(self, 
-                            df:pd.DataFrame, # DataFrame to modify
-                            grp: str # Group name to determine column names
-                            ):
-        "Format coordinates in the DataFrame for a specific group."
-        lon_col_d = self.coi[grp]['lon_d']
-        lat_col_d = self.coi[grp]['lat_d']
-        lon_col_m = self.coi[grp]['lon_m']
-        lat_col_m = self.coi[grp]['lat_m']
+    def _format_coordinates(self, df:pd.DataFrame):
+        coord_cols = self._get_coord_columns(df.columns)
         
-        # Define condition where 'dddddd' format is not available or is zero
-        condition = (
-            (df[lon_col_d].isna() | (df[lon_col_d] == 0)) |
-            (df[lat_col_d].isna() | (df[lat_col_d] == 0))
-        )
+        for coord in ['lat', 'lon']:
+            decimal_col, minute_col = coord_cols[f'{coord}_d'], coord_cols[f'{coord}_m']
+            
+            condition = df[decimal_col].isna() | (df[decimal_col] == 0)
+            df[coord] = np.where(condition,
+                                 df[minute_col].apply(self._safe_convert),
+                                 df[decimal_col])
         
-        # Apply conversion function only to non-null and non-zero values
-        df['lon'] = np.where(
-            condition,
-            df[lon_col_m].apply(lambda x: self._safe_convert(x)),
-            df[lon_col_d]
-        )
-        
-        df['lat'] = np.where(
-            condition,
-            df[lat_col_m].apply(lambda x: self._safe_convert(x)),
-            df[lat_col_d]
-        )
-        
-        # Drop rows where coordinate columns contain NaN values
         df.dropna(subset=['lat', 'lon'], inplace=True)
 
-    def _safe_convert(self, 
-                      value:float # Coordinate value to convert
-                      ):
-        "Convert coordinate value safely, handling NaN values."
+    def _get_coord_columns(self, columns):
+        return {
+            'lon_d': self._find_coord_column(columns, 'LON', 'dddddd'),
+            'lat_d': self._find_coord_column(columns, 'LAT', 'dddddd'),
+            'lon_m': self._find_coord_column(columns, 'LON', 'ddmmmm'),
+            'lat_m': self._find_coord_column(columns, 'LAT', 'ddmmmm')
+        }
+
+    def _find_coord_column(self, columns, coord_type, coord_format):
+        pattern = re.compile(f'{coord_type}.*{coord_format}', re.IGNORECASE)
+        matching_columns = [col for col in columns if pattern.search(col)]
+        return matching_columns[0] if matching_columns else None
+
+    def _safe_convert(self, value):
         if pd.isna(value):
-            return value  # Return NaN if value is NaN
+            return value
         try:
             return self.fn_convert_cor(value)
         except Exception as e:
             print(f"Error converting value {value}: {e}")
-            return value  # Return original value if an error occurs
+            return value
 
-
-# %% ../../nbs/handlers/helcom.ipynb 189
+# %% ../../nbs/handlers/helcom.ipynb 190
 # TO BE REFACTORED
 def get_renaming_rules(encoding_type='netcdf'):
     "Define columns of interest (keys) and renaming rules (values)."
@@ -804,7 +759,7 @@ def get_renaming_rules(encoding_type='netcdf'):
         print("Invalid encoding_type provided. Please use 'netcdf' or 'openrefine'.")
         return None
 
-# %% ../../nbs/handlers/helcom.ipynb 190
+# %% ../../nbs/handlers/helcom.ipynb 191
 class SelectAndRenameColumnCB(Callback):
     "Select and rename columns in a DataFrame based on renaming rules for a specified encoding type."
     def __init__(self, 
@@ -875,7 +830,7 @@ class SelectAndRenameColumnCB(Callback):
         return df, not_found_keys
 
 
-# %% ../../nbs/handlers/helcom.ipynb 199
+# %% ../../nbs/handlers/helcom.ipynb 200
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -887,7 +842,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 200
+# %% ../../nbs/handlers/helcom.ipynb 201
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve all global attributes."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -899,7 +854,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 202
+# %% ../../nbs/handlers/helcom.ipynb 203
 def enums_xtra(tfm, vars):
     "Retrieve a subset of the lengthy enum as `species_t` for instance."
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
@@ -910,7 +865,7 @@ def enums_xtra(tfm, vars):
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/helcom.ipynb 204
+# %% ../../nbs/handlers/helcom.ipynb 205
 def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[AddSampleTypeIdColumnCB(),
@@ -934,7 +889,7 @@ def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
                             RemapStationIdCB(),
                             RemapSedSliceTopBottomCB(),
                             LookupDryWetRatio(),
-                            FormatCoordinates(coi_coordinates, ddmmmm2dddddd),
+                            ParseCoordinates(ddmm_to_dd),
                             SanitizeLonLatCB(),
                             SelectAndRenameColumnCB(get_renaming_rules, encoding_type='netcdf'),
                             ReshapeLongToWide()

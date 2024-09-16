@@ -586,7 +586,7 @@ class LookupDryWetRatio(Callback):
         df.loc[df['dry_wet_ratio'] == 0, 'dry_wet_ratio'] = np.NaN
 
 
-# %% ../../nbs/handlers/helcom.ipynb 179
+# %% ../../nbs/handlers/helcom.ipynb 177
 class ParseCoordinates(Callback):
     """
     Get geographical coordinates from columns expressed in degrees decimal format 
@@ -634,7 +634,7 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 190
+# %% ../../nbs/handlers/helcom.ipynb 188
 # TO BE REFACTORED
 def get_renaming_rules(encoding_type='netcdf'):
     "Define columns of interest (keys) and renaming rules (values)."
@@ -759,7 +759,7 @@ def get_renaming_rules(encoding_type='netcdf'):
         print("Invalid encoding_type provided. Please use 'netcdf' or 'openrefine'.")
         return None
 
-# %% ../../nbs/handlers/helcom.ipynb 191
+# %% ../../nbs/handlers/helcom.ipynb 189
 class SelectAndRenameColumnCB(Callback):
     "Select and rename columns in a DataFrame based on renaming rules for a specified encoding type."
     def __init__(self, 
@@ -830,7 +830,7 @@ class SelectAndRenameColumnCB(Callback):
         return df, not_found_keys
 
 
-# %% ../../nbs/handlers/helcom.ipynb 200
+# %% ../../nbs/handlers/helcom.ipynb 198
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -842,7 +842,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 201
+# %% ../../nbs/handlers/helcom.ipynb 199
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve all global attributes."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -854,7 +854,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 203
+# %% ../../nbs/handlers/helcom.ipynb 201
 def enums_xtra(tfm, vars):
     "Retrieve a subset of the lengthy enum as `species_t` for instance."
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
@@ -865,7 +865,7 @@ def enums_xtra(tfm, vars):
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/helcom.ipynb 205
+# %% ../../nbs/handlers/helcom.ipynb 203
 def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[AddSampleTypeIdColumnCB(),

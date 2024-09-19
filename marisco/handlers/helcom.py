@@ -8,8 +8,8 @@ __all__ = ['fname_in', 'fname_out_nc', 'fname_out_csv', 'zotero_key', 'ref_id', 
            'SanitizeValue', 'unc_rel2stan', 'NormalizeUncCB', 'RemapBiotaSpeciesCB', 'RemapBiotaBodyPartCB',
            'RemapBiogroupCB', 'get_taxon_info_lut', 'RemapTaxonInformationCB', 'RemapSedimentCB', 'RemapUnitCB',
            'RemapDetectionLimitCB', 'RemapFiltCB', 'AddSampleLabCodeCB', 'AddMeasurementNoteCB', 'RemapStationIdCB',
-           'RemapSedSliceTopBottomCB', 'LookupDryWetRatio', 'ParseCoordinates', 'get_renaming_rules',
-           'SelectAndRenameColumnCB', 'get_attrs', 'enums_xtra', 'encode']
+           'RemapSedSliceTopBottomCB', 'LookupDryWetRatio', 'ParseCoordinates', 'get_common_rules',
+           'get_specific_rules', 'get_renaming_rules', 'SelectAndRenameColumnCB', 'get_attrs', 'enums_xtra', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb 6
 import pandas as pd 
@@ -19,7 +19,8 @@ import fastcore.all as fc
 from pathlib import Path 
 from dataclasses import asdict
 from typing import List, Dict, Callable, Tuple, Any 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
+import re
 
 from ..utils import (has_valid_varname, match_worms, Remapper, ddmm_to_dd,
                            match_maris_lut, Match, get_unique_across_dfs)
@@ -634,131 +635,97 @@ class ParseCoordinates(Callback):
             return value
 
 # %% ../../nbs/handlers/helcom.ipynb 187
-# TO BE REFACTORED
-def get_renaming_rules(encoding_type='netcdf'):
-    "Define columns of interest (keys) and renaming rules (values)."
-    vars = cdl_cfg()['vars']
-    if encoding_type == 'netcdf':
-        return OrderedDict({
-            ('seawater', 'biota', 'sediment'): {
-                # DEFAULT
-                'lat': vars['defaults']['lat']['name'],
-                'lon': vars['defaults']['lon']['name'],
-                'time': vars['defaults']['time']['name'],
-                'NUCLIDE': 'nuclide',
-                'detection_limit': vars['suffixes']['detection_limit']['name'],
-                'unit': vars['suffixes']['unit']['name'],
-                'value': 'value',
-                'uncertainty': vars['suffixes']['uncertainty']['name'],
-                'counting_method': vars['suffixes']['counting_method']['name'],
-                'sampling_method': vars['suffixes']['sampling_method']['name'],
-                'preparation_method': vars['suffixes']['preparation_method']['name']
-            },
-            ('seawater',): {
-                # SEAWATER
-                'SALIN': vars['suffixes']['salinity']['name'],
-                'SDEPTH': vars['defaults']['smp_depth']['name'],
-                #'FILT': vars['suffixes']['filtered']['name'], Need to fix
-                'TTEMP': vars['suffixes']['temperature']['name'],
-                'TDEPTH': vars['defaults']['tot_depth']['name'],
+def get_common_rules(vars, encoding_type):
+    "Get common renaming rules for NetCDF and OpenRefine."
+    common = {
+        'lat': 'latitude' if encoding_type == 'openrefine' else vars['defaults']['lat']['name'],
+        'lon': 'longitude' if encoding_type == 'openrefine' else vars['defaults']['lon']['name'],
+        'time': 'begperiod' if encoding_type == 'openrefine' else vars['defaults']['time']['name'],
+        'NUCLIDE': 'nuclide_id' if encoding_type == 'openrefine' else 'nuclide',
+        'detection_limit': 'detection' if encoding_type == 'openrefine' else vars['suffixes']['detection_limit']['name'],
+        'unit': 'unit_id' if encoding_type == 'openrefine' else vars['suffixes']['unit']['name'],
+        'value': 'activity' if encoding_type == 'openrefine' else 'value',
+        'uncertainty': 'uncertaint' if encoding_type == 'openrefine' else vars['suffixes']['uncertainty']['name'],
+        'SDEPTH': 'sampdepth' if encoding_type == 'openrefine' else vars['defaults']['smp_depth']['name'],
+        'TDEPTH': 'totdepth' if encoding_type == 'openrefine' else vars['defaults']['tot_depth']['name'],
+    }
+    
+    if encoding_type == 'openrefine':
+        common.update({
+            'samptype_id': 'samptype_id',
+            'station': 'station',
+            'samplabcode': 'samplabcode',
+            'SALIN': 'salinity',
+            'TTEMP': 'temperatur',
+            'FILT': 'filtered',
+            'measurenote': 'measurenote'
+        })
+    else:
+        common.update({
+            'counting_method': vars['suffixes']['counting_method']['name'],
+            'sampling_method': vars['suffixes']['sampling_method']['name'],
+            'preparation_method': vars['suffixes']['preparation_method']['name'],
+            'SALIN': vars['suffixes']['salinity']['name'],
+            'TTEMP': vars['suffixes']['temperature']['name'],
+        })
+    
+    return common
 
-            },
-            ('biota',): {
-                # BIOTA
-                'SDEPTH': vars['defaults']['smp_depth']['name'],
+# %% ../../nbs/handlers/helcom.ipynb 188
+def get_specific_rules(vars, encoding_type):
+    "Get specific renaming rules for NetCDF and OpenRefine."
+    if encoding_type == 'netcdf':
+        return {
+            'biota': {
                 'species': vars['bio']['species']['name'],
                 'body_part': vars['bio']['body_part']['name'],
                 'bio_group': vars['bio']['bio_group']['name']
             },
-            ('sediment',): {
-                # SEDIMENT
+            'sediment': {
                 'sed_type': vars['sed']['sed_type']['name'],
-                'TDEPTH': vars['defaults']['tot_depth']['name'],
             }
-        })
-    
+        }
     elif encoding_type == 'openrefine':
-        return OrderedDict({
-            ('seawater', 'biota', 'sediment'): {
-                # DEFAULT
-                'samptype_id': 'samptype_id',
-                'lat': 'latitude',
-                'lon': 'longitude',
-                'station': 'station',
-                'begperiod': 'begperiod',
-                'samplabcode': 'samplabcode',
-                #'endperiod': 'endperiod',
-                'nuclide_id': 'nuclide_id',
-                'detection_limit': 'detection',
-                'unit': 'unit_id',
-                'value': 'activity',
-                'uncertainty': 'uncertaint',
-                #'vartype': 'vartype',
-                #'rangelow': 'rangelow',
-                #'rangeupp': 'rangeupp',
-                #'rl_detection': 'rl_detection',
-                #'ru_detection': 'ru_detection',
-                #'freq': 'freq',
-                'SDEPTH': 'sampdepth',
-                #'samparea': 'samparea',
-                'SALIN': 'salinity',
-                'TTEMP': 'temperatur',
-                'FILT': 'filtered',
-                #'oxygen': 'oxygen',
-                #'sampquality': 'sampquality',
-                #'station': 'station',
-                #'samplabcode': 'samplabcode',
-                #'profile': 'profile',
-                #'transect': 'transect',
-                #'IODE_QualityFlag': 'IODE_QualityFlag',
-                'TDEPTH': 'totdepth',
-                #'counmet_id': 'counting_method',
-                #'sampmet_id': 'sampling_method',
-                #'prepmet_id': 'preparation_method',
-                'sampnote': 'sampnote',
-                'measurenote': 'measurenote'
-            },
-            ('seawater',) : {
-                # SEAWATER
-                #'volume': 'volume',
-                #'filtpore': 'filtpore',
-                #'acid': 'acid'
-            },
-            ('biota',) : {
-                # BIOTA
+        return {
+            'biota': {
                 'species': 'species_id',
                 'Taxonname': 'Taxonname',
                 'TaxonRepName': 'TaxonRepName',
-                #'Commonname': 'Commonname',
                 'Taxonrank': 'Taxonrank',
                 'TaxonDB': 'TaxonDB',
                 'TaxonDBID': 'TaxonDBID',
                 'TaxonDBURL': 'TaxonDBURL',
                 'body_part': 'bodypar_id',
-                #'drywt': 'drywt',
-                #'wetwt': 'wetwt',
                 'dry_wet_ratio': 'percentwt',
-                #'drymet_id': 'drymet_id'
             },
-            ('sediment',): {
-                # SEDIMENT
+            'sediment': {
                 'sed_type': 'sedtype_id',
-                #'sedtrap': 'sedtrap',
                 'top': 'sliceup',
                 'bottom': 'slicedown',
                 'SedRepName': 'SedRepName',
-                #'drywt': 'drywt',
-                #'wetwt': 'wetwt',
                 'dry_wet_ratio': 'percentwt',
-                #'drymet_id': 'drymet_id'
-                
             }
-        })
-    else:
-        print("Invalid encoding_type provided. Please use 'netcdf' or 'openrefine'.")
-        return None
+        }
 
-# %% ../../nbs/handlers/helcom.ipynb 188
+# %% ../../nbs/handlers/helcom.ipynb 189
+def get_renaming_rules(encoding_type='netcdf'):
+    "Get renaming rules for NetCDF and OpenRefine."
+    vars = cdl_cfg()['vars']
+    
+    if encoding_type not in ['netcdf', 'openrefine']:
+        raise ValueError("Invalid encoding_type provided. Please use 'netcdf' or 'openrefine'.")
+    
+    common_rules = get_common_rules(vars, encoding_type)
+    specific_rules = get_specific_rules(vars, encoding_type)
+    
+    rules = defaultdict(dict)
+    for sample_type in ['seawater', 'biota', 'sediment']:
+        rules[sample_type] = common_rules.copy()
+        rules[sample_type].update(specific_rules.get(sample_type, {}))
+    
+    return dict(rules)
+
+# %% ../../nbs/handlers/helcom.ipynb 190
 class SelectAndRenameColumnCB(Callback):
     "Select and rename columns in a DataFrame based on renaming rules for a specified encoding type."
     def __init__(self, 
@@ -829,7 +796,7 @@ class SelectAndRenameColumnCB(Callback):
         return df, not_found_keys
 
 
-# %% ../../nbs/handlers/helcom.ipynb 197
+# %% ../../nbs/handlers/helcom.ipynb 199
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -841,7 +808,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 198
+# %% ../../nbs/handlers/helcom.ipynb 200
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve all global attributes."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -853,7 +820,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 200
+# %% ../../nbs/handlers/helcom.ipynb 202
 def enums_xtra(tfm, vars):
     "Retrieve a subset of the lengthy enum as `species_t` for instance."
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
@@ -864,7 +831,7 @@ def enums_xtra(tfm, vars):
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/helcom.ipynb 202
+# %% ../../nbs/handlers/helcom.ipynb 204
 def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[AddSampleTypeIdColumnCB(),

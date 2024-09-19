@@ -35,7 +35,7 @@ CONFIGS = {
         'owner': 'franckalbinet',
         'repo': 'marisco'
     },
-    'names': {
+    'names': {  
         'nc_template': 'maris-template.nc'
     },
     'dirs': {

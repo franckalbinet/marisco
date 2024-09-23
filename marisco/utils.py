@@ -76,12 +76,12 @@ class Remapper():
     def _create_lookup_table(self):
         df = self.provider_lut_df
         for _, row in tqdm(df.iterrows(), total=len(df), desc="Processing"): 
-            # print(row[self.provider_col_to_match])
             self._process_row(row)
 
     def _process_row(self, row):
         value_to_match = row[self.provider_col_to_match]
         if isinstance(value_to_match, str):  # Only process if value is a string
+            # If value is in fixes, use the fixed value
             name_to_match = self.fixes.get(value_to_match, value_to_match)
             
             result = match_maris_lut(self.maris_lut, name_to_match, self.maris_col_id, self.maris_col_name).iloc[0]

@@ -4,7 +4,7 @@
 
 # %% auto 0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'AddSampleTypeIdColumnCB', 'AddNuclideIdColumnCB',
-           'LowerStripNameCB', 'ReshapeLongToWide', 'CompareDfsAndTfmCB', 'EncodeTimeCB']
+           'LowerStripNameCB', 'RemoveAllNAValuesCB', 'ReshapeLongToWide', 'CompareDfsAndTfmCB', 'EncodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb 2
 import copy
@@ -128,7 +128,21 @@ class LowerStripNameCB(Callback):
         for key in tfm.dfs.keys():
             tfm.dfs[key][self.col_dst] = tfm.dfs[key][self.col_src].apply(self._safe_transform)
 
-# %% ../nbs/api/callbacks.ipynb 32
+# %% ../nbs/api/callbacks.ipynb 31
+class RemoveAllNAValuesCB(Callback):
+    "Remove rows with all NA values."
+    def __init__(self, 
+                 cols_to_check:dict # A dictionary with the sample type as key and the column name to check as value
+                ):
+        fc.store_attr()
+
+    def __call__(self, tfm):
+        for k in tfm.dfs.keys():
+            col_to_check = self.cols_to_check[k]
+            mask = tfm.dfs[k][col_to_check].isnull().all(axis=1)
+            tfm.dfs[k] = tfm.dfs[k][~mask]
+
+# %% ../nbs/api/callbacks.ipynb 33
 class ReshapeLongToWide(Callback):
     def __init__(self, columns=['nuclide'], values=['value'], 
                  num_fill_value=-999, str_fill_value='STR FILL VALUE'):
@@ -182,7 +196,7 @@ class ReshapeLongToWide(Callback):
             tfm.dfs[grp] = self.pivot(tfm.dfs[grp])
             tfm.dfs[grp].columns = self.renamed_cols(tfm.dfs[grp].columns)
 
-# %% ../nbs/api/callbacks.ipynb 34
+# %% ../nbs/api/callbacks.ipynb 35
 class CompareDfsAndTfmCB(Callback):
     def __init__(self, dfs: Dict[str, pd.DataFrame]): 
         "Create a dataframe of dropped data. Data included in the `dfs` not in the `tfm`."
@@ -219,7 +233,7 @@ class CompareDfsAndTfmCB(Callback):
             'Number of rows in tfm.dfs + Number of dropped rows': len(tfm.dfs[grp].index) + len(tfm.dfs_dropped[grp].index)
         }
 
-# %% ../nbs/api/callbacks.ipynb 39
+# %% ../nbs/api/callbacks.ipynb 40
 class EncodeTimeCB(Callback):
     "Encode time as `int` representing seconds since xxx"    
     def __init__(self, cfg , verbose=False): fc.store_attr()

@@ -149,8 +149,7 @@ class ParseTimeCB(Callback):
         "Create a standardized date representation for Open Refine."
         df['begperiod'] = df['time']
 
-# %% ../../nbs/handlers/helcom.ipynb 58
-# Columns of interest
+# %% ../../nbs/handlers/helcom.ipynb 59
 coi_val = {'seawater' : {'val': 'VALUE_Bq/m³'},
            'biota':  {'val': 'VALUE_Bq/kg'},
            'sediment': {'val': 'VALUE_Bq/kg'}}

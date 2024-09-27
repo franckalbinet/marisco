@@ -209,7 +209,7 @@ fixes_biota_species = {
 class RemapBiotaSpeciesCB(Callback):
     "Biota species standardized to MARIS format."
     def __init__(self, 
-                 fn_lut:Callable # Function that returns the lookup table dictionary
+                 fn_lut: Callable # Function that returns the lookup table dictionary
                 ):
         fc.store_attr()
 

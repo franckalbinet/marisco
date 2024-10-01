@@ -2,15 +2,19 @@ placeholder = "_to_be_filled_in_"
 
 [grps.sea]
 name = "seawater"
+id = 1
 
 [grps.bio]
 name = "biota"
+id = 2
 
 [grps.sed]
 name = "sediment"
+id = 3
 
 [grps.sus]
 name = "suspended-matter"
+id = 4
 
 [global_attrs]
 id = ""

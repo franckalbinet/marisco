@@ -13,7 +13,7 @@ from operator import attrgetter
 from cftime import date2num
 import numpy as np
 import pandas as pd
-from .configs import cfg, cdl_cfg
+from .configs import cfg, cdl_cfg, grp_names
 from functools import partial 
 from typing import List, Dict, Callable, Tuple
 from pathlib import Path 
@@ -115,14 +115,15 @@ class RemapCB(Callback):
     "Generic MARIS remapping callback."
     def __init__(self, 
                  fn_lut: Callable, # Function that returns the lookup table dictionary
-                 dest_grps: list[str], # List of destination groups
                  col_remap: str, # Name of the column to remap
                  col_src: str, # Name of the column with the source values
+                 dest_grps: list[str]|str=grp_names(), # List of destination groups
                  default_value: Any = -1 # Default value for unmatched entries
                 ):
         fc.store_attr()
         self.lut = None
-        self.__class__.__doc__ = f"Remap values from '{col_src}' to '{col_remap}' for groups: {', '.join(dest_grps)}."
+        if isinstance(dest_grps, str): self.dest_grps = [dest_grps]
+        self.__doc__ = f"Remap values from '{col_src}' to '{col_remap}' for groups: {', '.join(dest_grps)}."
 
     def __call__(self, tfm):
         self.lut = self.fn_lut()
@@ -134,10 +135,14 @@ class RemapCB(Callback):
         df[self.col_remap] = df[self.col_src].apply(self._remap_value)
 
     def _remap_value(self, value: str) -> Any:
-        match = self.lut.get(value.strip(), Match(self.default_value, None, None, None))
-        if match.matched_id == self.default_value:
-            print(f"Unmatched value: {value}")
-        return match.matched_id
+        value = value.strip() if isinstance(value, str) else value
+        match = self.lut.get(value, Match(self.default_value, None, None, None))
+        if isinstance(match, Match):
+            if match.matched_id == self.default_value:
+                print(f"Unmatched value: {value}")
+            return match.matched_id 
+        else:
+            return match
 
 # %% ../nbs/api/callbacks.ipynb 27
 class LowerStripNameCB(Callback):

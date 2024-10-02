@@ -276,7 +276,7 @@ lut_tissues = lambda: Remapper(provider_lut_df=pd.read_csv('../../_data/accdb/mo
 lut_biogroup = lambda: get_lut(species_lut_path().parent, species_lut_path().name, 
                                key='species_id', value='biogroup_id')
 
-# %% ../../nbs/handlers/helcom.ipynb 99
+# %% ../../nbs/handlers/helcom.ipynb 98
 # TODO: Include Commonname field after next MARIS data reconciling process.
 def get_taxon_info_lut(
     maris_lut:str # Path to the MARIS lookup table (Excel file)
@@ -287,45 +287,32 @@ def get_taxon_info_lut(
 
 lut_taxon = lambda: get_taxon_info_lut(species_lut_path())
 
-# %% ../../nbs/handlers/helcom.ipynb 100
+# %% ../../nbs/handlers/helcom.ipynb 99
 class RemapTaxonInformationCB(Callback):
-    "Update taxon names based on MARIS species LUT `dbo_species.xlsx`."
-    def __init__(self, 
-                 fn_lut:Callable # Function that returns the lookup table dictionary
-                 ):
-        fc.store_attr()
+    "Update taxon information based on MARIS species LUT."
+    def __init__(self, fn_lut: Callable):
+        self.fn_lut = fn_lut
 
     def __call__(self, tfm):
-        "Update taxon information columns in the DataFrame using the lookup table."
         lut = self.fn_lut()
         df = tfm.dfs['biota']
         
-        self._set_taxon_rep_name(df)
+        df['TaxonRepName'] = df.get('RUBIN', 'Unknown')
         
         taxon_columns = ['Taxonname', 'Taxonrank', 'TaxonDB', 'TaxonDBID', 'TaxonDBURL']
         for col in taxon_columns:
-            df[col] = df['species'].apply(lambda x: self._get_name_by_species_id(x, lut[col]))
+            df[col] = df['species'].map(lut[col]).fillna('Unknown')
+        
+        unmatched = df[df['Taxonname'] == 'Unknown']['species'].unique()
+        if len(unmatched) > 0:
+            print(f"Unmatched species IDs: {', '.join(unmatched)}")
 
-    def _set_taxon_rep_name(self, df: pd.DataFrame):
-        "Set the `TaxonRepName` column to the `RUBIN` column values if it exists."
-        if 'RUBIN' in df.columns:
-            df['TaxonRepName'] = df['RUBIN']
-        else:
-            print("Warning: 'RUBIN' column not found in DataFrame.")
-
-    def _get_name_by_species_id(self, species_id: str, lut: dict) -> str:
-        "Get the name from the lookup table, defaulting to 'Unknown' if not found."
-        name = lut.get(species_id, 'Unknown')
-        if name == 'Unknown':
-            print(f"Unmatched species ID: {species_id}")
-        return name
-
-# %% ../../nbs/handlers/helcom.ipynb 109
+# %% ../../nbs/handlers/helcom.ipynb 108
 fixes_sediments = {
     'NO DATA': '(Not available)'
 }
 
-# %% ../../nbs/handlers/helcom.ipynb 111
+# %% ../../nbs/handlers/helcom.ipynb 110
 class RemapSedimentCB(Callback):
     "Update sediment id based on MARIS species LUT (dbo_sedtype.xlsx)."
     def __init__(self, 
@@ -365,7 +352,7 @@ class RemapSedimentCB(Callback):
         "Print the SEDI value if the matched_id is -1."
         print(f"Unmatched SEDI: {sedi_value}")
 
-# %% ../../nbs/handlers/helcom.ipynb 112
+# %% ../../nbs/handlers/helcom.ipynb 111
 lut_sediments = lambda: Remapper(provider_lut_df=pd.read_csv(Path(fname_in) / 'SEDIMENT_TYPE.csv'),
                                  maris_lut_fn=sediments_lut_path,
                                  maris_col_id='sedtype_id',
@@ -375,7 +362,7 @@ lut_sediments = lambda: Remapper(provider_lut_df=pd.read_csv(Path(fname_in) / 'S
                                  fname_cache='sediments_helcom.pkl'
                                  ).generate_lookup_table(fixes=fixes_sediments, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/helcom.ipynb 122
+# %% ../../nbs/handlers/helcom.ipynb 121
 lut_units = {
     'seawater': 1,  # 'Bq/m3'
     'sediment': 4,  # 'Bq/kgd' for sediment
@@ -386,7 +373,7 @@ lut_units = {
     }
 }
 
-# %% ../../nbs/handlers/helcom.ipynb 123
+# %% ../../nbs/handlers/helcom.ipynb 122
 class RemapUnitCB(Callback):
     "Set the `unit` id column in the DataFrames based on a lookup table."
     def __init__(self, 
@@ -401,10 +388,10 @@ class RemapUnitCB(Callback):
             else:
                 tfm.dfs[grp]['unit'] = tfm.dfs[grp]['BASIS'].apply(lambda x: lut_units[grp].get(x, 0))
 
-# %% ../../nbs/handlers/helcom.ipynb 128
+# %% ../../nbs/handlers/helcom.ipynb 127
 lut_dl = lambda: pd.read_excel(detection_limit_lut_path(), usecols=['name','id']).set_index('name').to_dict()['id']
 
-# %% ../../nbs/handlers/helcom.ipynb 130
+# %% ../../nbs/handlers/helcom.ipynb 129
 coi_dl = {'seawater' : {'val' : 'VALUE_Bq/m³',
                        'unc' : 'ERROR%_m³',
                        'dl' : '< VALUE_Bq/m³'},
@@ -416,7 +403,7 @@ coi_dl = {'seawater' : {'val' : 'VALUE_Bq/m³',
               'unc' : 'ERROR%_kg',
               'dl' : '< VALUE_Bq/kg'}}
 
-# %% ../../nbs/handlers/helcom.ipynb 133
+# %% ../../nbs/handlers/helcom.ipynb 132
 # TO BE REFACTORED
 class RemapDetectionLimitCB(Callback):
     "Remap value type to MARIS format."
@@ -456,14 +443,14 @@ class RemapDetectionLimitCB(Callback):
         # Perform lookup
         df['detection_limit'] = df['detection_limit'].map(lut)
 
-# %% ../../nbs/handlers/helcom.ipynb 141
+# %% ../../nbs/handlers/helcom.ipynb 140
 lut_filtered = {
     'N': 2,
     'n': 2,
     'F': 1
 }
 
-# %% ../../nbs/handlers/helcom.ipynb 143
+# %% ../../nbs/handlers/helcom.ipynb 142
 class RemapFiltCB(Callback):
     "Lookup FILT value in dataframe using the lookup table."
     def __init__(self,
@@ -476,7 +463,7 @@ class RemapFiltCB(Callback):
             if 'FILT' in df.columns:
                 df['FILT'] = df['FILT'].map(lambda x: self.lut_filtered.get(x, 0))
 
-# %% ../../nbs/handlers/helcom.ipynb 148
+# %% ../../nbs/handlers/helcom.ipynb 147
 class AddSampleLabCodeCB(Callback):
     "Remap `KEY` column to `samplabcode` in each DataFrame."
     def __call__(self, tfm):
@@ -486,10 +473,10 @@ class AddSampleLabCodeCB(Callback):
     def _remap_sample_id(self, df:pd.DataFrame):
         df['samplabcode'] = df['KEY']
 
-# %% ../../nbs/handlers/helcom.ipynb 153
+# %% ../../nbs/handlers/helcom.ipynb 152
 lut_method = lambda: pd.read_csv(Path(fname_in) / 'ANALYSIS_METHOD.csv').set_index('METHOD').to_dict()['DESCRIPTION']
 
-# %% ../../nbs/handlers/helcom.ipynb 154
+# %% ../../nbs/handlers/helcom.ipynb 153
 class AddMeasurementNoteCB(Callback):
     "Record measurement notes by adding a 'measurenote' column to DataFrames."
     def __init__(self, 
@@ -503,7 +490,7 @@ class AddMeasurementNoteCB(Callback):
             if 'METHOD' in df.columns:
                 df['measurementnote'] = df['METHOD'].map(lambda x: lut.get(x, 0))
 
-# %% ../../nbs/handlers/helcom.ipynb 158
+# %% ../../nbs/handlers/helcom.ipynb 157
 class RemapStationIdCB(Callback):
     "Remap Station ID to MARIS format."
     def __init__(self):
@@ -514,7 +501,7 @@ class RemapStationIdCB(Callback):
         for grp in tfm.dfs.keys(): 
             tfm.dfs[grp]['station'] = tfm.dfs[grp]['STATION']
 
-# %% ../../nbs/handlers/helcom.ipynb 162
+# %% ../../nbs/handlers/helcom.ipynb 161
 class RemapSedSliceTopBottomCB(Callback):
     "Remap Sediment slice top and bottom to MARIS format."
     def __call__(self, tfm:Transformer):
@@ -522,7 +509,7 @@ class RemapSedSliceTopBottomCB(Callback):
         tfm.dfs['sediment']['top'] = tfm.dfs['sediment']['UPPSLI']
         tfm.dfs['sediment']['bottom'] = tfm.dfs['sediment']['LOWSLI']
 
-# %% ../../nbs/handlers/helcom.ipynb 167
+# %% ../../nbs/handlers/helcom.ipynb 166
 class LookupDryWetRatio(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm:Transformer):
@@ -538,7 +525,7 @@ class LookupDryWetRatio(Callback):
         df.loc[df['dry_wet_ratio'] == 0, 'dry_wet_ratio'] = np.NaN
 
 
-# %% ../../nbs/handlers/helcom.ipynb 173
+# %% ../../nbs/handlers/helcom.ipynb 172
 class ParseCoordinates(Callback):
     """
     Get geographical coordinates from columns expressed in degrees decimal format 
@@ -586,7 +573,7 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 184
+# %% ../../nbs/handlers/helcom.ipynb 183
 def get_common_rules(vars, encoding_type):
     "Get common renaming rules for NetCDF and OpenRefine."
     common = {
@@ -623,7 +610,7 @@ def get_common_rules(vars, encoding_type):
     
     return common
 
-# %% ../../nbs/handlers/helcom.ipynb 185
+# %% ../../nbs/handlers/helcom.ipynb 184
 def get_specific_rules(vars, encoding_type):
     "Get specific renaming rules for NetCDF and OpenRefine."
     if encoding_type == 'netcdf':
@@ -659,7 +646,7 @@ def get_specific_rules(vars, encoding_type):
             }
         }
 
-# %% ../../nbs/handlers/helcom.ipynb 186
+# %% ../../nbs/handlers/helcom.ipynb 185
 def get_renaming_rules(encoding_type='netcdf'):
     "Get renaming rules for NetCDF and OpenRefine."
     vars = cdl_cfg()['vars']
@@ -677,7 +664,7 @@ def get_renaming_rules(encoding_type='netcdf'):
     
     return dict(rules)
 
-# %% ../../nbs/handlers/helcom.ipynb 187
+# %% ../../nbs/handlers/helcom.ipynb 186
 class SelectAndRenameColumnCB(Callback):
     "Select and rename columns in a DataFrame based on renaming rules for a specified encoding type."
     def __init__(self, 
@@ -748,7 +735,7 @@ class SelectAndRenameColumnCB(Callback):
         return df, not_found_keys
 
 
-# %% ../../nbs/handlers/helcom.ipynb 196
+# %% ../../nbs/handlers/helcom.ipynb 195
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -760,7 +747,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 197
+# %% ../../nbs/handlers/helcom.ipynb 196
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve all global attributes."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -772,7 +759,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 199
+# %% ../../nbs/handlers/helcom.ipynb 198
 def enums_xtra(tfm, vars):
     "Retrieve a subset of the lengthy enum as `species_t` for instance."
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
@@ -783,7 +770,7 @@ def enums_xtra(tfm, vars):
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/helcom.ipynb 201
+# %% ../../nbs/handlers/helcom.ipynb 200
 def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[AddSampleTypeIdColumnCB(),

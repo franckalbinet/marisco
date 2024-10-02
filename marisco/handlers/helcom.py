@@ -140,12 +140,12 @@ lut_nuclides = lambda df: Remapper(provider_lut_df=df,
 # %% ../../nbs/handlers/helcom.ipynb 41
 class RemapNuclideNameCB(Callback):
     def __init__(self, 
-                 fn_lut:Callable # Function that returns the lookup table dictionary
+                 fn_lut: Callable # Function that returns the lookup table dictionary
                 ):
         "Remap data provider nuclide names to MARIS nuclide names."
         fc.store_attr()
 
-    def __call__(self, tfm):
+    def __call__(self, tfm: Transformer):
         df_uniques = get_unique_across_dfs(tfm.dfs, col_name='NUCLIDE', as_df=True)
         lut = {k: v.matched_maris_name for k, v in self.fn_lut(df_uniques).items()}    
         for k in tfm.dfs.keys():
@@ -154,18 +154,18 @@ class RemapNuclideNameCB(Callback):
 # %% ../../nbs/handlers/helcom.ipynb 50
 class ParseTimeCB(Callback):
     "Parse and standardize time information in the dataframe."
-    def __call__(self, tfm):
+    def __call__(self, tfm: Transformer):
         for df in tfm.dfs.values():
             self._process_dates(df)
             self._define_beg_period(df)
 
-    def _process_dates(self, df):
+    def _process_dates(self, df: pd.DataFrame):
         "Process and correct date and time information in the DataFrame."
         df['time'] = self._parse_date(df)
         self._handle_missing_dates(df)
         self._fill_missing_time(df)
 
-    def _parse_date(self, df):
+    def _parse_date(self, df: pd.DataFrame):
         "Parse the DATE column if present."
         return pd.to_datetime(df['DATE'], format='%m/%d/%y %H:%M:%S', errors='coerce')
 
@@ -177,7 +177,7 @@ class ParseTimeCB(Callback):
         missing_day_month = (df["DAY"].isna()) & (df["MONTH"].isna()) & (df["YEAR"].notna())
         df.loc[missing_day_month, ["DAY", "MONTH"]] = 1
 
-    def _fill_missing_time(self, df):
+    def _fill_missing_time(self, df: pd.DataFrame):
         "Fill missing time values using YEAR, MONTH, and DAY columns."
         missing_time = df['time'].isna()
         df.loc[missing_time, 'time'] = pd.to_datetime(
@@ -186,7 +186,7 @@ class ParseTimeCB(Callback):
             errors='coerce'
         )
 
-    def _define_beg_period(self, df):
+    def _define_beg_period(self, df: pd.DataFrame):
         "Create a standardized date representation for Open Refine."
         df['begperiod'] = df['time']
 
@@ -203,7 +203,7 @@ class SanitizeValue(Callback):
                  ): 
         fc.store_attr()
 
-    def __call__(self, tfm):
+    def __call__(self, tfm: Transformer):
         for grp, df in tfm.dfs.items():
             value_col = self.coi[grp]['val']
             df.dropna(subset=[value_col], inplace=True)
@@ -228,12 +228,12 @@ coi_units_unc = [('seawater', 'VALUE_Bq/m³', 'ERROR%_m³'),
 class NormalizeUncCB(Callback):
     "Convert from relative error % to uncertainty of activity unit."
     def __init__(self, 
-                 fn_convert_unc:Callable=unc_rel2stan, # Function converting relative uncertainty to absolute uncertainty
-                 coi:List=coi_units_unc # List of columns of interest
+                 fn_convert_unc: Callable=unc_rel2stan, # Function converting relative uncertainty to absolute uncertainty
+                 coi: List=coi_units_unc # List of columns of interest
                 ):
         fc.store_attr()
     
-    def __call__(self, tfm):
+    def __call__(self, tfm: Transformer):
         for grp, val, unc in self.coi:
             if grp in tfm.dfs:
                 df = tfm.dfs[grp]
@@ -293,7 +293,7 @@ class RemapTaxonInformationCB(Callback):
     def __init__(self, fn_lut: Callable):
         self.fn_lut = fn_lut
 
-    def __call__(self, tfm):
+    def __call__(self, tfm: Transformer):
         lut = self.fn_lut()
         df = tfm.dfs['biota']
         
@@ -316,7 +316,7 @@ fixes_sediments = {
 class RemapSedimentCB(Callback):
     "Update sediment id based on MARIS species LUT (dbo_sedtype.xlsx)."
     def __init__(self, 
-                 fn_lut:Callable, # Function that returns the lookup table dictionary
+                 fn_lut: Callable, # Function that returns the lookup table dictionary
                 ):
         fc.store_attr()
 
@@ -325,7 +325,7 @@ class RemapSedimentCB(Callback):
         df['SEDI'] = df['SEDI'].replace({56: -99, 73: -99, np.nan: -99})
         return df
     
-    def __call__(self, tfm):
+    def __call__(self, tfm: Transformer):
         "Remap sediment types in the DataFrame using the lookup table and handle specific replacements."
         lut = self.fn_lut()
         
@@ -336,8 +336,8 @@ class RemapSedimentCB(Callback):
         tfm.dfs['sediment']['sed_type'] = tfm.dfs['sediment']['SEDI'].apply(lambda x: self._get_sediment_type(x, lut))
 
     def _get_sediment_type(self, 
-                           sedi_value:int, # The `SEDI` value from the DataFrame
-                           lut:dict # The lookup table dictionary
+                           sedi_value: int, # The `SEDI` value from the DataFrame
+                           lut: dict # The lookup table dictionary
                           ): 
         "Get the matched_id from the lookup table and print SEDI if the matched_id is -1."
         match = lut.get(sedi_value, Match(-1, None, None, None))
@@ -347,7 +347,7 @@ class RemapSedimentCB(Callback):
         return match.matched_id
 
     def _print_unmatched_sedi(self, 
-                              sedi_value:int # The `SEDI` value from the DataFram
+                              sedi_value: int # The `SEDI` value from the DataFram
                              ):
         "Print the SEDI value if the matched_id is -1."
         print(f"Unmatched SEDI: {sedi_value}")
@@ -377,11 +377,11 @@ lut_units = {
 class RemapUnitCB(Callback):
     "Set the `unit` id column in the DataFrames based on a lookup table."
     def __init__(self, 
-                 lut_units:dict=lut_units # Dictionary containing renaming rules for different unit categories
+                 lut_units: dict=lut_units # Dictionary containing renaming rules for different unit categories
                 ):
         fc.store_attr()
 
-    def __call__(self, tfm):
+    def __call__(self, tfm: Transformer):
         for grp in tfm.dfs.keys():
             if grp in ['seawater', 'sediment']:
                 tfm.dfs[grp]['unit'] = self.lut_units[grp]
@@ -408,12 +408,12 @@ coi_dl = {'seawater' : {'val' : 'VALUE_Bq/m³',
 class RemapDetectionLimitCB(Callback):
     "Remap value type to MARIS format."
     def __init__(self, 
-                 coi:dict, # Configuration options for column names
-                 fn_lut:callable # Function that returns a lookup table
+                 coi: dict, # Configuration options for column names
+                 fn_lut: callable # Function that returns a lookup table
                 ):
         fc.store_attr()
 
-    def __call__(self, tfm):
+    def __call__(self, tfm: Transformer):
         "Remap detection limits in the DataFrames using the lookup table."
         lut = self.fn_lut()
         
@@ -422,9 +422,9 @@ class RemapDetectionLimitCB(Callback):
             self._update_detection_limit(df, grp, lut)
     
     def _update_detection_limit(self, 
-                                df:pd.DataFrame, # The DataFrame to modify
-                                grp:str, # The group name to get the column configuration
-                                lut:dict # The lookup table dictionary
+                                df: pd.DataFrame, # The DataFrame to modify
+                                grp: str, # The group name to get the column configuration
+                                lut: dict # The lookup table dictionary
                                ):
         "Update detection limit column in the DataFrame based on lookup table and rules."
         detection_col = self.coi[grp]['dl']
@@ -466,11 +466,11 @@ class RemapFiltCB(Callback):
 # %% ../../nbs/handlers/helcom.ipynb 147
 class AddSampleLabCodeCB(Callback):
     "Remap `KEY` column to `samplabcode` in each DataFrame."
-    def __call__(self, tfm):
+    def __call__(self, tfm: Transformer):
         for grp in tfm.dfs:
             self._remap_sample_id(tfm.dfs[grp])
     
-    def _remap_sample_id(self, df:pd.DataFrame):
+    def _remap_sample_id(self, df: pd.DataFrame):
         df['samplabcode'] = df['KEY']
 
 # %% ../../nbs/handlers/helcom.ipynb 152
@@ -480,11 +480,11 @@ lut_method = lambda: pd.read_csv(Path(fname_in) / 'ANALYSIS_METHOD.csv').set_ind
 class AddMeasurementNoteCB(Callback):
     "Record measurement notes by adding a 'measurenote' column to DataFrames."
     def __init__(self, 
-                 fn_lut:callable # Function that returns the lookup dictionary with `METHOD` as key and `DESCRIPTION` as value
+                 fn_lut: callable # Function that returns the lookup dictionary with `METHOD` as key and `DESCRIPTION` as value
                 ):
         fc.store_attr()
         
-    def __call__(self, tfm):
+    def __call__(self, tfm: Transformer):
         lut = self.fn_lut()
         for df in tfm.dfs.values():
             if 'METHOD' in df.columns:
@@ -496,7 +496,7 @@ class RemapStationIdCB(Callback):
     def __init__(self):
         fc.store_attr()
 
-    def __call__(self, tfm:Transformer):
+    def __call__(self, tfm: Transformer):
         "Iterate through all DataFrames in the transformer object and remap `STATION` to `station_id`."
         for grp in tfm.dfs.keys(): 
             tfm.dfs[grp]['station'] = tfm.dfs[grp]['STATION']
@@ -504,7 +504,7 @@ class RemapStationIdCB(Callback):
 # %% ../../nbs/handlers/helcom.ipynb 161
 class RemapSedSliceTopBottomCB(Callback):
     "Remap Sediment slice top and bottom to MARIS format."
-    def __call__(self, tfm:Transformer):
+    def __call__(self, tfm: Transformer):
         "Iterate through all DataFrames in the transformer object and remap sediment slice top and bottom."
         tfm.dfs['sediment']['top'] = tfm.dfs['sediment']['UPPSLI']
         tfm.dfs['sediment']['bottom'] = tfm.dfs['sediment']['LOWSLI']
@@ -512,7 +512,7 @@ class RemapSedSliceTopBottomCB(Callback):
 # %% ../../nbs/handlers/helcom.ipynb 166
 class LookupDryWetRatio(Callback):
     "Lookup dry-wet ratio and format for MARIS."
-    def __call__(self, tfm:Transformer):
+    def __call__(self, tfm: Transformer):
         "Iterate through all DataFrames in the transformer object and apply the dry-wet ratio lookup."
         for grp in tfm.dfs.keys():
             if 'DW%' in tfm.dfs[grp].columns:
@@ -611,7 +611,7 @@ def get_common_rules(vars, encoding_type):
     return common
 
 # %% ../../nbs/handlers/helcom.ipynb 184
-def get_specific_rules(vars, encoding_type):
+def get_specific_rules(vars: dict, encoding_type: str) -> dict:
     "Get specific renaming rules for NetCDF and OpenRefine."
     if encoding_type == 'netcdf':
         return {
@@ -647,7 +647,7 @@ def get_specific_rules(vars, encoding_type):
         }
 
 # %% ../../nbs/handlers/helcom.ipynb 185
-def get_renaming_rules(encoding_type='netcdf'):
+def get_renaming_rules(encoding_type: str = 'netcdf') -> dict:
     "Get renaming rules for NetCDF and OpenRefine."
     vars = cdl_cfg()['vars']
     
@@ -668,13 +668,13 @@ def get_renaming_rules(encoding_type='netcdf'):
 class SelectAndRenameColumnCB(Callback):
     "Select and rename columns in a DataFrame based on renaming rules for a specified encoding type."
     def __init__(self, 
-                 fn_renaming_rules:Callable, # A function that returns an OrderedDict of renaming rules 
-                 encoding_type:str='netcdf', # The encoding type (`netcdf` or `openrefine`) to determine which renaming rules to use
-                 verbose:bool=False # Whether to print out renaming rules that were not applied
+                 fn_renaming_rules: Callable, # A function that returns an OrderedDict of renaming rules 
+                 encoding_type: str='netcdf', # The encoding type (`netcdf` or `openrefine`) to determine which renaming rules to use
+                 verbose: bool=False # Whether to print out renaming rules that were not applied
                  ):
         fc.store_attr()
 
-    def __call__(self, tfm:Transformer):
+    def __call__(self, tfm: Transformer):
         "Apply column selection and renaming to DataFrames in the transformer, and identify unused rules."
         try:
             renaming_rules = self.fn_renaming_rules(self.encoding_type)
@@ -701,8 +701,8 @@ class SelectAndRenameColumnCB(Callback):
                     print(f"Key '{old_col}' from renaming rules was not found in the DataFrame.")
 
     def _get_group_rules(self, 
-                         renaming_rules:OrderedDict, # Renaming rules
-                         group:str # Group name to filter rules
+                         renaming_rules: OrderedDict, # Renaming rules
+                         group: str # Group name to filter rules
                          ) -> OrderedDict: # Renaming rules applicable to the specified group
         "Retrieve and merge renaming rules for the specified group based on the encoding type."
         relevant_rules = [rules for key, rules in renaming_rules.items() if group in key]
@@ -712,8 +712,8 @@ class SelectAndRenameColumnCB(Callback):
         return merged_rules
 
     def _apply_renaming(self, 
-                        df:pd.DataFrame, # DataFrame to modify
-                        rename_rules:OrderedDict # Renaming rules
+                        df: pd.DataFrame, # DataFrame to modify
+                        rename_rules: OrderedDict # Renaming rules
                         ) -> tuple: # (Renamed and filtered df, Column names from renaming rules that were not found in the DataFrame)
         """
         Select columns based on renaming rules and apply renaming, only for existing columns
@@ -748,7 +748,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 # %% ../../nbs/handlers/helcom.ipynb 196
-def get_attrs(tfm, zotero_key, kw=kw):
+def get_attrs(tfm: Transformer, zotero_key: str, kw: list = kw) -> dict:
     "Retrieve all global attributes."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -771,7 +771,7 @@ def enums_xtra(tfm, vars):
     return xtras
 
 # %% ../../nbs/handlers/helcom.ipynb 200
-def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
+def encode(fname_in: str, fname_out_nc: str, nc_tpl_path: str, **kwargs) -> None:
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[AddSampleTypeIdColumnCB(),
                             LowerStripNameCB(col_src='NUCLIDE'),
@@ -781,9 +781,9 @@ def encode(fname_in, fname_out_nc, nc_tpl_path, **kwargs):
                             EncodeTimeCB(cfg()),
                             SanitizeValue(coi_val),       
                             NormalizeUncCB(),
-                            RemapBiotaSpeciesCB(lut_biota),
-                            RemapBiotaBodyPartCB(lut_tissues),
-                            RemapBiogroupCB(lut_biogroup),
+                            RemapCB(fn_lut=lut_biota, col_remap='species', col_src='RUBIN', dest_grps='biota'),
+                            RemapCB(lut_tissues, 'body_part', 'TISSUE', 'biota'),
+                            RemapCB(lut_biogroup, 'bio_group', 'species', 'biota'),
                             RemapTaxonInformationCB(lut_taxon),
                             RemapSedimentCB(lut_sediments),
                             RemapUnitCB(),

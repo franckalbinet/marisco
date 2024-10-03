@@ -139,10 +139,10 @@ lut_nuclides = lambda df: Remapper(provider_lut_df=df,
 
 # %% ../../nbs/handlers/helcom.ipynb 41
 class RemapNuclideNameCB(Callback):
+    "Remap data provider nuclide names to MARIS nuclide names."
     def __init__(self, 
                  fn_lut: Callable # Function that returns the lookup table dictionary
                 ):
-        "Remap data provider nuclide names to MARIS nuclide names."
         fc.store_attr()
 
     def __call__(self, tfm: Transformer):

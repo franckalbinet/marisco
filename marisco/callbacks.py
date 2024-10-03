@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 from .configs import cfg, cdl_cfg, grp_names
 from functools import partial 
-from typing import List, Dict, Callable, Tuple
+from typing import List, Dict, Callable, Tuple, Any, Optional
 from pathlib import Path 
 
 from .configs import get_lut, nuc_lut_path
@@ -28,7 +28,10 @@ class Callback():
     order = 0
 
 # %% ../nbs/api/callbacks.ipynb 7
-def run_cbs(cbs, obj=None):
+def run_cbs(
+    cbs: List[Callback], # List of callbacks to run
+    obj: Any # Object to pass to the callbacks
+    ):
     "Run the callbacks in the order they are specified."
     for cb in sorted(cbs, key=attrgetter('order')):
         if cb.__doc__: obj.logs.append(cb.__doc__)
@@ -37,16 +40,16 @@ def run_cbs(cbs, obj=None):
 # %% ../nbs/api/callbacks.ipynb 8
 class Transformer():
     def __init__(self, 
-                 dfs:pd.DataFrame, # Dictionary of DataFrames to transform
-                 cbs:list=None, # List of callbacks to run
-                 inplace:bool=False # Whether to modify the dataframes in place
+                 dfs: Dict[str, pd.DataFrame], # Dictionary of DataFrames to transform
+                 cbs: Optional[List[Callback]]=None, # List of callbacks to run
+                 inplace: bool=False # Whether to modify the dataframes in place
                  ): 
         "Transform the dataframes according to the specified callbacks."
         fc.store_attr()
         self.dfs = dfs if inplace else {k: v.copy() for k, v in dfs.items()}
         self.logs = []
             
-    def unique(self, col_name):
+    def unique(self, col_name: str) -> np.ndarray:
         "Distinct values of a specific column present in all groups."
         columns = [df.get(col_name) for df in self.dfs.values() if df.get(col_name) is not None]
         values = np.concatenate(columns) if columns else []
@@ -60,8 +63,8 @@ class Transformer():
 # %% ../nbs/api/callbacks.ipynb 15
 class SanitizeLonLatCB(Callback):
     "Drop row when both longitude & latitude equal 0. Drop unrealistic longitude & latitude values. Convert longitude & latitude `,` separator to `.` separator."
-    def __init__(self, verbose=False): fc.store_attr()
-    def __call__(self, tfm):
+    def __init__(self, verbose: bool=False): fc.store_attr()
+    def __call__(self, tfm: Transformer):
         for grp, df in tfm.dfs.items():
             " Convert `,` separator to `.` separator"
             df['lon'] = [float(str(x).replace(',', '.')) for x in df['lon']]
@@ -84,8 +87,8 @@ class SanitizeLonLatCB(Callback):
 # %% ../nbs/api/callbacks.ipynb 20
 class AddSampleTypeIdColumnCB(Callback):
     def __init__(self, 
-                 cdl_cfg:Callable=cdl_cfg, # Callable to get the CDL config dictionary
-                 col_name:str='samptype_id'
+                 cdl_cfg: Callable=cdl_cfg, # Callable to get the CDL config dictionary
+                 col_name: str='samptype_id' # Column name to store the sample type id
                  ): 
         "Add a column with the sample type id as defined in the CDL."
         fc.store_attr()
@@ -97,16 +100,16 @@ class AddSampleTypeIdColumnCB(Callback):
 # %% ../nbs/api/callbacks.ipynb 23
 class AddNuclideIdColumnCB(Callback):
     def __init__(self, 
-                 col_value:str, # Column name containing the nuclide name
-                 lut_fname_fn:callable=nuc_lut_path, # Function returning the lut path
-                 col_name:str='nuclide_id' # Column name to store the nuclide id
+                 col_value: str, # Column name containing the nuclide name
+                 lut_fname_fn: Callable=nuc_lut_path, # Function returning the lut path
+                 col_name: str='nuclide_id' # Column name to store the nuclide id
                  ): 
         "Add a column with the nuclide id."
         fc.store_attr()
         self.lut = get_lut(lut_fname_fn().parent, lut_fname_fn().name, 
                            key='nc_name', value='nuclide_id', reverse=False)
         
-    def __call__(self, tfm):
+    def __call__(self, tfm: Transformer):
         for grp, df in tfm.dfs.items(): 
             df[self.col_name] = df[self.col_value].map(self.lut)
 
@@ -148,9 +151,9 @@ class RemapCB(Callback):
 class LowerStripNameCB(Callback):
     "Convert values to lowercase and strip any trailing spaces."
     def __init__(self, 
-                 col_src:str, # Source column name e.g. 'Nuclide'
-                 col_dst:str=None, # Destination column name
-                 fn_transform:Callable=lambda x: x.lower().strip() # Transformation function
+                 col_src: str, # Source column name e.g. 'Nuclide'
+                 col_dst: str=None, # Destination column name
+                 fn_transform: Callable=lambda x: x.lower().strip() # Transformation function
                  ):
         fc.store_attr()
         self.__doc__ = f"Convert values from '{col_src}' to lowercase, strip spaces, and store in '{col_dst}'."
@@ -168,7 +171,7 @@ class LowerStripNameCB(Callback):
 class RemoveAllNAValuesCB(Callback):
     "Remove rows with all NA values."
     def __init__(self, 
-                 cols_to_check:dict # A dictionary with the sample type as key and the column name to check as value
+                 cols_to_check: Dict[str, str] # A dictionary with the sample type as key and the column name to check as value
                 ):
         fc.store_attr()
 
@@ -180,9 +183,13 @@ class RemoveAllNAValuesCB(Callback):
 
 # %% ../nbs/api/callbacks.ipynb 34
 class ReshapeLongToWide(Callback):
-    def __init__(self, columns=['nuclide'], values=['value'], 
-                 num_fill_value=-999, str_fill_value='STR FILL VALUE'):
-        "Convert data from long to wide with renamed columns."
+    "Convert data from long to wide with renamed columns."
+    def __init__(self, 
+                 columns: List[str]=['nuclide'], # Columns to use as index
+                 values: List[str]=['value'], # Columns to use as values
+                 num_fill_value: int=-999, # Fill value for numeric columns
+                 str_fill_value='STR FILL VALUE'
+                 ):
         fc.store_attr()
         self.derived_cols = self._get_derived_cols()
     
@@ -234,8 +241,10 @@ class ReshapeLongToWide(Callback):
 
 # %% ../nbs/api/callbacks.ipynb 36
 class CompareDfsAndTfmCB(Callback):
-    def __init__(self, dfs: Dict[str, pd.DataFrame]): 
-        "Create a dataframe of dropped data. Data included in the `dfs` not in the `tfm`."
+    "Create a dataframe of dropped data. Data included in the `dfs` not in the `tfm`."
+    def __init__(self, 
+                 dfs: Dict[str, pd.DataFrame] # Original dataframes
+                 ): 
         fc.store_attr()
         
     def __call__(self, tfm: Transformer) -> None:
@@ -271,8 +280,13 @@ class CompareDfsAndTfmCB(Callback):
 
 # %% ../nbs/api/callbacks.ipynb 41
 class EncodeTimeCB(Callback):
-    "Encode time as `int` representing seconds since xxx"    
-    def __init__(self, cfg , verbose=False): fc.store_attr()
+    "Encode time as `int` representing seconds since xxx."    
+    def __init__(self, 
+                 cfg: dict, # Configuration dictionary
+                 verbose: bool=False # Whether to print the number of invalid time entries
+                 ): 
+        fc.store_attr()
+        
     def __call__(self, tfm): 
         def format_time(x): 
             return date2num(x, units=self.cfg['units']['time'])

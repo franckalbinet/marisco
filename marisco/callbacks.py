@@ -62,25 +62,31 @@ class Transformer():
 
 # %% ../nbs/api/callbacks.ipynb 15
 class SanitizeLonLatCB(Callback):
-    "Drop row when both longitude & latitude equal 0. Drop unrealistic longitude & latitude values. Convert longitude & latitude `,` separator to `.` separator."
-    def __init__(self, verbose: bool=False): fc.store_attr()
+    "Drop rows with invalid longitude & latitude values. Convert `,` separator to `.` separator."
+    def __init__(self, 
+                 lon_col: str='lon', # Longitude column name
+                 lat_col: str='lat', # Latitude column name
+                 verbose: bool=False # Whether to print the number of invalid longitude & latitude values
+                 ):
+        fc.store_attr()
+        
     def __call__(self, tfm: Transformer):
         for grp, df in tfm.dfs.items():
-            " Convert `,` separator to `.` separator"
-            df['lon'] = [float(str(x).replace(',', '.')) for x in df['lon']]
-            df['lat'] = [float(str(x).replace(',', '.')) for x in df['lat']]
+            # Convert `,` separator to `.` separator
+            df[self.lon_col] = df[self.lon_col].apply(lambda x: float(str(x).replace(',', '.')))
+            df[self.lat_col] = df[self.lat_col].apply(lambda x: float(str(x).replace(',', '.')))
             
-            # mask zero values
-            mask_zeroes = (df.lon == 0) & (df.lat == 0) 
+            # Mask zero values
+            mask_zeroes = (df[self.lon_col] == 0) & (df[self.lat_col] == 0) 
             nZeroes = mask_zeroes.sum()
             if nZeroes and self.verbose: 
-                print(f'The "{grp}" group contains {nZeroes} data points whose (lon, lat) = (0, 0)')
+                print(f'The "{grp}" group contains {nZeroes} data points whose ({self.lon_col}, {self.lat_col}) = (0, 0)')
             
-            # mask gps out of bounds, goob. 
-            mask_goob = (df.lon < -180) | (df.lon > 180) | (df.lat < -90) | (df.lat > 90)
+            # Mask out of bounds values
+            mask_goob = (df[self.lon_col] < -180) | (df[self.lon_col] > 180) | (df[self.lat_col] < -90) | (df[self.lat_col] > 90)
             nGoob = mask_goob.sum()
             if nGoob and self.verbose: 
-                print(f'The "{grp}" group contains {nGoob} data points whose lon or lat are unrealistic. Outside -90 to 90 for latitude and -180 to 180 for longitude.')
+                print(f'The "{grp}" group contains {nGoob} data points with unrealistic {self.lon_col} or {self.lat_col} values.')
                 
             tfm.dfs[grp] = df.loc[~(mask_zeroes | mask_goob)]
 

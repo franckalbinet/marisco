@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 import re
 from functools import partial
-from typing import Union
+from typing import List, Dict, Callable, Tuple, Any, Optional
 
 from .inout import read_toml, write_toml
 import pandas as pd
@@ -27,7 +27,9 @@ NUCLIDE_LOOKUP_FNAME = 'dbo_nuclide.xlsx'
 MARISCO_CFG_DIRNAME = '.marisco'
 
 # %% ../nbs/api/configs.ipynb 5
-def base_path(): return Path.home() / MARISCO_CFG_DIRNAME
+def base_path(): 
+    "Return the path to the `.marisco` folder under your home directory."
+    return Path.home() / MARISCO_CFG_DIRNAME
 
 # %% ../nbs/api/configs.ipynb 8
 CONFIGS = {
@@ -56,16 +58,24 @@ CONFIGS = {
 }
 
 # %% ../nbs/api/configs.ipynb 12
-def cfg(): return read_toml(base_path() / CFG_FNAME)
+def cfg(): 
+    "Return the configuration as a dictionary."
+    return read_toml(base_path() / CFG_FNAME)
 
 # %% ../nbs/api/configs.ipynb 13
-def nuc_lut_path(): return Path(cfg()['dirs']['lut']) / NUCLIDE_LOOKUP_FNAME
+def nuc_lut_path(): 
+    "Return the path to the nuclide lookup table."
+    return Path(cfg()['dirs']['lut']) / NUCLIDE_LOOKUP_FNAME
 
 # %% ../nbs/api/configs.ipynb 14
-def lut_path(): return Path(cfg()['dirs']['lut'])
+def lut_path(): 
+    "Return the path to the lookup tables directory."
+    return Path(cfg()['dirs']['lut'])
 
 # %% ../nbs/api/configs.ipynb 15
-def cache_path(): return Path(cfg()['dirs']['cache'])
+def cache_path(): 
+    "Return the path to the cache directory."
+    return Path(cfg()['dirs']['cache'])
 
 # %% ../nbs/api/configs.ipynb 16
 CONFIGS_CDL = { 
@@ -411,7 +421,7 @@ CONFIGS_CDL = {
 
 # %% ../nbs/api/configs.ipynb 19
 def cdl_cfg():
-    "Return the CDL configuration as a dictionary."
+    "Return the CDL (Common Data Language) configuration as a dictionary."
     try:
         return read_toml(base_path() / CDL_FNAME)
     except FileNotFoundError:
@@ -419,53 +429,61 @@ def cdl_cfg():
 
 # %% ../nbs/api/configs.ipynb 20
 def grp_names(): 
-    "Return the group names as defined in `cdl.toml`"
+    "Return the group names as defined in `cdl.toml`."
     return [v['name'] for v in cdl_cfg()['grps'].values()]
 
 # %% ../nbs/api/configs.ipynb 21
 def species_lut_path():
+    "Return the path to the species lookup table."
     src_dir = lut_path()
     fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'species_t'][0]['fname']
     return src_dir / fname
 
 # %% ../nbs/api/configs.ipynb 22
 def bodyparts_lut_path():
+    "Return the path to the body parts lookup table."
     src_dir = lut_path()
     fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'body_part_t'][0]['fname']
     return src_dir / fname
 
 # %% ../nbs/api/configs.ipynb 23
 def biogroup_lut_path():
+    "Return the path to the biota group lookup table."
     src_dir = lut_path()
     fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'bio_group_t'][0]['fname']
     return src_dir / fname
 
 # %% ../nbs/api/configs.ipynb 24
 def sediments_lut_path():
+    "Return the path to the sediment type lookup table."
     src_dir = lut_path()
     fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'sed_type_t'][0]['fname']
     return src_dir / fname
 
 # %% ../nbs/api/configs.ipynb 25
 def unit_lut_path():
+    "Return the path to the unit lookup table."
     src_dir = lut_path()
     fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'unit_t'][0]['fname']
     return src_dir / fname
 
 # %% ../nbs/api/configs.ipynb 26
 def detection_limit_lut_path():
+    "Return the path to the detection limit lookup table."
     src_dir = lut_path()
     fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'dl_t'][0]['fname']
     return src_dir / fname
 
 # %% ../nbs/api/configs.ipynb 27
 def filtered_lut_path():
+    "Return the path to the filtered lookup table."
     src_dir = lut_path()
     fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'filt_t'][0]['fname']
     return src_dir / fname
 
 # %% ../nbs/api/configs.ipynb 28
 def area_lut_path():
+    "Return the path to the area lookup table."
     src_dir = lut_path()
     fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'area_t'][0]['fname']
     return src_dir / fname
@@ -478,31 +496,34 @@ NETCDF_TO_PYTHON_TYPE = {
 
 # %% ../nbs/api/configs.ipynb 31
 def name2grp(
-    name:str, # Name of the group
-    cdl:dict, # CDL configuration
+    name: str, # Group name
+    cdl: dict, # CDL configuration
     ):
     # Reverse `cdl.toml` config group dict so that group config key can be retrieve based on its name
     return {v['name']:k  for k, v in cdl['grps'].items()}[name]
 
 # %% ../nbs/api/configs.ipynb 34
 def nc_tpl_name():
+    "Return the name of the MARIS NetCDF template as defined in `configs.toml`"
     p = base_path()
     return read_toml(p / 'configs.toml')['names']['nc_template']
 
 # %% ../nbs/api/configs.ipynb 35
 def nc_tpl_path():
-    "Return the name of the MARIS NetCDF template as defined in `configs.toml`"
+    "Return the path of the MARIS NetCDF template as defined in `configs.toml`"
     p = base_path()
     return p / read_toml(p / 'configs.toml')['names']['nc_template']
 
 # %% ../nbs/api/configs.ipynb 37
-def sanitize(s:Union[str, float] # String to sanitize
-            ) -> str: # Sanitized string
+def sanitize(
+    s: str|float # String or float to sanitize
+    ) -> str|float:  # Sanitized string or original float
     """
-    Sanitize dictionary key to comply with NetCDF enumeration type: 
+    Sanitize dictionary key to comply with NetCDF enumeration type:
     
-        - remove `(`, `)`, `.`, `/`, `-`  
-        - strip the string
+    - Remove `(`, `)`, `.`, `/`, `-`
+    - Strip the string
+    - Return original value if it's not a string (e.g., NaN)
     """
     if isinstance(s, str):
         s = re.sub(r'[().]', '', s)
@@ -521,13 +542,14 @@ def try_int(x):
         return x
 
 # %% ../nbs/api/configs.ipynb 42
-def get_lut(src_dir: str, # Directory containing lookup tables
-            fname: str, # Excel file lookup table name
-            key: str, # Excel file column name to be used as dict keys 
-            value: str, # Excel file column name to be used as dict values 
-            do_sanitize: bool=True, # Sanitization required?
-            reverse: bool=False # Reverse lookup table (value, key)
-            ) -> dict: # MARIS lookup table (key, value)
+def get_lut(
+    src_dir: str, # Directory containing lookup tables
+    fname: str, # Excel file lookup table name
+    key: str, # Excel file column name to be used as dict keys 
+    value: str, # Excel file column name to be used as dict values 
+    do_sanitize: bool=True, # Sanitization required?
+    reverse: bool=False # Reverse lookup table (value, key)
+    ) -> dict: # MARIS lookup table (key, value)
     "Convert MARIS db lookup table excel file to dictionary `{'name': id, ...}` or `{id: name, ...}` if `reverse` is True."
     fname = Path(src_dir) / fname
     df = pd.read_excel(fname, usecols=[key, value]).dropna(subset=value)
@@ -543,10 +565,10 @@ def get_lut(src_dir: str, # Directory containing lookup tables
 
 # %% ../nbs/api/configs.ipynb 45
 class Enums():
-    "Return dictionaries of MARIS NetCDF's enumeration types"
+    "Return dictionaries of MARIS NetCDF's enumeration types."
     def __init__(self, 
-               lut_src_dir:str,
-               cdl_enums:dict
+               lut_src_dir:str, # Directory containing lookup tables
+               cdl_enums:dict # CDL configuration enumeration types
                ):
         fc.store_attr()
         self.types = self.lookup()
@@ -564,11 +586,11 @@ class Enums():
 
 # %% ../nbs/api/configs.ipynb 49
 def get_enum_dicts(
-    lut_src_dir:str,
-    cdl_enums:dict,
-    **kwargs
+    lut_src_dir:str, # Directory containing lookup tables
+    cdl_enums:dict, # CDL configuration enumeration types
+    **kwargs # Additional arguments
     ):
-    "Return a dict of NetCDF enumeration types"
+    "Return a dict of NetCDF enumeration types."
     enum_types = {}
     for enum in cdl_enums:
         name, fname, key, value = enum.values()

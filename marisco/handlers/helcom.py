@@ -159,17 +159,17 @@ class ParseTimeCB(Callback):
             self._process_dates(df)
             self._define_beg_period(df)
 
-    def _process_dates(self, df: pd.DataFrame):
+    def _process_dates(self, df: pd.DataFrame) -> None:
         "Process and correct date and time information in the DataFrame."
         df['time'] = self._parse_date(df)
         self._handle_missing_dates(df)
         self._fill_missing_time(df)
 
-    def _parse_date(self, df: pd.DataFrame):
+    def _parse_date(self, df: pd.DataFrame) -> pd.Series:
         "Parse the DATE column if present."
         return pd.to_datetime(df['DATE'], format='%m/%d/%y %H:%M:%S', errors='coerce')
 
-    def _handle_missing_dates(self, df):
+    def _handle_missing_dates(self, df: pd.DataFrame):
         "Handle cases where DAY or MONTH is 0 or missing."
         df.loc[df["DAY"] == 0, "DAY"] = 1
         df.loc[df["MONTH"] == 0, "MONTH"] = 1
@@ -177,7 +177,7 @@ class ParseTimeCB(Callback):
         missing_day_month = (df["DAY"].isna()) & (df["MONTH"].isna()) & (df["YEAR"].notna())
         df.loc[missing_day_month, ["DAY", "MONTH"]] = 1
 
-    def _fill_missing_time(self, df: pd.DataFrame):
+    def _fill_missing_time(self, df: pd.DataFrame) -> None:
         "Fill missing time values using YEAR, MONTH, and DAY columns."
         missing_time = df['time'].isna()
         df.loc[missing_time, 'time'] = pd.to_datetime(
@@ -186,7 +186,7 @@ class ParseTimeCB(Callback):
             errors='coerce'
         )
 
-    def _define_beg_period(self, df: pd.DataFrame):
+    def _define_beg_period(self, df: pd.DataFrame) -> None:
         "Create a standardized date representation for Open Refine."
         df['begperiod'] = df['time']
 
@@ -199,7 +199,7 @@ coi_val = {'seawater' : {'val': 'VALUE_Bq/m³'},
 class SanitizeValue(Callback):
     "Sanitize value/measurement by removing blank entries and populating `value` column."
     def __init__(self, 
-                 coi:dict # Dictionary containing column names for values based on group
+                 coi: Dict[str, Dict[str, str]] # Columns of interest. Format: {group_name: {'val': 'column_name'}}
                  ): 
         fc.store_attr()
 
@@ -211,9 +211,9 @@ class SanitizeValue(Callback):
 
 # %% ../../nbs/handlers/helcom.ipynb 64
 def unc_rel2stan(
-    df:pd.DataFrame, # DataFrame containing measurement and uncertainty columns
-    meas_col:str, # Name of the column with measurement values
-    unc_col:str # Name of the column with relative uncertainty values (percentages)
+    df: pd.DataFrame, # DataFrame containing measurement and uncertainty columns
+    meas_col: str, # Name of the column with measurement values
+    unc_col: str # Name of the column with relative uncertainty values (percentages)
 ) -> pd.Series: # Series with calculated absolute uncertainties
     "Convert relative uncertainty to absolute uncertainty."
     return df.apply(lambda row: row[unc_col] * row[meas_col] / 100, axis=1)
@@ -229,7 +229,7 @@ class NormalizeUncCB(Callback):
     "Convert from relative error % to uncertainty of activity unit."
     def __init__(self, 
                  fn_convert_unc: Callable=unc_rel2stan, # Function converting relative uncertainty to absolute uncertainty
-                 coi: List=coi_units_unc # List of columns of interest
+                 coi: List[Tuple[str, str, str]]=coi_units_unc # List of columns of interest
                 ):
         fc.store_attr()
     
@@ -320,7 +320,7 @@ class RemapSedimentCB(Callback):
                 ):
         fc.store_attr()
 
-    def _fix_inconsistent_sedi(self, df:pd.DataFrame):
+    def _fix_inconsistent_sedi(self, df:pd.DataFrame) -> pd.DataFrame:
         "Temporary fix for inconsistent SEDI values. Data provider to confirm and clarify."
         df['SEDI'] = df['SEDI'].replace({56: -99, 73: -99, np.nan: -99})
         return df
@@ -338,7 +338,7 @@ class RemapSedimentCB(Callback):
     def _get_sediment_type(self, 
                            sedi_value: int, # The `SEDI` value from the DataFrame
                            lut: dict # The lookup table dictionary
-                          ): 
+                          ) -> Match: # The Match object
         "Get the matched_id from the lookup table and print SEDI if the matched_id is -1."
         match = lut.get(sedi_value, Match(-1, None, None, None))
         
@@ -348,7 +348,7 @@ class RemapSedimentCB(Callback):
 
     def _print_unmatched_sedi(self, 
                               sedi_value: int # The `SEDI` value from the DataFram
-                             ):
+                             ) -> None:
         "Print the SEDI value if the matched_id is -1."
         print(f"Unmatched SEDI: {sedi_value}")
 
@@ -409,7 +409,7 @@ class RemapDetectionLimitCB(Callback):
     "Remap value type to MARIS format."
     def __init__(self, 
                  coi: dict, # Configuration options for column names
-                 fn_lut: callable # Function that returns a lookup table
+                 fn_lut: Callable # Function that returns a lookup table
                 ):
         fc.store_attr()
 
@@ -425,7 +425,7 @@ class RemapDetectionLimitCB(Callback):
                                 df: pd.DataFrame, # The DataFrame to modify
                                 grp: str, # The group name to get the column configuration
                                 lut: dict # The lookup table dictionary
-                               ):
+                               ) -> None:
         "Update detection limit column in the DataFrame based on lookup table and rules."
         detection_col = self.coi[grp]['dl']
         value_col = self.coi[grp]['val']
@@ -454,7 +454,7 @@ lut_filtered = {
 class RemapFiltCB(Callback):
     "Lookup FILT value in dataframe using the lookup table."
     def __init__(self,
-                 lut_filtered:dict=lut_filtered, # Dictionary mapping FILT codes to their corresponding names
+                 lut_filtered: dict=lut_filtered, # Dictionary mapping FILT codes to their corresponding names
                 ):
         fc.store_attr()
 
@@ -480,7 +480,7 @@ lut_method = lambda: pd.read_csv(Path(fname_in) / 'ANALYSIS_METHOD.csv').set_ind
 class AddMeasurementNoteCB(Callback):
     "Record measurement notes by adding a 'measurenote' column to DataFrames."
     def __init__(self, 
-                 fn_lut: callable # Function that returns the lookup dictionary with `METHOD` as key and `DESCRIPTION` as value
+                 fn_lut: Callable # Function that returns the lookup dictionary with `METHOD` as key and `DESCRIPTION` as value
                 ):
         fc.store_attr()
         
@@ -518,7 +518,7 @@ class LookupDryWetRatio(Callback):
             if 'DW%' in tfm.dfs[grp].columns:
                 self._apply_dry_wet_ratio(tfm.dfs[grp])
 
-    def _apply_dry_wet_ratio(self, df: pd.DataFrame):
+    def _apply_dry_wet_ratio(self, df: pd.DataFrame) -> None:
         "Apply dry-wet ratio conversion and formatting to the given DataFrame."
         df['dry_wet_ratio'] = df['DW%']
         # Convert 'DW%' = 0% to NaN.
@@ -531,14 +531,16 @@ class ParseCoordinates(Callback):
     Get geographical coordinates from columns expressed in degrees decimal format 
     or from columns in degrees/minutes decimal format where degrees decimal format is missing.
     """
-    def __init__(self, fn_convert_cor:Callable):
+    def __init__(self, 
+                 fn_convert_cor: Callable # Function that converts coordinates from degree-minute to decimal degree format
+                 ):
         self.fn_convert_cor = fn_convert_cor
 
     def __call__(self, tfm:Transformer):
         for df in tfm.dfs.values():
             self._format_coordinates(df)
 
-    def _format_coordinates(self, df:pd.DataFrame):
+    def _format_coordinates(self, df:pd.DataFrame) -> None:
         coord_cols = self._get_coord_columns(df.columns)
         
         for coord in ['lat', 'lon']:
@@ -551,7 +553,7 @@ class ParseCoordinates(Callback):
         
         df.dropna(subset=['lat', 'lon'], inplace=True)
 
-    def _get_coord_columns(self, columns):
+    def _get_coord_columns(self, columns) -> dict:
         return {
             'lon_d': self._find_coord_column(columns, 'LON', 'dddddd'),
             'lat_d': self._find_coord_column(columns, 'LAT', 'dddddd'),
@@ -559,12 +561,12 @@ class ParseCoordinates(Callback):
             'lat_m': self._find_coord_column(columns, 'LAT', 'ddmmmm')
         }
 
-    def _find_coord_column(self, columns, coord_type, coord_format):
+    def _find_coord_column(self, columns, coord_type, coord_format) -> str:
         pattern = re.compile(f'{coord_type}.*{coord_format}', re.IGNORECASE)
         matching_columns = [col for col in columns if pattern.search(col)]
         return matching_columns[0] if matching_columns else None
 
-    def _safe_convert(self, value):
+    def _safe_convert(self, value) -> str:
         if pd.isna(value):
             return value
         try:
@@ -574,7 +576,10 @@ class ParseCoordinates(Callback):
             return value
 
 # %% ../../nbs/handlers/helcom.ipynb 183
-def get_common_rules(vars, encoding_type):
+def get_common_rules(
+    vars: dict, # Configuration dictionary
+    encoding_type: str # Encoding type (`netcdf` or `openrefine`)
+    ) -> dict: # Common renaming rules for NetCDF and OpenRefine.
     "Get common renaming rules for NetCDF and OpenRefine."
     common = {
         'lat': 'latitude' if encoding_type == 'openrefine' else vars['defaults']['lat']['name'],
@@ -611,7 +616,10 @@ def get_common_rules(vars, encoding_type):
     return common
 
 # %% ../../nbs/handlers/helcom.ipynb 184
-def get_specific_rules(vars: dict, encoding_type: str) -> dict:
+def get_specific_rules(
+    vars: dict, # Configuration dictionary
+    encoding_type: str # Encoding type (`netcdf` or `openrefine`)
+    ) -> dict: # Specific renaming rules for NetCDF and OpenRefine.
     "Get specific renaming rules for NetCDF and OpenRefine."
     if encoding_type == 'netcdf':
         return {
@@ -647,7 +655,9 @@ def get_specific_rules(vars: dict, encoding_type: str) -> dict:
         }
 
 # %% ../../nbs/handlers/helcom.ipynb 185
-def get_renaming_rules(encoding_type: str = 'netcdf') -> dict:
+def get_renaming_rules(
+    encoding_type: str = 'netcdf' # Encoding type (`netcdf` or `openrefine`)
+    ) -> dict: # Renaming rules for NetCDF and OpenRefine.
     "Get renaming rules for NetCDF and OpenRefine."
     vars = cdl_cfg()['vars']
     
@@ -748,7 +758,11 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 # %% ../../nbs/handlers/helcom.ipynb 196
-def get_attrs(tfm: Transformer, zotero_key: str, kw: list = kw) -> dict:
+def get_attrs(
+    tfm: Transformer, # Transformer object
+    zotero_key: str, # Zotero dataset record key
+    kw: list = kw # List of keywords
+    ) -> dict: # Global attributes
     "Retrieve all global attributes."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -760,7 +774,10 @@ def get_attrs(tfm: Transformer, zotero_key: str, kw: list = kw) -> dict:
         ])()
 
 # %% ../../nbs/handlers/helcom.ipynb 198
-def enums_xtra(tfm, vars):
+def enums_xtra(
+    tfm: Transformer, # Transformer object
+    vars: list # List of variables to extract from the transformer
+    ):
     "Retrieve a subset of the lengthy enum as `species_t` for instance."
     enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
     xtras = {}
@@ -771,7 +788,13 @@ def enums_xtra(tfm, vars):
     return xtras
 
 # %% ../../nbs/handlers/helcom.ipynb 200
-def encode(fname_in: str, fname_out_nc: str, nc_tpl_path: str, **kwargs) -> None:
+def encode(
+    fname_in: str, # Input file name
+    fname_out_nc: str, # Output file name
+    nc_tpl_path: str, # NetCDF template file name
+    **kwargs # Additional arguments
+    ) -> None:
+    "Encode data to NetCDF."
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[AddSampleTypeIdColumnCB(),
                             LowerStripNameCB(col_src='NUCLIDE'),

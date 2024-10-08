@@ -20,7 +20,7 @@ from pathlib import Path
 
 from .configs import get_lut, nuc_lut_path
 from .utils import Match
-from typing import Any
+from typing import Any, Union
 
 # %% ../nbs/api/callbacks.ipynb 6
 class Callback(): 
@@ -39,28 +39,38 @@ def run_cbs(
 
 # %% ../nbs/api/callbacks.ipynb 8
 class Transformer():
+    "Transform the dataframe(s) according to the specified callbacks."
     def __init__(self, 
-                 dfs: Dict[str, pd.DataFrame], # Dictionary of DataFrames to transform
+                 data: Union[Dict[str, pd.DataFrame], pd.DataFrame], # Data to be transformed
                  cbs: Optional[List[Callback]]=None, # List of callbacks to run
-                 inplace: bool=False # Whether to modify the dataframes in place
+                 inplace: bool=False # Whether to modify the dataframe(s) in place
                  ): 
-        "Transform the dataframes according to the specified callbacks."
         fc.store_attr()
-        self.dfs = dfs if inplace else {k: v.copy() for k, v in dfs.items()}
+        self.is_single_df = isinstance(data, pd.DataFrame)
+        self.df, self.dfs = self._prepare_data(data, inplace)
         self.logs = []
             
+    def _prepare_data(self, data, inplace):
+        if self.is_single_df:
+            return (data if inplace else data.copy()), None
+        else:
+            return None, (data if inplace else {k: v.copy() for k, v in data.items()})
+    
     def unique(self, col_name: str) -> np.ndarray:
         "Distinct values of a specific column present in all groups."
-        columns = [df.get(col_name) for df in self.dfs.values() if df.get(col_name) is not None]
-        values = np.concatenate(columns) if columns else []
+        if self.is_single_df:
+            values = self.df.get(col_name, pd.Series()).dropna().values
+        else:
+            columns = [df.get(col_name) for df in self.dfs.values() if df.get(col_name) is not None]
+            values = np.concatenate([col.dropna().values for col in columns]) if columns else []
         return np.unique(values)
         
     def __call__(self):
-        "Transform the dataframes according to the specified callbacks."
+        "Transform the dataframe(s) according to the specified callbacks."
         if self.cbs: run_cbs(self.cbs, self)
-        return self.dfs
+        return self.df if self.is_single_df else self.dfs
 
-# %% ../nbs/api/callbacks.ipynb 15
+# %% ../nbs/api/callbacks.ipynb 17
 class SanitizeLonLatCB(Callback):
     "Drop rows with invalid longitude & latitude values. Convert `,` separator to `.` separator."
     def __init__(self, 
@@ -90,7 +100,7 @@ class SanitizeLonLatCB(Callback):
                 
             tfm.dfs[grp] = df.loc[~(mask_zeroes | mask_goob)]
 
-# %% ../nbs/api/callbacks.ipynb 20
+# %% ../nbs/api/callbacks.ipynb 22
 class AddSampleTypeIdColumnCB(Callback):
     def __init__(self, 
                  cdl_cfg: Callable=cdl_cfg, # Callable to get the CDL config dictionary
@@ -103,7 +113,7 @@ class AddSampleTypeIdColumnCB(Callback):
     def __call__(self, tfm):
         for grp, df in tfm.dfs.items(): df[self.col_name] = self.lut[grp]
 
-# %% ../nbs/api/callbacks.ipynb 23
+# %% ../nbs/api/callbacks.ipynb 25
 class AddNuclideIdColumnCB(Callback):
     def __init__(self, 
                  col_value: str, # Column name containing the nuclide name
@@ -119,7 +129,7 @@ class AddNuclideIdColumnCB(Callback):
         for grp, df in tfm.dfs.items(): 
             df[self.col_name] = df[self.col_value].map(self.lut)
 
-# %% ../nbs/api/callbacks.ipynb 26
+# %% ../nbs/api/callbacks.ipynb 28
 class RemapCB(Callback):
     "Generic MARIS remapping callback."
     def __init__(self, 
@@ -153,7 +163,7 @@ class RemapCB(Callback):
         else:
             return match
 
-# %% ../nbs/api/callbacks.ipynb 27
+# %% ../nbs/api/callbacks.ipynb 29
 class LowerStripNameCB(Callback):
     "Convert values to lowercase and strip any trailing spaces."
     def __init__(self, 
@@ -173,7 +183,7 @@ class LowerStripNameCB(Callback):
         for key in tfm.dfs.keys():
             tfm.dfs[key][self.col_dst] = tfm.dfs[key][self.col_src].apply(self._safe_transform)
 
-# %% ../nbs/api/callbacks.ipynb 32
+# %% ../nbs/api/callbacks.ipynb 34
 class RemoveAllNAValuesCB(Callback):
     "Remove rows with all NA values."
     def __init__(self, 
@@ -187,7 +197,7 @@ class RemoveAllNAValuesCB(Callback):
             mask = tfm.dfs[k][col_to_check].isnull().all(axis=1)
             tfm.dfs[k] = tfm.dfs[k][~mask]
 
-# %% ../nbs/api/callbacks.ipynb 34
+# %% ../nbs/api/callbacks.ipynb 36
 class ReshapeLongToWide(Callback):
     "Convert data from long to wide with renamed columns."
     def __init__(self, 
@@ -245,7 +255,7 @@ class ReshapeLongToWide(Callback):
             tfm.dfs[grp] = self.pivot(tfm.dfs[grp])
             tfm.dfs[grp].columns = self.renamed_cols(tfm.dfs[grp].columns)
 
-# %% ../nbs/api/callbacks.ipynb 36
+# %% ../nbs/api/callbacks.ipynb 38
 class CompareDfsAndTfmCB(Callback):
     "Create a dataframe of dropped data. Data included in the `dfs` not in the `tfm`."
     def __init__(self, 
@@ -284,7 +294,7 @@ class CompareDfsAndTfmCB(Callback):
             'Number of rows in tfm.dfs + Number of dropped rows': len(tfm.dfs[grp].index) + len(tfm.dfs_dropped[grp].index)
         }
 
-# %% ../nbs/api/callbacks.ipynb 41
+# %% ../nbs/api/callbacks.ipynb 43
 class EncodeTimeCB(Callback):
     "Encode time as `int` representing seconds since xxx."    
     def __init__(self, 

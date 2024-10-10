@@ -68,7 +68,7 @@ class Transformer():
     def __call__(self):
         "Transform the dataframe(s) according to the specified callbacks."
         if self.cbs: run_cbs(self.cbs, self)
-        return self.df if self.is_single_df else self.dfs
+        return self.df if self.dfs is None else self.dfs
 
 # %% ../nbs/api/callbacks.ipynb 17
 class SanitizeLonLatCB(Callback):
@@ -235,8 +235,11 @@ class ReshapeLongToWide(Callback):
 
     def pivot(self, df):
         derived_coi = [col for col in self.derived_cols if col in df.columns]
-        df.index.name = 'org_index'
-        df = df.reset_index()
+        # In past implementation we added an index column before pivoting 
+        # TO BE REMOVED
+        # making all rows (compound_idx) unique.
+        # df.index.name = 'org_index'
+        # df = df.reset_index()
         idx = list(set(df.columns) - set(self.columns + derived_coi + self.values))
         
         df, num_fill_value = self._fill_nan_values(df, idx)
@@ -248,14 +251,22 @@ class ReshapeLongToWide(Callback):
                                   aggfunc=lambda x: x).reset_index()
 
         pivot_df[idx] = pivot_df[idx].replace({self.str_fill_value: np.nan, num_fill_value: np.nan})
-        return pivot_df.set_index('org_index')
+        pivot_df = self.set_index(pivot_df)
+        return pivot_df
 
+    def set_index(self, df):
+        "Set the index of the dataframe."
+        # TODO: Consider implementing a universal unique index
+        # by hashing the compound index columns (lat, lon, time, depth, etc.)
+        df.index.name = 'org_index'
+        return df
+    
     def __call__(self, tfm):
         for grp in tfm.dfs.keys():
             tfm.dfs[grp] = self.pivot(tfm.dfs[grp])
             tfm.dfs[grp].columns = self.renamed_cols(tfm.dfs[grp].columns)
 
-# %% ../nbs/api/callbacks.ipynb 38
+# %% ../nbs/api/callbacks.ipynb 43
 class CompareDfsAndTfmCB(Callback):
     "Create a dataframe of dropped data. Data included in the `dfs` not in the `tfm`."
     def __init__(self, 
@@ -294,7 +305,7 @@ class CompareDfsAndTfmCB(Callback):
             'Number of rows in tfm.dfs + Number of dropped rows': len(tfm.dfs[grp].index) + len(tfm.dfs_dropped[grp].index)
         }
 
-# %% ../nbs/api/callbacks.ipynb 43
+# %% ../nbs/api/callbacks.ipynb 48
 class EncodeTimeCB(Callback):
     "Encode time as `int` representing seconds since xxx."    
     def __init__(self, 

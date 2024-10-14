@@ -525,7 +525,7 @@ class LookupDryWetRatio(Callback):
         df.loc[df['dry_wet_ratio'] == 0, 'dry_wet_ratio'] = np.NaN
 
 
-# %% ../../nbs/handlers/helcom.ipynb 172
+# %% ../../nbs/handlers/helcom.ipynb 173
 class ParseCoordinates(Callback):
     """
     Get geographical coordinates from columns expressed in degrees decimal format 
@@ -575,13 +575,14 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 183
+# %% ../../nbs/handlers/helcom.ipynb 184
 def get_common_rules(
     vars: dict, # Configuration dictionary
     encoding_type: str # Encoding type (`netcdf` or `openrefine`)
     ) -> dict: # Common renaming rules for NetCDF and OpenRefine.
     "Get common renaming rules for NetCDF and OpenRefine."
     common = {
+        'KEY': 'key',
         'lat': 'latitude' if encoding_type == 'openrefine' else vars['defaults']['lat']['name'],
         'lon': 'longitude' if encoding_type == 'openrefine' else vars['defaults']['lon']['name'],
         'time': 'begperiod' if encoding_type == 'openrefine' else vars['defaults']['time']['name'],
@@ -615,7 +616,7 @@ def get_common_rules(
     
     return common
 
-# %% ../../nbs/handlers/helcom.ipynb 184
+# %% ../../nbs/handlers/helcom.ipynb 185
 def get_specific_rules(
     vars: dict, # Configuration dictionary
     encoding_type: str # Encoding type (`netcdf` or `openrefine`)
@@ -630,6 +631,8 @@ def get_specific_rules(
             },
             'sediment': {
                 'sed_type': vars['sed']['sed_type']['name'],
+                'top': vars['sed']['top']['name'],
+                'bottom': vars['sed']['bottom']['name'],
             }
         }
     elif encoding_type == 'openrefine':
@@ -654,7 +657,7 @@ def get_specific_rules(
             }
         }
 
-# %% ../../nbs/handlers/helcom.ipynb 185
+# %% ../../nbs/handlers/helcom.ipynb 186
 def get_renaming_rules(
     encoding_type: str = 'netcdf' # Encoding type (`netcdf` or `openrefine`)
     ) -> dict: # Renaming rules for NetCDF and OpenRefine.
@@ -674,7 +677,7 @@ def get_renaming_rules(
     
     return dict(rules)
 
-# %% ../../nbs/handlers/helcom.ipynb 186
+# %% ../../nbs/handlers/helcom.ipynb 187
 class SelectAndRenameColumnCB(Callback):
     "Select and rename columns in a DataFrame based on renaming rules for a specified encoding type."
     def __init__(self, 
@@ -745,7 +748,7 @@ class SelectAndRenameColumnCB(Callback):
         return df, not_found_keys
 
 
-# %% ../../nbs/handlers/helcom.ipynb 195
+# %% ../../nbs/handlers/helcom.ipynb 197
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -757,7 +760,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 196
+# %% ../../nbs/handlers/helcom.ipynb 198
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -773,7 +776,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 198
+# %% ../../nbs/handlers/helcom.ipynb 200
 def enums_xtra(
     tfm: Transformer, # Transformer object
     vars: list # List of variables to extract from the transformer
@@ -787,7 +790,7 @@ def enums_xtra(
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/helcom.ipynb 200
+# %% ../../nbs/handlers/helcom.ipynb 202
 def encode(
     fname_in: str, # Input file name
     fname_out_nc: str, # Output file name

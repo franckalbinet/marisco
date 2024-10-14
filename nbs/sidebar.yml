@@ -14,4 +14,7 @@ website:
           - api/nc_template.ipynb
           - api/serializers.ipynb
           - api/utils.ipynb
-          
+      - section: Metadata
+        contents:
+          - metadata/field-definition.ipynb
+          - metadata/sample-uniqueness.ipynb

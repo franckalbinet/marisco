@@ -106,7 +106,6 @@ class Remapper():
         df_lut.index.name = 'source_key'
         return df_lut.sort_values(by='match_score', ascending=False)
 
-
 # %% ../nbs/api/utils.ipynb 16
 def has_valid_varname(
     var_names:list, # variable names

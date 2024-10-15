@@ -137,7 +137,8 @@ class RemapCB(Callback):
                  col_remap: str, # Name of the column to remap
                  col_src: str, # Name of the column with the source values
                  dest_grps: list[str]|str=grp_names(), # List of destination groups
-                 default_value: Any = -1 # Default value for unmatched entries
+                 default_value: Any = -1, # Default value for unmatched entries
+                 verbose: bool = False, # Whether to print unmatched values
                 ):
         fc.store_attr()
         self.lut = None
@@ -157,7 +158,7 @@ class RemapCB(Callback):
         value = value.strip() if isinstance(value, str) else value
         match = self.lut.get(value, Match(self.default_value, None, None, None))
         if isinstance(match, Match):
-            if match.matched_id == self.default_value:
+            if match.matched_id == self.default_value and self.verbose:
                 print(f"Unmatched value: {value}")
             return match.matched_id 
         else:

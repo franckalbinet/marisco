@@ -1,0 +1,3843 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>NetCDF to Open Refine CSV (WIP) – marisco</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="NetCDF to Open Refine CSV (WIP) – marisco">
+<meta property="og:description" content="MARIS companion package and tutorials">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="NetCDF to Open Refine CSV (WIP) – marisco">
+<meta name="twitter:description" content="MARIS companion package and tutorials">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/franckalbinet/marisco"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">NetCDF to Open Refine CSV (WIP)</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARISCO</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/maris_legacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Legacy</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc_template.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NetCDF Template</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/serializers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Serializers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Utilities</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Metadata</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../metadata/field-definition.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Field definitions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../metadata/sample-uniqueness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sample uniqueness</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#packages-import" id="toc-packages-import" class="nav-link active" data-scroll-target="#packages-import">Packages import</a></li>
+  <li><a href="#load-netcdf" id="toc-load-netcdf" class="nav-link" data-scroll-target="#load-netcdf">Load NetCDF</a>
+  <ul>
+  <li><a href="#netcdf4_to_df" id="toc-netcdf4_to_df" class="nav-link" data-scroll-target="#netcdf4_to_df">netcdf4_to_df</a></li>
+  </ul></li>
+  <li><a href="#transform-data" id="toc-transform-data" class="nav-link" data-scroll-target="#transform-data">Transform data</a>
+  <ul>
+  <li><a href="#reshape-wide-to-long" id="toc-reshape-wide-to-long" class="nav-link" data-scroll-target="#reshape-wide-to-long">Reshape: wide to long</a></li>
+  <li><a href="#reshapewidetolong" id="toc-reshapewidetolong" class="nav-link" data-scroll-target="#reshapewidetolong">ReshapeWideToLong</a></li>
+  <li><a href="#format-time" id="toc-format-time" class="nav-link" data-scroll-target="#format-time">Format: Time</a></li>
+  <li><a href="#lookuptimefromencodedtime" id="toc-lookuptimefromencodedtime" class="nav-link" data-scroll-target="#lookuptimefromencodedtime">LookupTimeFromEncodedTime</a></li>
+  <li><a href="#lookup-sample-type" id="toc-lookup-sample-type" class="nav-link" data-scroll-target="#lookup-sample-type">Lookup: Sample Type</a></li>
+  <li><a href="#getsampletypecb" id="toc-getsampletypecb" class="nav-link" data-scroll-target="#getsampletypecb">GetSampleTypeCB</a></li>
+  <li><a href="#lookup-nuclide" id="toc-lookup-nuclide" class="nav-link" data-scroll-target="#lookup-nuclide">Lookup : Nuclide</a></li>
+  <li><a href="#get_nucnames_lut" id="toc-get_nucnames_lut" class="nav-link" data-scroll-target="#get_nucnames_lut">get_nucnames_lut</a></li>
+  <li><a href="#lookupnuclidebyidcb" id="toc-lookupnuclidebyidcb" class="nav-link" data-scroll-target="#lookupnuclidebyidcb">LookupNuclideByIdCB</a></li>
+  <li><a href="#format-longitude-and-latitude" id="toc-format-longitude-and-latitude" class="nav-link" data-scroll-target="#format-longitude-and-latitude">Format : Longitude and Latitude</a></li>
+  <li><a href="#deg_to_dms" id="toc-deg_to_dms" class="nav-link" data-scroll-target="#deg_to_dms">deg_to_dms</a></li>
+  <li><a href="#convertlonlatcb" id="toc-convertlonlatcb" class="nav-link" data-scroll-target="#convertlonlatcb">ConvertLonLatCB</a></li>
+  <li><a href="#lookup-units" id="toc-lookup-units" class="nav-link" data-scroll-target="#lookup-units">Lookup : Units</a></li>
+  <li><a href="#get_unitnames_lut" id="toc-get_unitnames_lut" class="nav-link" data-scroll-target="#get_unitnames_lut">get_unitnames_lut</a></li>
+  <li><a href="#lookupunitbyidcb" id="toc-lookupunitbyidcb" class="nav-link" data-scroll-target="#lookupunitbyidcb">LookupUnitByIdCB</a></li>
+  <li><a href="#lookup-value-type-_dl" id="toc-lookup-value-type-_dl" class="nav-link" data-scroll-target="#lookup-value-type-_dl">Lookup : Value type (_dl)</a></li>
+  <li><a href="#get_detectionlimitnames_lut" id="toc-get_detectionlimitnames_lut" class="nav-link" data-scroll-target="#get_detectionlimitnames_lut">get_detectionlimitnames_lut</a></li>
+  <li><a href="#lookupvaluetypebyidcb" id="toc-lookupvaluetypebyidcb" class="nav-link" data-scroll-target="#lookupvaluetypebyidcb">LookupValueTypeByIdCB</a></li>
+  <li><a href="#lookup-biogroup" id="toc-lookup-biogroup" class="nav-link" data-scroll-target="#lookup-biogroup">Lookup : Biogroup</a></li>
+  <li><a href="#lookup-species" id="toc-lookup-species" class="nav-link" data-scroll-target="#lookup-species">Lookup : Species</a></li>
+  <li><a href="#get_species_lut" id="toc-get_species_lut" class="nav-link" data-scroll-target="#get_species_lut">get_species_lut</a></li>
+  <li><a href="#lookupspeciesbyidcb" id="toc-lookupspeciesbyidcb" class="nav-link" data-scroll-target="#lookupspeciesbyidcb">LookupSpeciesByIdCB</a></li>
+  <li><a href="#lookup-body-part" id="toc-lookup-body-part" class="nav-link" data-scroll-target="#lookup-body-part">Lookup : Body part</a></li>
+  <li><a href="#get_bodypart_lut" id="toc-get_bodypart_lut" class="nav-link" data-scroll-target="#get_bodypart_lut">get_bodypart_lut</a></li>
+  <li><a href="#lookupbodypartbyidcb" id="toc-lookupbodypartbyidcb" class="nav-link" data-scroll-target="#lookupbodypartbyidcb">LookupBodypartByIdCB</a></li>
+  <li><a href="#lookup-sediment-type" id="toc-lookup-sediment-type" class="nav-link" data-scroll-target="#lookup-sediment-type">Lookup : Sediment type</a></li>
+  <li><a href="#get_sediments_lut" id="toc-get_sediments_lut" class="nav-link" data-scroll-target="#get_sediments_lut">get_sediments_lut</a></li>
+  <li><a href="#lookupsedimenttypebyidcb" id="toc-lookupsedimenttypebyidcb" class="nav-link" data-scroll-target="#lookupsedimenttypebyidcb">LookupSedimentTypeByIdCB</a></li>
+  <li><a href="#rename-columns" id="toc-rename-columns" class="nav-link" data-scroll-target="#rename-columns">Rename columns</a></li>
+  <li><a href="#get_renaming_rules_netcdf2openrefine" id="toc-get_renaming_rules_netcdf2openrefine" class="nav-link" data-scroll-target="#get_renaming_rules_netcdf2openrefine">get_renaming_rules_netcdf2OpenRefine</a></li>
+  <li><a href="#encoding" id="toc-encoding" class="nav-link" data-scroll-target="#encoding">Encoding</a></li>
+  <li><a href="#encode" id="toc-encode" class="nav-link" data-scroll-target="#encode">encode</a></li>
+  </ul></li>
+  <li><a href="#todo" id="toc-todo" class="nav-link" data-scroll-target="#todo">TODO</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">NetCDF to Open Refine CSV (WIP)</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<hr>
+<section id="packages-import" class="level2">
+<h2 class="anchored" data-anchor-id="packages-import">Packages import</h2>
+<p>Get the current working directory (cwd). .</p>
+<div id="cell-5" class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Path.cwd()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Path('/Users/franckalbinet/pro/IAEA/MARIS/marisco/nbs/handlers')</code></pre>
+</div>
+</div>
+</section>
+<section id="load-netcdf" class="level2">
+<h2 class="anchored" data-anchor-id="load-netcdf">Load NetCDF</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L31" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="netcdf4_to_df" class="level3">
+<h3 class="anchored" data-anchor-id="netcdf4_to_df">netcdf4_to_df</h3>
+<blockquote class="blockquote">
+<pre><code> netcdf4_to_df (fname_in)</code></pre>
+</blockquote>
+<div id="cell-8" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>dfs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-9" class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dfs[<span class="st">'seawater'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">lon</th>
+<th data-quarto-table-cell-role="th">lat</th>
+<th data-quarto-table-cell-role="th">smp_depth</th>
+<th data-quarto-table-cell-role="th">tot_depth</th>
+<th data-quarto-table-cell-role="th">time</th>
+<th data-quarto-table-cell-role="th">h3</th>
+<th data-quarto-table-cell-role="th">h3_unc</th>
+<th data-quarto-table-cell-role="th">h3_dl</th>
+<th data-quarto-table-cell-role="th">h3_sal</th>
+<th data-quarto-table-cell-role="th">h3_temp</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">pu239_240_tot_dl</th>
+<th data-quarto-table-cell-role="th">pu239_240_tot_sal</th>
+<th data-quarto-table-cell-role="th">pu239_240_tot_temp</th>
+<th data-quarto-table-cell-role="th">pu239_240_tot_unit</th>
+<th data-quarto-table-cell-role="th">cm243_244_tot</th>
+<th data-quarto-table-cell-role="th">cm243_244_tot_unc</th>
+<th data-quarto-table-cell-role="th">cm243_244_tot_dl</th>
+<th data-quarto-table-cell-role="th">cm243_244_tot_sal</th>
+<th data-quarto-table-cell-role="th">cm243_244_tot_temp</th>
+<th data-quarto-table-cell-role="th">cm243_244_tot_unit</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sample</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>14.257800</td>
+<td>53.942200</td>
+<td>0.0</td>
+<td>10.0</td>
+<td>1339545600</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>14.257800</td>
+<td>53.942200</td>
+<td>8.0</td>
+<td>10.0</td>
+<td>1339545600</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>14.257800</td>
+<td>53.942200</td>
+<td>0.0</td>
+<td>10.0</td>
+<td>1339545600</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>14.257800</td>
+<td>53.942200</td>
+<td>8.0</td>
+<td>10.0</td>
+<td>1339545600</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>14.257800</td>
+<td>53.942200</td>
+<td>0.0</td>
+<td>9.0</td>
+<td>1370390400</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20237</td>
+<td>24.334999</td>
+<td>65.634697</td>
+<td>0.0</td>
+<td>17.0</td>
+<td>773971200</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">20238</td>
+<td>24.334999</td>
+<td>65.634697</td>
+<td>0.0</td>
+<td>17.0</td>
+<td>773971200</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20239</td>
+<td>24.334999</td>
+<td>65.634697</td>
+<td>0.0</td>
+<td>17.0</td>
+<td>773971200</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">20240</td>
+<td>24.334999</td>
+<td>65.634697</td>
+<td>0.0</td>
+<td>17.0</td>
+<td>841190400</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20241</td>
+<td>24.334999</td>
+<td>65.634697</td>
+<td>0.0</td>
+<td>17.0</td>
+<td>841190400</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>...</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+</tr>
+</tbody>
+</table>
+
+<p>20242 rows × 175 columns</p>
+</div>
+</div>
+</div>
+<div id="cell-10" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dfs[<span class="st">'biota'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">lon</th>
+<th data-quarto-table-cell-role="th">lat</th>
+<th data-quarto-table-cell-role="th">smp_depth</th>
+<th data-quarto-table-cell-role="th">time</th>
+<th data-quarto-table-cell-role="th">bio_group</th>
+<th data-quarto-table-cell-role="th">species</th>
+<th data-quarto-table-cell-role="th">body_part</th>
+<th data-quarto-table-cell-role="th">be7</th>
+<th data-quarto-table-cell-role="th">be7_unc</th>
+<th data-quarto-table-cell-role="th">be7_dl</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">sn113_dl</th>
+<th data-quarto-table-cell-role="th">sn113_unit</th>
+<th data-quarto-table-cell-role="th">sn117m</th>
+<th data-quarto-table-cell-role="th">sn117m_unc</th>
+<th data-quarto-table-cell-role="th">sn117m_dl</th>
+<th data-quarto-table-cell-role="th">sn117m_unit</th>
+<th data-quarto-table-cell-role="th">tl208</th>
+<th data-quarto-table-cell-role="th">tl208_unc</th>
+<th data-quarto-table-cell-role="th">tl208_dl</th>
+<th data-quarto-table-cell-role="th">tl208_unit</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sample</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>14.300000</td>
+<td>53.500000</td>
+<td>NaN</td>
+<td>1443052800</td>
+<td>4</td>
+<td>247</td>
+<td>52</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>...</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>14.300000</td>
+<td>53.500000</td>
+<td>NaN</td>
+<td>1443052800</td>
+<td>4</td>
+<td>247</td>
+<td>52</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>...</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>14.300000</td>
+<td>53.500000</td>
+<td>NaN</td>
+<td>1443052800</td>
+<td>4</td>
+<td>247</td>
+<td>52</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>...</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>14.300000</td>
+<td>53.500000</td>
+<td>NaN</td>
+<td>1443052800</td>
+<td>4</td>
+<td>247</td>
+<td>52</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>...</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>14.300000</td>
+<td>53.500000</td>
+<td>NaN</td>
+<td>1443052800</td>
+<td>4</td>
+<td>247</td>
+<td>52</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>...</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14868</td>
+<td>23.000000</td>
+<td>65.716698</td>
+<td>0.0</td>
+<td>1127606400</td>
+<td>4</td>
+<td>50</td>
+<td>52</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>...</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">14869</td>
+<td>23.049999</td>
+<td>65.716698</td>
+<td>0.0</td>
+<td>1064016000</td>
+<td>4</td>
+<td>50</td>
+<td>52</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>...</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14870</td>
+<td>23.049999</td>
+<td>65.716698</td>
+<td>0.0</td>
+<td>1064016000</td>
+<td>4</td>
+<td>50</td>
+<td>52</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>...</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">14871</td>
+<td>23.000000</td>
+<td>65.750000</td>
+<td>0.0</td>
+<td>1284940800</td>
+<td>4</td>
+<td>50</td>
+<td>52</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>...</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14872</td>
+<td>23.000000</td>
+<td>65.750000</td>
+<td>0.0</td>
+<td>1284940800</td>
+<td>4</td>
+<td>50</td>
+<td>52</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>...</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>-1</td>
+<td>-1</td>
+</tr>
+</tbody>
+</table>
+
+<p>14873 rows × 211 columns</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="transform-data" class="level2">
+<h2 class="anchored" data-anchor-id="transform-data">Transform data</h2>
+<section id="reshape-wide-to-long" class="level3">
+<h3 class="anchored" data-anchor-id="reshape-wide-to-long">Reshape: wide to long</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L56" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="reshapewidetolong" class="level3">
+<h3 class="anchored" data-anchor-id="reshapewidetolong">ReshapeWideToLong</h3>
+<blockquote class="blockquote">
+<pre><code> ReshapeWideToLong (columns='nuclide', values=['value'])</code></pre>
+</blockquote>
+<p><em>Convert data from wide to long with renamed columns.</em></p>
+<div id="cell-14" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[ReshapeWideToLong()])</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seawater':              lon        lat  smp_depth  tot_depth        time  sample  \
+ 0      14.199800  54.006001        0.0       11.0  1497744000      78   
+ 1      14.202300  54.006199        0.0       12.0  1339632000      83   
+ 2      14.199500  54.006302        0.0       12.0  1402876800      86   
+ 3      14.201000  54.006500        0.0       12.0  1278460800      91   
+ 4      14.200500  54.006668        0.0       12.0  1309910400     101   
+ ...          ...        ...        ...        ...         ...     ...   
+ 20237  20.030001  57.343300        0.0      236.0   524620800   14175   
+ 20238  21.500000  59.433300        0.0      156.0   555033600   15712   
+ 20239  21.525801  59.439800        0.0      160.0   585446400   15840   
+ 20240  21.525801  59.439800      150.0      160.0   585446400   15847   
+ 20241  23.555000  65.239998        0.0       73.0   587001600   20130   
+ 
+              nuclide      value       _unc  _dl  _sal  _temp  _unit  
+ 0                 h3   850.0000  59.669998    1  7.50    NaN      1  
+ 1                 h3   970.0000  29.100000    1  6.77    NaN      1  
+ 2                 h3   910.0000  24.570000    1  6.80    NaN      1  
+ 3                 h3  1070.0000  21.400000    1  5.82    NaN      1  
+ 4                 h3  1020.0000  20.400000    1  5.40    NaN      1  
+ ...              ...        ...        ...  ...   ...    ...    ...  
+ 20237  cm243_244_tot     0.0064   0.001280    1  6.90    NaN      1  
+ 20238  cm243_244_tot     0.0045   0.000900    1  6.75    NaN      1  
+ 20239  cm243_244_tot     0.0022   0.000660    1  5.83   20.4      1  
+ 20240  cm243_244_tot     0.0064   0.001920    1  9.77    3.9      1  
+ 20241  cm243_244_tot     0.0039   0.001170    1  3.10   15.6      1  
+ 
+ [20242 rows x 13 columns],
+ 'sediment':              lon        lat  tot_depth        time  sed_type  sample nuclide  \
+ 0      10.850000  54.049999       22.0   866592000        58     842     be7   
+ 1      10.203300  54.415001       13.0   811641600        58    4064     be7   
+ 2      10.203300  54.415001       13.0   811641600        58    4069     be7   
+ 3      10.203300  54.415001       13.0   811641600        58    4074     be7   
+ 4      11.750000  54.416698       24.0   838512000        58    4535     be7   
+ ...          ...        ...        ...         ...       ...     ...     ...   
+ 37084  23.391199  65.277496       90.0  1283299200         2   37039   bi212   
+ 37085  23.391199  65.277496       90.0  1283299200         2   37048   bi212   
+ 37086  23.391199  65.277496       90.0  1283299200         2   37065   bi212   
+ 37087  23.391199  65.277496       90.0  1283299200         2   37074   bi212   
+ 37088  23.391199  65.277496       90.0  1283299200         2   37083   bi212   
+ 
+            value    _unc  _dl  _unit  
+ 0      24.299999  7.7760    1      4  
+ 1      45.500000  4.5500    1      4  
+ 2       7.000000     NaN    2      4  
+ 3       4.800000     NaN    2      4  
+ 4       6.900000  1.9320    1      4  
+ ...          ...     ...  ...    ...  
+ 37084  42.900002  6.1347    1      4  
+ 37085  58.400002  6.1904    1      4  
+ 37086  51.400002  5.9624    1      4  
+ 37087  41.799999  5.4758    1      4  
+ 37088  43.700001  3.4523    1      4  
+ 
+ [37089 rows x 11 columns],
+ 'biota':            lon        lat  smp_depth        time  bio_group  species  \
+ 0      11.5000  54.080002        0.0   908755200         11       96   
+ 1      11.5000  54.080002        0.0   900547200         11       96   
+ 2      11.5000  54.080002        0.0   874540800         14      129   
+ 3      11.5000  54.080002        0.0   865900800         14      129   
+ 4      11.5000  54.080002        0.0   874886400         11       96   
+ ...        ...        ...        ...         ...        ...      ...   
+ 14868  12.0742  57.335201        0.0  1253145600         11       96   
+ 14869  12.0742  57.335201        0.0  1225670400         11       96   
+ 14870  12.0742  57.335201        0.0  1160352000         11       96   
+ 14871  12.0742  57.335201        0.0  1380240000         11       96   
+ 14872  12.0742  57.335201        0.0  1409788800         11       96   
+ 
+        body_part  sample nuclide   value      _unc  _dl  _unit  
+ 0             54     150     be7  46.500  1.813500    1      4  
+ 1             54     159     be7  66.500  6.317500    1      4  
+ 2              1     168     be7   5.430  1.574700    1      4  
+ 3              1     177     be7  13.700  4.384000    1      4  
+ 4             54     183     be7  11.300  0.000000    2      4  
+ ...          ...     ...     ...     ...       ...  ...    ...  
+ 14868         54   11586   tl208   0.880  0.079200    1      4  
+ 14869         54   11598   tl208   0.770  0.069300    1      4  
+ 14870         54   11620   tl208   1.310  0.142790    1      4  
+ 14871         54   11766   tl208   0.668  0.057448    1      4  
+ 14872         54   11775   tl208   0.684  0.072504    1      4  
+ 
+ [14873 rows x 13 columns]}</code></pre>
+</div>
+</div>
+<div id="cell-15" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>tfm.dfs[<span class="st">'sediment'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">lon</th>
+<th data-quarto-table-cell-role="th">lat</th>
+<th data-quarto-table-cell-role="th">tot_depth</th>
+<th data-quarto-table-cell-role="th">time</th>
+<th data-quarto-table-cell-role="th">sed_type</th>
+<th data-quarto-table-cell-role="th">sample</th>
+<th data-quarto-table-cell-role="th">nuclide</th>
+<th data-quarto-table-cell-role="th">value</th>
+<th data-quarto-table-cell-role="th">_unc</th>
+<th data-quarto-table-cell-role="th">_dl</th>
+<th data-quarto-table-cell-role="th">_unit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>10.850000</td>
+<td>54.049999</td>
+<td>22.0</td>
+<td>866592000</td>
+<td>58</td>
+<td>842</td>
+<td>be7</td>
+<td>24.299999</td>
+<td>7.7760</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>10.203300</td>
+<td>54.415001</td>
+<td>13.0</td>
+<td>811641600</td>
+<td>58</td>
+<td>4064</td>
+<td>be7</td>
+<td>45.500000</td>
+<td>4.5500</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>10.203300</td>
+<td>54.415001</td>
+<td>13.0</td>
+<td>811641600</td>
+<td>58</td>
+<td>4069</td>
+<td>be7</td>
+<td>7.000000</td>
+<td>NaN</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>10.203300</td>
+<td>54.415001</td>
+<td>13.0</td>
+<td>811641600</td>
+<td>58</td>
+<td>4074</td>
+<td>be7</td>
+<td>4.800000</td>
+<td>NaN</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>11.750000</td>
+<td>54.416698</td>
+<td>24.0</td>
+<td>838512000</td>
+<td>58</td>
+<td>4535</td>
+<td>be7</td>
+<td>6.900000</td>
+<td>1.9320</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">37084</td>
+<td>23.391199</td>
+<td>65.277496</td>
+<td>90.0</td>
+<td>1283299200</td>
+<td>2</td>
+<td>37039</td>
+<td>bi212</td>
+<td>42.900002</td>
+<td>6.1347</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">37085</td>
+<td>23.391199</td>
+<td>65.277496</td>
+<td>90.0</td>
+<td>1283299200</td>
+<td>2</td>
+<td>37048</td>
+<td>bi212</td>
+<td>58.400002</td>
+<td>6.1904</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">37086</td>
+<td>23.391199</td>
+<td>65.277496</td>
+<td>90.0</td>
+<td>1283299200</td>
+<td>2</td>
+<td>37065</td>
+<td>bi212</td>
+<td>51.400002</td>
+<td>5.9624</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">37087</td>
+<td>23.391199</td>
+<td>65.277496</td>
+<td>90.0</td>
+<td>1283299200</td>
+<td>2</td>
+<td>37074</td>
+<td>bi212</td>
+<td>41.799999</td>
+<td>5.4758</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">37088</td>
+<td>23.391199</td>
+<td>65.277496</td>
+<td>90.0</td>
+<td>1283299200</td>
+<td>2</td>
+<td>37083</td>
+<td>bi212</td>
+<td>43.700001</td>
+<td>3.4523</td>
+<td>1</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+
+<p>37089 rows × 11 columns</p>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="format-time" class="level3">
+<h3 class="anchored" data-anchor-id="format-time">Format: Time</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L113" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lookuptimefromencodedtime" class="level3">
+<h3 class="anchored" data-anchor-id="lookuptimefromencodedtime">LookupTimeFromEncodedTime</h3>
+<blockquote class="blockquote">
+<pre><code> LookupTimeFromEncodedTime (cfg)</code></pre>
+</blockquote>
+<p><em>Base class for callbacks.</em></p>
+<div id="cell-19" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[ReshapeWideToLong(),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                            LookupTimeFromEncodedTime(cfg())])</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seawater':              lon        lat  smp_depth  tot_depth        time  sample  \
+ 0      14.199800  54.006001        0.0       11.0  1497744000      78   
+ 1      14.202300  54.006199        0.0       12.0  1339632000      83   
+ 2      14.199500  54.006302        0.0       12.0  1402876800      86   
+ 3      14.201000  54.006500        0.0       12.0  1278460800      91   
+ 4      14.200500  54.006668        0.0       12.0  1309910400     101   
+ ...          ...        ...        ...        ...         ...     ...   
+ 20237  20.030001  57.343300        0.0      236.0   524620800   14175   
+ 20238  21.500000  59.433300        0.0      156.0   555033600   15712   
+ 20239  21.525801  59.439800        0.0      160.0   585446400   15840   
+ 20240  21.525801  59.439800      150.0      160.0   585446400   15847   
+ 20241  23.555000  65.239998        0.0       73.0   587001600   20130   
+ 
+              nuclide      value       _unc  _dl  _sal  _temp  _unit  \
+ 0                 h3   850.0000  59.669998    1  7.50    NaN      1   
+ 1                 h3   970.0000  29.100000    1  6.77    NaN      1   
+ 2                 h3   910.0000  24.570000    1  6.80    NaN      1   
+ 3                 h3  1070.0000  21.400000    1  5.82    NaN      1   
+ 4                 h3  1020.0000  20.400000    1  5.40    NaN      1   
+ ...              ...        ...        ...  ...   ...    ...    ...   
+ 20237  cm243_244_tot     0.0064   0.001280    1  6.90    NaN      1   
+ 20238  cm243_244_tot     0.0045   0.000900    1  6.75    NaN      1   
+ 20239  cm243_244_tot     0.0022   0.000660    1  5.83   20.4      1   
+ 20240  cm243_244_tot     0.0064   0.001920    1  9.77    3.9      1   
+ 20241  cm243_244_tot     0.0039   0.001170    1  3.10   15.6      1   
+ 
+       Sampling start date Sampling start time  
+ 0             18-Jun-2017            00:00:00  
+ 1             14-Jun-2012            00:00:00  
+ 2             16-Jun-2014            00:00:00  
+ 3             07-Jul-2010            00:00:00  
+ 4             06-Jul-2011            00:00:00  
+ ...                   ...                 ...  
+ 20237         17-Aug-1986            00:00:00  
+ 20238         04-Aug-1987            00:00:00  
+ 20239         21-Jul-1988            00:00:00  
+ 20240         21-Jul-1988            00:00:00  
+ 20241         08-Aug-1988            00:00:00  
+ 
+ [20242 rows x 15 columns],
+ 'sediment':              lon        lat  tot_depth        time  sed_type  sample nuclide  \
+ 0      10.850000  54.049999       22.0   866592000        58     842     be7   
+ 1      10.203300  54.415001       13.0   811641600        58    4064     be7   
+ 2      10.203300  54.415001       13.0   811641600        58    4069     be7   
+ 3      10.203300  54.415001       13.0   811641600        58    4074     be7   
+ 4      11.750000  54.416698       24.0   838512000        58    4535     be7   
+ ...          ...        ...        ...         ...       ...     ...     ...   
+ 37084  23.391199  65.277496       90.0  1283299200         2   37039   bi212   
+ 37085  23.391199  65.277496       90.0  1283299200         2   37048   bi212   
+ 37086  23.391199  65.277496       90.0  1283299200         2   37065   bi212   
+ 37087  23.391199  65.277496       90.0  1283299200         2   37074   bi212   
+ 37088  23.391199  65.277496       90.0  1283299200         2   37083   bi212   
+ 
+            value    _unc  _dl  _unit Sampling start date Sampling start time  
+ 0      24.299999  7.7760    1      4         18-Jun-1997            00:00:00  
+ 1      45.500000  4.5500    1      4         21-Sep-1995            00:00:00  
+ 2       7.000000     NaN    2      4         21-Sep-1995            00:00:00  
+ 3       4.800000     NaN    2      4         21-Sep-1995            00:00:00  
+ 4       6.900000  1.9320    1      4         28-Jul-1996            00:00:00  
+ ...          ...     ...  ...    ...                 ...                 ...  
+ 37084  42.900002  6.1347    1      4         01-Sep-2010            00:00:00  
+ 37085  58.400002  6.1904    1      4         01-Sep-2010            00:00:00  
+ 37086  51.400002  5.9624    1      4         01-Sep-2010            00:00:00  
+ 37087  41.799999  5.4758    1      4         01-Sep-2010            00:00:00  
+ 37088  43.700001  3.4523    1      4         01-Sep-2010            00:00:00  
+ 
+ [37089 rows x 13 columns],
+ 'biota':            lon        lat  smp_depth        time  bio_group  species  \
+ 0      11.5000  54.080002        0.0   908755200         11       96   
+ 1      11.5000  54.080002        0.0   900547200         11       96   
+ 2      11.5000  54.080002        0.0   874540800         14      129   
+ 3      11.5000  54.080002        0.0   865900800         14      129   
+ 4      11.5000  54.080002        0.0   874886400         11       96   
+ ...        ...        ...        ...         ...        ...      ...   
+ 14868  12.0742  57.335201        0.0  1253145600         11       96   
+ 14869  12.0742  57.335201        0.0  1225670400         11       96   
+ 14870  12.0742  57.335201        0.0  1160352000         11       96   
+ 14871  12.0742  57.335201        0.0  1380240000         11       96   
+ 14872  12.0742  57.335201        0.0  1409788800         11       96   
+ 
+        body_part  sample nuclide   value      _unc  _dl  _unit  \
+ 0             54     150     be7  46.500  1.813500    1      4   
+ 1             54     159     be7  66.500  6.317500    1      4   
+ 2              1     168     be7   5.430  1.574700    1      4   
+ 3              1     177     be7  13.700  4.384000    1      4   
+ 4             54     183     be7  11.300  0.000000    2      4   
+ ...          ...     ...     ...     ...       ...  ...    ...   
+ 14868         54   11586   tl208   0.880  0.079200    1      4   
+ 14869         54   11598   tl208   0.770  0.069300    1      4   
+ 14870         54   11620   tl208   1.310  0.142790    1      4   
+ 14871         54   11766   tl208   0.668  0.057448    1      4   
+ 14872         54   11775   tl208   0.684  0.072504    1      4   
+ 
+       Sampling start date Sampling start time  
+ 0             19-Oct-1998            00:00:00  
+ 1             16-Jul-1998            00:00:00  
+ 2             18-Sep-1997            00:00:00  
+ 3             10-Jun-1997            00:00:00  
+ 4             22-Sep-1997            00:00:00  
+ ...                   ...                 ...  
+ 14868         17-Sep-2009            00:00:00  
+ 14869         03-Nov-2008            00:00:00  
+ 14870         09-Oct-2006            00:00:00  
+ 14871         27-Sep-2013            00:00:00  
+ 14872         04-Sep-2014            00:00:00  
+ 
+ [14873 rows x 15 columns]}</code></pre>
+</div>
+</div>
+<div id="cell-20" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>tfm.dfs[<span class="st">'seawater'</span>][<span class="st">'Sampling start date'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0        18-Jun-2017
+1        14-Jun-2012
+2        16-Jun-2014
+3        07-Jul-2010
+4        06-Jul-2011
+            ...     
+20237    17-Aug-1986
+20238    04-Aug-1987
+20239    21-Jul-1988
+20240    21-Jul-1988
+20241    08-Aug-1988
+Name: Sampling start date, Length: 20242, dtype: object</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="lookup-sample-type" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-sample-type">Lookup: Sample Type</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L131" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="getsampletypecb" class="level3">
+<h3 class="anchored" data-anchor-id="getsampletypecb">GetSampleTypeCB</h3>
+<blockquote class="blockquote">
+<pre><code> GetSampleTypeCB ()</code></pre>
+</blockquote>
+<p><em>Base class for callbacks.</em></p>
+<div id="cell-24" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[ReshapeWideToLong(),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                            LookupTimeFromEncodedTime(cfg()),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                            GetSampleTypeCB()])</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>tfm()[<span class="st">'biota'</span>][<span class="st">'Sample type'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0        BIOTA
+1        BIOTA
+2        BIOTA
+3        BIOTA
+4        BIOTA
+         ...  
+14868    BIOTA
+14869    BIOTA
+14870    BIOTA
+14871    BIOTA
+14872    BIOTA
+Name: Sample type, Length: 14873, dtype: object</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="lookup-nuclide" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-nuclide">Lookup : Nuclide</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L139" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_nucnames_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_nucnames_lut">get_nucnames_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_nucnames_lut ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L144" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lookupnuclidebyidcb" class="level3">
+<h3 class="anchored" data-anchor-id="lookupnuclidebyidcb">LookupNuclideByIdCB</h3>
+<blockquote class="blockquote">
+<pre><code> LookupNuclideByIdCB (fn_lut=&lt;function get_nucnames_lut&gt;)</code></pre>
+</blockquote>
+<p><em>Lookup MARIS nuclide_id.</em></p>
+<div id="cell-29" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[ReshapeWideToLong(),</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                            LookupTimeFromEncodedTime(cfg()),</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                            GetSampleTypeCB(),</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                            LookupNuclideByIdCB(),</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seawater':              lon        lat  smp_depth  tot_depth        time  sample  \
+ 0      14.199800  54.006001        0.0       11.0  1497744000      78   
+ 1      14.202300  54.006199        0.0       12.0  1339632000      83   
+ 2      14.199500  54.006302        0.0       12.0  1402876800      86   
+ 3      14.201000  54.006500        0.0       12.0  1278460800      91   
+ 4      14.200500  54.006668        0.0       12.0  1309910400     101   
+ ...          ...        ...        ...        ...         ...     ...   
+ 20237  20.030001  57.343300        0.0      236.0   524620800   14175   
+ 20238  21.500000  59.433300        0.0      156.0   555033600   15712   
+ 20239  21.525801  59.439800        0.0      160.0   585446400   15840   
+ 20240  21.525801  59.439800      150.0      160.0   585446400   15847   
+ 20241  23.555000  65.239998        0.0       73.0   587001600   20130   
+ 
+              nuclide      value       _unc  _dl  _sal  _temp  _unit  \
+ 0                 h3   850.0000  59.669998    1  7.50    NaN      1   
+ 1                 h3   970.0000  29.100000    1  6.77    NaN      1   
+ 2                 h3   910.0000  24.570000    1  6.80    NaN      1   
+ 3                 h3  1070.0000  21.400000    1  5.82    NaN      1   
+ 4                 h3  1020.0000  20.400000    1  5.40    NaN      1   
+ ...              ...        ...        ...  ...   ...    ...    ...   
+ 20237  cm243_244_tot     0.0064   0.001280    1  6.90    NaN      1   
+ 20238  cm243_244_tot     0.0045   0.000900    1  6.75    NaN      1   
+ 20239  cm243_244_tot     0.0022   0.000660    1  5.83   20.4      1   
+ 20240  cm243_244_tot     0.0064   0.001920    1  9.77    3.9      1   
+ 20241  cm243_244_tot     0.0039   0.001170    1  3.10   15.6      1   
+ 
+       Sampling start date Sampling start time Sample type    Nuclide  
+ 0             18-Jun-2017            00:00:00    SEAWATER         3H  
+ 1             14-Jun-2012            00:00:00    SEAWATER         3H  
+ 2             16-Jun-2014            00:00:00    SEAWATER         3H  
+ 3             07-Jul-2010            00:00:00    SEAWATER         3H  
+ 4             06-Jul-2011            00:00:00    SEAWATER         3H  
+ ...                   ...                 ...         ...        ...  
+ 20237         17-Aug-1986            00:00:00    SEAWATER  243_244Cm  
+ 20238         04-Aug-1987            00:00:00    SEAWATER  243_244Cm  
+ 20239         21-Jul-1988            00:00:00    SEAWATER  243_244Cm  
+ 20240         21-Jul-1988            00:00:00    SEAWATER  243_244Cm  
+ 20241         08-Aug-1988            00:00:00    SEAWATER  243_244Cm  
+ 
+ [20242 rows x 17 columns],
+ 'sediment':              lon        lat  tot_depth        time  sed_type  sample nuclide  \
+ 0      10.850000  54.049999       22.0   866592000        58     842     be7   
+ 1      10.203300  54.415001       13.0   811641600        58    4064     be7   
+ 2      10.203300  54.415001       13.0   811641600        58    4069     be7   
+ 3      10.203300  54.415001       13.0   811641600        58    4074     be7   
+ 4      11.750000  54.416698       24.0   838512000        58    4535     be7   
+ ...          ...        ...        ...         ...       ...     ...     ...   
+ 37084  23.391199  65.277496       90.0  1283299200         2   37039   bi212   
+ 37085  23.391199  65.277496       90.0  1283299200         2   37048   bi212   
+ 37086  23.391199  65.277496       90.0  1283299200         2   37065   bi212   
+ 37087  23.391199  65.277496       90.0  1283299200         2   37074   bi212   
+ 37088  23.391199  65.277496       90.0  1283299200         2   37083   bi212   
+ 
+            value    _unc  _dl  _unit Sampling start date Sampling start time  \
+ 0      24.299999  7.7760    1      4         18-Jun-1997            00:00:00   
+ 1      45.500000  4.5500    1      4         21-Sep-1995            00:00:00   
+ 2       7.000000     NaN    2      4         21-Sep-1995            00:00:00   
+ 3       4.800000     NaN    2      4         21-Sep-1995            00:00:00   
+ 4       6.900000  1.9320    1      4         28-Jul-1996            00:00:00   
+ ...          ...     ...  ...    ...                 ...                 ...   
+ 37084  42.900002  6.1347    1      4         01-Sep-2010            00:00:00   
+ 37085  58.400002  6.1904    1      4         01-Sep-2010            00:00:00   
+ 37086  51.400002  5.9624    1      4         01-Sep-2010            00:00:00   
+ 37087  41.799999  5.4758    1      4         01-Sep-2010            00:00:00   
+ 37088  43.700001  3.4523    1      4         01-Sep-2010            00:00:00   
+ 
+       Sample type Nuclide  
+ 0        SEDIMENT     7Be  
+ 1        SEDIMENT     7Be  
+ 2        SEDIMENT     7Be  
+ 3        SEDIMENT     7Be  
+ 4        SEDIMENT     7Be  
+ ...           ...     ...  
+ 37084    SEDIMENT   212Bi  
+ 37085    SEDIMENT   212Bi  
+ 37086    SEDIMENT   212Bi  
+ 37087    SEDIMENT   212Bi  
+ 37088    SEDIMENT   212Bi  
+ 
+ [37089 rows x 15 columns],
+ 'biota':            lon        lat  smp_depth        time  bio_group  species  \
+ 0      11.5000  54.080002        0.0   908755200         11       96   
+ 1      11.5000  54.080002        0.0   900547200         11       96   
+ 2      11.5000  54.080002        0.0   874540800         14      129   
+ 3      11.5000  54.080002        0.0   865900800         14      129   
+ 4      11.5000  54.080002        0.0   874886400         11       96   
+ ...        ...        ...        ...         ...        ...      ...   
+ 14868  12.0742  57.335201        0.0  1253145600         11       96   
+ 14869  12.0742  57.335201        0.0  1225670400         11       96   
+ 14870  12.0742  57.335201        0.0  1160352000         11       96   
+ 14871  12.0742  57.335201        0.0  1380240000         11       96   
+ 14872  12.0742  57.335201        0.0  1409788800         11       96   
+ 
+        body_part  sample nuclide   value      _unc  _dl  _unit  \
+ 0             54     150     be7  46.500  1.813500    1      4   
+ 1             54     159     be7  66.500  6.317500    1      4   
+ 2              1     168     be7   5.430  1.574700    1      4   
+ 3              1     177     be7  13.700  4.384000    1      4   
+ 4             54     183     be7  11.300  0.000000    2      4   
+ ...          ...     ...     ...     ...       ...  ...    ...   
+ 14868         54   11586   tl208   0.880  0.079200    1      4   
+ 14869         54   11598   tl208   0.770  0.069300    1      4   
+ 14870         54   11620   tl208   1.310  0.142790    1      4   
+ 14871         54   11766   tl208   0.668  0.057448    1      4   
+ 14872         54   11775   tl208   0.684  0.072504    1      4   
+ 
+       Sampling start date Sampling start time Sample type Nuclide  
+ 0             19-Oct-1998            00:00:00       BIOTA     7Be  
+ 1             16-Jul-1998            00:00:00       BIOTA     7Be  
+ 2             18-Sep-1997            00:00:00       BIOTA     7Be  
+ 3             10-Jun-1997            00:00:00       BIOTA     7Be  
+ 4             22-Sep-1997            00:00:00       BIOTA     7Be  
+ ...                   ...                 ...         ...     ...  
+ 14868         17-Sep-2009            00:00:00       BIOTA   208Tl  
+ 14869         03-Nov-2008            00:00:00       BIOTA   208Tl  
+ 14870         09-Oct-2006            00:00:00       BIOTA   208Tl  
+ 14871         27-Sep-2013            00:00:00       BIOTA   208Tl  
+ 14872         04-Sep-2014            00:00:00       BIOTA   208Tl  
+ 
+ [14873 rows x 17 columns]}</code></pre>
+</div>
+</div>
+<div id="cell-30" class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>tfm.dfs[<span class="st">'biota'</span>][<span class="st">'Nuclide'</span>].unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array(['7Be', '40K', '54Mn', '57Co', '58Co', '60Co', '65Zn', '89Sr',
+       '90Sr', '95Zr', '95Nb', '99Tc', '103Ru', '106Ru', '108mAg',
+       '110mAg', '124Sb', '125Sb', '129mTe', '131I', '134Cs', '137Cs',
+       '140Ba', '140La', '141Ce', '144Ce', '155Eu', '210Pb', '212Pb',
+       '214Pb', '214Bi', '210Po', '223Ra', '224Ra', '226Ra', '228Ra',
+       '228Ac', '228Th', '232Th', '235U', '238Pu', '241Am', '134_137Cs',
+       '239_240Pu', '152Eu', '59Fe', '153Gd', '86Rb', '46Sc', '113Sn',
+       '117mSn', '208Tl'], dtype=object)</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="format-longitude-and-latitude" class="level3">
+<h3 class="anchored" data-anchor-id="format-longitude-and-latitude">Format : Longitude and Latitude</h3>
+<p>Convert from Longitude and Latitude DDD.DDDDD° to degrees, minutes, seconds and direction.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L160" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="deg_to_dms" class="level3">
+<h3 class="anchored" data-anchor-id="deg_to_dms">deg_to_dms</h3>
+<blockquote class="blockquote">
+<pre><code> deg_to_dms (deg, coordinate='lat')</code></pre>
+</blockquote>
+<p><em>Convert from decimal degrees to degrees, minutes, seconds.</em></p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L181" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="convertlonlatcb" class="level3">
+<h3 class="anchored" data-anchor-id="convertlonlatcb">ConvertLonLatCB</h3>
+<blockquote class="blockquote">
+<pre><code> ConvertLonLatCB (fn_convert=&lt;function deg_to_dms&gt;)</code></pre>
+</blockquote>
+<p><em>Convert from Longitude and Latitude DDD.DDDDD° to degrees, minutes, seconds and direction.</em></p>
+<div id="cell-36" class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[ReshapeWideToLong(),</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                            LookupTimeFromEncodedTime(cfg()),</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                            GetSampleTypeCB(),</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                            LookupNuclideByIdCB(),</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                            ConvertLonLatCB()</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seawater':              lon        lat  smp_depth  tot_depth        time  sample  \
+ 0      14.199800  54.006001        0.0       11.0  1497744000      78   
+ 1      14.202300  54.006199        0.0       12.0  1339632000      83   
+ 2      14.199500  54.006302        0.0       12.0  1402876800      86   
+ 3      14.201000  54.006500        0.0       12.0  1278460800      91   
+ 4      14.200500  54.006668        0.0       12.0  1309910400     101   
+ ...          ...        ...        ...        ...         ...     ...   
+ 20237  20.030001  57.343300        0.0      236.0   524620800   14175   
+ 20238  21.500000  59.433300        0.0      156.0   555033600   15712   
+ 20239  21.525801  59.439800        0.0      160.0   585446400   15840   
+ 20240  21.525801  59.439800      150.0      160.0   585446400   15847   
+ 20241  23.555000  65.239998        0.0       73.0   587001600   20130   
+ 
+              nuclide      value       _unc  _dl  ...  Sample type    Nuclide  \
+ 0                 h3   850.0000  59.669998    1  ...     SEAWATER         3H   
+ 1                 h3   970.0000  29.100000    1  ...     SEAWATER         3H   
+ 2                 h3   910.0000  24.570000    1  ...     SEAWATER         3H   
+ 3                 h3  1070.0000  21.400000    1  ...     SEAWATER         3H   
+ 4                 h3  1020.0000  20.400000    1  ...     SEAWATER         3H   
+ ...              ...        ...        ...  ...  ...          ...        ...   
+ 20237  cm243_244_tot     0.0064   0.001280    1  ...     SEAWATER  243_244Cm   
+ 20238  cm243_244_tot     0.0045   0.000900    1  ...     SEAWATER  243_244Cm   
+ 20239  cm243_244_tot     0.0022   0.000660    1  ...     SEAWATER  243_244Cm   
+ 20240  cm243_244_tot     0.0064   0.001920    1  ...     SEAWATER  243_244Cm   
+ 20241  cm243_244_tot     0.0039   0.001170    1  ...     SEAWATER  243_244Cm   
+ 
+        Latitude degrees Latitude minutes Latitude seconds Latitude direction  \
+ 0                    54                0        21.601868                  N   
+ 1                    54                0        22.315979                  N   
+ 2                    54                0        22.686768                  N   
+ 3                    54                0        23.400879                  N   
+ 4                    54                0        24.005127                  N   
+ ...                 ...              ...              ...                ...   
+ 20237                57               20        35.879517                  N   
+ 20238                59               25        59.880066                  N   
+ 20239                59               26        23.280945                  N   
+ 20240                59               26        23.280945                  N   
+ 20241                65               14        23.992310                  N   
+ 
+       Longitude degrees  Longitude minutes  Longitude seconds  \
+ 0                    14                 11          59.278336   
+ 1                    14                 12           8.280258   
+ 2                    14                 11          58.200302   
+ 3                    14                 12           3.600769   
+ 4                    14                 12           1.798325   
+ ...                 ...                ...                ...   
+ 20237                20                  1          48.002472   
+ 20238                21                 30           0.000000   
+ 20239                21                 31          32.882538   
+ 20240                21                 31          32.882538   
+ 20241                23                 33          18.001099   
+ 
+        Longitude direction  
+ 0                        E  
+ 1                        E  
+ 2                        E  
+ 3                        E  
+ 4                        E  
+ ...                    ...  
+ 20237                    E  
+ 20238                    E  
+ 20239                    E  
+ 20240                    E  
+ 20241                    E  
+ 
+ [20242 rows x 25 columns],
+ 'sediment':              lon        lat  tot_depth        time  sed_type  sample nuclide  \
+ 0      10.850000  54.049999       22.0   866592000        58     842     be7   
+ 1      10.203300  54.415001       13.0   811641600        58    4064     be7   
+ 2      10.203300  54.415001       13.0   811641600        58    4069     be7   
+ 3      10.203300  54.415001       13.0   811641600        58    4074     be7   
+ 4      11.750000  54.416698       24.0   838512000        58    4535     be7   
+ ...          ...        ...        ...         ...       ...     ...     ...   
+ 37084  23.391199  65.277496       90.0  1283299200         2   37039   bi212   
+ 37085  23.391199  65.277496       90.0  1283299200         2   37048   bi212   
+ 37086  23.391199  65.277496       90.0  1283299200         2   37065   bi212   
+ 37087  23.391199  65.277496       90.0  1283299200         2   37074   bi212   
+ 37088  23.391199  65.277496       90.0  1283299200         2   37083   bi212   
+ 
+            value    _unc  _dl  ...  Sample type Nuclide Latitude degrees  \
+ 0      24.299999  7.7760    1  ...     SEDIMENT     7Be               54   
+ 1      45.500000  4.5500    1  ...     SEDIMENT     7Be               54   
+ 2       7.000000     NaN    2  ...     SEDIMENT     7Be               54   
+ 3       4.800000     NaN    2  ...     SEDIMENT     7Be               54   
+ 4       6.900000  1.9320    1  ...     SEDIMENT     7Be               54   
+ ...          ...     ...  ...  ...          ...     ...              ...   
+ 37084  42.900002  6.1347    1  ...     SEDIMENT   212Bi               65   
+ 37085  58.400002  6.1904    1  ...     SEDIMENT   212Bi               65   
+ 37086  51.400002  5.9624    1  ...     SEDIMENT   212Bi               65   
+ 37087  41.799999  5.4758    1  ...     SEDIMENT   212Bi               65   
+ 37088  43.700001  3.4523    1  ...     SEDIMENT   212Bi               65   
+ 
+       Latitude minutes Latitude seconds  Latitude direction  \
+ 0                    2        59.997253                   N   
+ 1                   24        54.003296                   N   
+ 2                   24        54.003296                   N   
+ 3                   24        54.003296                   N   
+ 4                   25         0.114441                   N   
+ ...                ...              ...                 ...   
+ 37084               16        38.986816                   N   
+ 37085               16        38.986816                   N   
+ 37086               16        38.986816                   N   
+ 37087               16        38.986816                   N   
+ 37088               16        38.986816                   N   
+ 
+        Longitude degrees  Longitude minutes Longitude seconds  \
+ 0                     10                 51          0.001373   
+ 1                     10                 12         11.881714   
+ 2                     10                 12         11.881714   
+ 3                     10                 12         11.881714   
+ 4                     11                 45          0.000000   
+ ...                  ...                ...               ...   
+ 37084                 23                 23         28.316803   
+ 37085                 23                 23         28.316803   
+ 37086                 23                 23         28.316803   
+ 37087                 23                 23         28.316803   
+ 37088                 23                 23         28.316803   
+ 
+        Longitude direction  
+ 0                        E  
+ 1                        E  
+ 2                        E  
+ 3                        E  
+ 4                        E  
+ ...                    ...  
+ 37084                    E  
+ 37085                    E  
+ 37086                    E  
+ 37087                    E  
+ 37088                    E  
+ 
+ [37089 rows x 23 columns],
+ 'biota':            lon        lat  smp_depth        time  bio_group  species  \
+ 0      11.5000  54.080002        0.0   908755200         11       96   
+ 1      11.5000  54.080002        0.0   900547200         11       96   
+ 2      11.5000  54.080002        0.0   874540800         14      129   
+ 3      11.5000  54.080002        0.0   865900800         14      129   
+ 4      11.5000  54.080002        0.0   874886400         11       96   
+ ...        ...        ...        ...         ...        ...      ...   
+ 14868  12.0742  57.335201        0.0  1253145600         11       96   
+ 14869  12.0742  57.335201        0.0  1225670400         11       96   
+ 14870  12.0742  57.335201        0.0  1160352000         11       96   
+ 14871  12.0742  57.335201        0.0  1380240000         11       96   
+ 14872  12.0742  57.335201        0.0  1409788800         11       96   
+ 
+        body_part  sample nuclide   value  ...  Sample type  Nuclide  \
+ 0             54     150     be7  46.500  ...        BIOTA      7Be   
+ 1             54     159     be7  66.500  ...        BIOTA      7Be   
+ 2              1     168     be7   5.430  ...        BIOTA      7Be   
+ 3              1     177     be7  13.700  ...        BIOTA      7Be   
+ 4             54     183     be7  11.300  ...        BIOTA      7Be   
+ ...          ...     ...     ...     ...  ...          ...      ...   
+ 14868         54   11586   tl208   0.880  ...        BIOTA    208Tl   
+ 14869         54   11598   tl208   0.770  ...        BIOTA    208Tl   
+ 14870         54   11620   tl208   1.310  ...        BIOTA    208Tl   
+ 14871         54   11766   tl208   0.668  ...        BIOTA    208Tl   
+ 14872         54   11775   tl208   0.684  ...        BIOTA    208Tl   
+ 
+        Latitude degrees Latitude minutes Latitude seconds Latitude direction  \
+ 0                    54                4        48.006592                  N   
+ 1                    54                4        48.006592                  N   
+ 2                    54                4        48.006592                  N   
+ 3                    54                4        48.006592                  N   
+ 4                    54                4        48.006592                  N   
+ ...                 ...              ...              ...                ...   
+ 14868                57               20         6.724548                  N   
+ 14869                57               20         6.724548                  N   
+ 14870                57               20         6.724548                  N   
+ 14871                57               20         6.724548                  N   
+ 14872                57               20         6.724548                  N   
+ 
+       Longitude degrees  Longitude minutes  Longitude seconds  \
+ 0                    11                 30           0.000000   
+ 1                    11                 30           0.000000   
+ 2                    11                 30           0.000000   
+ 3                    11                 30           0.000000   
+ 4                    11                 30           0.000000   
+ ...                 ...                ...                ...   
+ 14868                12                  4          27.118835   
+ 14869                12                  4          27.118835   
+ 14870                12                  4          27.118835   
+ 14871                12                  4          27.118835   
+ 14872                12                  4          27.118835   
+ 
+        Longitude direction  
+ 0                        E  
+ 1                        E  
+ 2                        E  
+ 3                        E  
+ 4                        E  
+ ...                    ...  
+ 14868                    E  
+ 14869                    E  
+ 14870                    E  
+ 14871                    E  
+ 14872                    E  
+ 
+ [14873 rows x 25 columns]}</code></pre>
+</div>
+</div>
+<div id="cell-37" class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>tfm.dfs[<span class="st">'seawater'</span>].columns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Index(['lon', 'lat', 'smp_depth', 'tot_depth', 'time', 'sample', 'nuclide',
+       'value', '_unc', '_dl', '_sal', '_temp', '_unit', 'Sampling start date',
+       'Sampling start time', 'Sample type', 'Nuclide', 'Latitude degrees',
+       'Latitude minutes', 'Latitude seconds', 'Latitude direction',
+       'Longitude degrees', 'Longitude minutes', 'Longitude seconds',
+       'Longitude direction'],
+      dtype='object')</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="lookup-units" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-units">Lookup : Units</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L193" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_unitnames_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_unitnames_lut">get_unitnames_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_unitnames_lut ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L198" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lookupunitbyidcb" class="level3">
+<h3 class="anchored" data-anchor-id="lookupunitbyidcb">LookupUnitByIdCB</h3>
+<blockquote class="blockquote">
+<pre><code> LookupUnitByIdCB (fn_lut=&lt;function get_unitnames_lut&gt;)</code></pre>
+</blockquote>
+<p><em>Lookup MARIS unit by unit_id.</em></p>
+<div id="cell-42" class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[ReshapeWideToLong(),</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>                            LookupTimeFromEncodedTime(cfg()),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>                            GetSampleTypeCB(),</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>                            LookupNuclideByIdCB(),</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>                            ConvertLonLatCB(), </span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>                            LookupUnitByIdCB()</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seawater':              lon        lat  smp_depth  tot_depth        time  sample  \
+ 0      14.199800  54.006001        0.0       11.0  1497744000      78   
+ 1      14.202300  54.006199        0.0       12.0  1339632000      83   
+ 2      14.199500  54.006302        0.0       12.0  1402876800      86   
+ 3      14.201000  54.006500        0.0       12.0  1278460800      91   
+ 4      14.200500  54.006668        0.0       12.0  1309910400     101   
+ ...          ...        ...        ...        ...         ...     ...   
+ 20237  20.030001  57.343300        0.0      236.0   524620800   14175   
+ 20238  21.500000  59.433300        0.0      156.0   555033600   15712   
+ 20239  21.525801  59.439800        0.0      160.0   585446400   15840   
+ 20240  21.525801  59.439800      150.0      160.0   585446400   15847   
+ 20241  23.555000  65.239998        0.0       73.0   587001600   20130   
+ 
+              nuclide      value       _unc  _dl  ...    Nuclide  \
+ 0                 h3   850.0000  59.669998    1  ...         3H   
+ 1                 h3   970.0000  29.100000    1  ...         3H   
+ 2                 h3   910.0000  24.570000    1  ...         3H   
+ 3                 h3  1070.0000  21.400000    1  ...         3H   
+ 4                 h3  1020.0000  20.400000    1  ...         3H   
+ ...              ...        ...        ...  ...  ...        ...   
+ 20237  cm243_244_tot     0.0064   0.001280    1  ...  243_244Cm   
+ 20238  cm243_244_tot     0.0045   0.000900    1  ...  243_244Cm   
+ 20239  cm243_244_tot     0.0022   0.000660    1  ...  243_244Cm   
+ 20240  cm243_244_tot     0.0064   0.001920    1  ...  243_244Cm   
+ 20241  cm243_244_tot     0.0039   0.001170    1  ...  243_244Cm   
+ 
+        Latitude degrees  Latitude minutes Latitude seconds Latitude direction  \
+ 0                    54                 0        21.601868                  N   
+ 1                    54                 0        22.315979                  N   
+ 2                    54                 0        22.686768                  N   
+ 3                    54                 0        23.400879                  N   
+ 4                    54                 0        24.005127                  N   
+ ...                 ...               ...              ...                ...   
+ 20237                57                20        35.879517                  N   
+ 20238                59                25        59.880066                  N   
+ 20239                59                26        23.280945                  N   
+ 20240                59                26        23.280945                  N   
+ 20241                65                14        23.992310                  N   
+ 
+       Longitude degrees Longitude minutes  Longitude seconds  \
+ 0                    14                11          59.278336   
+ 1                    14                12           8.280258   
+ 2                    14                11          58.200302   
+ 3                    14                12           3.600769   
+ 4                    14                12           1.798325   
+ ...                 ...               ...                ...   
+ 20237                20                 1          48.002472   
+ 20238                21                30           0.000000   
+ 20239                21                31          32.882538   
+ 20240                21                31          32.882538   
+ 20241                23                33          18.001099   
+ 
+        Longitude direction   Unit  
+ 0                        E  Bq/m3  
+ 1                        E  Bq/m3  
+ 2                        E  Bq/m3  
+ 3                        E  Bq/m3  
+ 4                        E  Bq/m3  
+ ...                    ...    ...  
+ 20237                    E  Bq/m3  
+ 20238                    E  Bq/m3  
+ 20239                    E  Bq/m3  
+ 20240                    E  Bq/m3  
+ 20241                    E  Bq/m3  
+ 
+ [20242 rows x 26 columns],
+ 'sediment':              lon        lat  tot_depth        time  sed_type  sample nuclide  \
+ 0      10.850000  54.049999       22.0   866592000        58     842     be7   
+ 1      10.203300  54.415001       13.0   811641600        58    4064     be7   
+ 2      10.203300  54.415001       13.0   811641600        58    4069     be7   
+ 3      10.203300  54.415001       13.0   811641600        58    4074     be7   
+ 4      11.750000  54.416698       24.0   838512000        58    4535     be7   
+ ...          ...        ...        ...         ...       ...     ...     ...   
+ 37084  23.391199  65.277496       90.0  1283299200         2   37039   bi212   
+ 37085  23.391199  65.277496       90.0  1283299200         2   37048   bi212   
+ 37086  23.391199  65.277496       90.0  1283299200         2   37065   bi212   
+ 37087  23.391199  65.277496       90.0  1283299200         2   37074   bi212   
+ 37088  23.391199  65.277496       90.0  1283299200         2   37083   bi212   
+ 
+            value    _unc  _dl  ...  Nuclide Latitude degrees Latitude minutes  \
+ 0      24.299999  7.7760    1  ...      7Be               54                2   
+ 1      45.500000  4.5500    1  ...      7Be               54               24   
+ 2       7.000000     NaN    2  ...      7Be               54               24   
+ 3       4.800000     NaN    2  ...      7Be               54               24   
+ 4       6.900000  1.9320    1  ...      7Be               54               25   
+ ...          ...     ...  ...  ...      ...              ...              ...   
+ 37084  42.900002  6.1347    1  ...    212Bi               65               16   
+ 37085  58.400002  6.1904    1  ...    212Bi               65               16   
+ 37086  51.400002  5.9624    1  ...    212Bi               65               16   
+ 37087  41.799999  5.4758    1  ...    212Bi               65               16   
+ 37088  43.700001  3.4523    1  ...    212Bi               65               16   
+ 
+       Latitude seconds Latitude direction  Longitude degrees  \
+ 0            59.997253                  N                 10   
+ 1            54.003296                  N                 10   
+ 2            54.003296                  N                 10   
+ 3            54.003296                  N                 10   
+ 4             0.114441                  N                 11   
+ ...                ...                ...                ...   
+ 37084        38.986816                  N                 23   
+ 37085        38.986816                  N                 23   
+ 37086        38.986816                  N                 23   
+ 37087        38.986816                  N                 23   
+ 37088        38.986816                  N                 23   
+ 
+        Longitude minutes  Longitude seconds Longitude direction    Unit  
+ 0                     51           0.001373                   E  Bq/kgd  
+ 1                     12          11.881714                   E  Bq/kgd  
+ 2                     12          11.881714                   E  Bq/kgd  
+ 3                     12          11.881714                   E  Bq/kgd  
+ 4                     45           0.000000                   E  Bq/kgd  
+ ...                  ...                ...                 ...     ...  
+ 37084                 23          28.316803                   E  Bq/kgd  
+ 37085                 23          28.316803                   E  Bq/kgd  
+ 37086                 23          28.316803                   E  Bq/kgd  
+ 37087                 23          28.316803                   E  Bq/kgd  
+ 37088                 23          28.316803                   E  Bq/kgd  
+ 
+ [37089 rows x 24 columns],
+ 'biota':            lon        lat  smp_depth        time  bio_group  species  \
+ 0      11.5000  54.080002        0.0   908755200         11       96   
+ 1      11.5000  54.080002        0.0   900547200         11       96   
+ 2      11.5000  54.080002        0.0   874540800         14      129   
+ 3      11.5000  54.080002        0.0   865900800         14      129   
+ 4      11.5000  54.080002        0.0   874886400         11       96   
+ ...        ...        ...        ...         ...        ...      ...   
+ 14868  12.0742  57.335201        0.0  1253145600         11       96   
+ 14869  12.0742  57.335201        0.0  1225670400         11       96   
+ 14870  12.0742  57.335201        0.0  1160352000         11       96   
+ 14871  12.0742  57.335201        0.0  1380240000         11       96   
+ 14872  12.0742  57.335201        0.0  1409788800         11       96   
+ 
+        body_part  sample nuclide   value  ...  Nuclide  Latitude degrees  \
+ 0             54     150     be7  46.500  ...      7Be                54   
+ 1             54     159     be7  66.500  ...      7Be                54   
+ 2              1     168     be7   5.430  ...      7Be                54   
+ 3              1     177     be7  13.700  ...      7Be                54   
+ 4             54     183     be7  11.300  ...      7Be                54   
+ ...          ...     ...     ...     ...  ...      ...               ...   
+ 14868         54   11586   tl208   0.880  ...    208Tl                57   
+ 14869         54   11598   tl208   0.770  ...    208Tl                57   
+ 14870         54   11620   tl208   1.310  ...    208Tl                57   
+ 14871         54   11766   tl208   0.668  ...    208Tl                57   
+ 14872         54   11775   tl208   0.684  ...    208Tl                57   
+ 
+        Latitude minutes Latitude seconds Latitude direction Longitude degrees  \
+ 0                     4        48.006592                  N                11   
+ 1                     4        48.006592                  N                11   
+ 2                     4        48.006592                  N                11   
+ 3                     4        48.006592                  N                11   
+ 4                     4        48.006592                  N                11   
+ ...                 ...              ...                ...               ...   
+ 14868                20         6.724548                  N                12   
+ 14869                20         6.724548                  N                12   
+ 14870                20         6.724548                  N                12   
+ 14871                20         6.724548                  N                12   
+ 14872                20         6.724548                  N                12   
+ 
+       Longitude minutes  Longitude seconds  Longitude direction    Unit  
+ 0                    30           0.000000                    E  Bq/kgd  
+ 1                    30           0.000000                    E  Bq/kgd  
+ 2                    30           0.000000                    E  Bq/kgd  
+ 3                    30           0.000000                    E  Bq/kgd  
+ 4                    30           0.000000                    E  Bq/kgd  
+ ...                 ...                ...                  ...     ...  
+ 14868                 4          27.118835                    E  Bq/kgd  
+ 14869                 4          27.118835                    E  Bq/kgd  
+ 14870                 4          27.118835                    E  Bq/kgd  
+ 14871                 4          27.118835                    E  Bq/kgd  
+ 14872                 4          27.118835                    E  Bq/kgd  
+ 
+ [14873 rows x 26 columns]}</code></pre>
+</div>
+</div>
+<div id="cell-43" class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>tfm.dfs[<span class="st">'seawater'</span>].columns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Index(['lon', 'lat', 'smp_depth', 'tot_depth', 'time', 'sample', 'nuclide',
+       'value', '_unc', '_dl', '_sal', '_temp', '_unit', 'Sampling start date',
+       'Sampling start time', 'Sample type', 'Nuclide', 'Latitude degrees',
+       'Latitude minutes', 'Latitude seconds', 'Latitude direction',
+       'Longitude degrees', 'Longitude minutes', 'Longitude seconds',
+       'Longitude direction', 'Unit'],
+      dtype='object')</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="lookup-value-type-_dl" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-value-type-_dl">Lookup : Value type (_dl)</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L211" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_detectionlimitnames_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_detectionlimitnames_lut">get_detectionlimitnames_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_detectionlimitnames_lut ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L216" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lookupvaluetypebyidcb" class="level3">
+<h3 class="anchored" data-anchor-id="lookupvaluetypebyidcb">LookupValueTypeByIdCB</h3>
+<blockquote class="blockquote">
+<pre><code> LookupValueTypeByIdCB (fn_lut=&lt;function get_detectionlimitnames_lut&gt;)</code></pre>
+</blockquote>
+<p><em>Lookup MARIS Value Type.</em></p>
+<div id="cell-48" class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[ReshapeWideToLong(),</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                            LookupTimeFromEncodedTime(cfg()),</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>                            GetSampleTypeCB(),</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>                            LookupNuclideByIdCB(),</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>                            ConvertLonLatCB(), </span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>                            LookupUnitByIdCB(),</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>                            LookupValueTypeByIdCB()</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seawater':              lon        lat  smp_depth  tot_depth        time  sample  \
+ 0      14.199800  54.006001        0.0       11.0  1497744000      78   
+ 1      14.202300  54.006199        0.0       12.0  1339632000      83   
+ 2      14.199500  54.006302        0.0       12.0  1402876800      86   
+ 3      14.201000  54.006500        0.0       12.0  1278460800      91   
+ 4      14.200500  54.006668        0.0       12.0  1309910400     101   
+ ...          ...        ...        ...        ...         ...     ...   
+ 20237  20.030001  57.343300        0.0      236.0   524620800   14175   
+ 20238  21.500000  59.433300        0.0      156.0   555033600   15712   
+ 20239  21.525801  59.439800        0.0      160.0   585446400   15840   
+ 20240  21.525801  59.439800      150.0      160.0   585446400   15847   
+ 20241  23.555000  65.239998        0.0       73.0   587001600   20130   
+ 
+              nuclide      value       _unc  _dl  ...  Latitude degrees  \
+ 0                 h3   850.0000  59.669998    1  ...                54   
+ 1                 h3   970.0000  29.100000    1  ...                54   
+ 2                 h3   910.0000  24.570000    1  ...                54   
+ 3                 h3  1070.0000  21.400000    1  ...                54   
+ 4                 h3  1020.0000  20.400000    1  ...                54   
+ ...              ...        ...        ...  ...  ...               ...   
+ 20237  cm243_244_tot     0.0064   0.001280    1  ...                57   
+ 20238  cm243_244_tot     0.0045   0.000900    1  ...                59   
+ 20239  cm243_244_tot     0.0022   0.000660    1  ...                59   
+ 20240  cm243_244_tot     0.0064   0.001920    1  ...                59   
+ 20241  cm243_244_tot     0.0039   0.001170    1  ...                65   
+ 
+        Latitude minutes  Latitude seconds Latitude direction  \
+ 0                     0         21.601868                  N   
+ 1                     0         22.315979                  N   
+ 2                     0         22.686768                  N   
+ 3                     0         23.400879                  N   
+ 4                     0         24.005127                  N   
+ ...                 ...               ...                ...   
+ 20237                20         35.879517                  N   
+ 20238                25         59.880066                  N   
+ 20239                26         23.280945                  N   
+ 20240                26         23.280945                  N   
+ 20241                14         23.992310                  N   
+ 
+       Longitude degrees Longitude minutes Longitude seconds  \
+ 0                    14                11         59.278336   
+ 1                    14                12          8.280258   
+ 2                    14                11         58.200302   
+ 3                    14                12          3.600769   
+ 4                    14                12          1.798325   
+ ...                 ...               ...               ...   
+ 20237                20                 1         48.002472   
+ 20238                21                30          0.000000   
+ 20239                21                31         32.882538   
+ 20240                21                31         32.882538   
+ 20241                23                33         18.001099   
+ 
+        Longitude direction   Unit  Value type  
+ 0                        E  Bq/m3           =  
+ 1                        E  Bq/m3           =  
+ 2                        E  Bq/m3           =  
+ 3                        E  Bq/m3           =  
+ 4                        E  Bq/m3           =  
+ ...                    ...    ...         ...  
+ 20237                    E  Bq/m3           =  
+ 20238                    E  Bq/m3           =  
+ 20239                    E  Bq/m3           =  
+ 20240                    E  Bq/m3           =  
+ 20241                    E  Bq/m3           =  
+ 
+ [20242 rows x 27 columns],
+ 'sediment':              lon        lat  tot_depth        time  sed_type  sample nuclide  \
+ 0      10.850000  54.049999       22.0   866592000        58     842     be7   
+ 1      10.203300  54.415001       13.0   811641600        58    4064     be7   
+ 2      10.203300  54.415001       13.0   811641600        58    4069     be7   
+ 3      10.203300  54.415001       13.0   811641600        58    4074     be7   
+ 4      11.750000  54.416698       24.0   838512000        58    4535     be7   
+ ...          ...        ...        ...         ...       ...     ...     ...   
+ 37084  23.391199  65.277496       90.0  1283299200         2   37039   bi212   
+ 37085  23.391199  65.277496       90.0  1283299200         2   37048   bi212   
+ 37086  23.391199  65.277496       90.0  1283299200         2   37065   bi212   
+ 37087  23.391199  65.277496       90.0  1283299200         2   37074   bi212   
+ 37088  23.391199  65.277496       90.0  1283299200         2   37083   bi212   
+ 
+            value    _unc  _dl  ...  Latitude degrees Latitude minutes  \
+ 0      24.299999  7.7760    1  ...                54                2   
+ 1      45.500000  4.5500    1  ...                54               24   
+ 2       7.000000     NaN    2  ...                54               24   
+ 3       4.800000     NaN    2  ...                54               24   
+ 4       6.900000  1.9320    1  ...                54               25   
+ ...          ...     ...  ...  ...               ...              ...   
+ 37084  42.900002  6.1347    1  ...                65               16   
+ 37085  58.400002  6.1904    1  ...                65               16   
+ 37086  51.400002  5.9624    1  ...                65               16   
+ 37087  41.799999  5.4758    1  ...                65               16   
+ 37088  43.700001  3.4523    1  ...                65               16   
+ 
+       Latitude seconds Latitude direction Longitude degrees  \
+ 0            59.997253                  N                10   
+ 1            54.003296                  N                10   
+ 2            54.003296                  N                10   
+ 3            54.003296                  N                10   
+ 4             0.114441                  N                11   
+ ...                ...                ...               ...   
+ 37084        38.986816                  N                23   
+ 37085        38.986816                  N                23   
+ 37086        38.986816                  N                23   
+ 37087        38.986816                  N                23   
+ 37088        38.986816                  N                23   
+ 
+        Longitude minutes  Longitude seconds  Longitude direction    Unit  \
+ 0                     51           0.001373                    E  Bq/kgd   
+ 1                     12          11.881714                    E  Bq/kgd   
+ 2                     12          11.881714                    E  Bq/kgd   
+ 3                     12          11.881714                    E  Bq/kgd   
+ 4                     45           0.000000                    E  Bq/kgd   
+ ...                  ...                ...                  ...     ...   
+ 37084                 23          28.316803                    E  Bq/kgd   
+ 37085                 23          28.316803                    E  Bq/kgd   
+ 37086                 23          28.316803                    E  Bq/kgd   
+ 37087                 23          28.316803                    E  Bq/kgd   
+ 37088                 23          28.316803                    E  Bq/kgd   
+ 
+        Value type  
+ 0               =  
+ 1               =  
+ 2               &lt;  
+ 3               &lt;  
+ 4               =  
+ ...           ...  
+ 37084           =  
+ 37085           =  
+ 37086           =  
+ 37087           =  
+ 37088           =  
+ 
+ [37089 rows x 25 columns],
+ 'biota':            lon        lat  smp_depth        time  bio_group  species  \
+ 0      11.5000  54.080002        0.0   908755200         11       96   
+ 1      11.5000  54.080002        0.0   900547200         11       96   
+ 2      11.5000  54.080002        0.0   874540800         14      129   
+ 3      11.5000  54.080002        0.0   865900800         14      129   
+ 4      11.5000  54.080002        0.0   874886400         11       96   
+ ...        ...        ...        ...         ...        ...      ...   
+ 14868  12.0742  57.335201        0.0  1253145600         11       96   
+ 14869  12.0742  57.335201        0.0  1225670400         11       96   
+ 14870  12.0742  57.335201        0.0  1160352000         11       96   
+ 14871  12.0742  57.335201        0.0  1380240000         11       96   
+ 14872  12.0742  57.335201        0.0  1409788800         11       96   
+ 
+        body_part  sample nuclide   value  ...  Latitude degrees  \
+ 0             54     150     be7  46.500  ...                54   
+ 1             54     159     be7  66.500  ...                54   
+ 2              1     168     be7   5.430  ...                54   
+ 3              1     177     be7  13.700  ...                54   
+ 4             54     183     be7  11.300  ...                54   
+ ...          ...     ...     ...     ...  ...               ...   
+ 14868         54   11586   tl208   0.880  ...                57   
+ 14869         54   11598   tl208   0.770  ...                57   
+ 14870         54   11620   tl208   1.310  ...                57   
+ 14871         54   11766   tl208   0.668  ...                57   
+ 14872         54   11775   tl208   0.684  ...                57   
+ 
+        Latitude minutes  Latitude seconds Latitude direction  \
+ 0                     4         48.006592                  N   
+ 1                     4         48.006592                  N   
+ 2                     4         48.006592                  N   
+ 3                     4         48.006592                  N   
+ 4                     4         48.006592                  N   
+ ...                 ...               ...                ...   
+ 14868                20          6.724548                  N   
+ 14869                20          6.724548                  N   
+ 14870                20          6.724548                  N   
+ 14871                20          6.724548                  N   
+ 14872                20          6.724548                  N   
+ 
+       Longitude degrees Longitude minutes Longitude seconds  \
+ 0                    11                30          0.000000   
+ 1                    11                30          0.000000   
+ 2                    11                30          0.000000   
+ 3                    11                30          0.000000   
+ 4                    11                30          0.000000   
+ ...                 ...               ...               ...   
+ 14868                12                 4         27.118835   
+ 14869                12                 4         27.118835   
+ 14870                12                 4         27.118835   
+ 14871                12                 4         27.118835   
+ 14872                12                 4         27.118835   
+ 
+        Longitude direction    Unit  Value type  
+ 0                        E  Bq/kgd           =  
+ 1                        E  Bq/kgd           =  
+ 2                        E  Bq/kgd           =  
+ 3                        E  Bq/kgd           =  
+ 4                        E  Bq/kgd           &lt;  
+ ...                    ...     ...         ...  
+ 14868                    E  Bq/kgd           =  
+ 14869                    E  Bq/kgd           =  
+ 14870                    E  Bq/kgd           =  
+ 14871                    E  Bq/kgd           =  
+ 14872                    E  Bq/kgd           =  
+ 
+ [14873 rows x 27 columns]}</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="lookup-biogroup" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-biogroup">Lookup : Biogroup</h3>
+<p>Biogroup is in netcdf but not in OPEN REfINE csv format. Should we include this in Netcdf?</p>
+<hr>
+</section>
+<section id="lookup-species" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-species">Lookup : Species</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L229" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_species_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_species_lut">get_species_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_species_lut ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L234" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lookupspeciesbyidcb" class="level3">
+<h3 class="anchored" data-anchor-id="lookupspeciesbyidcb">LookupSpeciesByIdCB</h3>
+<blockquote class="blockquote">
+<pre><code> LookupSpeciesByIdCB (fn_lut=&lt;function get_species_lut&gt;)</code></pre>
+</blockquote>
+<p><em>Lookup MARIS species by species_id.</em></p>
+<div id="cell-56" class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[ReshapeWideToLong(),</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>                            LookupTimeFromEncodedTime(cfg()),</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>                            GetSampleTypeCB(),</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>                            LookupNuclideByIdCB(),</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>                            ConvertLonLatCB(), </span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>                            LookupUnitByIdCB(),</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>                            LookupValueTypeByIdCB(),</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>                            LookupSpeciesByIdCB()</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seawater':              lon        lat  smp_depth  tot_depth        time  sample  \
+ 0      14.199800  54.006001        0.0       11.0  1497744000      78   
+ 1      14.202300  54.006199        0.0       12.0  1339632000      83   
+ 2      14.199500  54.006302        0.0       12.0  1402876800      86   
+ 3      14.201000  54.006500        0.0       12.0  1278460800      91   
+ 4      14.200500  54.006668        0.0       12.0  1309910400     101   
+ ...          ...        ...        ...        ...         ...     ...   
+ 20237  20.030001  57.343300        0.0      236.0   524620800   14175   
+ 20238  21.500000  59.433300        0.0      156.0   555033600   15712   
+ 20239  21.525801  59.439800        0.0      160.0   585446400   15840   
+ 20240  21.525801  59.439800      150.0      160.0   585446400   15847   
+ 20241  23.555000  65.239998        0.0       73.0   587001600   20130   
+ 
+              nuclide      value       _unc  _dl  ...  Latitude degrees  \
+ 0                 h3   850.0000  59.669998    1  ...                54   
+ 1                 h3   970.0000  29.100000    1  ...                54   
+ 2                 h3   910.0000  24.570000    1  ...                54   
+ 3                 h3  1070.0000  21.400000    1  ...                54   
+ 4                 h3  1020.0000  20.400000    1  ...                54   
+ ...              ...        ...        ...  ...  ...               ...   
+ 20237  cm243_244_tot     0.0064   0.001280    1  ...                57   
+ 20238  cm243_244_tot     0.0045   0.000900    1  ...                59   
+ 20239  cm243_244_tot     0.0022   0.000660    1  ...                59   
+ 20240  cm243_244_tot     0.0064   0.001920    1  ...                59   
+ 20241  cm243_244_tot     0.0039   0.001170    1  ...                65   
+ 
+        Latitude minutes  Latitude seconds Latitude direction  \
+ 0                     0         21.601868                  N   
+ 1                     0         22.315979                  N   
+ 2                     0         22.686768                  N   
+ 3                     0         23.400879                  N   
+ 4                     0         24.005127                  N   
+ ...                 ...               ...                ...   
+ 20237                20         35.879517                  N   
+ 20238                25         59.880066                  N   
+ 20239                26         23.280945                  N   
+ 20240                26         23.280945                  N   
+ 20241                14         23.992310                  N   
+ 
+       Longitude degrees Longitude minutes Longitude seconds  \
+ 0                    14                11         59.278336   
+ 1                    14                12          8.280258   
+ 2                    14                11         58.200302   
+ 3                    14                12          3.600769   
+ 4                    14                12          1.798325   
+ ...                 ...               ...               ...   
+ 20237                20                 1         48.002472   
+ 20238                21                30          0.000000   
+ 20239                21                31         32.882538   
+ 20240                21                31         32.882538   
+ 20241                23                33         18.001099   
+ 
+        Longitude direction   Unit  Value type  
+ 0                        E  Bq/m3           =  
+ 1                        E  Bq/m3           =  
+ 2                        E  Bq/m3           =  
+ 3                        E  Bq/m3           =  
+ 4                        E  Bq/m3           =  
+ ...                    ...    ...         ...  
+ 20237                    E  Bq/m3           =  
+ 20238                    E  Bq/m3           =  
+ 20239                    E  Bq/m3           =  
+ 20240                    E  Bq/m3           =  
+ 20241                    E  Bq/m3           =  
+ 
+ [20242 rows x 27 columns],
+ 'sediment':              lon        lat  tot_depth        time  sed_type  sample nuclide  \
+ 0      10.850000  54.049999       22.0   866592000        58     842     be7   
+ 1      10.203300  54.415001       13.0   811641600        58    4064     be7   
+ 2      10.203300  54.415001       13.0   811641600        58    4069     be7   
+ 3      10.203300  54.415001       13.0   811641600        58    4074     be7   
+ 4      11.750000  54.416698       24.0   838512000        58    4535     be7   
+ ...          ...        ...        ...         ...       ...     ...     ...   
+ 37084  23.391199  65.277496       90.0  1283299200         2   37039   bi212   
+ 37085  23.391199  65.277496       90.0  1283299200         2   37048   bi212   
+ 37086  23.391199  65.277496       90.0  1283299200         2   37065   bi212   
+ 37087  23.391199  65.277496       90.0  1283299200         2   37074   bi212   
+ 37088  23.391199  65.277496       90.0  1283299200         2   37083   bi212   
+ 
+            value    _unc  _dl  ...  Latitude degrees Latitude minutes  \
+ 0      24.299999  7.7760    1  ...                54                2   
+ 1      45.500000  4.5500    1  ...                54               24   
+ 2       7.000000     NaN    2  ...                54               24   
+ 3       4.800000     NaN    2  ...                54               24   
+ 4       6.900000  1.9320    1  ...                54               25   
+ ...          ...     ...  ...  ...               ...              ...   
+ 37084  42.900002  6.1347    1  ...                65               16   
+ 37085  58.400002  6.1904    1  ...                65               16   
+ 37086  51.400002  5.9624    1  ...                65               16   
+ 37087  41.799999  5.4758    1  ...                65               16   
+ 37088  43.700001  3.4523    1  ...                65               16   
+ 
+       Latitude seconds Latitude direction Longitude degrees  \
+ 0            59.997253                  N                10   
+ 1            54.003296                  N                10   
+ 2            54.003296                  N                10   
+ 3            54.003296                  N                10   
+ 4             0.114441                  N                11   
+ ...                ...                ...               ...   
+ 37084        38.986816                  N                23   
+ 37085        38.986816                  N                23   
+ 37086        38.986816                  N                23   
+ 37087        38.986816                  N                23   
+ 37088        38.986816                  N                23   
+ 
+        Longitude minutes  Longitude seconds  Longitude direction    Unit  \
+ 0                     51           0.001373                    E  Bq/kgd   
+ 1                     12          11.881714                    E  Bq/kgd   
+ 2                     12          11.881714                    E  Bq/kgd   
+ 3                     12          11.881714                    E  Bq/kgd   
+ 4                     45           0.000000                    E  Bq/kgd   
+ ...                  ...                ...                  ...     ...   
+ 37084                 23          28.316803                    E  Bq/kgd   
+ 37085                 23          28.316803                    E  Bq/kgd   
+ 37086                 23          28.316803                    E  Bq/kgd   
+ 37087                 23          28.316803                    E  Bq/kgd   
+ 37088                 23          28.316803                    E  Bq/kgd   
+ 
+        Value type  
+ 0               =  
+ 1               =  
+ 2               &lt;  
+ 3               &lt;  
+ 4               =  
+ ...           ...  
+ 37084           =  
+ 37085           =  
+ 37086           =  
+ 37087           =  
+ 37088           =  
+ 
+ [37089 rows x 25 columns],
+ 'biota':            lon        lat  smp_depth        time  bio_group  species  \
+ 0      11.5000  54.080002        0.0   908755200         11       96   
+ 1      11.5000  54.080002        0.0   900547200         11       96   
+ 2      11.5000  54.080002        0.0   874540800         14      129   
+ 3      11.5000  54.080002        0.0   865900800         14      129   
+ 4      11.5000  54.080002        0.0   874886400         11       96   
+ ...        ...        ...        ...         ...        ...      ...   
+ 14868  12.0742  57.335201        0.0  1253145600         11       96   
+ 14869  12.0742  57.335201        0.0  1225670400         11       96   
+ 14870  12.0742  57.335201        0.0  1160352000         11       96   
+ 14871  12.0742  57.335201        0.0  1380240000         11       96   
+ 14872  12.0742  57.335201        0.0  1409788800         11       96   
+ 
+        body_part  sample nuclide   value  ...  Latitude minutes  \
+ 0             54     150     be7  46.500  ...                 4   
+ 1             54     159     be7  66.500  ...                 4   
+ 2              1     168     be7   5.430  ...                 4   
+ 3              1     177     be7  13.700  ...                 4   
+ 4             54     183     be7  11.300  ...                 4   
+ ...          ...     ...     ...     ...  ...               ...   
+ 14868         54   11586   tl208   0.880  ...                20   
+ 14869         54   11598   tl208   0.770  ...                20   
+ 14870         54   11620   tl208   1.310  ...                20   
+ 14871         54   11766   tl208   0.668  ...                20   
+ 14872         54   11775   tl208   0.684  ...                20   
+ 
+        Latitude seconds  Latitude direction Longitude degrees  \
+ 0             48.006592                   N                11   
+ 1             48.006592                   N                11   
+ 2             48.006592                   N                11   
+ 3             48.006592                   N                11   
+ 4             48.006592                   N                11   
+ ...                 ...                 ...               ...   
+ 14868          6.724548                   N                12   
+ 14869          6.724548                   N                12   
+ 14870          6.724548                   N                12   
+ 14871          6.724548                   N                12   
+ 14872          6.724548                   N                12   
+ 
+       Longitude minutes Longitude seconds Longitude direction    Unit  \
+ 0                    30          0.000000                   E  Bq/kgd   
+ 1                    30          0.000000                   E  Bq/kgd   
+ 2                    30          0.000000                   E  Bq/kgd   
+ 3                    30          0.000000                   E  Bq/kgd   
+ 4                    30          0.000000                   E  Bq/kgd   
+ ...                 ...               ...                 ...     ...   
+ 14868                 4         27.118835                   E  Bq/kgd   
+ 14869                 4         27.118835                   E  Bq/kgd   
+ 14870                 4         27.118835                   E  Bq/kgd   
+ 14871                 4         27.118835                   E  Bq/kgd   
+ 14872                 4         27.118835                   E  Bq/kgd   
+ 
+        Value type            Species  
+ 0               =  Fucus vesiculosus  
+ 1               =  Fucus vesiculosus  
+ 2               =     Mytilus edulis  
+ 3               =     Mytilus edulis  
+ 4               &lt;  Fucus vesiculosus  
+ ...           ...                ...  
+ 14868           =  Fucus vesiculosus  
+ 14869           =  Fucus vesiculosus  
+ 14870           =  Fucus vesiculosus  
+ 14871           =  Fucus vesiculosus  
+ 14872           =  Fucus vesiculosus  
+ 
+ [14873 rows x 28 columns]}</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="lookup-body-part" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-body-part">Lookup : Body part</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L248" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_bodypart_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_bodypart_lut">get_bodypart_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_bodypart_lut ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L253" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lookupbodypartbyidcb" class="level3">
+<h3 class="anchored" data-anchor-id="lookupbodypartbyidcb">LookupBodypartByIdCB</h3>
+<blockquote class="blockquote">
+<pre><code> LookupBodypartByIdCB (fn_lut=&lt;function get_bodypart_lut&gt;)</code></pre>
+</blockquote>
+<p><em>Lookup MARIS bodypart by bodypar_id.</em></p>
+<div id="cell-61" class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[ReshapeWideToLong(),</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>                            LookupTimeFromEncodedTime(cfg()),</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>                            GetSampleTypeCB(),</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>                            LookupNuclideByIdCB(),</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>                            ConvertLonLatCB(), </span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>                            LookupUnitByIdCB(),</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>                            LookupValueTypeByIdCB(),</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>                            LookupSpeciesByIdCB(),</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>                            LookupBodypartByIdCB()</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seawater':              lon        lat  smp_depth  tot_depth        time  sample  \
+ 0      14.199800  54.006001        0.0       11.0  1497744000      78   
+ 1      14.202300  54.006199        0.0       12.0  1339632000      83   
+ 2      14.199500  54.006302        0.0       12.0  1402876800      86   
+ 3      14.201000  54.006500        0.0       12.0  1278460800      91   
+ 4      14.200500  54.006668        0.0       12.0  1309910400     101   
+ ...          ...        ...        ...        ...         ...     ...   
+ 20237  20.030001  57.343300        0.0      236.0   524620800   14175   
+ 20238  21.500000  59.433300        0.0      156.0   555033600   15712   
+ 20239  21.525801  59.439800        0.0      160.0   585446400   15840   
+ 20240  21.525801  59.439800      150.0      160.0   585446400   15847   
+ 20241  23.555000  65.239998        0.0       73.0   587001600   20130   
+ 
+              nuclide      value       _unc  _dl  ...  Latitude degrees  \
+ 0                 h3   850.0000  59.669998    1  ...                54   
+ 1                 h3   970.0000  29.100000    1  ...                54   
+ 2                 h3   910.0000  24.570000    1  ...                54   
+ 3                 h3  1070.0000  21.400000    1  ...                54   
+ 4                 h3  1020.0000  20.400000    1  ...                54   
+ ...              ...        ...        ...  ...  ...               ...   
+ 20237  cm243_244_tot     0.0064   0.001280    1  ...                57   
+ 20238  cm243_244_tot     0.0045   0.000900    1  ...                59   
+ 20239  cm243_244_tot     0.0022   0.000660    1  ...                59   
+ 20240  cm243_244_tot     0.0064   0.001920    1  ...                59   
+ 20241  cm243_244_tot     0.0039   0.001170    1  ...                65   
+ 
+        Latitude minutes  Latitude seconds Latitude direction  \
+ 0                     0         21.601868                  N   
+ 1                     0         22.315979                  N   
+ 2                     0         22.686768                  N   
+ 3                     0         23.400879                  N   
+ 4                     0         24.005127                  N   
+ ...                 ...               ...                ...   
+ 20237                20         35.879517                  N   
+ 20238                25         59.880066                  N   
+ 20239                26         23.280945                  N   
+ 20240                26         23.280945                  N   
+ 20241                14         23.992310                  N   
+ 
+       Longitude degrees Longitude minutes Longitude seconds  \
+ 0                    14                11         59.278336   
+ 1                    14                12          8.280258   
+ 2                    14                11         58.200302   
+ 3                    14                12          3.600769   
+ 4                    14                12          1.798325   
+ ...                 ...               ...               ...   
+ 20237                20                 1         48.002472   
+ 20238                21                30          0.000000   
+ 20239                21                31         32.882538   
+ 20240                21                31         32.882538   
+ 20241                23                33         18.001099   
+ 
+        Longitude direction   Unit  Value type  
+ 0                        E  Bq/m3           =  
+ 1                        E  Bq/m3           =  
+ 2                        E  Bq/m3           =  
+ 3                        E  Bq/m3           =  
+ 4                        E  Bq/m3           =  
+ ...                    ...    ...         ...  
+ 20237                    E  Bq/m3           =  
+ 20238                    E  Bq/m3           =  
+ 20239                    E  Bq/m3           =  
+ 20240                    E  Bq/m3           =  
+ 20241                    E  Bq/m3           =  
+ 
+ [20242 rows x 27 columns],
+ 'sediment':              lon        lat  tot_depth        time  sed_type  sample nuclide  \
+ 0      10.850000  54.049999       22.0   866592000        58     842     be7   
+ 1      10.203300  54.415001       13.0   811641600        58    4064     be7   
+ 2      10.203300  54.415001       13.0   811641600        58    4069     be7   
+ 3      10.203300  54.415001       13.0   811641600        58    4074     be7   
+ 4      11.750000  54.416698       24.0   838512000        58    4535     be7   
+ ...          ...        ...        ...         ...       ...     ...     ...   
+ 37084  23.391199  65.277496       90.0  1283299200         2   37039   bi212   
+ 37085  23.391199  65.277496       90.0  1283299200         2   37048   bi212   
+ 37086  23.391199  65.277496       90.0  1283299200         2   37065   bi212   
+ 37087  23.391199  65.277496       90.0  1283299200         2   37074   bi212   
+ 37088  23.391199  65.277496       90.0  1283299200         2   37083   bi212   
+ 
+            value    _unc  _dl  ...  Latitude degrees Latitude minutes  \
+ 0      24.299999  7.7760    1  ...                54                2   
+ 1      45.500000  4.5500    1  ...                54               24   
+ 2       7.000000     NaN    2  ...                54               24   
+ 3       4.800000     NaN    2  ...                54               24   
+ 4       6.900000  1.9320    1  ...                54               25   
+ ...          ...     ...  ...  ...               ...              ...   
+ 37084  42.900002  6.1347    1  ...                65               16   
+ 37085  58.400002  6.1904    1  ...                65               16   
+ 37086  51.400002  5.9624    1  ...                65               16   
+ 37087  41.799999  5.4758    1  ...                65               16   
+ 37088  43.700001  3.4523    1  ...                65               16   
+ 
+       Latitude seconds Latitude direction Longitude degrees  \
+ 0            59.997253                  N                10   
+ 1            54.003296                  N                10   
+ 2            54.003296                  N                10   
+ 3            54.003296                  N                10   
+ 4             0.114441                  N                11   
+ ...                ...                ...               ...   
+ 37084        38.986816                  N                23   
+ 37085        38.986816                  N                23   
+ 37086        38.986816                  N                23   
+ 37087        38.986816                  N                23   
+ 37088        38.986816                  N                23   
+ 
+        Longitude minutes  Longitude seconds  Longitude direction    Unit  \
+ 0                     51           0.001373                    E  Bq/kgd   
+ 1                     12          11.881714                    E  Bq/kgd   
+ 2                     12          11.881714                    E  Bq/kgd   
+ 3                     12          11.881714                    E  Bq/kgd   
+ 4                     45           0.000000                    E  Bq/kgd   
+ ...                  ...                ...                  ...     ...   
+ 37084                 23          28.316803                    E  Bq/kgd   
+ 37085                 23          28.316803                    E  Bq/kgd   
+ 37086                 23          28.316803                    E  Bq/kgd   
+ 37087                 23          28.316803                    E  Bq/kgd   
+ 37088                 23          28.316803                    E  Bq/kgd   
+ 
+        Value type  
+ 0               =  
+ 1               =  
+ 2               &lt;  
+ 3               &lt;  
+ 4               =  
+ ...           ...  
+ 37084           =  
+ 37085           =  
+ 37086           =  
+ 37087           =  
+ 37088           =  
+ 
+ [37089 rows x 25 columns],
+ 'biota':            lon        lat  smp_depth        time  bio_group  species  \
+ 0      11.5000  54.080002        0.0   908755200         11       96   
+ 1      11.5000  54.080002        0.0   900547200         11       96   
+ 2      11.5000  54.080002        0.0   874540800         14      129   
+ 3      11.5000  54.080002        0.0   865900800         14      129   
+ 4      11.5000  54.080002        0.0   874886400         11       96   
+ ...        ...        ...        ...         ...        ...      ...   
+ 14868  12.0742  57.335201        0.0  1253145600         11       96   
+ 14869  12.0742  57.335201        0.0  1225670400         11       96   
+ 14870  12.0742  57.335201        0.0  1160352000         11       96   
+ 14871  12.0742  57.335201        0.0  1380240000         11       96   
+ 14872  12.0742  57.335201        0.0  1409788800         11       96   
+ 
+        body_part  sample nuclide   value  ...  Latitude seconds  \
+ 0             54     150     be7  46.500  ...         48.006592   
+ 1             54     159     be7  66.500  ...         48.006592   
+ 2              1     168     be7   5.430  ...         48.006592   
+ 3              1     177     be7  13.700  ...         48.006592   
+ 4             54     183     be7  11.300  ...         48.006592   
+ ...          ...     ...     ...     ...  ...               ...   
+ 14868         54   11586   tl208   0.880  ...          6.724548   
+ 14869         54   11598   tl208   0.770  ...          6.724548   
+ 14870         54   11620   tl208   1.310  ...          6.724548   
+ 14871         54   11766   tl208   0.668  ...          6.724548   
+ 14872         54   11775   tl208   0.684  ...          6.724548   
+ 
+        Latitude direction  Longitude degrees Longitude minutes  \
+ 0                       N                 11                30   
+ 1                       N                 11                30   
+ 2                       N                 11                30   
+ 3                       N                 11                30   
+ 4                       N                 11                30   
+ ...                   ...                ...               ...   
+ 14868                   N                 12                 4   
+ 14869                   N                 12                 4   
+ 14870                   N                 12                 4   
+ 14871                   N                 12                 4   
+ 14872                   N                 12                 4   
+ 
+       Longitude seconds Longitude direction    Unit  Value type  \
+ 0              0.000000                   E  Bq/kgd           =   
+ 1              0.000000                   E  Bq/kgd           =   
+ 2              0.000000                   E  Bq/kgd           =   
+ 3              0.000000                   E  Bq/kgd           =   
+ 4              0.000000                   E  Bq/kgd           &lt;   
+ ...                 ...                 ...     ...         ...   
+ 14868         27.118835                   E  Bq/kgd           =   
+ 14869         27.118835                   E  Bq/kgd           =   
+ 14870         27.118835                   E  Bq/kgd           =   
+ 14871         27.118835                   E  Bq/kgd           =   
+ 14872         27.118835                   E  Bq/kgd           =   
+ 
+                  Species                 Body part  
+ 0      Fucus vesiculosus  Whole haptophytic plants  
+ 1      Fucus vesiculosus  Whole haptophytic plants  
+ 2         Mytilus edulis              Whole animal  
+ 3         Mytilus edulis              Whole animal  
+ 4      Fucus vesiculosus  Whole haptophytic plants  
+ ...                  ...                       ...  
+ 14868  Fucus vesiculosus  Whole haptophytic plants  
+ 14869  Fucus vesiculosus  Whole haptophytic plants  
+ 14870  Fucus vesiculosus  Whole haptophytic plants  
+ 14871  Fucus vesiculosus  Whole haptophytic plants  
+ 14872  Fucus vesiculosus  Whole haptophytic plants  
+ 
+ [14873 rows x 29 columns]}</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="lookup-sediment-type" class="level3">
+<h3 class="anchored" data-anchor-id="lookup-sediment-type">Lookup : Sediment type</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L267" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_sediments_lut" class="level3">
+<h3 class="anchored" data-anchor-id="get_sediments_lut">get_sediments_lut</h3>
+<blockquote class="blockquote">
+<pre><code> get_sediments_lut ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L272" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lookupsedimenttypebyidcb" class="level3">
+<h3 class="anchored" data-anchor-id="lookupsedimenttypebyidcb">LookupSedimentTypeByIdCB</h3>
+<blockquote class="blockquote">
+<pre><code> LookupSedimentTypeByIdCB (fn_lut=&lt;function get_sediments_lut&gt;)</code></pre>
+</blockquote>
+<p><em>Lookup MARIS sedtype by sedtype_id.</em></p>
+<div id="cell-66" class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[ReshapeWideToLong(),</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>                            LookupTimeFromEncodedTime(cfg()),</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>                            GetSampleTypeCB(),</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>                            LookupNuclideByIdCB(),</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>                            ConvertLonLatCB(), </span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>                            LookupUnitByIdCB(),</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>                            LookupValueTypeByIdCB(),</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>                            LookupSpeciesByIdCB(),</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>                            LookupBodypartByIdCB(),</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>                            LookupSedimentTypeByIdCB()</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seawater':              lon        lat  smp_depth  tot_depth        time  sample  \
+ 0      14.199800  54.006001        0.0       11.0  1497744000      78   
+ 1      14.202300  54.006199        0.0       12.0  1339632000      83   
+ 2      14.199500  54.006302        0.0       12.0  1402876800      86   
+ 3      14.201000  54.006500        0.0       12.0  1278460800      91   
+ 4      14.200500  54.006668        0.0       12.0  1309910400     101   
+ ...          ...        ...        ...        ...         ...     ...   
+ 20237  20.030001  57.343300        0.0      236.0   524620800   14175   
+ 20238  21.500000  59.433300        0.0      156.0   555033600   15712   
+ 20239  21.525801  59.439800        0.0      160.0   585446400   15840   
+ 20240  21.525801  59.439800      150.0      160.0   585446400   15847   
+ 20241  23.555000  65.239998        0.0       73.0   587001600   20130   
+ 
+              nuclide      value       _unc  _dl  ...  Latitude degrees  \
+ 0                 h3   850.0000  59.669998    1  ...                54   
+ 1                 h3   970.0000  29.100000    1  ...                54   
+ 2                 h3   910.0000  24.570000    1  ...                54   
+ 3                 h3  1070.0000  21.400000    1  ...                54   
+ 4                 h3  1020.0000  20.400000    1  ...                54   
+ ...              ...        ...        ...  ...  ...               ...   
+ 20237  cm243_244_tot     0.0064   0.001280    1  ...                57   
+ 20238  cm243_244_tot     0.0045   0.000900    1  ...                59   
+ 20239  cm243_244_tot     0.0022   0.000660    1  ...                59   
+ 20240  cm243_244_tot     0.0064   0.001920    1  ...                59   
+ 20241  cm243_244_tot     0.0039   0.001170    1  ...                65   
+ 
+        Latitude minutes  Latitude seconds Latitude direction  \
+ 0                     0         21.601868                  N   
+ 1                     0         22.315979                  N   
+ 2                     0         22.686768                  N   
+ 3                     0         23.400879                  N   
+ 4                     0         24.005127                  N   
+ ...                 ...               ...                ...   
+ 20237                20         35.879517                  N   
+ 20238                25         59.880066                  N   
+ 20239                26         23.280945                  N   
+ 20240                26         23.280945                  N   
+ 20241                14         23.992310                  N   
+ 
+       Longitude degrees Longitude minutes Longitude seconds  \
+ 0                    14                11         59.278336   
+ 1                    14                12          8.280258   
+ 2                    14                11         58.200302   
+ 3                    14                12          3.600769   
+ 4                    14                12          1.798325   
+ ...                 ...               ...               ...   
+ 20237                20                 1         48.002472   
+ 20238                21                30          0.000000   
+ 20239                21                31         32.882538   
+ 20240                21                31         32.882538   
+ 20241                23                33         18.001099   
+ 
+        Longitude direction   Unit  Value type  
+ 0                        E  Bq/m3           =  
+ 1                        E  Bq/m3           =  
+ 2                        E  Bq/m3           =  
+ 3                        E  Bq/m3           =  
+ 4                        E  Bq/m3           =  
+ ...                    ...    ...         ...  
+ 20237                    E  Bq/m3           =  
+ 20238                    E  Bq/m3           =  
+ 20239                    E  Bq/m3           =  
+ 20240                    E  Bq/m3           =  
+ 20241                    E  Bq/m3           =  
+ 
+ [20242 rows x 27 columns],
+ 'sediment':              lon        lat  tot_depth        time  sed_type  sample nuclide  \
+ 0      10.850000  54.049999       22.0   866592000        58     842     be7   
+ 1      10.203300  54.415001       13.0   811641600        58    4064     be7   
+ 2      10.203300  54.415001       13.0   811641600        58    4069     be7   
+ 3      10.203300  54.415001       13.0   811641600        58    4074     be7   
+ 4      11.750000  54.416698       24.0   838512000        58    4535     be7   
+ ...          ...        ...        ...         ...       ...     ...     ...   
+ 37084  23.391199  65.277496       90.0  1283299200         2   37039   bi212   
+ 37085  23.391199  65.277496       90.0  1283299200         2   37048   bi212   
+ 37086  23.391199  65.277496       90.0  1283299200         2   37065   bi212   
+ 37087  23.391199  65.277496       90.0  1283299200         2   37074   bi212   
+ 37088  23.391199  65.277496       90.0  1283299200         2   37083   bi212   
+ 
+            value    _unc  _dl  ...  Latitude minutes Latitude seconds  \
+ 0      24.299999  7.7760    1  ...                 2        59.997253   
+ 1      45.500000  4.5500    1  ...                24        54.003296   
+ 2       7.000000     NaN    2  ...                24        54.003296   
+ 3       4.800000     NaN    2  ...                24        54.003296   
+ 4       6.900000  1.9320    1  ...                25         0.114441   
+ ...          ...     ...  ...  ...               ...              ...   
+ 37084  42.900002  6.1347    1  ...                16        38.986816   
+ 37085  58.400002  6.1904    1  ...                16        38.986816   
+ 37086  51.400002  5.9624    1  ...                16        38.986816   
+ 37087  41.799999  5.4758    1  ...                16        38.986816   
+ 37088  43.700001  3.4523    1  ...                16        38.986816   
+ 
+       Latitude direction Longitude degrees Longitude minutes  \
+ 0                      N                10                51   
+ 1                      N                10                12   
+ 2                      N                10                12   
+ 3                      N                10                12   
+ 4                      N                11                45   
+ ...                  ...               ...               ...   
+ 37084                  N                23                23   
+ 37085                  N                23                23   
+ 37086                  N                23                23   
+ 37087                  N                23                23   
+ 37088                  N                23                23   
+ 
+        Longitude seconds  Longitude direction    Unit Value type  \
+ 0               0.001373                    E  Bq/kgd          =   
+ 1              11.881714                    E  Bq/kgd          =   
+ 2              11.881714                    E  Bq/kgd          &lt;   
+ 3              11.881714                    E  Bq/kgd          &lt;   
+ 4               0.000000                    E  Bq/kgd          =   
+ ...                  ...                  ...     ...        ...   
+ 37084          28.316803                    E  Bq/kgd          =   
+ 37085          28.316803                    E  Bq/kgd          =   
+ 37086          28.316803                    E  Bq/kgd          =   
+ 37087          28.316803                    E  Bq/kgd          =   
+ 37088          28.316803                    E  Bq/kgd          =   
+ 
+        Sediment type  
+ 0           Pure mud  
+ 1           Pure mud  
+ 2           Pure mud  
+ 3           Pure mud  
+ 4           Pure mud  
+ ...              ...  
+ 37084         Gravel  
+ 37085         Gravel  
+ 37086         Gravel  
+ 37087         Gravel  
+ 37088         Gravel  
+ 
+ [37089 rows x 26 columns],
+ 'biota':            lon        lat  smp_depth        time  bio_group  species  \
+ 0      11.5000  54.080002        0.0   908755200         11       96   
+ 1      11.5000  54.080002        0.0   900547200         11       96   
+ 2      11.5000  54.080002        0.0   874540800         14      129   
+ 3      11.5000  54.080002        0.0   865900800         14      129   
+ 4      11.5000  54.080002        0.0   874886400         11       96   
+ ...        ...        ...        ...         ...        ...      ...   
+ 14868  12.0742  57.335201        0.0  1253145600         11       96   
+ 14869  12.0742  57.335201        0.0  1225670400         11       96   
+ 14870  12.0742  57.335201        0.0  1160352000         11       96   
+ 14871  12.0742  57.335201        0.0  1380240000         11       96   
+ 14872  12.0742  57.335201        0.0  1409788800         11       96   
+ 
+        body_part  sample nuclide   value  ...  Latitude seconds  \
+ 0             54     150     be7  46.500  ...         48.006592   
+ 1             54     159     be7  66.500  ...         48.006592   
+ 2              1     168     be7   5.430  ...         48.006592   
+ 3              1     177     be7  13.700  ...         48.006592   
+ 4             54     183     be7  11.300  ...         48.006592   
+ ...          ...     ...     ...     ...  ...               ...   
+ 14868         54   11586   tl208   0.880  ...          6.724548   
+ 14869         54   11598   tl208   0.770  ...          6.724548   
+ 14870         54   11620   tl208   1.310  ...          6.724548   
+ 14871         54   11766   tl208   0.668  ...          6.724548   
+ 14872         54   11775   tl208   0.684  ...          6.724548   
+ 
+        Latitude direction  Longitude degrees Longitude minutes  \
+ 0                       N                 11                30   
+ 1                       N                 11                30   
+ 2                       N                 11                30   
+ 3                       N                 11                30   
+ 4                       N                 11                30   
+ ...                   ...                ...               ...   
+ 14868                   N                 12                 4   
+ 14869                   N                 12                 4   
+ 14870                   N                 12                 4   
+ 14871                   N                 12                 4   
+ 14872                   N                 12                 4   
+ 
+       Longitude seconds Longitude direction    Unit  Value type  \
+ 0              0.000000                   E  Bq/kgd           =   
+ 1              0.000000                   E  Bq/kgd           =   
+ 2              0.000000                   E  Bq/kgd           =   
+ 3              0.000000                   E  Bq/kgd           =   
+ 4              0.000000                   E  Bq/kgd           &lt;   
+ ...                 ...                 ...     ...         ...   
+ 14868         27.118835                   E  Bq/kgd           =   
+ 14869         27.118835                   E  Bq/kgd           =   
+ 14870         27.118835                   E  Bq/kgd           =   
+ 14871         27.118835                   E  Bq/kgd           =   
+ 14872         27.118835                   E  Bq/kgd           =   
+ 
+                  Species                 Body part  
+ 0      Fucus vesiculosus  Whole haptophytic plants  
+ 1      Fucus vesiculosus  Whole haptophytic plants  
+ 2         Mytilus edulis              Whole animal  
+ 3         Mytilus edulis              Whole animal  
+ 4      Fucus vesiculosus  Whole haptophytic plants  
+ ...                  ...                       ...  
+ 14868  Fucus vesiculosus  Whole haptophytic plants  
+ 14869  Fucus vesiculosus  Whole haptophytic plants  
+ 14870  Fucus vesiculosus  Whole haptophytic plants  
+ 14871  Fucus vesiculosus  Whole haptophytic plants  
+ 14872  Fucus vesiculosus  Whole haptophytic plants  
+ 
+ [14873 rows x 29 columns]}</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="rename-columns" class="level3">
+<h3 class="anchored" data-anchor-id="rename-columns">Rename columns</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L287" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_renaming_rules_netcdf2openrefine" class="level3">
+<h3 class="anchored" data-anchor-id="get_renaming_rules_netcdf2openrefine">get_renaming_rules_netcdf2OpenRefine</h3>
+<blockquote class="blockquote">
+<pre><code> get_renaming_rules_netcdf2OpenRefine ()</code></pre>
+</blockquote>
+<div id="cell-70" class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SelectAndRenameColumnCB(Callback):</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>                 fn_renaming_rules,</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>                ):</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>        renaming <span class="op">=</span> <span class="va">self</span>.fn_renaming_rules()</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp <span class="kw">in</span> tfm.dfs.keys():            </span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>            <span class="co"># get columns related to the grp (e.g. 'biota').</span></span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>            coi <span class="op">=</span> [v <span class="cf">for</span> k, v <span class="kw">in</span> renaming.items() <span class="cf">if</span> grp <span class="kw">in</span> k]</span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Join cols of interest</span></span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>            coi_rename <span class="op">=</span> {}</span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> d <span class="kw">in</span> coi:</span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> k, v <span class="kw">in</span> d.items(): </span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a>                    coi_rename[k]<span class="op">=</span>v</span>
+<span id="cb54-16"><a href="#cb54-16" aria-hidden="true" tabindex="-1"></a>            <span class="co"># list cols</span></span>
+<span id="cb54-17"><a href="#cb54-17" aria-hidden="true" tabindex="-1"></a>            cols <span class="op">=</span> <span class="bu">list</span>(coi_rename.keys()) </span>
+<span id="cb54-18"><a href="#cb54-18" aria-hidden="true" tabindex="-1"></a>            <span class="co"># select cols in df </span></span>
+<span id="cb54-19"><a href="#cb54-19" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[grp] <span class="op">=</span> tfm.dfs[grp].loc[:, cols]</span>
+<span id="cb54-20"><a href="#cb54-20" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Rename cols</span></span>
+<span id="cb54-21"><a href="#cb54-21" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[grp].rename(columns<span class="op">=</span>coi_rename, inplace<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-71" class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> netcdf4_to_df(fname_in)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[ReshapeWideToLong(),</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>                            LookupTimeFromEncodedTime(cfg()),</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>                            GetSampleTypeCB(),</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>                            LookupNuclideByIdCB(),</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>                            ConvertLonLatCB(), </span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>                            LookupUnitByIdCB(),</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>                            LookupValueTypeByIdCB(),</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>                            LookupSpeciesByIdCB(),</span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>                            LookupBodypartByIdCB(),</span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>                            LookupSedimentTypeByIdCB(),</span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>                            SelectAndRenameColumnCB(get_renaming_rules_netcdf2OpenRefine)</span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>                            ])</span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>tfm()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seawater':       Sample type  Latitude degrees  Latitude minutes  Latitude seconds  \
+ 0        SEAWATER                54                 0         21.601868   
+ 1        SEAWATER                54                 0         22.315979   
+ 2        SEAWATER                54                 0         22.686768   
+ 3        SEAWATER                54                 0         23.400879   
+ 4        SEAWATER                54                 0         24.005127   
+ ...           ...               ...               ...               ...   
+ 20237    SEAWATER                57                20         35.879517   
+ 20238    SEAWATER                59                25         59.880066   
+ 20239    SEAWATER                59                26         23.280945   
+ 20240    SEAWATER                59                26         23.280945   
+ 20241    SEAWATER                65                14         23.992310   
+ 
+       Latitude direction  Longitude degrees  Longitude minutes  \
+ 0                      N                 14                 11   
+ 1                      N                 14                 12   
+ 2                      N                 14                 11   
+ 3                      N                 14                 12   
+ 4                      N                 14                 12   
+ ...                  ...                ...                ...   
+ 20237                  N                 20                  1   
+ 20238                  N                 21                 30   
+ 20239                  N                 21                 31   
+ 20240                  N                 21                 31   
+ 20241                  N                 23                 33   
+ 
+        Longitude seconds Longitude direction  Latitude decimal  ...  \
+ 0              59.278336                   E         54.006001  ...   
+ 1               8.280258                   E         54.006199  ...   
+ 2              58.200302                   E         54.006302  ...   
+ 3               3.600769                   E         54.006500  ...   
+ 4               1.798325                   E         54.006668  ...   
+ ...                  ...                 ...               ...  ...   
+ 20237          48.002472                   E         57.343300  ...   
+ 20238           0.000000                   E         59.433300  ...   
+ 20239          32.882538                   E         59.439800  ...   
+ 20240          32.882538                   E         59.439800  ...   
+ 20241          18.001099                   E         65.239998  ...   
+ 
+        Sampling start time    Nuclide Value type   Unit Activity or MDA  \
+ 0                 00:00:00         3H          =  Bq/m3        850.0000   
+ 1                 00:00:00         3H          =  Bq/m3        970.0000   
+ 2                 00:00:00         3H          =  Bq/m3        910.0000   
+ 3                 00:00:00         3H          =  Bq/m3       1070.0000   
+ 4                 00:00:00         3H          =  Bq/m3       1020.0000   
+ ...                    ...        ...        ...    ...             ...   
+ 20237             00:00:00  243_244Cm          =  Bq/m3          0.0064   
+ 20238             00:00:00  243_244Cm          =  Bq/m3          0.0045   
+ 20239             00:00:00  243_244Cm          =  Bq/m3          0.0022   
+ 20240             00:00:00  243_244Cm          =  Bq/m3          0.0064   
+ 20241             00:00:00  243_244Cm          =  Bq/m3          0.0039   
+ 
+       Uncertainty  Total depth  Sampling depth  Salinity  Temperature  
+ 0       59.669998         11.0             0.0      7.50          NaN  
+ 1       29.100000         12.0             0.0      6.77          NaN  
+ 2       24.570000         12.0             0.0      6.80          NaN  
+ 3       21.400000         12.0             0.0      5.82          NaN  
+ 4       20.400000         12.0             0.0      5.40          NaN  
+ ...           ...          ...             ...       ...          ...  
+ 20237    0.001280        236.0             0.0      6.90          NaN  
+ 20238    0.000900        156.0             0.0      6.75          NaN  
+ 20239    0.000660        160.0             0.0      5.83         20.4  
+ 20240    0.001920        160.0           150.0      9.77          3.9  
+ 20241    0.001170         73.0             0.0      3.10         15.6  
+ 
+ [20242 rows x 22 columns],
+ 'sediment':       Sample type  Latitude degrees  Latitude minutes  Latitude seconds  \
+ 0        SEDIMENT                54                 2         59.997253   
+ 1        SEDIMENT                54                24         54.003296   
+ 2        SEDIMENT                54                24         54.003296   
+ 3        SEDIMENT                54                24         54.003296   
+ 4        SEDIMENT                54                25          0.114441   
+ ...           ...               ...               ...               ...   
+ 37084    SEDIMENT                65                16         38.986816   
+ 37085    SEDIMENT                65                16         38.986816   
+ 37086    SEDIMENT                65                16         38.986816   
+ 37087    SEDIMENT                65                16         38.986816   
+ 37088    SEDIMENT                65                16         38.986816   
+ 
+       Latitude direction  Longitude degrees  Longitude minutes  \
+ 0                      N                 10                 51   
+ 1                      N                 10                 12   
+ 2                      N                 10                 12   
+ 3                      N                 10                 12   
+ 4                      N                 11                 45   
+ ...                  ...                ...                ...   
+ 37084                  N                 23                 23   
+ 37085                  N                 23                 23   
+ 37086                  N                 23                 23   
+ 37087                  N                 23                 23   
+ 37088                  N                 23                 23   
+ 
+        Longitude seconds Longitude direction  Latitude decimal  \
+ 0               0.001373                   E         54.049999   
+ 1              11.881714                   E         54.415001   
+ 2              11.881714                   E         54.415001   
+ 3              11.881714                   E         54.415001   
+ 4               0.000000                   E         54.416698   
+ ...                  ...                 ...               ...   
+ 37084          28.316803                   E         65.277496   
+ 37085          28.316803                   E         65.277496   
+ 37086          28.316803                   E         65.277496   
+ 37087          28.316803                   E         65.277496   
+ 37088          28.316803                   E         65.277496   
+ 
+        Longitude decimal Sampling start date Sampling start time Nuclide  \
+ 0              10.850000         18-Jun-1997            00:00:00     7Be   
+ 1              10.203300         21-Sep-1995            00:00:00     7Be   
+ 2              10.203300         21-Sep-1995            00:00:00     7Be   
+ 3              10.203300         21-Sep-1995            00:00:00     7Be   
+ 4              11.750000         28-Jul-1996            00:00:00     7Be   
+ ...                  ...                 ...                 ...     ...   
+ 37084          23.391199         01-Sep-2010            00:00:00   212Bi   
+ 37085          23.391199         01-Sep-2010            00:00:00   212Bi   
+ 37086          23.391199         01-Sep-2010            00:00:00   212Bi   
+ 37087          23.391199         01-Sep-2010            00:00:00   212Bi   
+ 37088          23.391199         01-Sep-2010            00:00:00   212Bi   
+ 
+       Value type    Unit  Activity or MDA  Uncertainty  Total depth  \
+ 0              =  Bq/kgd        24.299999       7.7760         22.0   
+ 1              =  Bq/kgd        45.500000       4.5500         13.0   
+ 2              &lt;  Bq/kgd         7.000000          NaN         13.0   
+ 3              &lt;  Bq/kgd         4.800000          NaN         13.0   
+ 4              =  Bq/kgd         6.900000       1.9320         24.0   
+ ...          ...     ...              ...          ...          ...   
+ 37084          =  Bq/kgd        42.900002       6.1347         90.0   
+ 37085          =  Bq/kgd        58.400002       6.1904         90.0   
+ 37086          =  Bq/kgd        51.400002       5.9624         90.0   
+ 37087          =  Bq/kgd        41.799999       5.4758         90.0   
+ 37088          =  Bq/kgd        43.700001       3.4523         90.0   
+ 
+       Sediment type  
+ 0          Pure mud  
+ 1          Pure mud  
+ 2          Pure mud  
+ 3          Pure mud  
+ 4          Pure mud  
+ ...             ...  
+ 37084        Gravel  
+ 37085        Gravel  
+ 37086        Gravel  
+ 37087        Gravel  
+ 37088        Gravel  
+ 
+ [37089 rows x 20 columns],
+ 'biota':       Sample type  Latitude degrees  Latitude minutes  Latitude seconds  \
+ 0           BIOTA                54                 4         48.006592   
+ 1           BIOTA                54                 4         48.006592   
+ 2           BIOTA                54                 4         48.006592   
+ 3           BIOTA                54                 4         48.006592   
+ 4           BIOTA                54                 4         48.006592   
+ ...           ...               ...               ...               ...   
+ 14868       BIOTA                57                20          6.724548   
+ 14869       BIOTA                57                20          6.724548   
+ 14870       BIOTA                57                20          6.724548   
+ 14871       BIOTA                57                20          6.724548   
+ 14872       BIOTA                57                20          6.724548   
+ 
+       Latitude direction  Longitude degrees  Longitude minutes  \
+ 0                      N                 11                 30   
+ 1                      N                 11                 30   
+ 2                      N                 11                 30   
+ 3                      N                 11                 30   
+ 4                      N                 11                 30   
+ ...                  ...                ...                ...   
+ 14868                  N                 12                  4   
+ 14869                  N                 12                  4   
+ 14870                  N                 12                  4   
+ 14871                  N                 12                  4   
+ 14872                  N                 12                  4   
+ 
+        Longitude seconds Longitude direction  Latitude decimal  ...  \
+ 0               0.000000                   E         54.080002  ...   
+ 1               0.000000                   E         54.080002  ...   
+ 2               0.000000                   E         54.080002  ...   
+ 3               0.000000                   E         54.080002  ...   
+ 4               0.000000                   E         54.080002  ...   
+ ...                  ...                 ...               ...  ...   
+ 14868          27.118835                   E         57.335201  ...   
+ 14869          27.118835                   E         57.335201  ...   
+ 14870          27.118835                   E         57.335201  ...   
+ 14871          27.118835                   E         57.335201  ...   
+ 14872          27.118835                   E         57.335201  ...   
+ 
+        Sampling start date Sampling start time Nuclide Value type    Unit  \
+ 0              19-Oct-1998            00:00:00     7Be          =  Bq/kgd   
+ 1              16-Jul-1998            00:00:00     7Be          =  Bq/kgd   
+ 2              18-Sep-1997            00:00:00     7Be          =  Bq/kgd   
+ 3              10-Jun-1997            00:00:00     7Be          =  Bq/kgd   
+ 4              22-Sep-1997            00:00:00     7Be          &lt;  Bq/kgd   
+ ...                    ...                 ...     ...        ...     ...   
+ 14868          17-Sep-2009            00:00:00   208Tl          =  Bq/kgd   
+ 14869          03-Nov-2008            00:00:00   208Tl          =  Bq/kgd   
+ 14870          09-Oct-2006            00:00:00   208Tl          =  Bq/kgd   
+ 14871          27-Sep-2013            00:00:00   208Tl          =  Bq/kgd   
+ 14872          04-Sep-2014            00:00:00   208Tl          =  Bq/kgd   
+ 
+       Activity or MDA  Uncertainty            Species  \
+ 0              46.500     1.813500  Fucus vesiculosus   
+ 1              66.500     6.317500  Fucus vesiculosus   
+ 2               5.430     1.574700     Mytilus edulis   
+ 3              13.700     4.384000     Mytilus edulis   
+ 4              11.300     0.000000  Fucus vesiculosus   
+ ...               ...          ...                ...   
+ 14868           0.880     0.079200  Fucus vesiculosus   
+ 14869           0.770     0.069300  Fucus vesiculosus   
+ 14870           1.310     0.142790  Fucus vesiculosus   
+ 14871           0.668     0.057448  Fucus vesiculosus   
+ 14872           0.684     0.072504  Fucus vesiculosus   
+ 
+                       Body part bio_group  
+ 0      Whole haptophytic plants        11  
+ 1      Whole haptophytic plants        11  
+ 2                  Whole animal        14  
+ 3                  Whole animal        14  
+ 4      Whole haptophytic plants        11  
+ ...                         ...       ...  
+ 14868  Whole haptophytic plants        11  
+ 14869  Whole haptophytic plants        11  
+ 14870  Whole haptophytic plants        11  
+ 14871  Whole haptophytic plants        11  
+ 14872  Whole haptophytic plants        11  
+ 
+ [14873 rows x 21 columns]}</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="encoding" class="level3">
+<h3 class="anchored" data-anchor-id="encoding">Encoding</h3>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/master/marisco/netcdf_to_csv.py#L348" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="encode" class="level3">
+<h3 class="anchored" data-anchor-id="encode">encode</h3>
+<blockquote class="blockquote">
+<pre><code> encode (fname_in, fname_out, ref_id=-1, **kwargs)</code></pre>
+</blockquote>
+<div id="cell-75" class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>encode(fname_in, fname_out, ref_id, verbose<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;marisco.serializers.OpenRefineCsvEncoder&gt;</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="todo" class="level2">
+<h2 class="anchored" data-anchor-id="todo">TODO</h2>
+<p>TODO Review Maris Nuclides lut. Cs127?</p>
+<p>TODO: Should the var be called ‘detection limit’? Is ‘value type’ more appropriate?</p>
+<p>TODO Biogroup not used in OPEN REfINE csv format. Confirm this</p>
+<p>TODO Ask about Species dbo. Paul said there is a larger one.</p>
+<p>TODO: Maintain sample (i.e.&nbsp;index) in the output.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

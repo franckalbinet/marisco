@@ -1,0 +1,41 @@
+{
+  "rules": [
+    {
+      "name": "Python Expert Guidelines",
+      "pattern": ".*",
+      "message": "You are an expert in Python, Marisco, and nbdev conventions. Ensure your code follows these guidelines:\n\n- Write concise, technical responses with accurate Python examples.\n- Use descriptive variable names that clearly indicate their purpose.\n- Prioritize readability and maintainability; follow PEP 8 style guidelines.\n- Utilize comments and docstrings for clarity, ensuring they follow nbdev conventions.\n- Structure code logically with a clear separation of concerns (modules, classes, functions).\n- Implement effective error handling and input validation.\n- Use type hints for all function signatures to enhance code clarity and usability.\n- Leverage fastcore and other utility libraries to enhance functionality and efficiency.",
+      "severity": "info"
+    },
+    {
+      "name": "IMFA Pattern Reminder",
+      "pattern": "(?i)remap|nomenclature",
+      "message": "Remember the IMFA Pattern for remapping nomenclatures:\n1. Inspect data provider nomenclature.\n2. Match automatically against MARIS nomenclature using fuzzy matching algorithms.\n3. Fix potential mismatches.\n4. Apply the lookup table to the dataframe.\nUse the `Remapper` object to facilitate this process.",
+      "severity": "info"
+    },
+    {
+      "name": "Error Handling and Validation",
+      "pattern": "(?i)error|exception|validate",
+      "message": "Ensure robust error handling and input validation:\n- Implement graceful error handling for unexpected conditions.\n- Use informative exceptions and log error messages for easier debugging.\n- Validate input data rigorously before processing to avoid runtime errors.",
+      "severity": "warning"
+    },
+    {
+      "name": "Marisco Guidelines",
+      "pattern": "marisco",
+      "message": "Follow Marisco's architectural patterns:\n- Use structured data formats (like NetCDF and CSV) and ensure data integrity.\n- Implement callbacks for modular data transformations and serializers for consistent data output.\n- Utilize configuration files for managing constants and settings.\n- Use appropriate functions from Marisco utility and config modules.\n- Maintain a consistent approach to data manipulation and ensure reproducibility.",
+      "severity": "info"
+    },
+    {
+      "name": "Performance Optimization",
+      "pattern": "(?i)performance|optimize",
+      "message": "Consider performance optimization:\n- Use vectorized operations and efficient algorithms for data processing.\n- Implement caching and other optimization techniques for large datasets.\n- Ensure functions are modular and reusable to promote code efficiency.",
+      "severity": "info"
+    }
+  ],
+  "formatters": {
+    "python": {
+      "quote_type": "single",
+      "indent_size": 4,
+      "max_line_length": 100
+    }
+  }
+}

@@ -264,7 +264,23 @@ CONFIGS_CDL = {
                     'standard_name': 'sediment_type_tbd'
                 },
                 'dtype': 'sed_type_t'
-            }
+            },
+            'top': {
+                'name': 'top',
+                'attrs': {
+                    'long_name': 'Top depth of sediment layer',
+                    'standard_name': 'top_depth_of_sediment_layer_tbd'
+                },
+                'dtype': 'f4'
+            },
+            'bottom': {
+                'name': 'bottom',
+                'attrs': {
+                    'long_name': 'Bottom depth of sediment layer',
+                    'standard_name': 'bottom_depth_of_sediment_layer_tbd'
+                },
+                'dtype': 'f4'
+            },
         },
         'suffixes':  {
             'uncertainty': {

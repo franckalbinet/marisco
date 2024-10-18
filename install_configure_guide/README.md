@@ -828,6 +828,10 @@ An integer value (the 'bodypar_id' defined in the LUT).
 ### Description:
 Top of sediment core interval relative to the water-sediment interface (cm).
 
+**_NOTE:_**
+For sediment samples, if the top slice depth is missing (i.e., sliceup = -1), there should not be multiple grab samples for the same latitude, longitude, and time. Multiple samples at the same location and time likely indicate a core was taken, but slice top and bottom information is missing. In such cases, these records should be flagged for review and excluded from analysis until complete depth information is provided.
+
+
 ### Lookup Table (LUT) in use:
 No
 

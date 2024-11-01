@@ -80,16 +80,12 @@ class Remapper():
         df = self.provider_lut_df
         for _, row in tqdm(df.iterrows(), total=len(df), desc="Processing"): 
             self._process_row(row)
-
+            
     def _process_row(self, row):
         value_to_match = row[self.provider_col_to_match]
         if isinstance(value_to_match, str):  # Only process if value is a string
-            # Convert value to lowercase for case-insensitive matching
-            value_to_match_lower = value_to_match.lower()
-            # Convert fixes keys to lowercase for case-insensitive matching
-            fixes_lower = {k.lower(): v for k, v in self.fixes.items()}
             # If value is in fixes, use the fixed value
-            name_to_match = self.fixes.get(value_to_match_lower, value_to_match)
+            name_to_match = self.fixes.get(value_to_match, value_to_match)
             
             result = match_maris_lut(self.maris_lut, name_to_match, self.maris_col_id, self.maris_col_name).iloc[0]
             match = Match(result[self.maris_col_id], result[self.maris_col_name], 

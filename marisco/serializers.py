@@ -90,6 +90,12 @@ def _create_and_copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_d
 # %% ../nbs/api/serializers.ipynb 13
 @patch
 def sanitize_if_enum_and_nan(self:NetCDFEncoder, values, fill_value=-1):
+    if self.verbose:
+        # Check for non-numeric values and print
+        non_numeric_types = [type(v) for v in values if not isinstance(v, (int, float, np.number))]
+        if non_numeric_types:
+            print(f"Non-numeric value types found: {non_numeric_types}")
+    
     values[np.isnan(values)] = int(fill_value)
     values = values.astype(int)
     return values

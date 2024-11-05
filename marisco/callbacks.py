@@ -142,9 +142,11 @@ class RemapCB(Callback):
                 ):
         fc.store_attr()
         self.lut = None
-        if isinstance(dest_grps, str): self.dest_grps = [dest_grps]
-        self.__doc__ = f"Remap values from '{col_src}' to '{col_remap}' for groups: {', '.join(dest_grps)}."
-
+        
+        if isinstance(dest_grps, str): 
+            self.dest_grps = [dest_grps]
+        self.__doc__ = f"Remap values from '{self.col_src}' to '{self.col_remap}' for groups: {', '.join(self.dest_grps) if len(self.dest_grps) > 1 else self.dest_grps[0]}."
+        
     def __call__(self, tfm):
         self.lut = self.fn_lut()
         for grp in self.dest_grps:

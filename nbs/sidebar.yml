@@ -16,5 +16,6 @@ website:
           - api/utils.ipynb
       - section: Metadata
         contents:
+          - metadata/data-curation-rules.ipynb
           - metadata/field-definition.ipynb
           - metadata/sample-uniqueness.ipynb

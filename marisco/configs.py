@@ -395,7 +395,7 @@ CONFIGS_CDL = {
             'fname': 'dbo_sedtype.xlsx', 
             'key': 'sedtype', 
             'value':'sedtype_id'
-        },
+        },  
         {
             'name': 'unit_t', 
             'fname': 'dbo_unit.xlsx', 

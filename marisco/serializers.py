@@ -85,6 +85,7 @@ def _create_and_copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_d
     group_dest.createVariable(var_name, variable_type, group_dest.dimensions, compression='zlib', complevel=9)            
     isNotEnum = type(variable_type) != netCDF4._netCDF4.EnumType
     values = df[var_name].values
+    print(values)
     group_dest[var_name][:] = values if isNotEnum else self.sanitize_if_enum_and_nan(values)
 
 # %% ../nbs/api/serializers.ipynb 13

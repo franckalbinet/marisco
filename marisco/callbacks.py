@@ -243,8 +243,10 @@ class ReshapeLongToWide(Callback):
         # making all rows (compound_idx) unique.
         # df.index.name = 'org_index'
         # df = df.reset_index()
+        print('df.columns', df.columns)
         idx = list(set(df.columns) - set(self.columns + derived_coi + self.values))
         
+        print('idx', idx)
         df, num_fill_value = self._fill_nan_values(df, idx)
 
         pivot_df = df.pivot_table(index=idx,

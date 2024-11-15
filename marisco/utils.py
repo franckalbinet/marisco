@@ -106,6 +106,7 @@ class Remapper():
         df_lut.index.name = 'source_key'
         return df_lut.sort_values(by='match_score', ascending=False)
 
+
 # %% ../nbs/api/utils.ipynb 17
 def has_valid_varname(
     var_names:list, # variable names
@@ -141,7 +142,7 @@ def has_valid_varname(
 
 # %% ../nbs/api/utils.ipynb 21
 def get_bbox(df,
-             coord_cols=('lon', 'lat')
+             coord_cols=('LON', 'LAT')
             ):
     "Get the bounding box of a DataFrame."
     x, y = coord_cols        
@@ -241,14 +242,6 @@ def match_maris_lut(
     return df[[maris_id, maris_name, 'score']]
 
 # %% ../nbs/api/utils.ipynb 45
-def get_bbox(df,
-             coord_cols=('lon', 'lat')
-            ):
-    x, y = coord_cols        
-    arr = [(row[x], row[y]) for _, row in df.iterrows()]
-    return MultiPoint(arr).envelope
-
-# %% ../nbs/api/utils.ipynb 52
 def download_files_in_folder(owner:str, 
                              repo:str, 
                              src_dir:str, 
@@ -282,7 +275,7 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
     else:
         print(f"Error: {response.status_code}")
 
-# %% ../nbs/api/utils.ipynb 54
+# %% ../nbs/api/utils.ipynb 47
 def match_worms(
     name:str # Name of species to look up in WoRMS
     ):
@@ -305,7 +298,7 @@ def match_worms(
     else:
         return -1
 
-# %% ../nbs/api/utils.ipynb 59
+# %% ../nbs/api/utils.ipynb 52
 def test_dfs(
     dfs1:dict, # First dictionary of DataFrames to compare 
     dfs2:dict # Second dictionary of DataFrames to compare

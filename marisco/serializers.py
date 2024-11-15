@@ -16,19 +16,31 @@ from fastcore.basics import patch, store_attr
 import fastcore.all as fc
 import os
 
+from marisco.configs import (
+    NC_DTYPES, 
+    NC_VARS, 
+    NC_DIM,
+    NC_GROUPS,
+    lut_path, 
+    Enums,
+    nc_tpl_path
+)
+
 # %% ../nbs/api/serializers.ipynb 4
 class NetCDFEncoder:
     "MARIS NetCDF encoder."
     def __init__(self, 
                  dfs:dict[pd.DataFrame], # dict of Dataframes to encode with group name as key {'sediment': df_sed, ...}
-                 src_fname:str, # File name and path to the MARIS CDL template
                  dest_fname:str, # Name of output file to produce
                  global_attrs:Dict, # Global attributes
-                 enums_xtra:Dict={}, # Enumeration types to overwrite
+                 src_fname:str = nc_tpl_path(), # File name and path to the MARIS CDL template
+                #  enums_xtra:Dict={}, # Enumeration types to overwrite
                  verbose:bool=False, # Print currently written NetCDF group and variable names
                  ):
         store_attr()
-        self.enum_types = {}
+        self.enum_dtypes = {}
+        self.nc_to_cols = {v:k for k,v in NC_VARS.items()}
+
 
 # %% ../nbs/api/serializers.ipynb 6
 @patch 
@@ -47,21 +59,20 @@ def copy_dimensions(self:NetCDFEncoder):
 @patch
 def process_groups(self:NetCDFEncoder):
     for grp_name, df in self.dfs.items():
-        self.process_group(grp_name, df)
+        self.process_group(NC_GROUPS[grp_name], df)
 
 # %% ../nbs/api/serializers.ipynb 9
 @patch
 def process_group(self:NetCDFEncoder, group_name, df):
     group_dest = self.dest.createGroup(group_name)
-    # Set the dimensions for each group
-    group_dest.createDimension(group_name, len(df.index))    
     self.copy_variables(group_name, df, group_dest)
 
 # %% ../nbs/api/serializers.ipynb 10
 @patch
 def copy_variables(self:NetCDFEncoder, group_name, df, group_dest):
+    cols = [NC_VARS[col] for col in df.columns if col in NC_VARS]
     for var_name, var_src in self.src.groups[group_name].variables.items():
-        if var_name in df.reset_index().columns: 
+        if var_name in cols: 
             self.copy_variable(var_name, var_src, df, group_dest)
 
 # %% ../nbs/api/serializers.ipynb 11
@@ -72,19 +83,16 @@ def copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_dest):
     if self.verbose: 
         print(80*'-')
         print(f'Group: {group_dest.name}, Variable: {var_name}')
-    # If the type of the var is an enum (meaning present in the template src) then create it
-    if dtype_name in enums_src: self.copy_enum_type(dtype_name) 
     self._create_and_copy_variable(var_name, var_src, df, group_dest, dtype_name)
     self.copy_variable_attributes(var_name, var_src, group_dest)
 
 # %% ../nbs/api/serializers.ipynb 12
 @patch
 def _create_and_copy_variable(self:NetCDFEncoder, var_name, var_src, df, group_dest, dtype_name):
-    variable_type = self.enum_types.get(dtype_name, var_src.datatype)
-    # Use the group_dest dimensions
-    group_dest.createVariable(var_name, variable_type, group_dest.dimensions, compression='zlib', complevel=9)            
+    variable_type = self.enum_dtypes.get(dtype_name, var_src.datatype)
+    group_dest.createVariable(var_name, variable_type, NC_DIM, compression='zlib', complevel=9)            
     isNotEnum = type(variable_type) != netCDF4._netCDF4.EnumType
-    values = df[var_name].values
+    values = df[self.nc_to_cols[var_name]].values
     group_dest[var_name][:] = values if isNotEnum else self.sanitize_if_enum_and_nan(values)
 
 # %% ../nbs/api/serializers.ipynb 13
@@ -114,16 +122,35 @@ def copy_enum_type(self:NetCDFEncoder, dtype_name):
 def copy_variable_attributes(self:NetCDFEncoder, var_name, var_src, group_dest):
     group_dest[var_name].setncatts(var_src.__dict__)
 
+# %% ../nbs/api/serializers.ipynb 16
+@patch
+def retrieve_all_cols(self:NetCDFEncoder, 
+                      dtypes=NC_DTYPES
+                      ):
+    "Retrieve all unique columns from the dict of dataframes." 
+    return list(set(col for df in self.dfs.values() for col in df.columns if col in dtypes.keys()))
+
 # %% ../nbs/api/serializers.ipynb 17
+@patch
+def create_enums(self:NetCDFEncoder):
+    cols = self.retrieve_all_cols()
+    enums = Enums(lut_src_dir=lut_path())
+    for col in cols:
+        name = NC_DTYPES[col]['name']
+        dtype = self.dest.createEnumType(np.int64, name, enums.types[col])
+        self.enum_dtypes[name] = dtype
+
+# %% ../nbs/api/serializers.ipynb 19
 @patch
 def encode(self:NetCDFEncoder):
     "Encode MARIS NetCDF based on template and dataframes."
     with Dataset(self.src_fname, format='NETCDF4') as self.src, Dataset(self.dest_fname, 'w', format='NETCDF4') as self.dest:
         self.copy_global_attributes()
         self.copy_dimensions()
+        self.create_enums()
         self.process_groups()
 
-# %% ../nbs/api/serializers.ipynb 26
+# %% ../nbs/api/serializers.ipynb 28
 class OpenRefineCsvEncoder:
     "OpenRefine CSV from NetCDF."
     def __init__(self, 
@@ -134,7 +161,7 @@ class OpenRefineCsvEncoder:
                  ):
         store_attr()
 
-# %% ../nbs/api/serializers.ipynb 27
+# %% ../nbs/api/serializers.ipynb 29
 @patch
 def process_groups_to_csv(self:OpenRefineCsvEncoder):
     for grp_name, df in self.dfs.items():
@@ -143,14 +170,14 @@ def process_groups_to_csv(self:OpenRefineCsvEncoder):
             df['ref_id'] = self.ref_id
         self.process_group_to_csv(grp_name, df)
 
-# %% ../nbs/api/serializers.ipynb 28
+# %% ../nbs/api/serializers.ipynb 30
 @patch
 def process_group_to_csv(self:OpenRefineCsvEncoder, group_name, df):
     filename, file_extension=os.path.splitext(self.dest_fname)
     path = filename + '_' + group_name + file_extension
     df.to_csv( path_or_buf= path, sep=',', index=False)
 
-# %% ../nbs/api/serializers.ipynb 29
+# %% ../nbs/api/serializers.ipynb 31
 @patch
 def encode(self:OpenRefineCsvEncoder):
     "Encode OpenRefine CSV based on dataframes from NetCDF."

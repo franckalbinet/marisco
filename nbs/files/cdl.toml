@@ -157,6 +157,22 @@ dtype = "sed_type_t"
 long_name = "Sediment type"
 standard_name = "sediment_type_tbd"
 
+[vars.sed.top]
+name = "top"
+dtype = "f4"
+
+[vars.sed.top.attrs]
+long_name = "Top depth of sediment layer"
+standard_name = "top_depth_of_sediment_layer_tbd"
+
+[vars.sed.bottom]
+name = "bottom"
+dtype = "f4"
+
+[vars.sed.bottom.attrs]
+long_name = "Bottom depth of sediment layer"
+standard_name = "bottom_depth_of_sediment_layer_tbd"
+
 [vars.suffixes.uncertainty]
 name = "_unc"
 dtype = "f4"

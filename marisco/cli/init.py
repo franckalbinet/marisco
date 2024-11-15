@@ -33,7 +33,7 @@ def main():
     # Write configs dictionary as `.toml` in base path
     # using config dictionary literals during initialization
     write_toml(path / CFG_FNAME, CONFIGS)
-    write_toml(path / CDL_FNAME, CONFIGS_CDL) 
+    # write_toml(path / CDL_FNAME, CONFIGS_CDL) 
     
     # Download luts (look-up table) to base path
     print('Downloading look-up tables ...')
@@ -43,4 +43,4 @@ def main():
                              src_dir=CONFIGS['paths']['luts'], 
                              dest_dir=CONFIGS['dirs']['lut'])
     
-    create_nc_template.main()
+    # create_nc_template.main()

@@ -1,0 +1,16 @@
+netcdf maris {
+types:
+  int64 enum area_t {T = 0} ;
+  int64 enum bio_group_t {_ = 0} ;
+
+dimensions:
+    id = UNLIMITED;
+
+group: seawater {
+  variables:
+    uint64 id(id);
+    float lon(id);
+    area_t area(id);
+    bio_group_t bio_group(id);
+}
+}

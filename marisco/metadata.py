@@ -13,7 +13,13 @@ from pyzotero import zotero, zotero_errors
 import json
 
 from .utils import get_bbox 
-from .callbacks import run_cbs, Callback, CompareDfsAndTfmCB
+from marisco.callbacks import (
+    run_cbs, 
+    Callback, 
+    CompareDfsAndTfmCB
+    )
+
+from .configs import get_time_units
 
 # %% ../nbs/api/metadata.ipynb 3
 class GlobAttrsFeeder:
@@ -37,7 +43,7 @@ class GlobAttrsFeeder:
 class BboxCB(Callback):
     "Compute dataset geographical bounding box"
     def __call__(self, obj):
-        bbox = get_bbox(pd.concat(obj.dfs)) 
+        bbox = get_bbox(pd.concat(obj.dfs))     
         lon_min, lon_max, lat_min, lat_max = [str(bound) for bound in bbox.bounds]
         obj.attrs.update({
             'geospatial_lat_min': lat_min, 
@@ -49,22 +55,27 @@ class BboxCB(Callback):
 # %% ../nbs/api/metadata.ipynb 5
 class DepthRangeCB(Callback):
     "Compute depth values range"
-    def __init__(self, depth_col='depth'): fc.store_attr()
+    def __init__(self, depth_col='SMP_DEPTH'): fc.store_attr()
     def __call__(self, obj):
         depths = pd.concat(obj.dfs).get(self.depth_col, default=pd.Series([]))
         if not depths.empty:
-            max_depth, min_depth = depths.max(), depths.min()
             obj.attrs.update({
-                'geospatial_vertical_max': '0' if min_depth == 0 else str(-min_depth),
-                'geospatial_vertical_min': str(-max_depth)})
+                'geospatial_vertical_max': str(depths.max()),
+                'geospatial_vertical_min': str(depths.min())})
 
 # %% ../nbs/api/metadata.ipynb 6
 class TimeRangeCB(Callback):
     "Compute time values range"
-    def __init__(self, cfg): fc.store_attr()
+    def __init__(self, 
+                 time_col:str = 'TIME',
+                 time_unit:str = get_time_units()): 
+        fc.store_attr()
+    
     def __call__(self, obj):
-        time = pd.concat(obj.dfs)['time']
-        start, end = [num2date(t, units=self.cfg['units']['time']).isoformat() 
+        time = pd.concat(obj.dfs)[self.time_col]
+        # start, end = [num2date(t, units=self.cfg['units']['time']).isoformat() 
+        #               for t in (time.min(), time.max())]
+        start, end = [num2date(t, units=self.time_unit).isoformat() 
                       for t in (time.min(), time.max())]
         obj.attrs.update({
             'time_coverage_start': start,

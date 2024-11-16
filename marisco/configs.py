@@ -126,7 +126,8 @@ NC_DTYPES = {
     },
     'SPECIES': {
         'name': 'species_t', 
-        'fname': 'dbo_species_cleaned.xlsx', 
+        # 'fname': 'dbo_species_cleaned.xlsx',
+        'fname': 'dbo_species_2024_07_22.xlsx',
         'key': 'species', 
         'value':'species_id'
     },
@@ -699,13 +700,15 @@ def get_lut(
     "Convert MARIS db lookup table excel file to dictionary `{'name': id, ...}` or `{id: name, ...}` if `reverse` is True."
     fname = Path(src_dir) / fname
     df = pd.read_excel(fname, usecols=[key, value]).dropna(subset=value)
+    
+    duplicates = df[key][df[key].duplicated()].tolist()
+    if duplicates:
+        print(f"Warning: {fname.name}: found duplicate keys: {duplicates}")
+        
     df[value] = df[value].astype('int')
     df = df.set_index(key)
     lut = df[value].to_dict()
-    
-    if do_sanitize:
-        lut = {sanitize(k): v for k, v in lut.items()}
-    
+    if do_sanitize: lut = {sanitize(k): v for k, v in lut.items()}
     lut = {try_int(k): try_int(v) for k, v in lut.items()}    
     return {v: k for k, v in lut.items()} if reverse else lut
 

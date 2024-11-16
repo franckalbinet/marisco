@@ -39,7 +39,7 @@ from marisco.configs import (
     Enums, get_lut
     )
 
-from ..serializers import NetCDFEncoder
+from ..encoders import NetCDFEncoder
 
 # %% ../../nbs/handlers/maris_legacy_long.ipynb 8
 # fname_in = Path().home() / 'pro/data/maris/MARIS_exportSample_20240313.txt'
@@ -89,7 +89,7 @@ def get_fname(dfs):
     name = name.replace(',', '').replace('.', '').replace('-', ' ').split(' ')
     return '-'.join(([str(id)] + name)) + '.nc'
 
-# %% ../../nbs/handlers/maris_legacy_long.ipynb 17
+# %% ../../nbs/handlers/maris_legacy_long.ipynb 18
 cois_renaming_rules = {
     'sample_id': 'SMP_ID',
     'latitude': 'LAT',
@@ -117,7 +117,7 @@ cois_renaming_rules = {
     'slicedown': 'BOTTOM'
 }
 
-# %% ../../nbs/handlers/maris_legacy_long.ipynb 22
+# %% ../../nbs/handlers/maris_legacy_long.ipynb 23
 class DropNAColumnsCB(Callback):
     "Drop variable containing only NaN or 'Not available' (id=0 in MARIS lookup tables)."
     def __init__(self, na_value=0): fc.store_attr()
@@ -133,10 +133,10 @@ class DropNAColumnsCB(Callback):
             tfm.dfs[k] = tfm.dfs[k].dropna(axis=1, how='all')
             tfm.dfs[k] = self.dropMarisNA(tfm.dfs[k])
 
-# %% ../../nbs/handlers/maris_legacy_long.ipynb 25
+# %% ../../nbs/handlers/maris_legacy_long.ipynb 26
 dl_name_to_id = lambda: get_lut(lut_path(), 'dbo_detectlimit.xlsx', key='name', value='id')
 
-# %% ../../nbs/handlers/maris_legacy_long.ipynb 27
+# %% ../../nbs/handlers/maris_legacy_long.ipynb 28
 class SanitizeDetectionLimitCB(Callback):
     "Assign Detection Limit name to its id based on MARIS nomenclature."
     def __init__(self,
@@ -149,7 +149,7 @@ class SanitizeDetectionLimitCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k][self.dl_name] = tfm.dfs[k][self.dl_name].replace(lut)
 
-# %% ../../nbs/handlers/maris_legacy_long.ipynb 31
+# %% ../../nbs/handlers/maris_legacy_long.ipynb 32
 class ParseTimeCB(Callback):
     "Parse time column from MARIS dump."
     def __init__(self,
@@ -160,7 +160,7 @@ class ParseTimeCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k][self.time_name] = pd.to_datetime(tfm.dfs[k][self.time_name], format='ISO8601')
 
-# %% ../../nbs/handlers/maris_legacy_long.ipynb 39
+# %% ../../nbs/handlers/maris_legacy_long.ipynb 42
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -172,7 +172,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/maris_legacy_long.ipynb 40
+# %% ../../nbs/handlers/maris_legacy_long.ipynb 43
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve global attributes from MARIS dump."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -184,7 +184,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/maris_legacy_long.ipynb 42
+# %% ../../nbs/handlers/maris_legacy_long.ipynb 45
 def encode(fname_in, fname_out, dataloader=None, **kwargs):
     if dataloader is None: dataloader = DataLoader(fname_in)._load_data()
     ref_ids = kwargs.get('ref_ids', dataloader.df.ref_id.unique())

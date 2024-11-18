@@ -23,7 +23,8 @@ from marisco.configs import (
     get_lut, 
     nuc_lut_path, 
     nc_tpl_path,
-    get_time_units
+    get_time_units,
+    NC_GROUPS
 )
 
 from .utils import Match
@@ -172,7 +173,9 @@ class AddSampleTypeIdColumnCB(Callback):
         self.lut = {v['name']: v['id'] for v in cdl_cfg()['grps'].values()}
         
     def __call__(self, tfm):
-        for grp, df in tfm.dfs.items(): df[self.col_name] = self.lut[grp]
+        for grp, df in tfm.dfs.items():             
+            grp= NC_GROUPS.get(grp, grp) 
+            df[self.col_name] = self.lut[grp]
 
 # %% ../nbs/api/callbacks.ipynb 31
 class AddNuclideIdColumnCB(Callback):

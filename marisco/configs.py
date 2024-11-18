@@ -165,6 +165,7 @@ CONFIGS = {
         'tmp': str(base_path() / 'tmp')
     },
     'paths': {
+        'nc_template': 'nbs/files/nc',
         'luts': 'nbs/files/lut'
     },
     'units': {

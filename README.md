@@ -79,17 +79,13 @@ maris_init
 This command:
 
 1.  creates a `.marisco/` directory containing various
-    configuration/configurable files ((below)) in your `/home` directory
+    configuration/configurable files ((below)) in your `/home`
+    directory;
 2.  creates a `configs.toml` file containing default but configurable
-    settings (default paths, …)
-3.  creates a configurable `cdl.toml` file used to generate a MARIS
-    [NetCDF4 CDL (Common Data
-    Language)](https://www.unidata.ucar.edu/software/netcdf/workshops/most-recent/nc3model/Cdl.html)
-    template;
-4.  downloads several MARIS DB nomenclature/lookup table into
-    `.marisco/lut/` directory
-5.  generate `maris-template.nc`, the MARIS NetCDF4 template generated
-    from `cdl.toml` and use to encode MARIS datasets
+    settings (default paths, …);
+3.  downloads several MARIS DB nomenclature/lookup table into
+    `.marisco/lut/` directory;
+4.  downloads `maris-template.nc`, the MARIS NetCDF4 template.
 
 > [!TIP]
 >
@@ -116,12 +112,8 @@ All commands accept a `-h` argument to get access to its documentation.
 
 #### `maris_init`
 
-Create configuration files, MARIS NetCDF CDL (Common Data Language) and
-donwload required lookup tables (nomenclatures).
-
-#### `maris_create_nc_template`
-
-Generate MARIS NetCDF template to be used when encoding datasets
+Donwload configuration file, NetCDF MAris template and required lookup
+tables (nomenclatures).
 
 #### `maris_netcdfy`
 
@@ -141,17 +133,13 @@ maris_netcdfy helcom _data/accdb/mors/csv _data/output/helcom.nc
 
 ## Development
 
-### FAQ
+The MARIS NetCDF template is generated from `nbs/files/cdl/maris.cdl`
+Common Data Language (CDL) file as defined by
+[Unidata](https://docs.unidata.ucar.edu/). To generate the MARIS NetCDF
+template `nbs/files/nc/maris-template.nc`, install the
+[NetCDF-C](https://pjbartlein.github.io/REarthSysSci/install_netCDF.html)
+utilities, once in `Marisco` home directory, run:
 
-#### How is `cdl.toml` created & what it is used for?
-
-A Python dictionary named `CONFIGS_CDL` specifying MARIS NetCDF
-attributes, variables, dimensions, … is defined in
-`nbs/api/configs.ipynb` in the first instance. Running the command
-`maris_init` will generate a [`toml`](https://www.wikiwand.com/fr/TOML)
-version of it named `.marisco/cdl.toml` further used to create a MARIS
-NetCDF template named in `.marisco/maris-template.nc`.
-
-Once `marisco` installed, further customization of the MARIS NetCDF
-template can be done directly through `.marisco/cdl.toml` file then
-running the command `maris_create_nc_template`.
+``` console
+ncgen -4 -o nc/maris-template.nc cdl/maris.cdl
+```

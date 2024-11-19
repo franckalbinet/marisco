@@ -112,7 +112,7 @@ def load_data(src_dir: str|Path,
     
     return {smp_type: load_and_merge(file_prefix) for file_prefix, smp_type in smp_types.items()}  
 
-# %% ../../nbs/handlers/helcom.ipynb 38
+# %% ../../nbs/handlers/helcom.ipynb 36
 fixes_nuclide_names = {
     'cs134137': 'cs134_137_tot',
     'cm243244': 'cm243_244_tot',
@@ -130,7 +130,7 @@ fixes_nuclide_names = {
     'cs138': 'cs137'
     }
 
-# %% ../../nbs/handlers/helcom.ipynb 42
+# %% ../../nbs/handlers/helcom.ipynb 40
 # Create a lookup table for nuclide names
 lut_nuclides = lambda df: Remapper(provider_lut_df=df,
                                    maris_lut_fn=nuc_lut_path,
@@ -141,7 +141,7 @@ lut_nuclides = lambda df: Remapper(provider_lut_df=df,
                                    fname_cache='nuclides_helcom.pkl').generate_lookup_table(fixes=fixes_nuclide_names, 
                                                                                             as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/helcom.ipynb 43
+# %% ../../nbs/handlers/helcom.ipynb 42
 class RemapNuclideNameCB(Callback):
     "Remap data provider nuclide names to MARIS nuclide names."
     def __init__(self, 
@@ -155,13 +155,13 @@ class RemapNuclideNameCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k]['NUCLIDE'] = tfm.dfs[k]['NUCLIDE'].replace(lut)
 
-# %% ../../nbs/handlers/helcom.ipynb 52
+# %% ../../nbs/handlers/helcom.ipynb 53
 class ParseTimeCB(Callback):
     "Parse and standardize time information in the dataframe."
     def __call__(self, tfm: Transformer):
         for df in tfm.dfs.values():
             self._process_dates(df)
-            self._define_beg_period(df)
+            # self._define_beg_period(df) # REMOVE STEP - we will use an OPEN REFINE decoder to replace the open refine encoder. 
 
     def _process_dates(self, df: pd.DataFrame) -> None:
         "Process and correct date and time information in the DataFrame."
@@ -189,17 +189,18 @@ class ParseTimeCB(Callback):
             format='%Y%m%d', 
             errors='coerce'
         )
-
+    ''' REMOVE STEP - we will use an OPEN REFINE decoder to replace the open refine encoder. 
     def _define_beg_period(self, df: pd.DataFrame) -> None:
         "Create a standardized date representation for Open Refine."
         df['begperiod'] = df['time']
+    '''
 
-# %% ../../nbs/handlers/helcom.ipynb 61
+# %% ../../nbs/handlers/helcom.ipynb 62
 coi_val = {'seawater' : {'val': 'VALUE_Bq/m³'},
            'biota':  {'val': 'VALUE_Bq/kg'},
            'sediment': {'val': 'VALUE_Bq/kg'}}
 
-# %% ../../nbs/handlers/helcom.ipynb 62
+# %% ../../nbs/handlers/helcom.ipynb 63
 class SanitizeValue(Callback):
     "Sanitize value/measurement by removing blank entries and populating `value` column."
     def __init__(self, 
@@ -213,7 +214,7 @@ class SanitizeValue(Callback):
             df.dropna(subset=[value_col], inplace=True)
             df['value'] = df[value_col]
 
-# %% ../../nbs/handlers/helcom.ipynb 66
+# %% ../../nbs/handlers/helcom.ipynb 67
 def unc_rel2stan(
     df: pd.DataFrame, # DataFrame containing measurement and uncertainty columns
     meas_col: str, # Name of the column with measurement values
@@ -222,13 +223,13 @@ def unc_rel2stan(
     "Convert relative uncertainty to absolute uncertainty."
     return df.apply(lambda row: row[unc_col] * row[meas_col] / 100, axis=1)
 
-# %% ../../nbs/handlers/helcom.ipynb 68
+# %% ../../nbs/handlers/helcom.ipynb 69
 # Columns of interest
 coi_units_unc = [('seawater', 'VALUE_Bq/m³', 'ERROR%_m³'),
                  ('biota', 'VALUE_Bq/kg', 'ERROR%'),
                  ('sediment', 'VALUE_Bq/kg', 'ERROR%_kg')]
 
-# %% ../../nbs/handlers/helcom.ipynb 70
+# %% ../../nbs/handlers/helcom.ipynb 71
 class NormalizeUncCB(Callback):
     "Convert from relative error % to uncertainty of activity unit."
     def __init__(self, 
@@ -243,14 +244,14 @@ class NormalizeUncCB(Callback):
                 df = tfm.dfs[grp]
                 df['uncertainty'] = self.fn_convert_unc(df, val, unc)
 
-# %% ../../nbs/handlers/helcom.ipynb 80
+# %% ../../nbs/handlers/helcom.ipynb 81
 fixes_biota_species = {
     'CARDIUM EDULE': 'Cerastoderma edule',
     'LAMINARIA SACCHARINA': 'Saccharina latissima',
     'PSETTA MAXIMA': 'Scophthalmus maximus',
     'STIZOSTEDION LUCIOPERCA': 'Sander luciopercas'}
 
-# %% ../../nbs/handlers/helcom.ipynb 84
+# %% ../../nbs/handlers/helcom.ipynb 85
 lut_biota = lambda: Remapper(provider_lut_df=pd.read_csv(Path(fname_in) / 'RUBIN_NAME.csv'),
                              maris_lut_fn=species_lut_path,
                              maris_col_id='species_id',
@@ -260,13 +261,13 @@ lut_biota = lambda: Remapper(provider_lut_df=pd.read_csv(Path(fname_in) / 'RUBIN
                              fname_cache='species_helcom.pkl'
                              ).generate_lookup_table(fixes=fixes_biota_species, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/helcom.ipynb 90
+# %% ../../nbs/handlers/helcom.ipynb 91
 fixes_biota_tissues = {
     'WHOLE FISH WITHOUT HEAD AND ENTRAILS': 'Whole animal eviscerated without head',
     'ENTRAILS': 'Viscera',
     'SKIN/EPIDERMIS': 'Skin'}
 
-# %% ../../nbs/handlers/helcom.ipynb 93
+# %% ../../nbs/handlers/helcom.ipynb 94
 lut_tissues = lambda: Remapper(provider_lut_df=pd.read_csv('../../_data/accdb/mors/csv/TISSUE.csv'),
                                maris_lut_fn=bodyparts_lut_path,
                                maris_col_id='bodypar_id',
@@ -276,11 +277,11 @@ lut_tissues = lambda: Remapper(provider_lut_df=pd.read_csv('../../_data/accdb/mo
                                fname_cache='tissues_helcom.pkl'
                                ).generate_lookup_table(fixes=fixes_biota_tissues, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/helcom.ipynb 97
+# %% ../../nbs/handlers/helcom.ipynb 98
 lut_biogroup = lambda: get_lut(species_lut_path().parent, species_lut_path().name, 
                                key='species_id', value='biogroup_id')
 
-# %% ../../nbs/handlers/helcom.ipynb 100
+# %% ../../nbs/handlers/helcom.ipynb 101
 # TODO: Include Commonname field after next MARIS data reconciling process.
 def get_taxon_info_lut(
     maris_lut:str # Path to the MARIS lookup table (Excel file)
@@ -291,7 +292,7 @@ def get_taxon_info_lut(
 
 lut_taxon = lambda: get_taxon_info_lut(species_lut_path())
 
-# %% ../../nbs/handlers/helcom.ipynb 101
+# %% ../../nbs/handlers/helcom.ipynb 102
 class RemapTaxonInformationCB(Callback):
     "Update taxon information based on MARIS species LUT."
     def __init__(self, fn_lut: Callable):
@@ -311,12 +312,12 @@ class RemapTaxonInformationCB(Callback):
         if len(unmatched) > 0:
             print(f"Unmatched species IDs: {', '.join(unmatched)}")
 
-# %% ../../nbs/handlers/helcom.ipynb 110
+# %% ../../nbs/handlers/helcom.ipynb 111
 fixes_sediments = {
     'NO DATA': '(Not available)'
 }
 
-# %% ../../nbs/handlers/helcom.ipynb 112
+# %% ../../nbs/handlers/helcom.ipynb 113
 class RemapSedimentCB(Callback):
     "Update sediment id based on MARIS species LUT (dbo_sedtype.xlsx)."
     def __init__(self, 
@@ -356,7 +357,7 @@ class RemapSedimentCB(Callback):
         "Print the SEDI value if the matched_id is -1."
         print(f"Unmatched SEDI: {sedi_value}")
 
-# %% ../../nbs/handlers/helcom.ipynb 113
+# %% ../../nbs/handlers/helcom.ipynb 114
 lut_sediments = lambda: Remapper(provider_lut_df=pd.read_csv(Path(fname_in) / 'SEDIMENT_TYPE.csv'),
                                  maris_lut_fn=sediments_lut_path,
                                  maris_col_id='sedtype_id',
@@ -366,7 +367,7 @@ lut_sediments = lambda: Remapper(provider_lut_df=pd.read_csv(Path(fname_in) / 'S
                                  fname_cache='sediments_helcom.pkl'
                                  ).generate_lookup_table(fixes=fixes_sediments, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/helcom.ipynb 123
+# %% ../../nbs/handlers/helcom.ipynb 124
 lut_units = {
     'seawater': 1,  # 'Bq/m3'
     'sediment': 4,  # 'Bq/kgd' for sediment
@@ -377,7 +378,7 @@ lut_units = {
     }
 }
 
-# %% ../../nbs/handlers/helcom.ipynb 124
+# %% ../../nbs/handlers/helcom.ipynb 125
 class RemapUnitCB(Callback):
     "Set the `unit` id column in the DataFrames based on a lookup table."
     def __init__(self, 
@@ -392,10 +393,10 @@ class RemapUnitCB(Callback):
             else:
                 tfm.dfs[grp]['unit'] = tfm.dfs[grp]['BASIS'].apply(lambda x: lut_units[grp].get(x, 0))
 
-# %% ../../nbs/handlers/helcom.ipynb 129
+# %% ../../nbs/handlers/helcom.ipynb 130
 lut_dl = lambda: pd.read_excel(detection_limit_lut_path(), usecols=['name','id']).set_index('name').to_dict()['id']
 
-# %% ../../nbs/handlers/helcom.ipynb 131
+# %% ../../nbs/handlers/helcom.ipynb 132
 coi_dl = {'seawater' : {'val' : 'VALUE_Bq/m³',
                        'unc' : 'ERROR%_m³',
                        'dl' : '< VALUE_Bq/m³'},
@@ -407,7 +408,7 @@ coi_dl = {'seawater' : {'val' : 'VALUE_Bq/m³',
               'unc' : 'ERROR%_kg',
               'dl' : '< VALUE_Bq/kg'}}
 
-# %% ../../nbs/handlers/helcom.ipynb 134
+# %% ../../nbs/handlers/helcom.ipynb 135
 # TO BE REFACTORED
 class RemapDetectionLimitCB(Callback):
     "Remap value type to MARIS format."
@@ -447,14 +448,14 @@ class RemapDetectionLimitCB(Callback):
         # Perform lookup
         df['detection_limit'] = df['detection_limit'].map(lut)
 
-# %% ../../nbs/handlers/helcom.ipynb 142
+# %% ../../nbs/handlers/helcom.ipynb 143
 lut_filtered = {
     'N': 2,
     'n': 2,
     'F': 1
 }
 
-# %% ../../nbs/handlers/helcom.ipynb 144
+# %% ../../nbs/handlers/helcom.ipynb 145
 class RemapFiltCB(Callback):
     "Lookup FILT value in dataframe using the lookup table."
     def __init__(self,
@@ -467,7 +468,7 @@ class RemapFiltCB(Callback):
             if 'FILT' in df.columns:
                 df['FILT'] = df['FILT'].map(lambda x: self.lut_filtered.get(x, 0))
 
-# %% ../../nbs/handlers/helcom.ipynb 149
+# %% ../../nbs/handlers/helcom.ipynb 150
 class AddSampleLabCodeCB(Callback):
     "Remap `KEY` column to `samplabcode` in each DataFrame."
     def __call__(self, tfm: Transformer):
@@ -477,10 +478,10 @@ class AddSampleLabCodeCB(Callback):
     def _remap_sample_id(self, df: pd.DataFrame):
         df['samplabcode'] = df['KEY']
 
-# %% ../../nbs/handlers/helcom.ipynb 154
+# %% ../../nbs/handlers/helcom.ipynb 155
 lut_method = lambda: pd.read_csv(Path(fname_in) / 'ANALYSIS_METHOD.csv').set_index('METHOD').to_dict()['DESCRIPTION']
 
-# %% ../../nbs/handlers/helcom.ipynb 155
+# %% ../../nbs/handlers/helcom.ipynb 156
 class AddMeasurementNoteCB(Callback):
     "Record measurement notes by adding a 'measurenote' column to DataFrames."
     def __init__(self, 
@@ -494,7 +495,7 @@ class AddMeasurementNoteCB(Callback):
             if 'METHOD' in df.columns:
                 df['measurementnote'] = df['METHOD'].map(lambda x: lut.get(x, 0))
 
-# %% ../../nbs/handlers/helcom.ipynb 159
+# %% ../../nbs/handlers/helcom.ipynb 160
 class RemapStationIdCB(Callback):
     "Remap Station ID to MARIS format."
     def __init__(self):
@@ -505,7 +506,7 @@ class RemapStationIdCB(Callback):
         for grp in tfm.dfs.keys(): 
             tfm.dfs[grp]['station'] = tfm.dfs[grp]['STATION']
 
-# %% ../../nbs/handlers/helcom.ipynb 163
+# %% ../../nbs/handlers/helcom.ipynb 164
 class RemapSedSliceTopBottomCB(Callback):
     "Remap Sediment slice top and bottom to MARIS format."
     def __call__(self, tfm: Transformer):
@@ -513,7 +514,7 @@ class RemapSedSliceTopBottomCB(Callback):
         tfm.dfs['sediment']['top'] = tfm.dfs['sediment']['UPPSLI']
         tfm.dfs['sediment']['bottom'] = tfm.dfs['sediment']['LOWSLI']
 
-# %% ../../nbs/handlers/helcom.ipynb 168
+# %% ../../nbs/handlers/helcom.ipynb 169
 class LookupDryWetRatio(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm: Transformer):
@@ -529,7 +530,7 @@ class LookupDryWetRatio(Callback):
         df.loc[df['dry_wet_ratio'] == 0, 'dry_wet_ratio'] = np.NaN
 
 
-# %% ../../nbs/handlers/helcom.ipynb 175
+# %% ../../nbs/handlers/helcom.ipynb 176
 class ParseCoordinates(Callback):
     """
     Get geographical coordinates from columns expressed in degrees decimal format 
@@ -579,7 +580,7 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 186
+# %% ../../nbs/handlers/helcom.ipynb 187
 def get_common_rules(
     vars: dict, # Configuration dictionary
     encoding_type: str # Encoding type (`netcdf` or `openrefine`)
@@ -620,7 +621,7 @@ def get_common_rules(
     
     return common
 
-# %% ../../nbs/handlers/helcom.ipynb 187
+# %% ../../nbs/handlers/helcom.ipynb 188
 def get_specific_rules(
     vars: dict, # Configuration dictionary
     encoding_type: str # Encoding type (`netcdf` or `openrefine`)
@@ -661,7 +662,7 @@ def get_specific_rules(
             }
         }
 
-# %% ../../nbs/handlers/helcom.ipynb 188
+# %% ../../nbs/handlers/helcom.ipynb 189
 def get_renaming_rules(
     encoding_type: str = 'netcdf' # Encoding type (`netcdf` or `openrefine`)
     ) -> dict: # Renaming rules for NetCDF and OpenRefine.
@@ -681,7 +682,7 @@ def get_renaming_rules(
     
     return dict(rules)
 
-# %% ../../nbs/handlers/helcom.ipynb 189
+# %% ../../nbs/handlers/helcom.ipynb 190
 class SelectAndRenameColumnCB(Callback):
     "Select and rename columns in a DataFrame based on renaming rules for a specified encoding type."
     def __init__(self, 
@@ -752,7 +753,7 @@ class SelectAndRenameColumnCB(Callback):
         return df, not_found_keys
 
 
-# %% ../../nbs/handlers/helcom.ipynb 199
+# %% ../../nbs/handlers/helcom.ipynb 200
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -764,7 +765,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 200
+# %% ../../nbs/handlers/helcom.ipynb 201
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -780,7 +781,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 202
+# %% ../../nbs/handlers/helcom.ipynb 203
 def enums_xtra(
     tfm: Transformer, # Transformer object
     vars: list # List of variables to extract from the transformer
@@ -794,7 +795,7 @@ def enums_xtra(
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/helcom.ipynb 204
+# %% ../../nbs/handlers/helcom.ipynb 205
 def encode(
     fname_in: str, # Input file name
     fname_out_nc: str, # Output file name

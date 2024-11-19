@@ -95,8 +95,13 @@ class Remapper():
             # Handle non-string values (e.g., NaN)
             self.lut[row[self.provider_col_key]] = Match(-1, "Unknown", value_to_match, 0)
             
-    def select_match(self, match_score_threshold:int=1):
+    def select_match(self, match_score_threshold:int=1, verbose:bool=False):
+        if verbose:
+            matched_len= len([v for v in self.lut.values() if v.match_score < match_score_threshold])
+            print(f"{matched_len} entries matched the criteria, while {len(self.lut) - matched_len} entries had a match score of {match_score_threshold} or higher.")
+            
         self.lut = {k: v for k, v in self.lut.items() if v.match_score >= match_score_threshold}
+                  
         return self._format_output()
 
     def _format_output(self):

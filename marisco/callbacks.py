@@ -14,7 +14,7 @@ from operator import attrgetter
 from cftime import date2num
 import numpy as np
 import pandas as pd
-from .configs import cfg, cdl_cfg, grp_names
+from .configs import NC_GROUPS,cfg, cdl_cfg
 from functools import partial 
 from typing import List, Dict, Callable, Tuple, Any, Optional
 from pathlib import Path 
@@ -114,7 +114,7 @@ class RemapCB(Callback):
                  fn_lut: Callable, # Function that returns the lookup table dictionary
                  col_remap: str, # Name of the column to remap
                  col_src: str, # Name of the column with the source values
-                 dest_grps: list[str]|str=grp_names(), # List of destination groups
+                 dest_grps: list[str]|str=NC_GROUPS.keys(), # List of destination groups
                  default_value: Any = -1 # Default value for unmatched entries
                 ):
         fc.store_attr()

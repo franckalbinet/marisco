@@ -6,6 +6,7 @@ website:
         contents:
           - handlers/helcom.ipynb
           - handlers/maris_legacy.ipynb
+          - handlers/geotraces.ipynb
       - section: API
         contents:
           - api/callbacks.ipynb

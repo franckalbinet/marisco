@@ -21,7 +21,11 @@ from operator import attrgetter
 from dataclasses import dataclass
 from typing import List, Dict, Callable, Tuple
 
-from .configs import species_lut_path, sediments_lut_path, cache_path
+from marisco.configs import (
+    species_lut_path, 
+    sediments_lut_path, 
+    cache_path
+)
 
 import jellyfish as jf
 from collections.abc import Callable

@@ -40,7 +40,6 @@ from marisco.callbacks import (
     AddNuclideIdColumnCB, 
     LowerStripNameCB, 
     SanitizeLonLatCB, 
-    ReshapeLongToWide, 
     CompareDfsAndTfmCB, 
     RemapCB
 )
@@ -59,7 +58,6 @@ from marisco.configs import (
     nc_tpl_path, 
     cfg, 
     cache_path, 
-    cdl_cfg, 
     Enums, 
     lut_path, 
     species_lut_path, 

@@ -38,8 +38,7 @@ from marisco.configs import (
     AVOGADRO,
     NC_VARS,
     get_lut,
-    lut_path, 
-    cdl_cfg, 
+    lut_path,
     cfg, 
     nc_tpl_path, 
     Enums

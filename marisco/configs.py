@@ -580,60 +580,68 @@ def nuc_lut_path():
     return Path(cfg()['dirs']['lut']) / NUCLIDE_LOOKUP_FNAME
 
 # %% ../nbs/api/configs.ipynb 27
-def species_lut_path():
+def species_lut_path(fname: str= 'dbo_species.xlsx'):
     "Return the path to the species lookup table."
     src_dir = lut_path()
-    fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'species_t'][0]['fname']
     return src_dir / fname
+
+species_lut_path()
 
 # %% ../nbs/api/configs.ipynb 28
-def bodyparts_lut_path():
+def bodyparts_lut_path(fname: str= 'dbo_bodypar.xlsx'):
     "Return the path to the body parts lookup table."
     src_dir = lut_path()
-    fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'body_part_t'][0]['fname']
     return src_dir / fname
+
+bodyparts_lut_path()
 
 # %% ../nbs/api/configs.ipynb 29
-def biogroup_lut_path():
+def biogroup_lut_path(fname: str= 'dbo_biogroup.xlsx'):
     "Return the path to the biota group lookup table."
     src_dir = lut_path()
-    fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'bio_group_t'][0]['fname']
     return src_dir / fname
+
+biogroup_lut_path()
 
 # %% ../nbs/api/configs.ipynb 30
-def sediments_lut_path():
+def sediments_lut_path(fname: str= 'dbo_sedtype.xlsx'):
     "Return the path to the sediment type lookup table."
     src_dir = lut_path()
-    fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'sed_type_t'][0]['fname']
     return src_dir / fname
+
+sediments_lut_path()
 
 # %% ../nbs/api/configs.ipynb 31
-def unit_lut_path():
+def unit_lut_path(fname: str= 'dbo_unit.xlsx'):
     "Return the path to the unit lookup table."
     src_dir = lut_path()
-    fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'unit_t'][0]['fname']
     return src_dir / fname
+
+unit_lut_path()
 
 # %% ../nbs/api/configs.ipynb 32
-def detection_limit_lut_path():
+def detection_limit_lut_path(fname: str= 'dbo_detectlimit.xlsx'):
     "Return the path to the detection limit lookup table."
     src_dir = lut_path()
-    fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'dl_t'][0]['fname']
     return src_dir / fname
+
+detection_limit_lut_path()
 
 # %% ../nbs/api/configs.ipynb 33
-def filtered_lut_path():
+def filtered_lut_path(fname: str= 'dbo_filtered.xlsx'):
     "Return the path to the filtered lookup table."
     src_dir = lut_path()
-    fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'filt_t'][0]['fname']
     return src_dir / fname
 
+filtered_lut_path()
+
 # %% ../nbs/api/configs.ipynb 34
-def area_lut_path():
+def area_lut_path(fname: str= 'dbo_area.xlsx'):
     "Return the path to the area lookup table."
     src_dir = lut_path()
-    fname = [enum for enum in cdl_cfg()['enums'] if enum['name'] == 'area_t'][0]['fname']
     return src_dir / fname
+
+area_lut_path()
 
 # %% ../nbs/api/configs.ipynb 36
 NETCDF_TO_PYTHON_TYPE = {
@@ -655,13 +663,13 @@ def nc_tpl_name():
     p = base_path()
     return read_toml(p / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 42
+# %% ../nbs/api/configs.ipynb 41
 def nc_tpl_path():
     "Return the path of the MARIS NetCDF template as defined in `configs.toml`"
     p = base_path()
     return p / read_toml(p / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 44
+# %% ../nbs/api/configs.ipynb 42
 def get_time_units(
     nc_path: Callable=nc_tpl_path # Function returning Path to NetCDF template file
     ) -> str: # Time units string (e.g. 'seconds since 1970-01-01 00:00:00.0')
@@ -673,7 +681,7 @@ def get_time_units(
                 
     raise ValueError("Time variable not found in NetCDF file")
 
-# %% ../nbs/api/configs.ipynb 48
+# %% ../nbs/api/configs.ipynb 46
 def sanitize(
     s: str|float # String or float to sanitize
     ) -> str|float:  # Sanitized string or original float
@@ -692,7 +700,7 @@ def sanitize(
     else:
         return str(s).strip()
 
-# %% ../nbs/api/configs.ipynb 52
+# %% ../nbs/api/configs.ipynb 50
 def try_int(x):
     "Try to convert `x` to an integer."
     try:
@@ -700,7 +708,7 @@ def try_int(x):
     except (ValueError, TypeError):
         return x
 
-# %% ../nbs/api/configs.ipynb 53
+# %% ../nbs/api/configs.ipynb 51
 def get_lut(
     src_dir: str, # Directory containing lookup tables
     fname: str, # Excel file lookup table name
@@ -725,7 +733,7 @@ def get_lut(
     lut = {try_int(k): try_int(v) for k, v in lut.items()}    
     return {v: k for k, v in lut.items()} if reverse else lut
 
-# %% ../nbs/api/configs.ipynb 56
+# %% ../nbs/api/configs.ipynb 54
 class Enums():
     "Return dictionaries of MARIS NetCDF's enumeration types."
     def __init__(self, 

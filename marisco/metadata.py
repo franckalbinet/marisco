@@ -11,7 +11,7 @@ import fastcore.all as fc
 from cftime import num2date
 from pyzotero import zotero, zotero_errors
 import json
-from typing import Dict, List
+from typing import Dict, List, Callable
 
 from .utils import get_bbox 
 from .configs import get_time_units, cfg
@@ -69,13 +69,12 @@ class TimeRangeCB(Callback):
     "Compute time values range"
     def __init__(self, 
                  time_col: str='TIME',
-                 time_unit: str=get_time_units()): 
+                 fn_time_unit: Callable=get_time_units): 
         fc.store_attr()
+        self.time_unit = fn_time_unit()
     
     def __call__(self, obj):
         time = pd.concat(obj.dfs)[self.time_col]
-        # start, end = [num2date(t, units=self.cfg['units']['time']).isoformat() 
-        #               for t in (time.min(), time.max())]
         start, end = [num2date(t, units=self.time_unit).isoformat() 
                       for t in (time.min(), time.max())]
         obj.attrs.update({

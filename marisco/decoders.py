@@ -6,16 +6,12 @@
 __all__ = ['nc_to_dfs']
 
 # %% ../nbs/api/decoders.ipynb 3
-import netCDF4
 from pathlib import Path
 from netCDF4 import Dataset
-import pandas as pd
-from typing import Dict, Callable
 import pandas as pd
 import numpy as np
 from fastcore.basics import patch, store_attr
 import fastcore.all as fc
-import os
 
 from marisco.configs import (
     NC_DTYPES, 

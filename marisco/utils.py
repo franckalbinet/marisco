@@ -17,28 +17,26 @@ import numpy as np
 from tqdm import tqdm 
 import requests
 from shapely import MultiPoint
-from operator import attrgetter
-from dataclasses import dataclass
-from typing import List, Dict, Callable, Tuple
-
-from marisco.configs import (
-    species_lut_path, 
-    sediments_lut_path, 
-    cache_path
-)
-
 import jellyfish as jf
-from collections.abc import Callable
+from dataclasses import dataclass
 
-# %% ../nbs/api/utils.ipynb 5
+from typing import List, Dict, Callable, Tuple, Optional
+
+from .configs import cache_path
+
+
+# from collections.abc import Callable
+
+# %% ../nbs/api/utils.ipynb 4
+# TBD: move to configs
 NA = 'Not available'
 
-# %% ../nbs/api/utils.ipynb 8
-def get_unique_across_dfs(dfs:dict,  # Dictionary of dataframes
-                          col_name:str='NUCLIDE', # Column name to extract unique values from
-                          as_df:bool=False, # Return a DataFrame of unique values
-                          include_nchars:bool=False # Add a column with the number of characters in the value
-                          ) -> list: # Returns a list of unique column values across dataframes
+# %% ../nbs/api/utils.ipynb 7
+def get_unique_across_dfs(dfs: Dict[str, pd.DataFrame],  # Dictionary of dataframes
+                          col_name: str='NUCLIDE', # Column name to extract unique values from
+                          as_df: bool=False, # Return a DataFrame of unique values
+                          include_nchars: bool=False # Add a column with the number of characters in the value
+                          ) -> List[str]: # Returns a list of unique column values across dataframes
     "Get a list of unique column values across dataframes."
     unique_values = list(set().union(*(df[col_name].unique() for df in dfs.values() if col_name in df.columns)))
     if not as_df:
@@ -48,17 +46,17 @@ def get_unique_across_dfs(dfs:dict,  # Dictionary of dataframes
         if include_nchars: df_uniques['n_chars'] = df_uniques['value'].str.len()
         return df_uniques
 
-# %% ../nbs/api/utils.ipynb 14
+# %% ../nbs/api/utils.ipynb 13
 class Remapper():
     "Remap a data provider lookup table to a MARIS lookup table using fuzzy matching."
     def __init__(self,
-                 provider_lut_df:pd.DataFrame, # Data provider lookup table to be remapped
-                 maris_lut_fn:callable, # Function that returns the MARIS lookup table path
-                 maris_col_id:str, # MARIS lookup table column name for the id
-                 maris_col_name:str, # MARIS lookup table column name for the name
-                 provider_col_to_match:str, # Data provider lookup table column name for the name to match
-                 provider_col_key, # Data provider lookup table column name for the key
-                 fname_cache  # Cache file name
+                 provider_lut_df: pd.DataFrame, # Data provider lookup table to be remapped
+                 maris_lut_fn: Callable, # Function that returns the MARIS lookup table path
+                 maris_col_id: str, # MARIS lookup table column name for the id
+                 maris_col_name: str, # MARIS lookup table column name for the name
+                 provider_col_to_match: str, # Data provider lookup table column name for the name to match
+                 provider_col_key: str, # Data provider lookup table column name for the key
+                 fname_cache: str # Cache file name
                  ):
         fc.store_attr()
         self.cache_file = cache_path() / fname_cache
@@ -99,13 +97,8 @@ class Remapper():
             # Handle non-string values (e.g., NaN)
             self.lut[row[self.provider_col_key]] = Match(-1, "Unknown", value_to_match, 0)
             
-    def select_match(self, match_score_threshold:int=1, verbose:bool=False):
-        if verbose:
-            matched_len= len([v for v in self.lut.values() if v.match_score < match_score_threshold])
-            print(f"{matched_len} entries matched the criteria, while {len(self.lut) - matched_len} entries had a match score of {match_score_threshold} or higher.")
-            
+    def select_match(self, match_score_threshold:int=1):
         self.lut = {k: v for k, v in self.lut.items() if v.match_score >= match_score_threshold}
-                  
         return self._format_output()
 
     def _format_output(self):
@@ -116,11 +109,12 @@ class Remapper():
         return df_lut.sort_values(by='match_score', ascending=False)
 
 
-# %% ../nbs/api/utils.ipynb 17
+# %% ../nbs/api/utils.ipynb 16
+# TBD: Assess if still needed
 def has_valid_varname(
-    var_names:list, # variable names
-    cdl_path:str, # Path to MARIS CDL file (point of truth)
-    group = None, # Check if the variable names is contained in the group
+    var_names: List[str], # variable names
+    cdl_path: str, # Path to MARIS CDL file (point of truth)
+    group: Optional[str] = None, # Check if the variable names is contained in the group
 ):
     "Check that proposed variable names are in MARIS CDL"
     has_valid = True
@@ -149,30 +143,31 @@ def has_valid_varname(
                 print(f'"{name}" variable name not found in MARIS CDL')
     return has_valid  
 
-# %% ../nbs/api/utils.ipynb 21
+# %% ../nbs/api/utils.ipynb 20
 def get_bbox(df,
-             coord_cols=('LON', 'LAT')
+             coord_cols: Tuple[str, str] = ('LON', 'LAT')
             ):
     "Get the bounding box of a DataFrame."
     x, y = coord_cols        
     arr = [(row[x], row[y]) for _, row in df.iterrows()]
     return MultiPoint(arr).envelope
 
-# %% ../nbs/api/utils.ipynb 27
+# %% ../nbs/api/utils.ipynb 26
 def ddmm_to_dd(
-    ddmmmm:float # Coordinates in degrees/minutes decimal format
+    ddmmmm: float # Coordinates in degrees/minutes decimal format
     ) -> float: # Coordinates in degrees decimal format
     # Convert degrees/minutes decimal to degrees decimal.
     mins, degs = modf(ddmmmm)
     mins = mins * 100
     return round(int(degs) + (mins / 60), 6)
 
-# %% ../nbs/api/utils.ipynb 30
-def download_files_in_folder(owner:str, 
-                             repo:str, 
-                             src_dir:str, 
-                             dest_dir:str
-                             ):
+# %% ../nbs/api/utils.ipynb 29
+def download_files_in_folder(
+    owner: str, # GitHub owner
+    repo: str, # GitHub repository
+    src_dir: str, # Source directory
+    dest_dir: str # Destination directory
+    ):
     "Make a GET request to the GitHub API to get the contents of the folder."
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{src_dir}"
     response = requests.get(url)
@@ -201,9 +196,9 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
     else:
         print(f"Error: {response.status_code}")
 
-# %% ../nbs/api/utils.ipynb 32
+# %% ../nbs/api/utils.ipynb 31
 def match_worms(
-    name:str # Name of species to look up in WoRMS
+    name: str # Name of species to look up in WoRMS
     ):
     "Lookup `name` in WoRMS (fuzzy match)."
     url = 'https://www.marinespecies.org/rest/AphiaRecordsByMatchNames'
@@ -224,7 +219,7 @@ def match_worms(
     else:
         return -1
 
-# %% ../nbs/api/utils.ipynb 37
+# %% ../nbs/api/utils.ipynb 36
 @dataclass
 class Match:
     "Match between a data provider name and a MARIS lookup table."
@@ -233,7 +228,7 @@ class Match:
     source_name: str
     match_score: int
 
-# %% ../nbs/api/utils.ipynb 38
+# %% ../nbs/api/utils.ipynb 37
 def match_maris_lut(
     lut_path: str, # Path to MARIS species authoritative species look-up table
     data_provider_name: str, # Name of data provider nomenclature item to look up 
@@ -250,12 +245,13 @@ def match_maris_lut(
     df = df.sort_values(by='score', ascending=True)[:nresults]
     return df[[maris_id, maris_name, 'score']]
 
-# %% ../nbs/api/utils.ipynb 45
-def download_files_in_folder(owner:str, 
-                             repo:str, 
-                             src_dir:str, 
-                             dest_dir:str
-                             ):
+# %% ../nbs/api/utils.ipynb 44
+def download_files_in_folder(
+    owner: str, # GitHub owner
+    repo: str, # GitHub repository
+    src_dir: str, # Source directory
+    dest_dir: str # Destination directory
+    ):
     "Make a GET request to the GitHub API to get the contents of the folder"
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{src_dir}"
     response = requests.get(url)
@@ -284,33 +280,10 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
     else:
         print(f"Error: {response.status_code}")
 
-# %% ../nbs/api/utils.ipynb 47
-def match_worms(
-    name:str # Name of species to look up in WoRMS
-    ):
-    "Lookup `name` in WoRMS (fuzzy match)"
-    url = 'https://www.marinespecies.org/rest/AphiaRecordsByMatchNames'
-    params = {
-        'scientificnames[]': [name],
-        'marine_only': 'true'
-    }
-    headers = {
-        'accept': 'application/json'
-    }
-    
-    response = requests.get(url, params=params, headers=headers)
-    
-    # Check if the request was successful (status code 200)
-    if response.status_code == 200:
-        data = response.json()
-        return data
-    else:
-        return -1
-
-# %% ../nbs/api/utils.ipynb 52
+# %% ../nbs/api/utils.ipynb 46
 def test_dfs(
-    dfs1:dict, # First dictionary of DataFrames to compare 
-    dfs2:dict # Second dictionary of DataFrames to compare
+    dfs1: Dict[str, pd.DataFrame], # First dictionary of DataFrames to compare 
+    dfs2: Dict[str, pd.DataFrame] # Second dictionary of DataFrames to compare
     ) -> None: # It raises an `AssertionError` if the DataFrames are not equal
     "Compare two dictionaries of DataFrames for equality (also ensuring that columns are in the same order)."
     for grp in dfs1.keys():

@@ -4,8 +4,8 @@
 
 # %% auto 0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB', 'AddSampleTypeIdColumnCB',
-           'AddNuclideIdColumnCB', 'SelectColumnsCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'ReshapeLongToWide',
-           'CompareDfsAndTfmCB', 'UniqueIndexCB', 'EncodeTimeCB']
+           'AddNuclideIdColumnCB', 'SelectColumnsCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB',
+           'UniqueIndexCB', 'EncodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb 2
 import copy
@@ -14,10 +14,9 @@ from operator import attrgetter
 from cftime import date2num
 import numpy as np
 import pandas as pd
-from .configs import NC_GROUPS,cfg, cdl_cfg
 from functools import partial 
-from typing import List, Dict, Callable, Tuple, Any, Optional
 from pathlib import Path 
+from typing import List, Dict, Callable, Tuple, Any, Optional, Union
 
 from marisco.configs import (
     get_lut, 
@@ -25,11 +24,12 @@ from marisco.configs import (
     nc_tpl_path,
     get_time_units,
     NC_GROUPS,
-    SMP_TYPE_LUT
+    SMP_TYPE_LUT,
+    cfg, 
+    # cdl_cfg
 )
 
 from .utils import Match
-from typing import Any, Union
 
 # %% ../nbs/api/callbacks.ipynb 6
 class Callback(): 
@@ -230,77 +230,6 @@ class RemoveAllNAValuesCB(Callback):
             col_to_check = self.cols_to_check[k]
             mask = tfm.dfs[k][col_to_check].isnull().all(axis=1)
             tfm.dfs[k] = tfm.dfs[k][~mask]
-
-# %% ../nbs/api/callbacks.ipynb 37
-class ReshapeLongToWide(Callback):
-    "Convert data from long to wide with renamed columns."
-    def __init__(self, 
-                 columns: List[str]=['nuclide'], # Columns to use as index
-                 values: List[str]=['value'], # Columns to use as values
-                 num_fill_value: int=-999, # Fill value for numeric columns
-                 str_fill_value='STR FILL VALUE'
-                 ):
-        fc.store_attr()
-        self.derived_cols = self._get_derived_cols()
-    
-    def _get_derived_cols(self):
-        "Retrieve all possible derived vars (e.g 'unc', 'dl', ...) from configs."
-        return [value['name'] for value in cdl_cfg()['vars']['suffixes'].values()]
-
-    def renamed_cols(self, cols):
-        "Flatten columns name."
-        return [inner if outer == "value" else f'{inner}{outer}' if inner else outer
-                for outer, inner in cols]
-
-    def _get_unique_fill_value(self, df, idx):
-        "Get a unique fill value for NaN replacement."
-        fill_value = self.num_fill_value
-        while (df[idx] == fill_value).any().any():
-            fill_value -= 1
-        return fill_value
-
-    def _fill_nan_values(self, df, idx):
-        "Fill NaN values in index columns."
-        num_fill_value = self._get_unique_fill_value(df, idx)
-        for col in idx:
-            fill_value = num_fill_value if pd.api.types.is_numeric_dtype(df[col]) else self.str_fill_value
-            df[col] = df[col].fillna(fill_value)
-        return df, num_fill_value
-
-    def pivot(self, df):
-        derived_coi = [col for col in self.derived_cols if col in df.columns]
-        # In past implementation we added an index column before pivoting 
-        # TO BE REMOVED
-        # making all rows (compound_idx) unique.
-        # df.index.name = 'org_index'
-        # df = df.reset_index()
-        idx = list(set(df.columns) - set(self.columns + derived_coi + self.values))
-        
-        df, num_fill_value = self._fill_nan_values(df, idx)
-
-        pivot_df = df.pivot_table(index=idx,
-                                  columns=self.columns,
-                                  values=self.values + derived_coi,
-                                  
-                                  
-                                  aggfunc=lambda x: x
-                                  ).reset_index()
-
-        pivot_df[idx] = pivot_df[idx].replace({self.str_fill_value: np.nan, num_fill_value: np.nan})
-        pivot_df = self.set_index(pivot_df)
-        return pivot_df
-
-        def set_index(self, df):
-            "Set the index of the dataframe."
-            # TODO: Consider implementing a universal unique index
-            # by hashing the compound index columns (lat, lon, time, depth, etc.)
-            df.index.name = 'org_index'
-            return df
-    
-    def __call__(self, tfm):
-        for grp in tfm.dfs.keys():
-            tfm.dfs[grp] = self.pivot(tfm.dfs[grp])
-            tfm.dfs[grp].columns = self.renamed_cols(tfm.dfs[grp].columns)
 
 # %% ../nbs/api/callbacks.ipynb 44
 class CompareDfsAndTfmCB(Callback):

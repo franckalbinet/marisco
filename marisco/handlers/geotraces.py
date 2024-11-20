@@ -262,7 +262,7 @@ class ParseTimeCB(Callback):
 lut_nuclides = lambda: get_lut(lut_path(), 'dbo_nuclide.xlsx', 
                                key='nc_name', value='nuclide_id', reverse=False)
 
-# %% ../../nbs/handlers/geotraces.ipynb 72
+# %% ../../nbs/handlers/geotraces.ipynb 73
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -274,7 +274,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/geotraces.ipynb 73
+# %% ../../nbs/handlers/geotraces.ipynb 74
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve global attributes from Geotraces dataset."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -286,7 +286,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/geotraces.ipynb 76
+# %% ../../nbs/handlers/geotraces.ipynb 77
 def encode(fname_in, fname_out, **kwargs):
     df = pd.read_csv(fname_in)
     tfm = Transformer(df, cbs=[

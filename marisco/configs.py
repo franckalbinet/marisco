@@ -5,22 +5,19 @@
 # %% auto 0
 __all__ = ['AVOGADRO', 'NC_DIM', 'NC_VARS', 'NC_GROUPS', 'SMP_TYPE_LUT', 'NC_DTYPES', 'CFG_FNAME', 'CDL_FNAME',
            'NUCLIDE_LOOKUP_FNAME', 'MARISCO_CFG_DIRNAME', 'CONFIGS', 'CONFIGS_CDL', 'NETCDF_TO_PYTHON_TYPE',
-           'base_path', 'cfg', 'nuc_lut_path', 'lut_path', 'cache_path', 'cdl_cfg', 'species_lut_path',
-           'bodyparts_lut_path', 'biogroup_lut_path', 'sediments_lut_path', 'unit_lut_path', 'detection_limit_lut_path',
-           'filtered_lut_path', 'area_lut_path', 'name2grp', 'nc_tpl_name', 'nc_tpl_path', 'get_time_units', 'sanitize',
-           'get_lut', 'Enums']
+           'base_path', 'cfg', 'lut_path', 'cache_path', 'nuc_lut_path', 'species_lut_path', 'bodyparts_lut_path',
+           'biogroup_lut_path', 'sediments_lut_path', 'unit_lut_path', 'detection_limit_lut_path', 'filtered_lut_path',
+           'area_lut_path', 'nc_tpl_name', 'nc_tpl_path', 'get_time_units', 'sanitize', 'get_lut', 'Enums']
 
 # %% ../nbs/api/configs.ipynb 2
 from pathlib import Path
 import os
 import re
-from functools import partial
-from typing import List, Dict, Callable, Tuple, Any, Optional
-
-from .inout import read_toml, write_toml
+from typing import Dict
 import pandas as pd
 import fastcore.all as fc
 from netCDF4 import Dataset
+from .inout import read_toml
 
 # %% ../nbs/api/configs.ipynb 3
 AVOGADRO = 6.02214076e23
@@ -151,18 +148,18 @@ NC_DTYPES = {
     }
 }
 
-# %% ../nbs/api/configs.ipynb 10
+# %% ../nbs/api/configs.ipynb 9
 CFG_FNAME = 'configs.toml'
 CDL_FNAME = 'cdl.toml'
 NUCLIDE_LOOKUP_FNAME = 'dbo_nuclide.xlsx'
 MARISCO_CFG_DIRNAME = '.marisco'
 
-# %% ../nbs/api/configs.ipynb 11
+# %% ../nbs/api/configs.ipynb 10
 def base_path(): 
     "Return the path to the `.marisco` folder under your home directory."
     return Path.home() / MARISCO_CFG_DIRNAME
 
-# %% ../nbs/api/configs.ipynb 14
+# %% ../nbs/api/configs.ipynb 13
 CONFIGS = {
     'gh': {
         'owner': 'franckalbinet',
@@ -190,27 +187,23 @@ CONFIGS = {
     }
 }
 
-# %% ../nbs/api/configs.ipynb 18
+# %% ../nbs/api/configs.ipynb 17
 def cfg(): 
     "Return the configuration as a dictionary."
     return read_toml(base_path() / CFG_FNAME)
 
-# %% ../nbs/api/configs.ipynb 19
-def nuc_lut_path(): 
-    "Return the path to the nuclide lookup table."
-    return Path(cfg()['dirs']['lut']) / NUCLIDE_LOOKUP_FNAME
-
-# %% ../nbs/api/configs.ipynb 20
+# %% ../nbs/api/configs.ipynb 18
 def lut_path(): 
     "Return the path to the lookup tables directory."
     return Path(cfg()['dirs']['lut'])
 
-# %% ../nbs/api/configs.ipynb 21
+# %% ../nbs/api/configs.ipynb 19
 def cache_path(): 
     "Return the path to the cache directory."
     return Path(cfg()['dirs']['cache'])
 
-# %% ../nbs/api/configs.ipynb 22
+# %% ../nbs/api/configs.ipynb 20
+# TO BE REMOVED: Now read directly from `maris.cdl` file
 CONFIGS_CDL = { 
     'placeholder': '_to_be_filled_in_',
     'grps': {
@@ -568,18 +561,23 @@ CONFIGS_CDL = {
         ]
 }
 
-# %% ../nbs/api/configs.ipynb 25
-def cdl_cfg():
-    "Return the CDL (Common Data Language) configuration as a dictionary."
-    try:
-        return read_toml(base_path() / CDL_FNAME)
-    except FileNotFoundError:
-        return CONFIGS_CDL
+# %% ../nbs/api/configs.ipynb 23
+# def cdl_cfg():
+#     "Return the CDL (Common Data Language) configuration as a dictionary."
+#     try:
+#         return read_toml(base_path() / CDL_FNAME)
+#     except FileNotFoundError:
+#         return CONFIGS_CDL
 
-# %% ../nbs/api/configs.ipynb 26
+# %% ../nbs/api/configs.ipynb 24
 # def grp_names(): 
 #     "Return the group names as defined in `cdl.toml`."
 #     return [v['name'] for v in cdl_cfg()['grps'].values()]
+
+# %% ../nbs/api/configs.ipynb 26
+def nuc_lut_path(): 
+    "Return the path to the nuclide lookup table."
+    return Path(cfg()['dirs']['lut']) / NUCLIDE_LOOKUP_FNAME
 
 # %% ../nbs/api/configs.ipynb 27
 def species_lut_path():
@@ -644,12 +642,12 @@ NETCDF_TO_PYTHON_TYPE = {
     }
 
 # %% ../nbs/api/configs.ipynb 37
-def name2grp(
-    name: str, # Group name
-    cdl: dict, # CDL configuration
-    ):
-    # Reverse `cdl.toml` config group dict so that group config key can be retrieve based on its name
-    return {v['name']:k  for k, v in cdl['grps'].items()}[name]
+# def name2grp(
+#     name: str, # Group name
+#     cdl: dict, # CDL configuration
+#     ):
+#     # Reverse `cdl.toml` config group dict so that group config key can be retrieve based on its name
+#     return {v['name']:k  for k, v in cdl['grps'].items()}[name]
 
 # %% ../nbs/api/configs.ipynb 40
 def nc_tpl_name():
@@ -657,7 +655,7 @@ def nc_tpl_name():
     p = base_path()
     return read_toml(p / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 43
+# %% ../nbs/api/configs.ipynb 42
 def nc_tpl_path():
     "Return the path of the MARIS NetCDF template as defined in `configs.toml`"
     p = base_path()
@@ -711,7 +709,7 @@ def get_lut(
     do_sanitize: bool=True, # Sanitization required?
     reverse: bool=False, # Reverse lookup table (value, key)
     check_duplicates: bool=False # Check for duplicates in lookup table
-    ) -> dict: # MARIS lookup table (key, value)
+    ) -> Dict[str, int]: # MARIS lookup table (key, value)
     "Convert MARIS db lookup table excel file to dictionary `{'name': id, ...}` or `{id: name, ...}` if `reverse` is True."
     fname = Path(src_dir) / fname
     df = pd.read_excel(fname, usecols=[key, value]).dropna(subset=value)
@@ -731,8 +729,8 @@ def get_lut(
 class Enums():
     "Return dictionaries of MARIS NetCDF's enumeration types."
     def __init__(self, 
-                 lut_src_dir:str, # Directory containing lookup tables
-                 dtypes:dict = NC_DTYPES, # Custom NetCDF types
+                 lut_src_dir: str, # Directory containing lookup tables
+                 dtypes: Dict[str, Dict[str, str]]=NC_DTYPES, # Custom NetCDF types
                  ):
         fc.store_attr()
         self.types = self.lookup()

@@ -24,7 +24,8 @@ from marisco.configs import (
     nuc_lut_path, 
     nc_tpl_path,
     get_time_units,
-    NC_GROUPS
+    NC_GROUPS,
+    SMP_TYPE_LUT
 )
 
 from .utils import Match
@@ -165,16 +166,14 @@ class LowerStripNameCB(Callback):
 # %% ../nbs/api/callbacks.ipynb 28
 class AddSampleTypeIdColumnCB(Callback):
     def __init__(self, 
-                 cdl_cfg: Callable=cdl_cfg, # Callable to get the CDL config dictionary
+                 lut: dict=SMP_TYPE_LUT, # Lookup table for sample type
                  col_name: str='samptype_id' # Column name to store the sample type id
                  ): 
         "Add a column with the sample type id as defined in the CDL."
         fc.store_attr()
-        self.lut = {v['name']: v['id'] for v in cdl_cfg()['grps'].values()}
         
     def __call__(self, tfm):
         for grp, df in tfm.dfs.items():             
-            grp= NC_GROUPS.get(grp, grp) 
             df[self.col_name] = self.lut[grp]
 
 # %% ../nbs/api/callbacks.ipynb 31

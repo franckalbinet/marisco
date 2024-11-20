@@ -13,7 +13,7 @@ __all__ = ['AVOGADRO', 'NC_DIM', 'NC_VARS', 'NC_GROUPS', 'SMP_TYPE_LUT', 'NC_DTY
 from pathlib import Path
 import os
 import re
-from typing import Dict
+from typing import Dict, Callable
 import pandas as pd
 import fastcore.all as fc
 from netCDF4 import Dataset
@@ -663,10 +663,10 @@ def nc_tpl_path():
 
 # %% ../nbs/api/configs.ipynb 44
 def get_time_units(
-    nc_path: Path=nc_tpl_path() # Path to NetCDF file
+    nc_path: Callable=nc_tpl_path # Function returning Path to NetCDF template file
     ) -> str: # Time units string (e.g. 'seconds since 1970-01-01 00:00:00.0')
     "Get the units attribute of the time variable from a NetCDF file."
-    with Dataset(nc_path, 'r') as nc:
+    with Dataset(nc_tpl_path(), 'r') as nc:
         for group in nc.groups.values():
             if 'time' in group.variables:
                 return group.variables['time'].units

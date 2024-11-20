@@ -129,6 +129,8 @@ class RemapCB(Callback):
         for grp in self.dest_grps:
             if grp in tfm.dfs:
                 self._remap_group(tfm.dfs[grp])
+            else:
+                print(f"Group {grp} not found in the dataframes.")
 
     def _remap_group(self, df: pd.DataFrame):
         df[self.col_remap] = df[self.col_src].apply(self._remap_value)

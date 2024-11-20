@@ -136,7 +136,7 @@ NC_DTYPES = {
     'SPECIES': {
         'name': 'species_t', 
         # 'fname': 'dbo_species_cleaned.xlsx',
-        'fname': 'dbo_species_2024_07_22.xlsx',
+        'fname': 'dbo_species_2024-11-19.xlsx',
         'key': 'species', 
         'value':'species_id'
     },

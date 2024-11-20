@@ -12,8 +12,8 @@ website:
           - api/callbacks.ipynb
           - api/configs.ipynb
           - api/metadata.ipynb
-          - api/nc_template.ipynb
-          - api/serializers.ipynb
+          - api/encoders.ipynb
+          - api/decoders.ipynb
           - api/utils.ipynb
       - section: Metadata
         contents:

@@ -10,7 +10,6 @@ import netCDF4
 from netCDF4 import Dataset
 import pandas as pd
 from typing import Dict, Callable
-import pandas as pd
 import numpy as np
 from fastcore.basics import patch, store_attr
 import fastcore.all as fc
@@ -30,14 +29,14 @@ from marisco.configs import (
 class NetCDFEncoder:
     "MARIS NetCDF encoder."
     def __init__(self, 
-                 dfs:dict[pd.DataFrame], # dict of Dataframes to encode with group name as key {'sediment': df_sed, ...}
-                 dest_fname:str, # Name of output file to produce
-                 global_attrs:Dict, # Global attributes
-                 src_fname:str = nc_tpl_path(), # File name and path to the MARIS CDL template
-                #  enums_xtra:Dict={}, # Enumeration types to overwrite
-                 verbose:bool=False, # Print currently written NetCDF group and variable names
+                 dfs: Dict[str, pd.DataFrame], # dict of Dataframes to encode with group name as key {'sediment': df_sed, ...}
+                 dest_fname: str, # Name of output file to produce
+                 global_attrs: Dict[str, str], # Global attributes
+                 fn_src_fname: Callable=nc_tpl_path, # Function returning file name and path to the MARIS CDL template
+                 verbose: bool=False, # Print currently written NetCDF group and variable names
                  ):
         store_attr()
+        self.src_fname = fn_src_fname()
         self.enum_dtypes = {}
         self.nc_to_cols = {v:k for k,v in NC_VARS.items()}
 
@@ -156,10 +155,10 @@ def encode(self:NetCDFEncoder):
 class OpenRefineCsvEncoder:
     "OpenRefine CSV from NetCDF."
     def __init__(self, 
-                 dfs:dict[pd.DataFrame], # dict of Dataframes to encode with group name as key {'sediment': df_sed, ...}
-                 dest_fname:str, # Name of output file to produce
-                 ref_id = -1, # ref_id to include 
-                 verbose:bool=False, # Print 
+                 dfs: Dict[str, pd.DataFrame], # dict of Dataframes to encode with group name as key {'sediment': df_sed, ...}
+                 dest_fname: str, # Name of output file to produce
+                 ref_id: int=-1, # ref_id to include 
+                 verbose: bool=False, # Print 
                  ):
         store_attr()
 

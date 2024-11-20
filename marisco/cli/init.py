@@ -11,15 +11,14 @@ from fastcore.script import *
 from fastcore.xtras import mkdir
 from fastcore.style import S
 
+from ..inout import write_toml
+
 from marisco.configs import (
     base_path, 
-    CONFIGS, 
-    CONFIGS_CDL, 
-    CFG_FNAME, 
-    CDL_FNAME
+    CONFIGS,  
+    CFG_FNAME
 )
 
-from ..inout import write_toml
 from marisco.utils import (
     download_file,
     download_files_in_folder
@@ -46,7 +45,6 @@ def main():
     owner, repo = CONFIGS['gh'].values()
     # Download luts (look-up table) to base path
     print('Downloading look-up tables ...')
-    
     download_files_in_folder(owner, repo,
                              src_dir=CONFIGS['paths']['luts'], 
                              dest_dir=CONFIGS['dirs']['lut'])

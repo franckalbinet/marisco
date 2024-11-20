@@ -10,7 +10,6 @@ import tomli_w
 import tomli
 from typing import Dict, Any
 
-
 # %% ../nbs/api/inout.ipynb 3
 def write_toml(fname: str, cfg: Dict[str, Any]):
     "Write a TOML file from a dictionary."

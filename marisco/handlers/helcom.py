@@ -14,20 +14,20 @@ __all__ = ['fname_in', 'fname_out_nc', 'fname_out_csv', 'zotero_key', 'ref_id', 
 # %% ../../nbs/handlers/helcom.ipynb 6
 import pandas as pd 
 import numpy as np
-#from functools import partial 
+from functools import partial 
 import fastcore.all as fc 
 from pathlib import Path 
-#from dataclasses import asdict
+from dataclasses import asdict
 from typing import List, Dict, Callable, Tuple, Any 
 from collections import OrderedDict, defaultdict
 import re
 
 from marisco.utils import (
-    #has_valid_varname, 
-    #match_worms, 
+    has_valid_varname, 
+    match_worms, 
     Remapper, 
     ddmm_to_dd,
-    #match_maris_lut, 
+    match_maris_lut, 
     Match, 
     get_unique_across_dfs
 )
@@ -58,7 +58,7 @@ from marisco.configs import (
     nuc_lut_path, 
     nc_tpl_path, 
     cfg, 
-    #cache_path, 
+    cache_path, 
     cdl_cfg, 
     Enums, 
     lut_path, 
@@ -67,7 +67,7 @@ from marisco.configs import (
     bodyparts_lut_path, 
     detection_limit_lut_path, 
     filtered_lut_path, 
-    #area_lut_path, 
+    area_lut_path, 
     get_lut, 
     unit_lut_path
 )
@@ -88,16 +88,12 @@ zotero_key ='26VMZZ2Q' # HELCOM MORS zotero key
 ref_id = 100 # HELCOM MORS reference id as defined by MARIS
 
 # %% ../../nbs/handlers/helcom.ipynb 13
-default_smp_types = {  
-    'BIO': 'BIOTA', 
-    'SEA': 'SEAWATER', 
-    'SED': 'SEDIMENT'
-}
+default_smp_types = [('SEA', 'seawater'), ('SED', 'sediment'), ('BIO', 'biota')]
 
 # %% ../../nbs/handlers/helcom.ipynb 14
-def load_data(src_dir: str|Path, 
-              smp_types: dict = default_smp_types 
-             ) -> Dict[str, pd.DataFrame]: 
+def load_data(src_dir: str|Path, # The directory where the source CSV files are located
+              smp_types: list=default_smp_types # A list of tuples, each containing the file prefix and the corresponding sample type name
+             ) -> Dict[str, pd.DataFrame]: # A dictionary with sample types as keys and their corresponding dataframes as values
     "Load HELCOM data and return the data in a dictionary of dataframes with the dictionary key as the sample type."
     src_path = Path(src_dir)
     
@@ -110,7 +106,7 @@ def load_data(src_dir: str|Path,
             print(f"Error loading files for {file_prefix}: {e}")
             return pd.DataFrame()  # Return an empty DataFrame if files are not found
     
-    return {smp_type: load_and_merge(file_prefix) for file_prefix, smp_type in smp_types.items()}  
+    return {smp_type: load_and_merge(file_prefix) for file_prefix, smp_type in smp_types}
 
 # %% ../../nbs/handlers/helcom.ipynb 36
 fixes_nuclide_names = {

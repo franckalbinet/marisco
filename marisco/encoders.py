@@ -9,7 +9,7 @@ __all__ = ['NetCDFEncoder', 'OpenRefineCsvEncoder']
 import netCDF4
 from netCDF4 import Dataset
 import pandas as pd
-from typing import Dict
+from typing import Dict, Callable
 import numpy as np
 from fastcore.basics import patch, store_attr
 import fastcore.all as fc
@@ -32,10 +32,11 @@ class NetCDFEncoder:
                  dfs: Dict[str, pd.DataFrame], # dict of Dataframes to encode with group name as key {'sediment': df_sed, ...}
                  dest_fname: str, # Name of output file to produce
                  global_attrs: Dict[str, str], # Global attributes
-                 src_fname: str=nc_tpl_path(), # File name and path to the MARIS CDL template
+                 fn_src_fname: Callable=nc_tpl_path, # Function returning file name and path to the MARIS CDL template
                  verbose: bool=False, # Print currently written NetCDF group and variable names
                  ):
         store_attr()
+        self.src_fname = fn_src_fname()
         self.enum_dtypes = {}
         self.nc_to_cols = {v:k for k,v in NC_VARS.items()}
 

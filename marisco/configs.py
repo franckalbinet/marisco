@@ -151,6 +151,7 @@ MARISCO_CFG_DIRNAME = '.marisco'
 # %% ../nbs/api/configs.ipynb 10
 def base_path(): 
     "Return the path to the `.marisco` folder under your home directory."
+    print('Path.home()', Path.home())
     return Path.home() / MARISCO_CFG_DIRNAME
 
 # %% ../nbs/api/configs.ipynb 13
@@ -563,6 +564,7 @@ CONFIGS_CDL = {
 def cdl_cfg():
     "Return the CDL (Common Data Language) configuration as a dictionary."
     try:
+        print('cdl_path', base_path() / CDL_FNAME) 
         return read_toml(base_path() / CDL_FNAME)
     except FileNotFoundError:
         return CONFIGS_CDL

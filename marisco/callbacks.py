@@ -338,8 +338,7 @@ class CompareDfsAndTfmCB(Callback):
         return {
             'Number of rows in dfs': len(self.dfs[grp].index),
             'Number of rows in tfm.dfs': len(tfm.dfs[grp].index),
-            'Number of dropped rows': len(tfm.dfs_dropped[grp].index),
-            'Number of rows in tfm.dfs + Number of dropped rows': len(tfm.dfs[grp].index) + len(tfm.dfs_dropped[grp].index)
+            'Number of rows removed': len(tfm.dfs_dropped[grp].index),
         }
 
 # %% ../nbs/api/callbacks.ipynb 47
@@ -365,7 +364,7 @@ class EncodeTimeCB(Callback):
         for grp, df in tfm.dfs.items():
             n_missing = df[self.col_time].isna().sum()
             if n_missing:
-                print(f"Warning: {n_missing} missing time values in {grp}")
+                print(f"Warning: {n_missing} missing time value(s) in {grp}")
             
             # Remove NaN times and convert to seconds since epoch
             tfm.dfs[grp] = tfm.dfs[grp][tfm.dfs[grp][self.col_time].notna()]

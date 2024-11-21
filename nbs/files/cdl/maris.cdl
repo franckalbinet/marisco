@@ -152,8 +152,8 @@ group: biota {
             drywt:long_name = "Dry weight of biota sample, expressed in grams." ;
             drywt:standard_name = "dry_weight_of_biota_sample" ;
 		float wetwt(id) ;
-            drywt:long_name = "Wet weight of biota sample, expressed in grams." ;
-            drywt:standard_name = "wet_weight_of_biota_sample" ;
+            wetwt:long_name = "Wet weight of biota sample, expressed in grams." ;
+            wetwt:standard_name = "wet_weight_of_biota_sample" ;
 }
 
 group: seawater {
@@ -331,8 +331,8 @@ group: sediment {
             drywt:long_name = "Dry weight of sediment sample, expressed in grams." ;
             drywt:standard_name = "dry_weight_of_sediment_sample" ;
 		float wetwt(id) ;
-            drywt:long_name = "Wet weight of sediment sample, expressed in grams." ;
-            drywt:standard_name = "wet_weight_of_sediment_sample" ;
+            wetwt:long_name = "Wet weight of sediment sample, expressed in grams." ;
+            wetwt:standard_name = "wet_weight_of_sediment_sample" ;
 }
 
 group: suspended_matter {

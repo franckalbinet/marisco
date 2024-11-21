@@ -581,89 +581,101 @@ def nuc_lut_path():
     return Path(cfg()['dirs']['lut']) / NUCLIDE_LOOKUP_FNAME
 
 # %% ../nbs/api/configs.ipynb 27
-def species_lut_path(fname: str= 'dbo_species.xlsx'):
+def species_lut_path():
     "Return the path to the species lookup table."
     src_dir = lut_path()
+    fname = NC_DTYPES['SPECIES']['fname']
+    
     return src_dir / fname
 
-species_lut_path(fname='dbo_species_2024-11-19.xlsx')
+species_lut_path()
 
 # %% ../nbs/api/configs.ipynb 28
-def bodyparts_lut_path(fname: str= 'dbo_bodypar.xlsx'):
+def bodyparts_lut_path():
     "Return the path to the body parts lookup table."
     src_dir = lut_path()
+    fname = NC_DTYPES['BODY_PART']['fname']
     return src_dir / fname
 
 bodyparts_lut_path()
 
 # %% ../nbs/api/configs.ipynb 29
-def biogroup_lut_path(fname: str= 'dbo_biogroup.xlsx'):
+def biogroup_lut_path():
     "Return the path to the biota group lookup table."
     src_dir = lut_path()
+    fname = NC_DTYPES['BIO_GROUP']['fname']
     return src_dir / fname
 
 biogroup_lut_path()
 
 # %% ../nbs/api/configs.ipynb 30
-def sediments_lut_path(fname: str= 'dbo_sedtype.xlsx'):
+def sediments_lut_path():
     "Return the path to the sediment type lookup table."
     src_dir = lut_path()
+    fname = NC_DTYPES['SED_TYPE']['fname']
     return src_dir / fname
 
 sediments_lut_path()
 
 # %% ../nbs/api/configs.ipynb 31
-def unit_lut_path(fname: str= 'dbo_unit.xlsx'):
+def unit_lut_path():
     "Return the path to the unit lookup table."
     src_dir = lut_path()
+    fname = NC_DTYPES['UNIT']['fname']
     return src_dir / fname
 
 unit_lut_path()
 
 # %% ../nbs/api/configs.ipynb 32
-def detection_limit_lut_path(fname: str= 'dbo_detectlimit.xlsx'):
+def detection_limit_lut_path():
     "Return the path to the detection limit lookup table."
     src_dir = lut_path()
+    fname = NC_DTYPES['DL']['fname']
     return src_dir / fname
 
 detection_limit_lut_path()
 
 # %% ../nbs/api/configs.ipynb 33
-def filtered_lut_path(fname: str= 'dbo_filtered.xlsx'):
+def filtered_lut_path():
     "Return the path to the filtered lookup table."
     src_dir = lut_path()
+    fname = NC_DTYPES['FILT']['fname']
     return src_dir / fname
 
 filtered_lut_path()
 
 # %% ../nbs/api/configs.ipynb 34
-def area_lut_path(fname: str= 'dbo_area.xlsx'):
+def area_lut_path():
     "Return the path to the area lookup table."
     src_dir = lut_path()
+    fname = NC_DTYPES['AREA']['fname']
     return src_dir / fname
 
 area_lut_path()
 
 # %% ../nbs/api/configs.ipynb 35
-def prepmet_lut_path(fname: str= 'dbo_prepmet.xlsx'):
+def prepmet_lut_path():
     "Return the path to the prepmet lookup table."
     src_dir = lut_path()
+    fname = NC_DTYPES['PREP_MET']['fname']
     return src_dir / fname
 
 prepmet_lut_path()
 
 # %% ../nbs/api/configs.ipynb 36
-def sampmet_lut_path(fname: str= 'dbo_sampmet.xlsx'):
+def sampmet_lut_path():
     "Return the path to the sampmet lookup table."
     src_dir = lut_path()
+    fname = NC_DTYPES['SAMP_MET']['fname']
     return src_dir / fname
 
 sampmet_lut_path()
 
 # %% ../nbs/api/configs.ipynb 37
-def counmet_lut_path(fname: str= 'dbo_counmet.xlsx'):
+def counmet_lut_path():
     "Return the path to the counmet lookup table."
     src_dir = lut_path()
+    fname = NC_DTYPES['COUNT_MET']['fname']
     return src_dir / fname
 
 counmet_lut_path()

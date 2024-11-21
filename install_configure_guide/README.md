@@ -38,8 +38,8 @@ The MARIS data is converted to a standardized CSV format for importing into the 
 | Taxon database ID      | TaxonDBID        |                                        |
 | Taxon database URL     | TaxonDBURL       |                                        |
 | Body part ID           | bodypar_id       | body_part                              |
-| Slice up               | sliceup          |                                        |
-| Slice down             | slicedown        |                                        |
+| Slice up               | sliceup          | top                                    |
+| Slice down             | slicedown        | bottom                                 |
 | Sediment type ID       | sedtype_id       | sed_type                               |
 | Sediment reported name | SedRepName       |                                        |
 | Volume                 | volume           |                                        |
@@ -50,8 +50,8 @@ The MARIS data is converted to a standardized CSV format for importing into the 
 | Acidified              | acid             |                                        |
 | Oxygen                 | oxygen           |                                        |
 | Sample area            | samparea         |                                        |
-| Dry weight             | drywt            |                                        |
-| Wet weight             | wetwt            |                                        |
+| Dry weight             | drywt            | drywt                                  |
+| Wet weight             | wetwt            | wetwt                                  |
 | Percent weight         | percentwt        |                                        |
 | Sampling method ID     | sampmet_id       | sampling_method                        |
 | Drying method ID       | drymet_id        |                                        |
@@ -842,10 +842,10 @@ No
 float
 
 ### NetCDF Variable Name:
-Not included in NetCDF.
+`top`
 
 ### NetCDF Data Type:
-Not included in NetCDF.
+float
 
 ---
 
@@ -864,10 +864,10 @@ No
 float
 
 ### NetCDF Variable Name:
-Not included in NetCDF.
+`bottom`
 
 ### NetCDF Data Type:
-Not included in NetCDF.
+float
 
 ---
 
@@ -1111,10 +1111,10 @@ No
 float
 
 ### NetCDF Variable Name:
-Not included in NetCDF.
+`drywt`
 
 ### NetCDF Data Type:
-Not included in NetCDF.
+float
 
 ---
 
@@ -1133,10 +1133,10 @@ No
 float
 
 ### NetCDF Variable Name:
-Not included in NetCDF.
+`wetwt`
 
 ### NetCDF Data Type:
-Not included in NetCDF.
+float
 
 ---
 

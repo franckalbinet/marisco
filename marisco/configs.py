@@ -623,14 +623,14 @@ def detection_limit_lut_path():
     fname = NC_DTYPES['DL']['fname']
     return src_dir / fname
 
-# %% ../nbs/api/configs.ipynb 40
+# %% ../nbs/api/configs.ipynb 39
 def filtered_lut_path():
     "Return the path to the filtered lookup table."
     src_dir = lut_path()
     fname = NC_DTYPES['FILT']['fname']
     return src_dir / fname
 
-# %% ../nbs/api/configs.ipynb 42
+# %% ../nbs/api/configs.ipynb 41
 def area_lut_path():
     "Return the path to the area lookup table."
     src_dir = lut_path()
@@ -639,7 +639,7 @@ def area_lut_path():
 
 # area_lut_path()
 
-# %% ../nbs/api/configs.ipynb 44
+# %% ../nbs/api/configs.ipynb 43
 def prepmet_lut_path():
     "Return the path to the prepmet lookup table."
     src_dir = lut_path()
@@ -657,7 +657,7 @@ def sampmet_lut_path():
 
 # sampmet_lut_path()
 
-# %% ../nbs/api/configs.ipynb 46
+# %% ../nbs/api/configs.ipynb 47
 def counmet_lut_path():
     "Return the path to the counmet lookup table."
     src_dir = lut_path()
@@ -666,13 +666,13 @@ def counmet_lut_path():
 
 # counmet_lut_path()
 
-# %% ../nbs/api/configs.ipynb 48
+# %% ../nbs/api/configs.ipynb 50
 NETCDF_TO_PYTHON_TYPE = {
     'u8': int,
     'f4': float
     }
 
-# %% ../nbs/api/configs.ipynb 49
+# %% ../nbs/api/configs.ipynb 51
 # def name2grp(
 #     name: str, # Group name
 #     cdl: dict, # CDL configuration
@@ -680,19 +680,19 @@ NETCDF_TO_PYTHON_TYPE = {
 #     # Reverse `cdl.toml` config group dict so that group config key can be retrieve based on its name
 #     return {v['name']:k  for k, v in cdl['grps'].items()}[name]
 
-# %% ../nbs/api/configs.ipynb 52
+# %% ../nbs/api/configs.ipynb 54
 def nc_tpl_name():
     "Return the name of the MARIS NetCDF template as defined in `configs.toml`"
     p = base_path()
     return read_toml(p / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 53
+# %% ../nbs/api/configs.ipynb 55
 def nc_tpl_path():
     "Return the path of the MARIS NetCDF template as defined in `configs.toml`"
     p = base_path()
     return p / read_toml(p / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 54
+# %% ../nbs/api/configs.ipynb 56
 def get_time_units(
     nc_path: Callable=nc_tpl_path # Function returning Path to NetCDF template file
     ) -> str: # Time units string (e.g. 'seconds since 1970-01-01 00:00:00.0')
@@ -704,7 +704,7 @@ def get_time_units(
                 
     raise ValueError("Time variable not found in NetCDF file")
 
-# %% ../nbs/api/configs.ipynb 58
+# %% ../nbs/api/configs.ipynb 60
 def sanitize(
     s: str|float # String or float to sanitize
     ) -> str|float:  # Sanitized string or original float
@@ -723,7 +723,7 @@ def sanitize(
     else:
         return str(s).strip()
 
-# %% ../nbs/api/configs.ipynb 62
+# %% ../nbs/api/configs.ipynb 64
 def try_int(x):
     "Try to convert `x` to an integer."
     try:
@@ -731,7 +731,7 @@ def try_int(x):
     except (ValueError, TypeError):
         return x
 
-# %% ../nbs/api/configs.ipynb 63
+# %% ../nbs/api/configs.ipynb 65
 def get_lut(
     src_dir: str, # Directory containing lookup tables
     fname: str, # Excel file lookup table name
@@ -756,7 +756,7 @@ def get_lut(
     lut = {try_int(k): try_int(v) for k, v in lut.items()}    
     return {v: k for k, v in lut.items()} if reverse else lut
 
-# %% ../nbs/api/configs.ipynb 66
+# %% ../nbs/api/configs.ipynb 68
 class Enums():
     "Return dictionaries of MARIS NetCDF's enumeration types."
     def __init__(self, 

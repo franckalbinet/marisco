@@ -55,7 +55,9 @@ NC_VARS = {
     'BODY_PART': 'body_part',
     'SED_TYPE': 'sed_type',
     'TOP': 'top',
-    'BOTTOM': 'bottom'
+    'BOTTOM': 'bottom',
+    'DRYWT': 'drywt',
+    'WETWT': 'wetwt'
     }
 
 # %% ../nbs/api/configs.ipynb 6

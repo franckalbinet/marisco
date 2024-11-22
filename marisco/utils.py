@@ -97,7 +97,11 @@ class Remapper():
             # Handle non-string values (e.g., NaN)
             self.lut[row[self.provider_col_key]] = Match(-1, "Unknown", value_to_match, 0)
             
-    def select_match(self, match_score_threshold:int=1):
+    def select_match(self, match_score_threshold:int=1, verbose:bool=False):
+        if verbose:
+            matched_len= len([v for v in self.lut.values() if v.match_score < match_score_threshold])
+            print(f"{matched_len} entries matched the criteria, while {len(self.lut) - matched_len} entries had a match score of {match_score_threshold} or higher.")
+        
         self.lut = {k: v for k, v in self.lut.items() if v.match_score >= match_score_threshold}
         return self._format_output()
 
@@ -228,7 +232,7 @@ class Match:
     source_name: str
     match_score: int
 
-# %% ../nbs/api/utils.ipynb 37
+# %% ../nbs/api/utils.ipynb 38
 def match_maris_lut(
     lut_path: str, # Path to MARIS species authoritative species look-up table
     data_provider_name: str, # Name of data provider nomenclature item to look up 
@@ -245,7 +249,7 @@ def match_maris_lut(
     df = df.sort_values(by='score', ascending=True)[:nresults]
     return df[[maris_id, maris_name, 'score']]
 
-# %% ../nbs/api/utils.ipynb 44
+# %% ../nbs/api/utils.ipynb 45
 def download_files_in_folder(
     owner: str, # GitHub owner
     repo: str, # GitHub repository
@@ -280,7 +284,7 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
     else:
         print(f"Error: {response.status_code}")
 
-# %% ../nbs/api/utils.ipynb 46
+# %% ../nbs/api/utils.ipynb 47
 def test_dfs(
     dfs1: Dict[str, pd.DataFrame], # First dictionary of DataFrames to compare 
     dfs2: Dict[str, pd.DataFrame] # Second dictionary of DataFrames to compare

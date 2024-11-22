@@ -129,6 +129,8 @@ class RemapCB(Callback):
         for grp in self.dest_grps:
             if grp in tfm.dfs:
                 self._remap_group(tfm.dfs[grp])
+            else:
+                print(f"Group {grp} not found in the dataframes.")
 
     def _remap_group(self, df: pd.DataFrame):
         df[self.col_remap] = df[self.col_src].apply(self._remap_value)
@@ -266,8 +268,7 @@ class CompareDfsAndTfmCB(Callback):
         return {
             'Number of rows in dfs': len(self.dfs[grp].index),
             'Number of rows in tfm.dfs': len(tfm.dfs[grp].index),
-            'Number of dropped rows': len(tfm.dfs_dropped[grp].index),
-            'Number of rows in tfm.dfs + Number of dropped rows': len(tfm.dfs[grp].index) + len(tfm.dfs_dropped[grp].index)
+            'Number of rows removed': len(tfm.dfs_dropped[grp].index),
         }
 
 # %% ../nbs/api/callbacks.ipynb 47
@@ -298,7 +299,7 @@ class EncodeTimeCB(Callback):
         for grp, df in tfm.dfs.items():
             n_missing = df[self.col_time].isna().sum()
             if n_missing:
-                print(f"Warning: {n_missing} missing time values in {grp}")
+                print(f"Warning: {n_missing} missing time value(s) in {grp}")
             
             # Remove NaN times and convert to seconds since epoch
             tfm.dfs[grp] = tfm.dfs[grp][tfm.dfs[grp][self.col_time].notna()]

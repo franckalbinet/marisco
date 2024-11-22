@@ -13,6 +13,7 @@ from fastcore.style import S
 
 from ..inout import write_toml
 
+
 from marisco.configs import (
     base_path, 
     CONFIGS,  
@@ -23,6 +24,7 @@ from marisco.utils import (
     download_file,
     download_files_in_folder
     )
+
 
 # %% ../../nbs/cli/init.ipynb 3
 @call_parse

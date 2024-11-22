@@ -42,6 +42,9 @@ from marisco.configs import (
 
 from ..encoders import NetCDFEncoder
 
+import warnings
+warnings.filterwarnings('ignore')
+
 # %% ../../nbs/handlers/maris_legacy.ipynb 10
 fname_in = Path().home() / 'pro/data/maris/2024-11-20 MARIS_QA_shapetype_id=1.txt'
 dir_dest = '../../_data/output/dump'
@@ -72,7 +75,6 @@ class DataLoader:
                  ) -> dict: # Dictionary of dataframes
         df = self.df[self.df.ref_id == ref_id].copy() if ref_id else self.df.copy()
         return {self.LUT[name]: grp for name, grp in df.groupby('samptype') if name in self.LUT}
-
 
 # %% ../../nbs/handlers/maris_legacy.ipynb 14
 def get_zotero_key(dfs):
@@ -130,10 +132,13 @@ class DropNAColumnsCB(Callback):
             tfm.dfs[k] = tfm.dfs[k].dropna(axis=1, how='all')
             tfm.dfs[k] = self.dropMarisNA(tfm.dfs[k])
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 31
-dl_name_to_id = lambda: get_lut(lut_path(), 'dbo_detectlimit.xlsx', key='name', value='id')
+# %% ../../nbs/handlers/maris_legacy.ipynb 32
+dl_name_to_id = lambda: get_lut(lut_path(), 
+                                'dbo_detectlimit.xlsx', 
+                                key='name', 
+                                value='id')
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 33
+# %% ../../nbs/handlers/maris_legacy.ipynb 34
 class SanitizeDetectionLimitCB(Callback):
     "Assign Detection Limit name to its id based on MARIS nomenclature."
     def __init__(self,
@@ -146,7 +151,7 @@ class SanitizeDetectionLimitCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k][self.dl_name] = tfm.dfs[k][self.dl_name].replace(lut)
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 37
+# %% ../../nbs/handlers/maris_legacy.ipynb 38
 class ParseTimeCB(Callback):
     "Parse time column from MARIS dump."
     def __init__(self,
@@ -157,7 +162,7 @@ class ParseTimeCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k][self.time_name] = pd.to_datetime(tfm.dfs[k][self.time_name], format='ISO8601')
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 46
+# %% ../../nbs/handlers/maris_legacy.ipynb 47
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -169,7 +174,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 47
+# %% ../../nbs/handlers/maris_legacy.ipynb 48
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve global attributes from MARIS dump."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -181,7 +186,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 49
+# %% ../../nbs/handlers/maris_legacy.ipynb 50
 def encode(
     fname_in: str, # Path to the MARIS dump data in CSV format
     dir_dest: str, # Path to the folder where the NetCDF output will be saved

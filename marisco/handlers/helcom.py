@@ -389,7 +389,6 @@ class RemapUnitCB(Callback):
 
 # %% ../../nbs/handlers/helcom.ipynb 137
 lut_dl = lambda: pd.read_excel(detection_limit_lut_path(), usecols=['name','id']).set_index('name').to_dict()['id']
-lut_dl()
 
 # %% ../../nbs/handlers/helcom.ipynb 139
 coi_dl = {'SEAWATER' : {'VALUE' : 'VALUE_Bq/m³',

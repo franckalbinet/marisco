@@ -6,9 +6,8 @@ __all__ = ['fname_in', 'fname_out_nc', 'zotero_key', 'ref_id', 'default_smp_type
            'lut_biogroup', 'fixes_sediments', 'lut_sediments', 'sed_replace_lut', 'lut_units', 'lut_dl', 'coi_dl',
            'lut_filtered', 'lut_method', 'kw', 'load_data', 'RemapNuclideNameCB', 'ParseTimeCB', 'SanitizeValue',
            'unc_rel2stan', 'NormalizeUncCB', 'RemapSedimentCB', 'RemapUnitCB', 'RemapDetectionLimitCB', 'RemapFiltCB',
-           'AddSampleLabCodeCB', 'AddMeasurementNoteCB', 'RemapStationIdCB', 'RemapSedSliceTopBottomCB',
-           'LookupDryWetRatio', 'ParseCoordinates', 'get_common_rules', 'get_specific_rules', 'get_renaming_rules',
-           'SelectAndRenameColumnCB', 'get_attrs', 'enums_xtra', 'encode']
+           'RemapSedSliceTopBottomCB', 'LookupDryWetRatio', 'ParseCoordinates', 'get_common_rules',
+           'get_specific_rules', 'get_renaming_rules', 'SelectAndRenameColumnCB', 'get_attrs', 'enums_xtra', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb 6
 import pandas as pd 
@@ -465,9 +464,9 @@ class RemapDetectionLimitCB(Callback):
 
 # %% ../../nbs/handlers/helcom.ipynb 150
 lut_filtered = {
-    'N': 2,
-    'n': 2,
-    'F': 1
+    'N': 2, # No
+    'n': 2, # No
+    'F': 1 # Yes
 }
 
 # %% ../../nbs/handlers/helcom.ipynb 152
@@ -483,53 +482,18 @@ class RemapFiltCB(Callback):
             if 'FILT' in df.columns:
                 df['FILT'] = df['FILT'].map(lambda x: self.lut_filtered.get(x, 0))
 
-# %% ../../nbs/handlers/helcom.ipynb 157
-class AddSampleLabCodeCB(Callback):
-    "Remap `KEY` column to `samplabcode` in each DataFrame."
-    def __call__(self, tfm: Transformer):
-        for grp in tfm.dfs:
-            self._remap_sample_id(tfm.dfs[grp])
-    
-    def _remap_sample_id(self, df: pd.DataFrame):
-        df['samplabcode'] = df['KEY']
-
-# %% ../../nbs/handlers/helcom.ipynb 162
+# %% ../../nbs/handlers/helcom.ipynb 172
 lut_method = lambda: pd.read_csv(Path(fname_in) / 'ANALYSIS_METHOD.csv').set_index('METHOD').to_dict()['DESCRIPTION']
 
-# %% ../../nbs/handlers/helcom.ipynb 163
-class AddMeasurementNoteCB(Callback):
-    "Record measurement notes by adding a 'measurenote' column to DataFrames."
-    def __init__(self, 
-                 fn_lut: Callable # Function that returns the lookup dictionary with `METHOD` as key and `DESCRIPTION` as value
-                ):
-        fc.store_attr()
-        
-    def __call__(self, tfm: Transformer):
-        lut = self.fn_lut()
-        for df in tfm.dfs.values():
-            if 'METHOD' in df.columns:
-                df['measurementnote'] = df['METHOD'].map(lambda x: lut.get(x, 0))
-
-# %% ../../nbs/handlers/helcom.ipynb 167
-class RemapStationIdCB(Callback):
-    "Remap Station ID to MARIS format."
-    def __init__(self):
-        fc.store_attr()
-
-    def __call__(self, tfm: Transformer):
-        "Iterate through all DataFrames in the transformer object and remap `STATION` to `station_id`."
-        for grp in tfm.dfs.keys(): 
-            tfm.dfs[grp]['station'] = tfm.dfs[grp]['STATION']
-
-# %% ../../nbs/handlers/helcom.ipynb 171
+# %% ../../nbs/handlers/helcom.ipynb 183
 class RemapSedSliceTopBottomCB(Callback):
     "Remap Sediment slice top and bottom to MARIS format."
     def __call__(self, tfm: Transformer):
         "Iterate through all DataFrames in the transformer object and remap sediment slice top and bottom."
-        tfm.dfs['sediment']['top'] = tfm.dfs['sediment']['UPPSLI']
-        tfm.dfs['sediment']['bottom'] = tfm.dfs['sediment']['LOWSLI']
+        tfm.dfs['SEDIMENT']['TOP'] = tfm.dfs['SEDIMENT']['UPPSLI']
+        tfm.dfs['SEDIMENT']['BOTTOM'] = tfm.dfs['SEDIMENT']['LOWSLI']
 
-# %% ../../nbs/handlers/helcom.ipynb 176
+# %% ../../nbs/handlers/helcom.ipynb 189
 class LookupDryWetRatio(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm: Transformer):
@@ -545,7 +509,7 @@ class LookupDryWetRatio(Callback):
         df.loc[df['dry_wet_ratio'] == 0, 'dry_wet_ratio'] = np.NaN
 
 
-# %% ../../nbs/handlers/helcom.ipynb 183
+# %% ../../nbs/handlers/helcom.ipynb 196
 class ParseCoordinates(Callback):
     """
     Get geographical coordinates from columns expressed in degrees decimal format 
@@ -595,7 +559,7 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 194
+# %% ../../nbs/handlers/helcom.ipynb 207
 def get_common_rules(
     vars: dict, # Configuration dictionary
     encoding_type: str # Encoding type (`netcdf` or `openrefine`)
@@ -636,7 +600,7 @@ def get_common_rules(
     
     return common
 
-# %% ../../nbs/handlers/helcom.ipynb 195
+# %% ../../nbs/handlers/helcom.ipynb 208
 def get_specific_rules(
     vars: dict, # Configuration dictionary
     encoding_type: str # Encoding type (`netcdf` or `openrefine`)
@@ -677,7 +641,7 @@ def get_specific_rules(
             }
         }
 
-# %% ../../nbs/handlers/helcom.ipynb 196
+# %% ../../nbs/handlers/helcom.ipynb 209
 def get_renaming_rules(
     encoding_type: str = 'netcdf' # Encoding type (`netcdf` or `openrefine`)
     ) -> dict: # Renaming rules for NetCDF and OpenRefine.
@@ -697,7 +661,7 @@ def get_renaming_rules(
     
     return dict(rules)
 
-# %% ../../nbs/handlers/helcom.ipynb 197
+# %% ../../nbs/handlers/helcom.ipynb 210
 class SelectAndRenameColumnCB(Callback):
     "Select and rename columns in a DataFrame based on renaming rules for a specified encoding type."
     def __init__(self, 
@@ -768,7 +732,7 @@ class SelectAndRenameColumnCB(Callback):
         return df, not_found_keys
 
 
-# %% ../../nbs/handlers/helcom.ipynb 207
+# %% ../../nbs/handlers/helcom.ipynb 220
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -780,7 +744,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 208
+# %% ../../nbs/handlers/helcom.ipynb 221
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -796,7 +760,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 210
+# %% ../../nbs/handlers/helcom.ipynb 223
 def enums_xtra(
     tfm: Transformer, # Transformer object
     vars: list # List of variables to extract from the transformer
@@ -810,7 +774,7 @@ def enums_xtra(
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/helcom.ipynb 212
+# %% ../../nbs/handlers/helcom.ipynb 225
 def encode(
     fname_in: str, # Input file name
     fname_out_nc: str, # Output file name

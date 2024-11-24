@@ -52,7 +52,7 @@ The MARIS data is converted to a standardized CSV format for importing into the 
 | Sample area            | samparea         |                                        |
 | Dry weight             | drywt            | drywt                                  |
 | Wet weight             | wetwt            | wetwt                                  |
-| Percent weight         | percentwt        |                                        |
+| Percent weight         | percentwt        | percentwt                              |
 | Sampling method ID     | sampmet_id       | sampling_method                        |
 | Drying method ID       | drymet_id        |                                        |
 | Preparation method ID  | prepmet_id       | preparation_method                     |
@@ -1143,7 +1143,7 @@ float
 ## Percent Weight
 
 ### Description:
-Expressed as a percentage. This is calculated by dividing the dry weight by the wet weight and then multiplying by 100. The reported value should be greater than 0 and less than 100. 
+Expressed as a percentage. This is calculated by dividing the dry weight by the wet weight. The reported value should be greater than 0 and less than 1. 
 
 ### Lookup Table (LUT) in use:
 No
@@ -1155,10 +1155,10 @@ No
 float
 
 ### NetCDF Variable Name:
-Not included in NetCDF.
+`percentwt`
 
 ### NetCDF Data Type:
-Not included in NetCDF.
+float
 
 ---
 

@@ -1143,7 +1143,7 @@ float
 ## Percent Weight
 
 ### Description:
-Expressed as a percentage. This is calculated by dividing the dry weight by the wet weight. The reported value should be greater than 0 and less than 1. 
+Expressed in decimal form. This is calculated by dividing the dry weight by the wet weight. The reported value should be greater than 0 and less than 1. 
 
 ### Lookup Table (LUT) in use:
 No

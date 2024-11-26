@@ -6,7 +6,12 @@ __all__ = ['fname_in', 'fname_out_nc', 'zotero_key', 'ref_id', 'default_smp_type
            'lut_biogroup', 'fixes_sediments', 'lut_sediments', 'sed_replace_lut', 'lut_units', 'lut_dl', 'coi_dl',
            'lut_filtered', 'lut_method', 'kw', 'load_data', 'RemapNuclideNameCB', 'ParseTimeCB', 'SanitizeValue',
            'unc_rel2stan', 'NormalizeUncCB', 'RemapSedimentCB', 'RemapUnitCB', 'RemapDetectionLimitCB', 'RemapFiltCB',
+<<<<<<< HEAD
            'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'ParseCoordinates', 'get_attrs', 'encode']
+=======
+           'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'ParseCoordinates', 'SelectAndRenameColumnCB',
+           'get_attrs', 'enums_xtra', 'encode']
+>>>>>>> b5657dfd603187bb362432884986b76e11b3cc19
 
 # %% ../../nbs/handlers/helcom.ipynb 6
 import pandas as pd 
@@ -576,7 +581,56 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
+<<<<<<< HEAD
 # %% ../../nbs/handlers/helcom.ipynb 236
+=======
+# %% ../../nbs/handlers/helcom.ipynb 225
+class SelectAndRenameColumnCB(Callback):
+    """Select and rename columns in a DataFrame based on NC_VARS."""
+    def __init__(self, 
+                 renaming_rules: dict, # A dictionary of renaming rules
+                 verbose: bool=False # Whether to print out renaming rules that were not applied
+                 ):
+        self.renaming_rules = renaming_rules
+        self.verbose = verbose
+
+    def __call__(self, tfm: Transformer):
+        """Apply column selection and renaming to DataFrames in the transformer, and identify unused rules."""
+        for group in tfm.dfs.keys():
+            df = tfm.dfs[group]
+            df, not_found_keys = self._apply_renaming(df, self.renaming_rules)
+            tfm.dfs[group] = df
+            
+            # Print any renaming rules that were not used
+            if not_found_keys and self.verbose:
+                print(f"\nGroup '{group}' has the following renaming rules not applied:")
+                for old_col in not_found_keys:
+                    print(f"Key '{old_col}' from renaming rules was not found in the DataFrame.")
+
+    def _apply_renaming(self, 
+                        df: pd.DataFrame, # DataFrame to modify
+                        rename_rules: dict # Renaming rules
+                        ) -> tuple: # (Renamed and filtered df, Column names from renaming rules that were not found in the DataFrame)
+        """
+        Select columns based on renaming rules and apply renaming, only for existing columns
+        while maintaining the order of the dictionary columns.
+        """
+        # Filter columns to only those in NC_VARS
+        existing_columns = set(df.columns)
+        valid_rules = {old_col: new_col for old_col, new_col in rename_rules.items() if old_col in existing_columns}
+
+        # Keep only the columns that are in the renaming rules
+        df = df[list(valid_rules.keys())]
+
+        # Apply renaming
+        df.rename(columns=valid_rules, inplace=True)
+
+        # Determine which keys were not found
+        not_found_keys = set(rename_rules.keys()) - existing_columns
+        return df, not_found_keys
+
+# %% ../../nbs/handlers/helcom.ipynb 234
+>>>>>>> b5657dfd603187bb362432884986b76e11b3cc19
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -588,7 +642,11 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
+<<<<<<< HEAD
 # %% ../../nbs/handlers/helcom.ipynb 237
+=======
+# %% ../../nbs/handlers/helcom.ipynb 235
+>>>>>>> b5657dfd603187bb362432884986b76e11b3cc19
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -604,7 +662,25 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
+<<<<<<< HEAD
 # %% ../../nbs/handlers/helcom.ipynb 243
+=======
+# %% ../../nbs/handlers/helcom.ipynb 237
+def enums_xtra(
+    tfm: Transformer, # Transformer object
+    vars: list # List of variables to extract from the transformer
+    ):
+    "Retrieve a subset of the lengthy enum as `species_t` for instance."
+    enums = Enums(lut_src_dir=lut_path(), cdl_enums=cdl_cfg()['enums'])
+    xtras = {}
+    for var in vars:
+        unique_vals = tfm.unique(var)
+        if unique_vals.any():
+            xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
+    return xtras
+
+# %% ../../nbs/handlers/helcom.ipynb 239
+>>>>>>> b5657dfd603187bb362432884986b76e11b3cc19
 def encode(
     fname_in: str, # Input file name
     fname_out_nc: str, # Output file name

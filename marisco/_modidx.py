@@ -327,6 +327,17 @@ d = { 'settings': { 'branch': 'master',
                                                                                              'marisco/handlers/helcom.py'),
                                          'marisco.handlers.helcom.SanitizeValue.__init__': ( 'handlers/helcom.html#sanitizevalue.__init__',
                                                                                              'marisco/handlers/helcom.py'),
+<<<<<<< HEAD
+=======
+                                         'marisco.handlers.helcom.SelectAndRenameColumnCB': ( 'handlers/helcom.html#selectandrenamecolumncb',
+                                                                                              'marisco/handlers/helcom.py'),
+                                         'marisco.handlers.helcom.SelectAndRenameColumnCB.__call__': ( 'handlers/helcom.html#selectandrenamecolumncb.__call__',
+                                                                                                       'marisco/handlers/helcom.py'),
+                                         'marisco.handlers.helcom.SelectAndRenameColumnCB.__init__': ( 'handlers/helcom.html#selectandrenamecolumncb.__init__',
+                                                                                                       'marisco/handlers/helcom.py'),
+                                         'marisco.handlers.helcom.SelectAndRenameColumnCB._apply_renaming': ( 'handlers/helcom.html#selectandrenamecolumncb._apply_renaming',
+                                                                                                              'marisco/handlers/helcom.py'),
+>>>>>>> b5657dfd603187bb362432884986b76e11b3cc19
                                          'marisco.handlers.helcom.encode': ('handlers/helcom.html#encode', 'marisco/handlers/helcom.py'),
                                          'marisco.handlers.helcom.get_attrs': ( 'handlers/helcom.html#get_attrs',
                                                                                 'marisco/handlers/helcom.py'),

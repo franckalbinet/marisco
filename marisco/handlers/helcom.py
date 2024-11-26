@@ -6,8 +6,8 @@ __all__ = ['fname_in', 'fname_out_nc', 'zotero_key', 'ref_id', 'default_smp_type
            'lut_biogroup', 'fixes_sediments', 'lut_sediments', 'sed_replace_lut', 'lut_units', 'lut_dl', 'coi_dl',
            'lut_filtered', 'lut_method', 'kw', 'load_data', 'RemapNuclideNameCB', 'ParseTimeCB', 'SanitizeValue',
            'unc_rel2stan', 'NormalizeUncCB', 'RemapSedimentCB', 'RemapUnitCB', 'RemapDetectionLimitCB', 'RemapFiltCB',
-           'RemapSedSliceTopBottomCB', 'LookupDryWetRatio', 'ParseCoordinates', 'get_common_rules',
-           'get_specific_rules', 'get_renaming_rules', 'SelectAndRenameColumnCB', 'get_attrs', 'enums_xtra', 'encode']
+           'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'ParseCoordinates', 'SelectAndRenameColumnCB',
+           'get_attrs', 'enums_xtra', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb 6
 import pandas as pd 
@@ -72,7 +72,8 @@ from marisco.configs import (
     base_path, # not needed here, included to troubleshoot cdl_cfg
     prepmet_lut_path,
     sampmet_lut_path,
-    counmet_lut_path
+    counmet_lut_path, 
+    NC_VARS
 )
 
 from marisco.encoders import (
@@ -493,23 +494,39 @@ class RemapSedSliceTopBottomCB(Callback):
         tfm.dfs['SEDIMENT']['TOP'] = tfm.dfs['SEDIMENT']['UPPSLI']
         tfm.dfs['SEDIMENT']['BOTTOM'] = tfm.dfs['SEDIMENT']['LOWSLI']
 
-# %% ../../nbs/handlers/helcom.ipynb 189
-class LookupDryWetRatio(Callback):
+# %% ../../nbs/handlers/helcom.ipynb 206
+class LookupDryWetPercentWeightCB(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm: Transformer):
         "Iterate through all DataFrames in the transformer object and apply the dry-wet ratio lookup."
         for grp in tfm.dfs.keys():
             if 'DW%' in tfm.dfs[grp].columns:
                 self._apply_dry_wet_ratio(tfm.dfs[grp])
+            if 'WEIGHT' in tfm.dfs[grp].columns and 'BASIS' in tfm.dfs[grp].columns:
+                self._correct_basis(tfm.dfs[grp])
+                self._apply_weight(tfm.dfs[grp])
 
     def _apply_dry_wet_ratio(self, df: pd.DataFrame) -> None:
         "Apply dry-wet ratio conversion and formatting to the given DataFrame."
-        df['dry_wet_ratio'] = df['DW%']
-        # Convert 'DW%' = 0% to NaN.
-        df.loc[df['dry_wet_ratio'] == 0, 'dry_wet_ratio'] = np.NaN
+        df['PERCENTWT'] = df['DW%'] / 100  # Convert percentage to fraction
+        df.loc[df['PERCENTWT'] == 0, 'PERCENTWT'] = np.NaN  # Convert 0% to NaN
 
+    def _correct_basis(self, df: pd.DataFrame) -> None:
+        "Correct BASIS values. Assuming F = Fresh weight, so F = W"
+        df.loc[df['BASIS'] == 'F', 'BASIS'] = 'W'
 
-# %% ../../nbs/handlers/helcom.ipynb 196
+    def _apply_weight(self, df: pd.DataFrame) -> None:
+        "Apply weight conversion and formatting to the given DataFrame."
+        dry_condition = df['BASIS'] == 'D'
+        wet_condition = df['BASIS'] == 'W'
+        
+        df.loc[dry_condition, 'DRYWT'] = df['WEIGHT']
+        df.loc[dry_condition & df['PERCENTWT'].notna(), 'WETWT'] = df['WEIGHT'] / df['PERCENTWT']
+        
+        df.loc[wet_condition, 'WETWT'] = df['WEIGHT']
+        df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['WEIGHT'] * df['PERCENTWT']
+
+# %% ../../nbs/handlers/helcom.ipynb 215
 class ParseCoordinates(Callback):
     """
     Get geographical coordinates from columns expressed in degrees decimal format 
@@ -531,11 +548,11 @@ class ParseCoordinates(Callback):
             decimal_col, minute_col = coord_cols[f'{coord}_d'], coord_cols[f'{coord}_m']
             
             condition = df[decimal_col].isna() | (df[decimal_col] == 0)
-            df[coord] = np.where(condition,
+            df[coord.upper()] = np.where(condition,
                                  df[minute_col].apply(self._safe_convert),
                                  df[decimal_col])
         
-        df.dropna(subset=['lat', 'lon'], inplace=True)
+        df.dropna(subset=['LAT', 'LON'], inplace=True)
 
     def _get_coord_columns(self, columns) -> dict:
         return {
@@ -559,136 +576,21 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 207
-def get_common_rules(
-    vars: dict, # Configuration dictionary
-    encoding_type: str # Encoding type (`netcdf` or `openrefine`)
-    ) -> dict: # Common renaming rules for NetCDF and OpenRefine.
-    "Get common renaming rules for NetCDF and OpenRefine."
-    common = {
-        'KEY': 'key',
-        'lat': 'latitude' if encoding_type == 'openrefine' else vars['defaults']['lat']['name'],
-        'lon': 'longitude' if encoding_type == 'openrefine' else vars['defaults']['lon']['name'],
-        'time': 'begperiod' if encoding_type == 'openrefine' else vars['defaults']['time']['name'],
-        'NUCLIDE': 'nuclide_id' if encoding_type == 'openrefine' else 'nuclide',
-        'detection_limit': 'detection' if encoding_type == 'openrefine' else vars['suffixes']['detection_limit']['name'],
-        'unit': 'unit_id' if encoding_type == 'openrefine' else vars['suffixes']['unit']['name'],
-        'value': 'activity' if encoding_type == 'openrefine' else 'value',
-        'uncertainty': 'uncertaint' if encoding_type == 'openrefine' else vars['suffixes']['uncertainty']['name'],
-        'SDEPTH': 'sampdepth' if encoding_type == 'openrefine' else vars['defaults']['smp_depth']['name'],
-        'TDEPTH': 'totdepth' if encoding_type == 'openrefine' else vars['defaults']['tot_depth']['name'],
-    }
-    
-    if encoding_type == 'openrefine':
-        common.update({
-            'samptype_id': 'samptype_id',
-            'station': 'station',
-            'samplabcode': 'samplabcode',
-            'SALIN': 'salinity',
-            'TTEMP': 'temperatur',
-            'FILT': 'filtered',
-            'measurenote': 'measurenote'
-        })
-    else:
-        common.update({
-            'counting_method': vars['suffixes']['counting_method']['name'],
-            'sampling_method': vars['suffixes']['sampling_method']['name'],
-            'preparation_method': vars['suffixes']['preparation_method']['name'],
-            'SALIN': vars['suffixes']['salinity']['name'],
-            'TTEMP': vars['suffixes']['temperature']['name'],
-        })
-    
-    return common
-
-# %% ../../nbs/handlers/helcom.ipynb 208
-def get_specific_rules(
-    vars: dict, # Configuration dictionary
-    encoding_type: str # Encoding type (`netcdf` or `openrefine`)
-    ) -> dict: # Specific renaming rules for NetCDF and OpenRefine.
-    "Get specific renaming rules for NetCDF and OpenRefine."
-    if encoding_type == 'netcdf':
-        return {
-            'biota': {
-                'species': vars['bio']['species']['name'],
-                'body_part': vars['bio']['body_part']['name'],
-                'bio_group': vars['bio']['bio_group']['name']
-            },
-            'sediment': {
-                'sed_type': vars['sed']['sed_type']['name'],
-                'top': vars['sed']['top']['name'],
-                'bottom': vars['sed']['bottom']['name'],
-            }
-        }
-    elif encoding_type == 'openrefine':
-        return {
-            'biota': {
-                'species': 'species_id',
-                'Taxonname': 'Taxonname',
-                'TaxonRepName': 'TaxonRepName',
-                'Taxonrank': 'Taxonrank',
-                'TaxonDB': 'TaxonDB',
-                'TaxonDBID': 'TaxonDBID',
-                'TaxonDBURL': 'TaxonDBURL',
-                'body_part': 'bodypar_id',
-                'dry_wet_ratio': 'percentwt',
-            },
-            'sediment': {
-                'sed_type': 'sedtype_id',
-                'top': 'sliceup',
-                'bottom': 'slicedown',
-                'SedRepName': 'SedRepName',
-                'dry_wet_ratio': 'percentwt',
-            }
-        }
-
-# %% ../../nbs/handlers/helcom.ipynb 209
-def get_renaming_rules(
-    encoding_type: str = 'netcdf' # Encoding type (`netcdf` or `openrefine`)
-    ) -> dict: # Renaming rules for NetCDF and OpenRefine.
-    "Get renaming rules for NetCDF and OpenRefine."
-    vars = cdl_cfg()['vars']
-    
-    if encoding_type not in ['netcdf', 'openrefine']:
-        raise ValueError("Invalid encoding_type provided. Please use 'netcdf' or 'openrefine'.")
-    
-    common_rules = get_common_rules(vars, encoding_type)
-    specific_rules = get_specific_rules(vars, encoding_type)
-    
-    rules = defaultdict(dict)
-    for sample_type in ['seawater', 'biota', 'sediment']:
-        rules[sample_type] = common_rules.copy()
-        rules[sample_type].update(specific_rules.get(sample_type, {}))
-    
-    return dict(rules)
-
-# %% ../../nbs/handlers/helcom.ipynb 210
+# %% ../../nbs/handlers/helcom.ipynb 225
 class SelectAndRenameColumnCB(Callback):
-    "Select and rename columns in a DataFrame based on renaming rules for a specified encoding type."
+    """Select and rename columns in a DataFrame based on NC_VARS."""
     def __init__(self, 
-                 fn_renaming_rules: Callable, # A function that returns an OrderedDict of renaming rules 
-                 encoding_type: str='netcdf', # The encoding type (`netcdf` or `openrefine`) to determine which renaming rules to use
+                 renaming_rules: dict, # A dictionary of renaming rules
                  verbose: bool=False # Whether to print out renaming rules that were not applied
                  ):
-        fc.store_attr()
+        self.renaming_rules = renaming_rules
+        self.verbose = verbose
 
     def __call__(self, tfm: Transformer):
-        "Apply column selection and renaming to DataFrames in the transformer, and identify unused rules."
-        try:
-            renaming_rules = self.fn_renaming_rules(self.encoding_type)
-        except ValueError as e:
-            print(f"Error fetching renaming rules: {e}")
-            return
-
+        """Apply column selection and renaming to DataFrames in the transformer, and identify unused rules."""
         for group in tfm.dfs.keys():
-            # Get relevant renaming rules for the current group
-            group_rules = self._get_group_rules(renaming_rules, group)
-
-            if not group_rules:
-                continue
-
-            # Apply renaming rules and track keys not found in the DataFrame
             df = tfm.dfs[group]
-            df, not_found_keys = self._apply_renaming(df, group_rules)
+            df, not_found_keys = self._apply_renaming(df, self.renaming_rules)
             tfm.dfs[group] = df
             
             # Print any renaming rules that were not used
@@ -697,32 +599,20 @@ class SelectAndRenameColumnCB(Callback):
                 for old_col in not_found_keys:
                     print(f"Key '{old_col}' from renaming rules was not found in the DataFrame.")
 
-    def _get_group_rules(self, 
-                         renaming_rules: OrderedDict, # Renaming rules
-                         group: str # Group name to filter rules
-                         ) -> OrderedDict: # Renaming rules applicable to the specified group
-        "Retrieve and merge renaming rules for the specified group based on the encoding type."
-        relevant_rules = [rules for key, rules in renaming_rules.items() if group in key]
-        merged_rules = OrderedDict()
-        for rules in relevant_rules:
-            merged_rules.update(rules)
-        return merged_rules
-
     def _apply_renaming(self, 
                         df: pd.DataFrame, # DataFrame to modify
-                        rename_rules: OrderedDict # Renaming rules
+                        rename_rules: dict # Renaming rules
                         ) -> tuple: # (Renamed and filtered df, Column names from renaming rules that were not found in the DataFrame)
         """
         Select columns based on renaming rules and apply renaming, only for existing columns
-        while maintaining the order of the dictionary columns."""
+        while maintaining the order of the dictionary columns.
+        """
+        # Filter columns to only those in NC_VARS
         existing_columns = set(df.columns)
-        valid_rules = OrderedDict((old_col, new_col) for old_col, new_col in rename_rules.items() if old_col in existing_columns)
+        valid_rules = {old_col: new_col for old_col, new_col in rename_rules.items() if old_col in existing_columns}
 
-        # Create a list to maintain the order of columns
-        columns_to_keep = [col for col in rename_rules.keys() if col in existing_columns]
-        columns_to_keep += [new_col for old_col, new_col in valid_rules.items() if new_col in df.columns]
-
-        df = df[list(OrderedDict.fromkeys(columns_to_keep))]
+        # Keep only the columns that are in the renaming rules
+        df = df[list(valid_rules.keys())]
 
         # Apply renaming
         df.rename(columns=valid_rules, inplace=True)
@@ -731,8 +621,7 @@ class SelectAndRenameColumnCB(Callback):
         not_found_keys = set(rename_rules.keys()) - existing_columns
         return df, not_found_keys
 
-
-# %% ../../nbs/handlers/helcom.ipynb 220
+# %% ../../nbs/handlers/helcom.ipynb 234
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -744,7 +633,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 221
+# %% ../../nbs/handlers/helcom.ipynb 235
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -760,7 +649,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 223
+# %% ../../nbs/handlers/helcom.ipynb 237
 def enums_xtra(
     tfm: Transformer, # Transformer object
     vars: list # List of variables to extract from the transformer
@@ -774,7 +663,7 @@ def enums_xtra(
             xtras[f'{var}_t'] = enums.filter(f'{var}_t', unique_vals)
     return xtras
 
-# %% ../../nbs/handlers/helcom.ipynb 225
+# %% ../../nbs/handlers/helcom.ipynb 239
 def encode(
     fname_in: str, # Input file name
     fname_out_nc: str, # Output file name

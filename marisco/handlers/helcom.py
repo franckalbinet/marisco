@@ -81,8 +81,10 @@ from marisco.encoders import (
 )
 
 from marisco.decoders import (
+    nc_to_dfs,
     get_netcdf_properties, 
-    get_netcdf_group_properties
+    get_netcdf_group_properties,
+    get_netcdf_variable_properties
 )
 import warnings
 warnings.filterwarnings('ignore')
@@ -498,7 +500,7 @@ class RemapSedSliceTopBottomCB(Callback):
         tfm.dfs['SEDIMENT']['TOP'] = tfm.dfs['SEDIMENT']['UPPSLI']
         tfm.dfs['SEDIMENT']['BOTTOM'] = tfm.dfs['SEDIMENT']['LOWSLI']
 
-# %% ../../nbs/handlers/helcom.ipynb 207
+# %% ../../nbs/handlers/helcom.ipynb 210
 class LookupDryWetPercentWeightCB(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm: Transformer):
@@ -530,7 +532,7 @@ class LookupDryWetPercentWeightCB(Callback):
         df.loc[wet_condition, 'WETWT'] = df['WEIGHT']
         df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['WEIGHT'] * df['PERCENTWT']
 
-# %% ../../nbs/handlers/helcom.ipynb 216
+# %% ../../nbs/handlers/helcom.ipynb 219
 class ParseCoordinates(Callback):
     """
     Get geographical coordinates from columns expressed in degrees decimal format 
@@ -580,7 +582,7 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 237
+# %% ../../nbs/handlers/helcom.ipynb 240
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -592,7 +594,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 238
+# %% ../../nbs/handlers/helcom.ipynb 241
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -608,7 +610,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 244
+# %% ../../nbs/handlers/helcom.ipynb 247
 def encode(
     fname_in: str, # Input file name
     fname_out_nc: str, # Output file name

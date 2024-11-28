@@ -150,16 +150,14 @@ def get_netcdf_variable_properties(file_path: str, as_df: bool = False) -> dict 
                 var_info = {
                     'group': group_name,
                     'variable': var_name,
-                    'dtype': var.dtype.str,
-                    'dimensions': str(var.dimensions),
-                    'fill_value': var._FillValue if hasattr(var, '_FillValue') else None,
+                    'data_type': var.dtype.str,
+                    'dimensions_id': str(var.dimensions),
+                    'dimensions_size': str(var.shape),
                 }
-                
-                # Add attributes
+                # Add variable attributes
                 for attr in var.ncattrs():
-                    if attr != '_FillValue':  # Skip fill value as it's already captured
-                        var_info[f'attr_{attr}'] = var.getncattr(attr)
-                
+                    var_info[f'attr_{attr}'] = str(getattr(var, attr))
+                    
                 group_vars[var_name] = var_info
             var_properties[group_name] = group_vars
 
@@ -175,7 +173,7 @@ def get_netcdf_variable_properties(file_path: str, as_df: bool = False) -> dict 
     df = pd.DataFrame(rows)
     
     # Reorder columns to put key information first
-    first_cols = ['group', 'variable', 'dtype', 'dimensions']
+    first_cols = ['group', 'variable', 'dimensions_id', 'dimensions_size']
     other_cols = [col for col in df.columns if col not in first_cols]
     df = df[first_cols + other_cols]
     

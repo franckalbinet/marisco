@@ -81,7 +81,8 @@ from marisco.encoders import (
 )
 
 from marisco.decoders import (
-    get_netcdf_properties
+    get_netcdf_properties, 
+    get_netcdf_group_properties
 )
 import warnings
 warnings.filterwarnings('ignore')

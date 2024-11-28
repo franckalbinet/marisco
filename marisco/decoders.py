@@ -54,7 +54,7 @@ def nc_to_dfs(
     
     return dfs
 
-# %% ../nbs/api/decoders.ipynb 9
+# %% ../nbs/api/decoders.ipynb 11
 def get_netcdf_properties(file_path: str) -> dict:
     """
     Retrieve general properties of a NetCDF file.
@@ -89,7 +89,7 @@ def get_netcdf_properties(file_path: str) -> dict:
     
     return properties
 
-# %% ../nbs/api/decoders.ipynb 13
+# %% ../nbs/api/decoders.ipynb 15
 def get_netcdf_group_properties(file_path: str) -> dict:
     """
     Retrieve properties of each group in a NetCDF file, including dimension sizes.
@@ -124,7 +124,7 @@ def get_netcdf_group_properties(file_path: str) -> dict:
     return group_properties
 
 
-# %% ../nbs/api/decoders.ipynb 16
+# %% ../nbs/api/decoders.ipynb 18
 def get_netcdf_variable_properties(file_path: str, as_df: bool = False) -> dict | pd.DataFrame:
     """
     Retrieve properties of variables in each group of a NetCDF file.

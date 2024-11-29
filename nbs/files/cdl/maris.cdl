@@ -13,6 +13,7 @@ types:
   int64 enum sed_type_t {TBD_10 = 0} ;
   int64 enum species_t {TBD_11 = 0} ;
   int64 enum unit_t {TBD_12 = 0} ;
+  int64 enum lab_t {TBD_13 = 0};
     
 // Global attributes
 :id = "TBD" ;
@@ -125,6 +126,9 @@ group: biota {
         prep_met_t prep_met(id) ;
             prep_met:long_name = "Preparation method" ;
             prep_met:standard_name = "preparation_method" ;
+        lab_t lab(id) ;
+            lab:long_name = "laboratory" ;
+            lab:standard_name = "laboratory" ;
         float vol(id) ;
             vol:long_name = "Volume" ;
             vol:standard_name = "volume" ;
@@ -148,13 +152,13 @@ group: biota {
         body_part_t body_part(id) ;
             body_part:long_name = "Body part" ;
             body_part:standard_name = "body_part_tbd" ;
-	float drywt(id) ;
+		float drywt(id) ;
         	drywt:long_name = "Dry weight of biota sample, expressed in grams." ;
         	drywt:standard_name = "dry_weight_of_biota_sample" ;
-	float wetwt(id) ;
+		float wetwt(id) ;
             wetwt:long_name = "Wet weight of biota sample, expressed in grams." ;
             wetwt:standard_name = "wet_weight_of_biota_sample" ;
-	float percentwt(id) ;
+		float percentwt(id) ;
         	percentwt:long_name = "Dry weight as a percentage of fresh weight." ;
         	percentwt:standard_name = "percentage_weight_of_biota_sample" ;
 }
@@ -226,6 +230,9 @@ group: seawater {
         prep_met_t prep_met(id) ;
             prep_met:long_name = "Preparation method" ;
             prep_met:standard_name = "preparation_method" ;
+        lab_t lab(id) ;
+            lab:long_name = "laboratory" ;
+            lab:standard_name = "laboratory" ;
         float vol(id) ;
             vol:long_name = "Volume" ;
             vol:standard_name = "volume" ;
@@ -307,6 +314,9 @@ group: sediment {
         prep_met_t prep_met(id) ;
             prep_met:long_name = "Preparation method" ;
             prep_met:standard_name = "preparation_method" ;
+        lab_t lab(id) ;
+            lab:long_name = "laboratory" ;
+            lab:standard_name = "laboratory" ;
         float vol(id) ;
             vol:long_name = "Volume" ;
             vol:standard_name = "volume" ;
@@ -330,13 +340,13 @@ group: sediment {
         float bottom(id) ;
             bottom:long_name = "Bottom depth of sediment layer" ;
             bottom:standard_name = "bottom_depth_of_sediment_layer_tbd" ;
-	float drywt(id) ;
+		float drywt(id) ;
             drywt:long_name = "Dry weight of sediment sample, expressed in grams." ;
             drywt:standard_name = "dry_weight_of_sediment_sample" ;
-	float wetwt(id) ;
+		float wetwt(id) ;
             wetwt:long_name = "Wet weight of sediment sample, expressed in grams." ;
             wetwt:standard_name = "wet_weight_of_sediment_sample" ;
-	float percentwt(id) ;
+		float percentwt(id) ;
         	percentwt:long_name = "Dry weight as a percentage of fresh weight." ;
         	percentwt:standard_name = "percentage_weight_of_biota_sample" ;
 }
@@ -407,6 +417,9 @@ group: suspended_matter {
         prep_met_t prep_met(id) ;
             prep_met:long_name = "Preparation method" ;
             prep_met:standard_name = "preparation_method" ;
+        lab_t lab(id) ;
+            lab:long_name = "laboratory" ;
+            lab:standard_name = "laboratory" ;
         float vol(id) ;
             vol:long_name = "Volume" ;
             vol:standard_name = "volume" ;

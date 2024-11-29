@@ -5,7 +5,7 @@
 # %% auto 0
 __all__ = ['AVOGADRO', 'NC_DIM', 'NC_VARS', 'NC_GROUPS', 'SMP_TYPE_LUT', 'NC_DTYPES', 'CFG_FNAME', 'NUCLIDE_LOOKUP_FNAME',
            'MARISCO_CFG_DIRNAME', 'CONFIGS', 'CONFIGS_CDL', 'NETCDF_TO_PYTHON_TYPE', 'base_path', 'cfg', 'lut_path',
-           'cache_path', 'nuc_lut_path', 'species_lut_path', 'bodyparts_lut_path', 'biogroup_lut_path',
+           'cache_path', 'nuc_lut_path', 'species_lut_path', 'bodyparts_lut_path', 'lab_lut_path', 'biogroup_lut_path',
            'sediments_lut_path', 'unit_lut_path', 'detection_limit_lut_path', 'filtered_lut_path', 'area_lut_path',
            'prepmet_lut_path', 'sampmet_lut_path', 'counmet_lut_path', 'nc_tpl_name', 'nc_tpl_path', 'get_time_units',
            'sanitize', 'get_lut', 'Enums']
@@ -57,7 +57,8 @@ NC_VARS = {
     'TOP': 'top',
     'BOTTOM': 'bottom',
     'DRYWT': 'drywt',
-    'WETWT': 'wetwt'
+    'WETWT': 'wetwt',
+    'LAB': 'lab'
     }
 
 # %% ../nbs/api/configs.ipynb 6
@@ -148,6 +149,12 @@ NC_DTYPES = {
         'fname': 'dbo_unit.xlsx', 
         'key': 'unit_sanitized', 
         'value':'unit_id'
+    },
+    'LAB': {
+        'name': 'lab_t', 
+        'fname': 'dbo_lab.xlsx', 
+        'key': 'lab_abb', 
+        'value':'lab_id'
     }
 }
 
@@ -597,42 +604,49 @@ def bodyparts_lut_path():
     fname = NC_DTYPES['BODY_PART']['fname']
     return src_dir / fname
 
-# %% ../nbs/api/configs.ipynb 31
+# %% ../nbs/api/configs.ipynb 30
+def lab_lut_path():
+    "Return the path to the laboratory lookup table."
+    src_dir = lut_path()
+    fname = NC_DTYPES['LAB']['fname']
+    return src_dir / fname
+
+# %% ../nbs/api/configs.ipynb 32
 def biogroup_lut_path():
     "Return the path to the biota group lookup table."
     src_dir = lut_path()
     fname = NC_DTYPES['BIO_GROUP']['fname']
     return src_dir / fname
 
-# %% ../nbs/api/configs.ipynb 33
+# %% ../nbs/api/configs.ipynb 34
 def sediments_lut_path():
     "Return the path to the sediment type lookup table."
     src_dir = lut_path()
     fname = NC_DTYPES['SED_TYPE']['fname']
     return src_dir / fname
 
-# %% ../nbs/api/configs.ipynb 35
+# %% ../nbs/api/configs.ipynb 36
 def unit_lut_path():
     "Return the path to the unit lookup table."
     src_dir = lut_path()
     fname = NC_DTYPES['UNIT']['fname']
     return src_dir / fname
 
-# %% ../nbs/api/configs.ipynb 37
+# %% ../nbs/api/configs.ipynb 38
 def detection_limit_lut_path():
     "Return the path to the detection limit lookup table."
     src_dir = lut_path()
     fname = NC_DTYPES['DL']['fname']
     return src_dir / fname
 
-# %% ../nbs/api/configs.ipynb 39
+# %% ../nbs/api/configs.ipynb 40
 def filtered_lut_path():
     "Return the path to the filtered lookup table."
     src_dir = lut_path()
     fname = NC_DTYPES['FILT']['fname']
     return src_dir / fname
 
-# %% ../nbs/api/configs.ipynb 41
+# %% ../nbs/api/configs.ipynb 42
 def area_lut_path():
     "Return the path to the area lookup table."
     src_dir = lut_path()
@@ -641,7 +655,7 @@ def area_lut_path():
 
 # area_lut_path()
 
-# %% ../nbs/api/configs.ipynb 43
+# %% ../nbs/api/configs.ipynb 44
 def prepmet_lut_path():
     "Return the path to the prepmet lookup table."
     src_dir = lut_path()
@@ -650,7 +664,7 @@ def prepmet_lut_path():
 
 # prepmet_lut_path()
 
-# %% ../nbs/api/configs.ipynb 45
+# %% ../nbs/api/configs.ipynb 46
 def sampmet_lut_path():
     "Return the path to the sampmet lookup table."
     src_dir = lut_path()
@@ -659,7 +673,7 @@ def sampmet_lut_path():
 
 # sampmet_lut_path()
 
-# %% ../nbs/api/configs.ipynb 47
+# %% ../nbs/api/configs.ipynb 48
 def counmet_lut_path():
     "Return the path to the counmet lookup table."
     src_dir = lut_path()
@@ -668,13 +682,13 @@ def counmet_lut_path():
 
 # counmet_lut_path()
 
-# %% ../nbs/api/configs.ipynb 50
+# %% ../nbs/api/configs.ipynb 51
 NETCDF_TO_PYTHON_TYPE = {
     'u8': int,
     'f4': float
     }
 
-# %% ../nbs/api/configs.ipynb 51
+# %% ../nbs/api/configs.ipynb 52
 # def name2grp(
 #     name: str, # Group name
 #     cdl: dict, # CDL configuration
@@ -682,19 +696,19 @@ NETCDF_TO_PYTHON_TYPE = {
 #     # Reverse `cdl.toml` config group dict so that group config key can be retrieve based on its name
 #     return {v['name']:k  for k, v in cdl['grps'].items()}[name]
 
-# %% ../nbs/api/configs.ipynb 54
+# %% ../nbs/api/configs.ipynb 55
 def nc_tpl_name():
     "Return the name of the MARIS NetCDF template as defined in `configs.toml`"
     p = base_path()
     return read_toml(p / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 55
+# %% ../nbs/api/configs.ipynb 56
 def nc_tpl_path():
     "Return the path of the MARIS NetCDF template as defined in `configs.toml`"
     p = base_path()
     return p / read_toml(p / 'configs.toml')['names']['nc_template']
 
-# %% ../nbs/api/configs.ipynb 56
+# %% ../nbs/api/configs.ipynb 57
 def get_time_units(
     nc_path: Callable=nc_tpl_path # Function returning Path to NetCDF template file
     ) -> str: # Time units string (e.g. 'seconds since 1970-01-01 00:00:00.0')
@@ -706,7 +720,7 @@ def get_time_units(
                 
     raise ValueError("Time variable not found in NetCDF file")
 
-# %% ../nbs/api/configs.ipynb 60
+# %% ../nbs/api/configs.ipynb 61
 def sanitize(
     s: str|float # String or float to sanitize
     ) -> str|float:  # Sanitized string or original float
@@ -725,7 +739,7 @@ def sanitize(
     else:
         return str(s).strip()
 
-# %% ../nbs/api/configs.ipynb 64
+# %% ../nbs/api/configs.ipynb 65
 def try_int(x):
     "Try to convert `x` to an integer."
     try:
@@ -733,7 +747,7 @@ def try_int(x):
     except (ValueError, TypeError):
         return x
 
-# %% ../nbs/api/configs.ipynb 65
+# %% ../nbs/api/configs.ipynb 66
 def get_lut(
     src_dir: str, # Directory containing lookup tables
     fname: str, # Excel file lookup table name
@@ -758,7 +772,7 @@ def get_lut(
     lut = {try_int(k): try_int(v) for k, v in lut.items()}    
     return {v: k for k, v in lut.items()} if reverse else lut
 
-# %% ../nbs/api/configs.ipynb 68
+# %% ../nbs/api/configs.ipynb 69
 class Enums():
     "Return dictionaries of MARIS NetCDF's enumeration types."
     def __init__(self, 

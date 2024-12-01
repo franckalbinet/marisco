@@ -20,7 +20,7 @@ from shapely import MultiPoint
 import jellyfish as jf
 from dataclasses import dataclass
 
-from typing import List, Dict, Callable, Tuple, Optional
+from typing import List, Dict, Callable, Tuple, Optional, Union
 
 from .configs import cache_path
 
@@ -51,7 +51,7 @@ class Remapper():
     "Remap a data provider lookup table to a MARIS lookup table using fuzzy matching."
     def __init__(self,
                  provider_lut_df: pd.DataFrame, # Data provider lookup table to be remapped
-                 maris_lut_fn: Callable, # Function that returns the MARIS lookup table path
+                 maris_lut_fn: Union[Callable, pd.DataFrame], # MARIS lookup table or function returning the path
                  maris_col_id: str, # MARIS lookup table column name for the id
                  maris_col_name: str, # MARIS lookup table column name for the name
                  provider_col_to_match: str, # Data provider lookup table column name for the name to match
@@ -60,7 +60,11 @@ class Remapper():
                  ):
         fc.store_attr()
         self.cache_file = cache_path() / fname_cache
-        self.maris_lut = maris_lut_fn()
+        # Check if maris_lut is a callable function or already a DataFrame
+        if callable(maris_lut_fn):
+            self.maris_lut = maris_lut_fn()
+        else:
+            self.maris_lut = maris_lut_fn
         self.lut = {}
 
     def generate_lookup_table(self, 
@@ -111,7 +115,6 @@ class Remapper():
                                         columns=['matched_maris_name', 'source_name', 'match_score'])
         df_lut.index.name = 'source_key'
         return df_lut.sort_values(by='match_score', ascending=False)
-
 
 # %% ../nbs/api/utils.ipynb 16
 # TBD: Assess if still needed
@@ -232,9 +235,9 @@ class Match:
     source_name: str
     match_score: int
 
-# %% ../nbs/api/utils.ipynb 38
+# %% ../nbs/api/utils.ipynb 37
 def match_maris_lut(
-    lut_path: str, # Path to MARIS species authoritative species look-up table
+    lut: Union[str, pd.DataFrame, Path], # Either str, Path or DataFrame
     data_provider_name: str, # Name of data provider nomenclature item to look up 
     maris_id: str, # Id of MARIS lookup table nomenclature item to match
     maris_name: str, # Name of MARIS lookup table nomenclature item to match
@@ -242,14 +245,20 @@ def match_maris_lut(
     nresults: int = 10 # Maximum number of results to return
 ) -> pd.DataFrame:
     "Fuzzy matching data provider and MARIS lookup tables (e.g biota species, sediments, ...)."
-    df = pd.read_excel(lut_path)
+    if isinstance(lut, str) or isinstance(lut, Path):
+        df = pd.read_excel(lut)  # Load the LUT if a path is provided
+    elif isinstance(lut, pd.DataFrame):
+        df = lut  # Use the DataFrame directly if provided
+    else:
+        raise ValueError("lut must be either a file path or a DataFrame")
+
     df = df.dropna(subset=[maris_name])
     df = df.astype({maris_id: 'int'})
     df['score'] = df[maris_name].str.lower().apply(lambda x: dist_fn(data_provider_name.lower(), x))
     df = df.sort_values(by='score', ascending=True)[:nresults]
     return df[[maris_id, maris_name, 'score']]
 
-# %% ../nbs/api/utils.ipynb 45
+# %% ../nbs/api/utils.ipynb 46
 def download_files_in_folder(
     owner: str, # GitHub owner
     repo: str, # GitHub repository
@@ -284,7 +293,7 @@ def download_file(owner, repo, src_dir, dest_dir, fname):
     else:
         print(f"Error: {response.status_code}")
 
-# %% ../nbs/api/utils.ipynb 47
+# %% ../nbs/api/utils.ipynb 48
 def test_dfs(
     dfs1: Dict[str, pd.DataFrame], # First dictionary of DataFrames to compare 
     dfs2: Dict[str, pd.DataFrame] # Second dictionary of DataFrames to compare

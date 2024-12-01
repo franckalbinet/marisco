@@ -4,10 +4,10 @@
 __all__ = ['fname_in', 'fname_out_nc', 'zotero_key', 'ref_id', 'default_smp_types', 'fixes_nuclide_names', 'lut_nuclides',
            'coi_val', 'coi_units_unc', 'fixes_biota_species', 'lut_biota', 'fixes_biota_tissues', 'lut_tissues',
            'lut_biogroup_from_biota', 'fixes_sediments', 'lut_sediments', 'sed_replace_lut', 'lut_units', 'lut_dl',
-           'coi_dl', 'lut_filtered', 'lut_method', 'kw', 'load_data', 'RemapNuclideNameCB', 'ParseTimeCB',
-           'SanitizeValue', 'unc_rel2stan', 'NormalizeUncCB', 'RemapSedimentCB', 'RemapUnitCB', 'RemapDetectionLimitCB',
-           'RemapFiltCB', 'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'ParseCoordinates', 'get_attrs',
-           'encode']
+           'coi_dl', 'lut_filtered', 'fixes_lab_names', 'lut_method', 'kw', 'load_data', 'RemapNuclideNameCB',
+           'ParseTimeCB', 'SanitizeValue', 'unc_rel2stan', 'NormalizeUncCB', 'RemapSedimentCB', 'RemapUnitCB',
+           'RemapDetectionLimitCB', 'RemapFiltCB', 'combine_lut_columns', 'RemapSedSliceTopBottomCB',
+           'LookupDryWetPercentWeightCB', 'ParseCoordinates', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb 6
 import pandas as pd 
@@ -63,6 +63,7 @@ from marisco.configs import (
     prepmet_lut_path,
     sampmet_lut_path,
     counmet_lut_path, 
+    lab_lut_path,
     NC_VARS
 )
 
@@ -472,10 +473,29 @@ class RemapFiltCB(Callback):
             if 'FILT' in df.columns:
                 df['FILT'] = df['FILT'].map(lambda x: self.lut_filtered.get(x, 0))
 
-# %% ../../nbs/handlers/helcom.ipynb 166
+# %% ../../nbs/handlers/helcom.ipynb 154
+def combine_lut_columns(lut_path: Callable, combine_cols: List[str] = []):
+    if lut_path:
+        df_lut = pd.read_excel(lut_path()) 
+        if combine_cols:
+            # Combine the specified columns into a single column with space as separator
+            df_lut['combined'] = df_lut[combine_cols].astype(str).agg(' '.join, axis=1)
+            # Create a column name by joining column names with '_'
+            combined_col_name = '_'.join(combine_cols)
+            df_lut.rename(columns={'combined': combined_col_name}, inplace=True)
+        return df_lut
+
+# %% ../../nbs/handlers/helcom.ipynb 161
+fixes_lab_names = {
+    'STATENS STRÅLSKYDDSINSTITUT, SWEDEN': 'Swedish Radiation Safety Authority Sweden',
+    'V. G. KHLOPIN RADIUM INSTITUTE, RUSSIA': 'V.G. Khlopin Radium Institute - Lab. of Environmental Radioactive Contamination Monitoring Russian Federation',
+    'ENVIRONMENTAL PROTECTION AGENCY, LITHUANIA': 'Lithuanian Environmental Protection Agency Lithuania',
+    }
+
+# %% ../../nbs/handlers/helcom.ipynb 179
 lut_method = lambda: pd.read_csv(Path(fname_in) / 'ANALYSIS_METHOD.csv').set_index('METHOD').to_dict()['DESCRIPTION']
 
-# %% ../../nbs/handlers/helcom.ipynb 172
+# %% ../../nbs/handlers/helcom.ipynb 185
 class RemapSedSliceTopBottomCB(Callback):
     "Remap Sediment slice top and bottom to MARIS format."
     def __call__(self, tfm: Transformer):
@@ -483,7 +503,7 @@ class RemapSedSliceTopBottomCB(Callback):
         tfm.dfs['SEDIMENT']['TOP'] = tfm.dfs['SEDIMENT']['UPPSLI']
         tfm.dfs['SEDIMENT']['BOTTOM'] = tfm.dfs['SEDIMENT']['LOWSLI']
 
-# %% ../../nbs/handlers/helcom.ipynb 198
+# %% ../../nbs/handlers/helcom.ipynb 210
 class LookupDryWetPercentWeightCB(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm: Transformer):
@@ -515,7 +535,7 @@ class LookupDryWetPercentWeightCB(Callback):
         df.loc[wet_condition, 'WETWT'] = df['WEIGHT']
         df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['WEIGHT'] * df['PERCENTWT']
 
-# %% ../../nbs/handlers/helcom.ipynb 207
+# %% ../../nbs/handlers/helcom.ipynb 219
 class ParseCoordinates(Callback):
     """
     Get geographical coordinates from columns expressed in degrees decimal format 
@@ -565,7 +585,7 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 220
+# %% ../../nbs/handlers/helcom.ipynb 232
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -577,7 +597,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 221
+# %% ../../nbs/handlers/helcom.ipynb 233
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -593,7 +613,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 224
+# %% ../../nbs/handlers/helcom.ipynb 236
 def encode(
     fname_in: str, # Input file name
     fname_out_nc: str, # Output file name

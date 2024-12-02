@@ -492,10 +492,10 @@ fixes_lab_names = {
     'ENVIRONMENTAL PROTECTION AGENCY, LITHUANIA': 'Lithuanian Environmental Protection Agency Lithuania',
     }
 
-# %% ../../nbs/handlers/helcom.ipynb 179
+# %% ../../nbs/handlers/helcom.ipynb 180
 lut_method = lambda: pd.read_csv(Path(fname_in) / 'ANALYSIS_METHOD.csv').set_index('METHOD').to_dict()['DESCRIPTION']
 
-# %% ../../nbs/handlers/helcom.ipynb 185
+# %% ../../nbs/handlers/helcom.ipynb 186
 class RemapSedSliceTopBottomCB(Callback):
     "Remap Sediment slice top and bottom to MARIS format."
     def __call__(self, tfm: Transformer):
@@ -503,7 +503,7 @@ class RemapSedSliceTopBottomCB(Callback):
         tfm.dfs['SEDIMENT']['TOP'] = tfm.dfs['SEDIMENT']['UPPSLI']
         tfm.dfs['SEDIMENT']['BOTTOM'] = tfm.dfs['SEDIMENT']['LOWSLI']
 
-# %% ../../nbs/handlers/helcom.ipynb 210
+# %% ../../nbs/handlers/helcom.ipynb 211
 class LookupDryWetPercentWeightCB(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm: Transformer):
@@ -535,7 +535,7 @@ class LookupDryWetPercentWeightCB(Callback):
         df.loc[wet_condition, 'WETWT'] = df['WEIGHT']
         df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['WEIGHT'] * df['PERCENTWT']
 
-# %% ../../nbs/handlers/helcom.ipynb 219
+# %% ../../nbs/handlers/helcom.ipynb 220
 class ParseCoordinates(Callback):
     """
     Get geographical coordinates from columns expressed in degrees decimal format 
@@ -585,7 +585,7 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 232
+# %% ../../nbs/handlers/helcom.ipynb 233
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -597,7 +597,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 233
+# %% ../../nbs/handlers/helcom.ipynb 234
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -613,7 +613,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 236
+# %% ../../nbs/handlers/helcom.ipynb 237
 def encode(
     fname_in: str, # Input file name
     fname_out_nc: str, # Output file name

@@ -594,10 +594,10 @@ class AddSampleIDCB(Callback):
         # Convert 'SMP_ID' to integer, handling floating point representations
         df['SMP_ID'] = df['SMP_ID'].apply(lambda x: int(float(x)) if isinstance(x, str) and '.' in x else int(x))
 
-# %% ../../nbs/handlers/helcom.ipynb 199
+# %% ../../nbs/handlers/helcom.ipynb 202
 lut_method = lambda: pd.read_csv(Path(fname_in) / 'ANALYSIS_METHOD.csv').set_index('METHOD').to_dict()['DESCRIPTION']
 
-# %% ../../nbs/handlers/helcom.ipynb 205
+# %% ../../nbs/handlers/helcom.ipynb 208
 class RemapSedSliceTopBottomCB(Callback):
     "Remap Sediment slice top and bottom to MARIS format."
     def __call__(self, tfm: Transformer):
@@ -605,7 +605,7 @@ class RemapSedSliceTopBottomCB(Callback):
         tfm.dfs['SEDIMENT']['TOP'] = tfm.dfs['SEDIMENT']['UPPSLI']
         tfm.dfs['SEDIMENT']['BOTTOM'] = tfm.dfs['SEDIMENT']['LOWSLI']
 
-# %% ../../nbs/handlers/helcom.ipynb 230
+# %% ../../nbs/handlers/helcom.ipynb 233
 class LookupDryWetPercentWeightCB(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm: Transformer):
@@ -637,12 +637,9 @@ class LookupDryWetPercentWeightCB(Callback):
         df.loc[wet_condition, 'WETWT'] = df['WEIGHT']
         df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['WEIGHT'] * df['PERCENTWT']
 
-# %% ../../nbs/handlers/helcom.ipynb 238
+# %% ../../nbs/handlers/helcom.ipynb 241
 class ParseCoordinates(Callback):
-    """
-    Get geographical coordinates from columns expressed in degrees decimal format 
-    or from columns in degrees/minutes decimal format where degrees decimal format is missing or zero.
-    """
+    "Get geographical coordinates from columns expressed in degrees decimal format  or from columns in degrees/minutes decimal format where degrees decimal format is missing or zero."
     def __init__(self, 
                  fn_convert_cor: Callable # Function that converts coordinates from degree-minute to decimal degree format
                  ):
@@ -687,7 +684,7 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 249
+# %% ../../nbs/handlers/helcom.ipynb 252
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -699,7 +696,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 250
+# %% ../../nbs/handlers/helcom.ipynb 253
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -715,7 +712,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 253
+# %% ../../nbs/handlers/helcom.ipynb 256
 def encode(
     fname_in: str, # Input file name
     fname_out_nc: str, # Output file name
@@ -738,6 +735,7 @@ def encode(
                             RemapUnitCB(),
                             RemapDetectionLimitCB(coi_dl, lut_dl),
                             RemapFiltCB(lut_filtered),
+                            RemapCB(fn_lut=lut_lab, col_remap='LAB', col_src='LABORATORY', dest_grps=['BIOTA','SEDIMENT','SEAWATER']), # REVIEW 
                             RemapSedSliceTopBottomCB(),
                             LookupDryWetPercentWeightCB(),
                             ParseCoordinates(ddmm_to_dd),

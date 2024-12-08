@@ -10,6 +10,10 @@ __all__ = ['fname_coastal_water', 'fname_clos1F', 'fname_iaea_orbs', 'fname_out'
            'RemoveJapanaseCharCB', 'FixRangeValueStringCB', 'SelectColsOfInterestCB', 'WideToLongCB', 'RemapUnitNameCB',
            'RemapNuclideNameCB', 'ParseTimeCB', 'get_attrs', 'encode']
 
+# %% ../../nbs/handlers/tepco.ipynb 3
+import warnings
+warnings.filterwarnings('ignore')
+
 # %% ../../nbs/handlers/tepco.ipynb 4
 import pandas as pd
 import re

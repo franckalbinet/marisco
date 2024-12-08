@@ -121,8 +121,19 @@ class RemapCB(Callback):
                 ):
         fc.store_attr()
         self.lut = None
-        if isinstance(dest_grps, str): self.dest_grps = [dest_grps]
-        self.__doc__ = f"Remap values from '{col_src}' to '{col_remap}' for groups: {', '.join(dest_grps)}."
+        
+        if isinstance(dest_grps, str):
+            self.dest_grps = [dest_grps]
+        # Format the documentation string based on the type and content of dest_grps
+        if isinstance(self.dest_grps, list):
+            if len(self.dest_grps) > 1:
+                grp_str = ', '.join(self.dest_grps[:-1]) + ' and ' + self.dest_grps[-1]
+            else:
+                grp_str = self.dest_grps[0]
+        else:
+            grp_str = self.dest_grps
+                
+        self.__doc__ = f"Remap values from '{col_src}' to '{col_remap}' for groups: {grp_str}."
 
     def __call__(self, tfm):
         self.lut = self.fn_lut()
@@ -154,7 +165,7 @@ class LowerStripNameCB(Callback):
                  fn_transform: Callable=lambda x: x.lower().strip() # Transformation function
                  ):
         fc.store_attr()
-        self.__doc__ = f"Convert values from '{col_src}' to lowercase, strip spaces, and store in '{col_dst}'."
+        self.__doc__ = f"Convert '{col_src}' column values to lowercase, strip spaces, and store in '{col_dst}' column."
         if not col_dst: self.col_dst = col_src
         
     def _safe_transform(self, value):

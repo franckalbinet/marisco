@@ -152,11 +152,13 @@ NC_DTYPES = {
     },
     'LAB': {
         'name': 'lab_t', 
-        'fname': 'dbo_lab.xlsx', 
-        'key': 'lab_abb', 
+        #'fname': 'dbo_lab.xlsx', 
+        'fname': 'dbo_lab_cleaned.xlsx', 
+        'key': 'lab', 
         'value':'lab_id'
     }
 }
+
 
 # %% ../nbs/api/configs.ipynb 9
 CFG_FNAME = 'configs.toml'

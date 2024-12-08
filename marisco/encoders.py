@@ -137,8 +137,15 @@ def retrieve_all_cols(self:NetCDFEncoder,
 def create_enums(self:NetCDFEncoder):
     cols = self.retrieve_all_cols()
     enums = Enums(lut_src_dir=lut_path())
+    
+    if self.verbose: 
+        print(80*'-')
+        print('Creating enums for the following columns:')
+        print(cols)
+        
     for col in cols:
         name = NC_DTYPES[col]['name']
+        if self.verbose: print(f'Creating enum for {name} with values {enums.types[col]}.')
         dtype = self.dest.createEnumType(np.int64, name, enums.types[col])
         self.enum_dtypes[name] = dtype
 

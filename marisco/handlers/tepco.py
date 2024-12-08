@@ -10,7 +10,7 @@ __all__ = ['fname_coastal_water', 'fname_clos1F', 'fname_iaea_orbs', 'fname_out'
            'RemoveJapanaseCharCB', 'FixRangeValueStringCB', 'SelectColsOfInterestCB', 'WideToLongCB', 'RemapUnitNameCB',
            'RemapNuclideNameCB', 'ParseTimeCB', 'get_attrs', 'encode']
 
-# %% ../../nbs/handlers/tepco.ipynb 5
+# %% ../../nbs/handlers/tepco.ipynb 4
 import pandas as pd
 import re
 import numpy as np
@@ -41,14 +41,14 @@ from marisco.metadata import (
     KeyValuePairCB    
     )
 
-# %% ../../nbs/handlers/tepco.ipynb 7
+# %% ../../nbs/handlers/tepco.ipynb 6
 fname_coastal_water = 'https://radioactivity.nra.go.jp/cont/en/results/sea/coastal_water.csv'
 fname_clos1F = 'https://radioactivity.nra.go.jp/cont/en/results/sea/close1F_water.xlsx'
 fname_iaea_orbs = 'https://raw.githubusercontent.com/RML-IAEA/iaea.orbs/refs/heads/main/stations/station_points.csv'
 
 fname_out = '../../_data/output/tepco.nc'
 
-# %% ../../nbs/handlers/tepco.ipynb 11
+# %% ../../nbs/handlers/tepco.ipynb 10
 def find_location_section(df, 
                           col_idx=0,
                           pattern='Sampling point number'
@@ -58,7 +58,7 @@ def find_location_section(df,
     indices = df[mask].index
     return indices[0] if len(indices) > 0 else -1
 
-# %% ../../nbs/handlers/tepco.ipynb 14
+# %% ../../nbs/handlers/tepco.ipynb 13
 def fix_sampling_time(x):
     if pd.isna(x): 
         return '00:00:00'
@@ -66,7 +66,7 @@ def fix_sampling_time(x):
         hour, min =  x.split(':')[:2]
         return f"{hour if len(hour) == 2 else '0' + hour}:{min}:00"
 
-# %% ../../nbs/handlers/tepco.ipynb 15
+# %% ../../nbs/handlers/tepco.ipynb 14
 def get_coastal_water_df(fname_coastal_water):
     "Get the measurements dataframe from the `coastal_water.csv` file."
     
@@ -84,7 +84,7 @@ def get_coastal_water_df(fname_coastal_water):
     df = df.drop(columns=['Sampling date', 'Sampling time'])
     return df
 
-# %% ../../nbs/handlers/tepco.ipynb 18
+# %% ../../nbs/handlers/tepco.ipynb 17
 def get_locs_coastal_water(fname_coastal_water):
     locs_idx = find_location_section(pd.read_csv(fname_coastal_water, 
                                       skiprows=0, low_memory=False))
@@ -97,7 +97,7 @@ def get_locs_coastal_water(fname_coastal_water):
     df['org'] = 'coastal_seawater.csv'
     return df
 
-# %% ../../nbs/handlers/tepco.ipynb 22
+# %% ../../nbs/handlers/tepco.ipynb 21
 def get_clos1F_df(fname_clos1F):
     "Get measurements dataframe from close1F_water.xlsx file and parse datetime."
     excel_file = pd.ExcelFile(fname_clos1F)
@@ -126,7 +126,7 @@ def get_clos1F_df(fname_clos1F):
     df = df.drop(columns=['Sampling date', 'Sampling time'])
     return df
 
-# %% ../../nbs/handlers/tepco.ipynb 25
+# %% ../../nbs/handlers/tepco.ipynb 24
 def get_locs_clos1F(fname_clos1F):
     "Get locations dataframe from close1F_water.xlsx file from each sheets."
     excel_file = pd.ExcelFile(fname_clos1F)
@@ -148,13 +148,13 @@ def get_locs_clos1F(fname_clos1F):
     df['org'] = 'close1F.csv'
     return df
 
-# %% ../../nbs/handlers/tepco.ipynb 28
+# %% ../../nbs/handlers/tepco.ipynb 27
 def get_locs_orbs(fname_iaea_orbs):
     df = pd.read_csv(fname_iaea_orbs)
     df.columns = ['org', 'station', 'LON', 'LAT']
     return df
 
-# %% ../../nbs/handlers/tepco.ipynb 30
+# %% ../../nbs/handlers/tepco.ipynb 29
 def concat_locs(dfs):
     "Concatenate and drop duplicates from coastal_seawater.csv and iaea_orbs.csv (kept)"
     df = pd.concat(dfs)
@@ -168,7 +168,7 @@ def concat_locs(dfs):
     df.sort_values('station', ascending=True, inplace=True)
     return df
 
-# %% ../../nbs/handlers/tepco.ipynb 32
+# %% ../../nbs/handlers/tepco.ipynb 31
 def align_dfs(df_from, df_to):
     "Align columns structure of df_from to df_to."
     df = defaultdict()    
@@ -176,21 +176,21 @@ def align_dfs(df_from, df_to):
         df[c] = df_from[c].values if c in df_from.columns else np.NAN
     return pd.DataFrame(df)
 
-# %% ../../nbs/handlers/tepco.ipynb 34
+# %% ../../nbs/handlers/tepco.ipynb 33
 def concat_dfs(df_coastal_water, df_clos1F):
     "Concatenate and drop duplicates from coastal_seawater.csv and close1F_water.xlsx (kept)"
     df_clos1F = align_dfs(df_clos1F, df_coastal_water)
     df = pd.concat([df_coastal_water, df_clos1F])
     return df
 
-# %% ../../nbs/handlers/tepco.ipynb 36
+# %% ../../nbs/handlers/tepco.ipynb 35
 def georef_data(df_meas, df_locs):
     "Georeference measurements dataframe using locations dataframe."
     assert "Sampling point number" in df_meas.columns and "station" in df_locs.columns
     return pd.merge(df_meas, df_locs, how="inner", 
                     left_on='Sampling point number', right_on='station')
 
-# %% ../../nbs/handlers/tepco.ipynb 38
+# %% ../../nbs/handlers/tepco.ipynb 37
 def load_data(fname_coastal_water, fname_clos1F, fname_iaea_orbs):
     "Load, align and georeference TEPCO data"
     df_locs = concat_locs(
@@ -201,7 +201,7 @@ def load_data(fname_coastal_water, fname_clos1F, fname_iaea_orbs):
     df_meas.dropna(subset=['Sampling point number'], inplace=True)
     return {'SEAWATER': georef_data(df_meas, df_locs)}
 
-# %% ../../nbs/handlers/tepco.ipynb 45
+# %% ../../nbs/handlers/tepco.ipynb 44
 class FixMissingValuesCB(Callback):
     "Assign `NaN` to values equal to `ND` (not detected) - to be confirmed "
     def __call__(self, tfm): 
@@ -209,7 +209,7 @@ class FixMissingValuesCB(Callback):
             predicate = tfm.dfs[k] == 'ND'
             tfm.dfs[k][predicate] = np.nan
 
-# %% ../../nbs/handlers/tepco.ipynb 49
+# %% ../../nbs/handlers/tepco.ipynb 48
 class RemoveJapanaseCharCB(Callback):
     "Remove 約 (about) char"
     def _transform_if_about(self, value, about_char='約'):
@@ -222,7 +222,7 @@ class RemoveJapanaseCharCB(Callback):
             cols_rdn = [c for c in tfm.dfs[k].columns if ('(Bq/L)' in c) and (tfm.dfs[k][c].dtype == 'object')]
             tfm.dfs[k][cols_rdn] = tfm.dfs[k][cols_rdn].map(self._transform_if_about)
 
-# %% ../../nbs/handlers/tepco.ipynb 53
+# %% ../../nbs/handlers/tepco.ipynb 52
 class FixRangeValueStringCB(Callback):
     "Replace range values (e.g '4.0E+00<&<8.0E+00' or '1.0～2.7') by their mean"
     
@@ -249,11 +249,11 @@ class FixRangeValueStringCB(Callback):
                        if ('(Bq/L)' in c) and (tfm.dfs[k][c].dtype == 'object')]
             tfm.dfs[k][cols_rdn] = tfm.dfs[k][cols_rdn].map(self._transform_if_range).astype(float)
 
-# %% ../../nbs/handlers/tepco.ipynb 57
+# %% ../../nbs/handlers/tepco.ipynb 56
 common_coi = ['org', 'LON', 'LAT', 'TIME', 'station']
 nuclides_pattern = '(Bq/L)'
 
-# %% ../../nbs/handlers/tepco.ipynb 58
+# %% ../../nbs/handlers/tepco.ipynb 57
 class SelectColsOfInterestCB(Callback):
     "Select columns of interest."
     def __init__(self, common_coi, nuclides_pattern): fc.store_attr()
@@ -261,7 +261,7 @@ class SelectColsOfInterestCB(Callback):
         nuc_of_interest = [c for c in tfm.dfs['SEAWATER'].columns if nuclides_pattern in c]
         tfm.dfs['SEAWATER'] = tfm.dfs['SEAWATER'][self.common_coi + nuc_of_interest]
 
-# %% ../../nbs/handlers/tepco.ipynb 61
+# %% ../../nbs/handlers/tepco.ipynb 60
 class WideToLongCB(Callback):
     """
     Parse TEPCO measurement columns to extract nuclide name, measurement value, 
@@ -328,10 +328,10 @@ class WideToLongCB(Callback):
         tfm.dfs['SEAWATER'].rename(columns={'index': 'ID'}, inplace=True)
         
 
-# %% ../../nbs/handlers/tepco.ipynb 64
+# %% ../../nbs/handlers/tepco.ipynb 63
 unit_mapping = {'Bq/L': 3}
 
-# %% ../../nbs/handlers/tepco.ipynb 65
+# %% ../../nbs/handlers/tepco.ipynb 64
 class RemapUnitNameCB(Callback):
     """
     Remap `UNIT` name to MARIS id.
@@ -341,7 +341,7 @@ class RemapUnitNameCB(Callback):
         tfm.dfs['SEAWATER']['UNIT'] = tfm.dfs['SEAWATER']['UNIT'].map(self.unit_mapping)
 
 
-# %% ../../nbs/handlers/tepco.ipynb 68
+# %% ../../nbs/handlers/tepco.ipynb 67
 nuclide_mapping = {
     '131I': 29,
     '134Cs': 31,
@@ -367,7 +367,7 @@ nuclide_mapping = {
     '54Mn': 6
 }
 
-# %% ../../nbs/handlers/tepco.ipynb 69
+# %% ../../nbs/handlers/tepco.ipynb 68
 class RemapNuclideNameCB(Callback):
     """
     Remap `NUCLIDE` name to MARIS id.
@@ -376,7 +376,7 @@ class RemapNuclideNameCB(Callback):
     def __call__(self, tfm):
         tfm.dfs['SEAWATER']['NUCLIDE'] = tfm.dfs['SEAWATER']['NUCLIDE'].map(self.nuclide_mapping)
 
-# %% ../../nbs/handlers/tepco.ipynb 72
+# %% ../../nbs/handlers/tepco.ipynb 71
 class ParseTimeCB(Callback):
     "Parse time column from TEPCO."
     def __init__(self,
@@ -387,7 +387,7 @@ class ParseTimeCB(Callback):
         tfm.dfs['SEAWATER'][self.time_name] = pd.to_datetime(tfm.dfs['SEAWATER'][self.time_name], 
                                                              format='%Y/%m/%d %H:%M:%S', errors='coerce')
 
-# %% ../../nbs/handlers/tepco.ipynb 78
+# %% ../../nbs/handlers/tepco.ipynb 77
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -399,7 +399,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/tepco.ipynb 79
+# %% ../../nbs/handlers/tepco.ipynb 78
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve global attributes from MARIS dump."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -410,7 +410,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/tepco.ipynb 81
+# %% ../../nbs/handlers/tepco.ipynb 80
 def encode(
     fname_out: str, # Path to the folder where the NetCDF output will be saved
     **kwargs # Additional keyword arguments

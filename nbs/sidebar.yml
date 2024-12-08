@@ -7,7 +7,6 @@ website:
           - handlers/helcom.ipynb
           - handlers/geotraces.ipynb
           - handlers/maris_legacy.ipynb
-          - handlers/ospar.ipynb
           - handlers/tepco.ipynb
       - section: API
         contents:

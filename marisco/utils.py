@@ -92,7 +92,6 @@ class Remapper():
         if isinstance(value_to_match, str):  # Only process if value is a string
             # If value is in fixes, use the fixed value
             name_to_match = self.fixes.get(value_to_match, value_to_match)
-            
             result = match_maris_lut(self.maris_lut, name_to_match, self.maris_col_id, self.maris_col_name).iloc[0]
             match = Match(result[self.maris_col_id], result[self.maris_col_name], 
                           value_to_match, result['score'])

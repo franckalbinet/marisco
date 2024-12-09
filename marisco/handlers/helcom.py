@@ -19,9 +19,9 @@ import fastcore.all as fc
 from pathlib import Path 
 #from dataclasses import asdict
 from typing import List, Dict, Callable, Tuple, Any 
-from collections import OrderedDict, defaultdict
+#from collections import OrderedDict, defaultdict
 import re
-from functools import partial
+#from functools import partial
 
 from marisco.utils import (
     Remapper, 

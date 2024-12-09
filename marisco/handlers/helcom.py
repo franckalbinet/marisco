@@ -19,9 +19,9 @@ import fastcore.all as fc
 from pathlib import Path 
 #from dataclasses import asdict
 from typing import List, Dict, Callable, Tuple, Any 
-from collections import OrderedDict, defaultdict
+#from collections import OrderedDict, defaultdict
 import re
-from functools import partial
+#from functools import partial
 
 from marisco.utils import (
     Remapper, 
@@ -146,16 +146,17 @@ lut_nuclides = lambda df: Remapper(provider_lut_df=df,
 class RemapNuclideNameCB(Callback):
     "Remap data provider nuclide names to standardized MARIS nuclide names."
     def __init__(self, 
-                 fn_lut: Callable # Function that returns the lookup table dictionary
+                 fn_lut: Callable, # Function that returns the lookup table dictionary
+                 col_name: str # Column name to remap
                 ):
         fc.store_attr()
 
     def __call__(self, tfm: Transformer):
-        df_uniques = get_unique_across_dfs(tfm.dfs, col_name='NUCLIDE', as_df=True)
+        df_uniques = get_unique_across_dfs(tfm.dfs, col_name=self.col_name, as_df=True)
         #lut = {k: v.matched_maris_name for k, v in self.fn_lut(df_uniques).items()}    
         lut = {k: v.matched_id for k, v in self.fn_lut(df_uniques).items()}    
         for k in tfm.dfs.keys():
-            tfm.dfs[k]['NUCLIDE'] = tfm.dfs[k]['NUCLIDE'].replace(lut)
+            tfm.dfs[k]['NUCLIDE'] = tfm.dfs[k][self.col_name].replace(lut)
 
 # %% ../../nbs/handlers/helcom.ipynb 47
 class ParseTimeCB(Callback):

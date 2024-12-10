@@ -8,7 +8,7 @@ __all__ = ['fname_coastal_water', 'fname_clos1F', 'fname_iaea_orbs', 'fname_out'
            'get_coastal_water_df', 'get_locs_coastal_water', 'get_clos1F_df', 'get_locs_clos1F', 'get_locs_orbs',
            'concat_locs', 'align_dfs', 'concat_dfs', 'georef_data', 'load_data', 'FixMissingValuesCB',
            'RemoveJapanaseCharCB', 'FixRangeValueStringCB', 'SelectColsOfInterestCB', 'WideToLongCB', 'RemapUnitNameCB',
-           'RemapNuclideNameCB', 'ParseTimeCB', 'get_attrs', 'encode']
+           'RemapNuclideNameCB', 'RemapDLCB', 'ParseTimeCB', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/tepco.ipynb 3
 import warnings
@@ -380,7 +380,17 @@ class RemapNuclideNameCB(Callback):
     def __call__(self, tfm):
         tfm.dfs['SEAWATER']['NUCLIDE'] = tfm.dfs['SEAWATER']['NUCLIDE'].map(self.nuclide_mapping)
 
-# %% ../../nbs/handlers/tepco.ipynb 71
+# %% ../../nbs/handlers/tepco.ipynb 72
+class RemapDLCB(Callback):
+    """
+    Remap `DL` name to MARIS id.
+    """
+    def __init__(self): fc.store_attr()
+    def dl_mapping(self, value): return 1 if pd.isna(value) else 2
+    def __call__(self, tfm): 
+        tfm.dfs['SEAWATER']['DL'] = tfm.dfs['SEAWATER']['DL'].map(self.dl_mapping)
+
+# %% ../../nbs/handlers/tepco.ipynb 75
 class ParseTimeCB(Callback):
     "Parse time column from TEPCO."
     def __init__(self,
@@ -391,7 +401,7 @@ class ParseTimeCB(Callback):
         tfm.dfs['SEAWATER'][self.time_name] = pd.to_datetime(tfm.dfs['SEAWATER'][self.time_name], 
                                                              format='%Y/%m/%d %H:%M:%S', errors='coerce')
 
-# %% ../../nbs/handlers/tepco.ipynb 77
+# %% ../../nbs/handlers/tepco.ipynb 82
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -403,7 +413,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/tepco.ipynb 78
+# %% ../../nbs/handlers/tepco.ipynb 83
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve global attributes from MARIS dump."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -414,7 +424,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/tepco.ipynb 80
+# %% ../../nbs/handlers/tepco.ipynb 85
 def encode(
     fname_out: str, # Path to the folder where the NetCDF output will be saved
     **kwargs # Additional keyword arguments
@@ -430,6 +440,7 @@ def encode(
         WideToLongCB(),
         RemapUnitNameCB(unit_mapping),
         RemapNuclideNameCB(nuclide_mapping),
+        RemapDLCB(),
         ParseTimeCB(),
         EncodeTimeCB(),
         SanitizeLonLatCB()

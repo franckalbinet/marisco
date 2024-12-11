@@ -91,7 +91,7 @@ def copy_variable(self:NetCDFEncoder, var_name, var_src, df, grp_dest):
 # %% ../nbs/api/encoders.ipynb 13
 @patch
 def _create_and_copy_variable(self:NetCDFEncoder, var_name, var_src, df, grp_dest, dtype_name):
-    variable_type = self.enum_dtypes.get(dtype_name, var_src.datatype)
+    variable_type = self.enum_dtypes.get(dtype_name, var_src.datatype)    
     grp_dest.createVariable(var_name, variable_type, NC_DIM, compression='zlib', complevel=9)            
     isNotEnum = type(variable_type) != netCDF4._netCDF4.EnumType
     values = df[self.nc_to_cols[var_name]].values

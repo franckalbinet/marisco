@@ -24,7 +24,7 @@ from marisco.configs import (
     get_time_units
 )
 
-# %% ../nbs/api/decoders.ipynb 5
+# %% ../nbs/api/decoders.ipynb 6
 def nc_to_dfs(
     fname: str # Path to NetCDF file
     ) -> dict: # Dictionary with group names as keys and pandas DataFrames as values

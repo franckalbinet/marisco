@@ -9,6 +9,7 @@ website:
           - handlers/geotraces.ipynb
           - handlers/maris_legacy.ipynb
           - handlers/tepco.ipynb
+          - handlers/data_format_transformation.ipynb
       - section: API
         contents:
           - api/callbacks.ipynb
@@ -18,7 +19,7 @@ website:
           - api/decoders.ipynb
           - api/utils.ipynb
       - section: Metadata
-        contents:
+        contents: 
           - metadata/data-curation-rules.ipynb
           - metadata/field-definition.ipynb
           - metadata/sample-uniqueness.ipynb

@@ -5,6 +5,7 @@ website:
       - section: "Handlers"
         contents:
           - handlers/helcom.ipynb
+          - handlers/ospar.ipynb          
           - handlers/geotraces.ipynb
           - handlers/maris_legacy.ipynb
           - handlers/tepco.ipynb

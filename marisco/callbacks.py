@@ -327,7 +327,7 @@ class DecodeTimeCB(Callback):
                  ): 
         fc.store_attr()
         self.units = fn_units()
-    
+
     def __call__(self, tfm): 
         for grp, df in tfm.dfs.items():
             n_missing = df[self.col_time].isna().sum()
@@ -336,8 +336,6 @@ class DecodeTimeCB(Callback):
             
             # Remove NaN times and convert to datetime
             tfm.dfs[grp] = tfm.dfs[grp][tfm.dfs[grp][self.col_time].notna()]
-            tfm.dfs[grp][self.col_time] = pd.to_datetime(
-                tfm.dfs[grp][self.col_time].apply(
-                    lambda x: num2date(x, units=self.units).strftime('%Y-%m-%d %H:%M:%S')
-                )
+            tfm.dfs[grp][self.col_time] = df[self.col_time].apply(
+                lambda x: num2date(x, units=self.units, only_use_cftime_datetimes=False)
             )

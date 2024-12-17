@@ -27,7 +27,11 @@ from marisco.utils import (
     ddmm_to_dd,
     Match, 
     get_unique_across_dfs,
-    NA
+    NA,
+    nc_to_dfs,
+    get_netcdf_properties, 
+    get_netcdf_group_properties,
+    get_netcdf_variable_properties
 )
 
 from marisco.callbacks import (
@@ -73,12 +77,7 @@ from marisco.encoders import (
     NetCDFEncoder, 
 )
 
-from marisco.decoders import (
-    nc_to_dfs,
-    get_netcdf_properties, 
-    get_netcdf_group_properties,
-    get_netcdf_variable_properties
-)
+
 import warnings
 warnings.filterwarnings('ignore')
 

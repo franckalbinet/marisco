@@ -4,7 +4,8 @@
 
 # %% auto 0
 __all__ = ['NA', 'get_unique_across_dfs', 'Remapper', 'has_valid_varname', 'get_bbox', 'ddmm_to_dd', 'download_files_in_folder',
-           'download_file', 'match_worms', 'Match', 'match_maris_lut', 'test_dfs']
+           'download_file', 'match_worms', 'Match', 'match_maris_lut', 'test_dfs', 'nc_to_dfs', 'get_netcdf_properties',
+           'get_netcdf_group_properties', 'get_netcdf_variable_properties', 'get_enum_dict']
 
 # %% ../nbs/api/utils.ipynb 2
 from pathlib import Path
@@ -301,3 +302,187 @@ def test_dfs(
     for grp in dfs1.keys():
         df1, df2 = (df.sort_index() for df in (dfs1[grp], dfs2[grp]))
         fc.test_eq(df1, df2.reindex(columns=df1.columns))
+
+# %% ../nbs/api/utils.ipynb 51
+def nc_to_dfs(
+    fname: str # Path to NetCDF file
+    ) -> dict: # Dictionary with group names as keys and pandas DataFrames as values
+    "Convert a NetCDF (with groups) file to a dictionary of dataframes."
+    dfs = {}
+    
+    with Dataset(fname, 'r') as nc:
+        # Process each group in the NetCDF file
+        for group_name in nc.groups:
+            group = nc.groups[group_name]
+            
+            # Get all variables in the group
+            data = {}
+            for var_name in group.variables:
+                # Skip dimension variables (like 'id')
+                if var_name not in group.dimensions:
+                    data[var_name] = group.variables[var_name][:]
+            
+            # Convert to DataFrame
+            df = pd.DataFrame(data)
+            
+            # Convert time from seconds since epoch if present
+            if 'time' in df.columns:
+                df['time'] = pd.to_datetime(df['time'], unit='s')
+                
+            dfs[group_name.upper()] = df
+    
+    return dfs
+
+# %% ../nbs/api/utils.ipynb 55
+def get_netcdf_properties(file_path: str) -> dict:
+    """
+    Retrieve general properties of a NetCDF file.
+
+    Parameters:
+    file_path (str): Path to the NetCDF file.
+
+    Returns:
+    dict: A dictionary containing file properties such as size, format, and dimensions.
+    """
+    properties = {}
+    
+    file = Path(file_path)
+    
+    if not file.exists():
+        print(f'File not found: {file_path}')
+        return properties
+
+    # Get file size
+    properties['file_size_bytes'] = file.stat().st_size
+    
+    # Open the NetCDF file
+    with Dataset(file_path, 'r') as nc:
+        # Get file format
+        properties['file_format'] = nc.file_format
+
+        # Get groups
+        properties['groups'] = list(nc.groups.keys())
+        
+        # Get global attributes
+        properties['global_attributes'] = {attr: nc.getncattr(attr) for attr in nc.ncattrs()}
+    
+    return properties
+
+# %% ../nbs/api/utils.ipynb 59
+def get_netcdf_group_properties(file_path: str) -> dict:
+    """
+    Retrieve properties of each group in a NetCDF file, including dimension sizes.
+
+    Parameters:
+    file_path (str): Path to the NetCDF file.
+
+    Returns:
+    dict: A dictionary containing properties of each group such as variables, dimensions with sizes, and attributes.
+    """
+    group_properties = {}
+
+    file = Path(file_path)
+
+    if not file.exists():
+        print(f'File not found: {file_path}')
+        return group_properties
+
+    with Dataset(file_path, 'r') as nc:
+        # Iterate over each group in the NetCDF file
+        for group_name, group in nc.groups.items():
+            # Get dimensions with their sizes
+            dimensions = {dim_name: len(dim) for dim_name, dim in group.dimensions.items()}
+            
+            group_info = {
+                'variables': list(group.variables.keys()),
+                'dimensions': dimensions,
+                'attributes': {attr: group.getncattr(attr) for attr in group.ncattrs()}
+            }
+            group_properties[group_name] = group_info
+
+    return group_properties
+
+
+# %% ../nbs/api/utils.ipynb 62
+def get_netcdf_variable_properties(file_path: str, as_df: bool = False) -> dict | pd.DataFrame:
+    """
+    Retrieve properties of variables in each group of a NetCDF file.
+
+    Parameters:
+    file_path (str): Path to the NetCDF file
+    as_df (bool): If True, returns a pandas DataFrame; if False, returns nested dictionary
+
+    Returns:
+    Union[dict, pd.DataFrame]: Properties of variables either as nested dictionary or DataFrame
+    """
+    var_properties = {}
+    
+    file = Path(file_path)
+    if not file.exists():
+        print(f'File not found: {file_path}')
+        return var_properties
+
+    with Dataset(file_path, 'r') as nc:
+        for group_name, group in nc.groups.items():
+            group_vars = {}
+            for var_name, var in group.variables.items():
+                var_info = {
+                    'group': group_name,
+                    'variable': var_name,
+                    'data_type': var.dtype.str,
+                    'dimensions_id': str(var.dimensions),
+                    'dimensions_size': str(var.shape),
+                }
+                # Add variable attributes
+                for attr in var.ncattrs():
+                    var_info[f'attr_{attr}'] = str(getattr(var, attr))
+                    
+                group_vars[var_name] = var_info
+            var_properties[group_name] = group_vars
+
+    if not as_df:
+        return var_properties
+    
+    # Convert to DataFrame
+    rows = []
+    for group_name, group_vars in var_properties.items():
+        for var_name, var_info in group_vars.items():
+            rows.append(var_info)
+    
+    df = pd.DataFrame(rows)
+    
+    # Reorder columns to put key information first
+    first_cols = ['group', 'variable', 'dimensions_id', 'dimensions_size']
+    other_cols = [col for col in df.columns if col not in first_cols]
+    df = df[first_cols + other_cols]
+    
+    return df
+
+# %% ../nbs/api/utils.ipynb 65
+def get_enum_dict(file_path: str, var_name: str) -> dict:
+    """
+    Get the enum dictionary for a variable in a NetCDF file.
+    
+    Parameters:
+    file_path (str): Path to the NetCDF file
+    var_name (str): Name of the variable to get enum for
+    
+    Returns:
+    dict: Dictionary mapping enum names to values, or empty dict if not found
+    """
+    with Dataset(file_path, 'r') as nc:
+        # Look for the variable in all groups
+        enum_dict = {}
+        for group_name in nc.groups:
+            group = nc.groups[group_name]
+            if var_name in group.variables:
+                var = group.variables[var_name]
+                if hasattr(var.datatype, 'enum_dict'):
+                    nc_enum_dict = var.datatype.enum_dict       
+                    # Store group info and enum dict
+                    enum_dict[group_name] = {
+                        'variable': var_name,
+                        'enum_dict': nc_enum_dict
+                    }
+                    
+        return enum_dict

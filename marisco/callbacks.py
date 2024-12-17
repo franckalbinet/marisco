@@ -5,13 +5,13 @@
 # %% auto 0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB', 'AddSampleTypeIdColumnCB',
            'AddNuclideIdColumnCB', 'SelectColumnsCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB',
-           'UniqueIndexCB', 'EncodeTimeCB']
+           'UniqueIndexCB', 'EncodeTimeCB', 'DecodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb 2
 import copy
 import fastcore.all as fc
 from operator import attrgetter
-from cftime import date2num
+from cftime import date2num ,num2date
 import numpy as np
 import pandas as pd
 from functools import partial 
@@ -317,3 +317,27 @@ class EncodeTimeCB(Callback):
             # Remove NaN times and convert to seconds since epoch
             tfm.dfs[grp] = tfm.dfs[grp][tfm.dfs[grp][self.col_time].notna()]
             tfm.dfs[grp][self.col_time] = tfm.dfs[grp][self.col_time].apply(lambda x: date2num(x, units=self.units))
+
+# %% ../nbs/api/callbacks.ipynb 53
+class DecodeTimeCB(Callback):
+    "Decode time from seconds since epoch to datetime format."    
+    def __init__(self, 
+                 col_time: str='TIME',
+                 fn_units: Callable=get_time_units # Function returning the time units
+                 ): 
+        fc.store_attr()
+        self.units = fn_units()
+    
+    def __call__(self, tfm): 
+        for grp, df in tfm.dfs.items():
+            n_missing = df[self.col_time].isna().sum()
+            if n_missing:
+                print(f"Warning: {n_missing} missing time value(s) in {grp}")
+            
+            # Remove NaN times and convert to datetime
+            tfm.dfs[grp] = tfm.dfs[grp][tfm.dfs[grp][self.col_time].notna()]
+            tfm.dfs[grp][self.col_time] = pd.to_datetime(
+                tfm.dfs[grp][self.col_time].apply(
+                    lambda x: num2date(x, units=self.units).strftime('%Y-%m-%d %H:%M:%S')
+                )
+            )

@@ -73,7 +73,7 @@ def save_dataframes(self: NetCDFDecoder):
     """
     # Validate destination path
     if self.dest_out is None:
-        raise ValueError("No destination path provided")
+        self.dest_out  = str(Path(self.fname_in).with_suffix(''))
     
     # Validate output format
     if self.output_format != 'csv':
@@ -97,6 +97,4 @@ def decode(self: NetCDFDecoder):
     # Funvtion to rename the columns. 
     self.process_groups()
     self.save_dataframes()
-    
-    return self.dfs
-    
+    return self.dfs    

@@ -70,11 +70,16 @@ from marisco.configs import (
     sampmet_lut_path,
     counmet_lut_path, 
     lab_lut_path,
-    NC_VARS
+    NC_VARS,
+    OR_VARS
 )
 
 from marisco.encoders import (
     NetCDFEncoder, 
+)
+
+from marisco.handlers.data_format_transformation import (
+    decode, 
 )
 
 import warnings
@@ -757,7 +762,7 @@ def encode(
                             RemapCB(fn_lut=lut_biogroup_from_biota, col_remap='BIO_GROUP', col_src='SPECIES', dest_grps='BIOTA'),
                             RemapSedimentCB(fn_lut=lut_sediments, replace_lut=sed_replace_lut),
                             RemapFiltCB(lut_filtered),
-                            RemapCB(fn_lut=lut_lab, col_remap='LAB', col_src='LABORATORY', dest_grps=['BIOTA','SEDIMENT','SEAWATER']),
+                            #RemapCB(fn_lut=lut_lab, col_remap='LAB', col_src='LABORATORY', dest_grps=['BIOTA','SEDIMENT','SEAWATER']),
                             #AddSampleIDCB(lut_type=smp_type_lut),
                             AddDepthCB(),
                             AddSalinityCB(),

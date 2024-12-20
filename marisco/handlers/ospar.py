@@ -77,6 +77,9 @@ from marisco.encoders import (
     NetCDFEncoder, 
 )
 
+from marisco.handlers.data_format_transformation import (
+    decode, 
+)
 
 import warnings
 warnings.filterwarnings('ignore')

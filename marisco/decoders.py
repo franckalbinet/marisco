@@ -63,74 +63,32 @@ def process_group(self: NetCDFDecoder, group_name: str, df: pd.DataFrame, remap_
 @patch
 def save_dataframes(self: NetCDFDecoder):
     """
-    Save DataFrames to files in the specified format.
+    Save DataFrames to CSV files.
     
-    Parameters:
-        dest_path (str, optional): Base path for output files, without extension.
-            If None, uses self.dest_fname's path without extension.
-        output_format (str): Format to save files in. Options:
-            - 'csv': Comma-separated values
-            - 'excel': Excel spreadsheet (one sheet per group)
-            - 'json': JSON format
-            - 'parquet': Apache Parquet format
-            - 'hdf': HDF5 format
-            - 'pickle': Python pickle format
-            - 'feather': Feather format
-            - 'stata': Stata format
+    Each group in the DataFrame dictionary will be saved as a separate CSV file
+    with the naming pattern: {base_path}_{group_name}.csv
+    
+    Raises:
+        ValueError: If no destination path is provided or if output format is not CSV
     """
-    # Get base path without extension
+    # Validate destination path
     if self.dest_out is None:
-            raise ValueError("No destination path provided")
-    else:
-        base_path = str(Path(self.dest_out).with_suffix(''))
+        raise ValueError("No destination path provided")
     
-    # Handle formats that combine all groups in one file
-    if self.output_format == 'excel':
-        output_path = f"{base_path}.xlsx"
-        with pd.ExcelWriter(output_path) as writer:
-            for group_name, df in self.dfs.items():
-                df.to_excel(writer, sheet_name=group_name, index=False)
-                if self.verbose:
-                    print(f"Saved {group_name} to sheet in {output_path}")
+    # Validate output format
+    if self.output_format != 'csv':
+        raise ValueError("Only CSV format is supported")
     
-    elif self.output_format == 'hdf':
-        output_path = f"{base_path}.h5"
-        with pd.HDFStore(output_path) as store:
-            for group_name, df in self.dfs.items():
-                store[group_name] = df
-                if self.verbose:
-                    print(f"Saved {group_name} to group in {output_path}")
+    # Get base path without extension
+    base_path = str(Path(self.dest_out).with_suffix(''))
     
-    # Handle formats that create separate files for each group
-    else:
-        format_extensions = {
-            'csv': '.csv',
-            'json': '.json',
-            'parquet': '.parquet',
-            'pickle': '.pkl',
-            'feather': '.feather',
-            'stata': '.dta'
-        }
+    # Save each DataFrame to a CSV file
+    for group_name, df in self.dfs.items():
+        output_path = f"{base_path}_{group_name}.csv"
+        df.to_csv(output_path, index=False)
         
-        if self.output_format not in format_extensions:
-            raise ValueError(f"Unsupported output format: {self.output_format}. Supported formats: {format_extensions.keys()}")
-            
-        extension = format_extensions[self.output_format]
-        save_methods = {
-            'csv': lambda df, path: df.to_csv(path, index=False),
-            'json': lambda df, path: df.to_json(path),
-            'parquet': lambda df, path: df.to_parquet(path),
-            'pickle': lambda df, path: df.to_pickle(path),
-            'feather': lambda df, path: df.to_feather(path),
-            'stata': lambda df, path: df.to_stata(path)
-        }
-        
-        for group_name, df in self.dfs.items():
-            output_path = f"{base_path}_{group_name}{extension}"
-            save_methods[self.output_format](df, output_path)
-            
-            if self.verbose:
-                print(f"Saved {group_name} to {output_path}")
+        if self.verbose:
+            print(f"Saved {group_name} to {output_path}")
 
 # %% ../nbs/api/decoders.ipynb 10
 @patch

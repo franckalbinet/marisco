@@ -100,6 +100,7 @@ def load_data(src_dir:str, # Directory where the source CSV files are located
     "Load `OSPAR` data and return the data in a dictionary of dataframes with the dictionary key as the sample type."
     return {
         sample_type: pd.read_csv(Path(src_dir) / f'{file_name}.csv', encoding='unicode_escape')
+                     .rename(columns=str.lower)  # Convert all column names to lowercase
         for file_name, sample_type in lut.items()
     }
 
@@ -151,14 +152,14 @@ class ParseTimeCB(Callback):
     "Parse the time format in the dataframe."
     def __call__(self, tfm):
         for df in tfm.dfs.values():
-            df['TIME'] = pd.to_datetime(df['Sampling date'], format='%m/%d/%y %H:%M:%S', errors='coerce')
+            df['TIME'] = pd.to_datetime(df['sampling date'], format='%m/%d/%y %H:%M:%S', errors='coerce')
             df.dropna(subset=['TIME'], inplace=True)
 
 # %% ../../nbs/handlers/ospar.ipynb 54
 class SanitizeValueCB(Callback):
     "Sanitize value by removing blank entries and populating `value` column."
     def __init__(self, 
-                 value_col: str='Activity or MDA' # Column name to sanitize
+                 value_col: str='activity or mda' # Column name to sanitize
                  ):
         fc.store_attr()
 
@@ -174,7 +175,7 @@ unc_exp2stan = lambda df, unc_col: df[unc_col] / 2
 class NormalizeUncCB(Callback):
     """Normalize uncertainty values in DataFrames."""
     def __init__(self, 
-                 col_unc: str='Uncertainty', # Column name to normalize
+                 col_unc: str='uncertainty', # Column name to normalize
                  fn_convert_unc: Callable=unc_exp2stan, # Function correcting coverage factor
                  ): 
         fc.store_attr()
@@ -206,22 +207,22 @@ class RemapUnitCB(Callback):
             self._update_units(df)
 
     def _apply_default_units(self, df: pd.DataFrame):
-        df.loc[df['Unit'].isnull(), 'Unit'] = 'Bq/l'
+        df.loc[df['unit'].isnull(), 'unit'] = 'Bq/l'
 
     def _print_na_units(self, df: pd.DataFrame):
-        na_count = df['Unit'].isnull().sum()
+        na_count = df['unit'].isnull().sum()
         if na_count > 0:
-            print(f"Number of rows with NaN in 'Unit' column: {na_count}")
+            print(f"Number of rows with NaN in 'unit' column: {na_count}")
 
     def _update_units(self, df: pd.DataFrame):
-        df['UNIT'] = df['Unit'].apply(lambda x: self.lut.get(x, 'Unknown'))
+        df['UNIT'] = df['unit'].apply(lambda x: self.lut.get(x, 'Unknown'))
 
 # %% ../../nbs/handlers/ospar.ipynb 89
 lut_dl = lambda: pd.read_excel(detection_limit_lut_path(), usecols=['name','id']).set_index('name').to_dict()['id']
 
 # %% ../../nbs/handlers/ospar.ipynb 90
-coi_dl = {'SEAWATER' : {'DL' : 'Value type'},
-          'BIOTA':  {'DL' : 'Value type'}
+coi_dl = {'SEAWATER' : {'DL' : 'value type'},
+          'BIOTA':  {'DL' : 'value type'}
           }
 
 # %% ../../nbs/handlers/ospar.ipynb 91
@@ -293,7 +294,7 @@ fixes_biota_species = {
     }
 
 # %% ../../nbs/handlers/ospar.ipynb 106
-lut_biota = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name='Species', as_df=True),
+lut_biota = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name='species', as_df=True),
                              maris_lut_fn=species_lut_path,
                              maris_col_id='species_id',
                              maris_col_name='species',
@@ -302,7 +303,7 @@ lut_biota = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name
                              fname_cache='species_ospar.pkl').generate_lookup_table(fixes=fixes_biota_species, as_df=False, overwrite=False)
 
 # %% ../../nbs/handlers/ospar.ipynb 121
-lut_biota_enhanced = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name='Biological group', as_df=True),
+lut_biota_enhanced = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name='biological group', as_df=True),
                              maris_lut_fn=species_lut_path,
                              maris_col_id='species_id',
                              maris_col_name='species',
@@ -331,8 +332,8 @@ class AddBodypartTempCB(Callback):
     "Add a temporary column with the body part and biological group combined."    
     def __call__(self, tfm):
         tfm.dfs['BIOTA']['body_part_temp'] = (
-            tfm.dfs['BIOTA']['Body Part'] + ' ' + 
-            tfm.dfs['BIOTA']['Biological group']
+            tfm.dfs['BIOTA']['body part'] + ' ' + 
+            tfm.dfs['BIOTA']['biological group']
             ).str.strip().str.lower()                                 
 
 # %% ../../nbs/handlers/ospar.ipynb 139
@@ -368,13 +369,12 @@ class AddSampleIdCB(Callback):
     "Create a SMP_ID column from the ID column"
     def __call__(self, tfm):
         for df in tfm.dfs.values():
-            if 'ID' in df.columns:
-                df['SMP_ID'] = df['ID']
+            if 'id' in df.columns:
+                df['SMP_ID'] = df['id']
 
 # %% ../../nbs/handlers/ospar.ipynb 167
 class ConvertLonLatCB(Callback):
-    """Convert Longitude and Latitude values to decimal degrees (DDD.DDDDD°). This class processes DataFrames to convert latitude and longitude from degrees, minutes, and seconds 
-    (DMS) format with direction indicators to decimal degrees format."""
+    """Convert Coordinates to decimal degrees (DDD.DDDDD°)."""
     def __init__(self):
         fc.store_attr()
 
@@ -385,16 +385,16 @@ class ConvertLonLatCB(Callback):
 
     def _convert_latitude(self, df: pd.DataFrame) -> pd.Series:
         return np.where(
-            df['LatDir'].isin(['S']),
-            self._dms_to_decimal(df['LatD'], df['LatM'], df['LatS']) * -1,
-            self._dms_to_decimal(df['LatD'], df['LatM'], df['LatS'])
+            df['latdir'].isin(['S']),
+            self._dms_to_decimal(df['latd'], df['latm'], df['lats']) * -1,
+            self._dms_to_decimal(df['latd'], df['latm'], df['lats'])
         )
 
     def _convert_longitude(self, df: pd.DataFrame) -> pd.Series:
         return np.where(
-            df['LongDir'].isin(['W']),
-            self._dms_to_decimal(df['LongD'], df['LongM'], df['LongS']) * -1,
-            self._dms_to_decimal(df['LongD'], df['LongM'], df['LongS'])
+            df['longdir'].isin(['W']),
+            self._dms_to_decimal(df['longd'], df['longm'], df['longs']) * -1,
+            self._dms_to_decimal(df['longd'], df['longm'], df['longs'])
         )
 
     def _dms_to_decimal(self, degrees: pd.Series, minutes: pd.Series, seconds: pd.Series) -> pd.Series:
@@ -439,16 +439,16 @@ def encode(
     "Encode data to NetCDF."
     dfs = load_data(fname_in)
     tfm = Transformer(dfs, cbs=[
-                            LowerStripNameCB(col_src='Nuclide', col_dst='Nuclide'),
-                            RemapNuclideNameCB(lut_nuclides, col_name='Nuclide'),
+                            LowerStripNameCB(col_src='nuclide', col_dst='nuclide'),
+                            RemapNuclideNameCB(lut_nuclides, col_name='nuclide'),
                             ParseTimeCB(),
                             EncodeTimeCB(),
                             SanitizeValueCB(),
                             NormalizeUncCB(),
                             RemapUnitCB(renaming_unit_rules),
                             RemapDetectionLimitCB(coi_dl, lut_dl),
-                            RemapCB(fn_lut=lut_biota, col_remap='SPECIES', col_src='Species', dest_grps='BIOTA'),    
-                            RemapCB(fn_lut=lut_biota_enhanced, col_remap='enhanced_species', col_src='Biological group', dest_grps='BIOTA'),    
+                            RemapCB(fn_lut=lut_biota, col_remap='SPECIES', col_src='species', dest_grps='BIOTA'),    
+                            RemapCB(fn_lut=lut_biota_enhanced, col_remap='enhanced_species', col_src='biological group', dest_grps='BIOTA'),    
                             EnhanceSpeciesCB(),
                             RemapCB(fn_lut=lut_biogroup_from_biota, col_remap='BIO_GROUP', col_src='SPECIES', dest_grps='BIOTA'),
                             AddBodypartTempCB(),
@@ -456,7 +456,7 @@ def encode(
                             AddSampleIdCB(),
                             AddDepthCB(),    
                             ConvertLonLatCB(),
-                            SanitizeLonLatCB()
+                            SanitizeLonLatCB(),
                                 ])
     tfm()
     encoder = NetCDFEncoder(tfm.dfs, 

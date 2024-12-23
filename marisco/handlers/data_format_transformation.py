@@ -27,7 +27,7 @@ from marisco.callbacks import (
     Callback,
     Transformer,
     DecodeTimeCB,
-    RemapCB
+    AddSampleTypeIdColumnCB
 )  
     
 from marisco.decoders import (
@@ -299,7 +299,7 @@ class RemapToHumanReadableCB(Callback):
                                 print(f"Converted {original_col} in {group_name}")
                                 print("-" * 80)
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 42
+# %% ../../nbs/handlers/data_format_transformation.ipynb 44
 def decode(
     fname_in: str, # Input file name
     dest_out: str | None = None, # Output file name (optional)
@@ -329,6 +329,7 @@ def decode(
             RemapToHumanReadableCB(
                 src_fname=fname_in),
             DecodeTimeCB(),
+            AddSampleTypeIdColumnCB(),
         ]
     )    
     

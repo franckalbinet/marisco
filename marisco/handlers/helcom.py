@@ -199,13 +199,13 @@ class ParseTimeCB(Callback):
 coi_sediment = {
     'kg_type': {
         'VALUE': 'VALUE_Bq/kg',
-        'UNCERTAINTY': 'ERROR%_kg',
+        'UNC': 'ERROR%_kg',
         'DL': '< VALUE_Bq/kg',
         'UNIT': 3,  # Unit ID for Bq/kg
     },
     'm2_type': {
         'VALUE': 'VALUE_Bq/m²',
-        'UNCERTAINTY': 'ERROR%_m²',
+        'UNC': 'ERROR%_m²',
         'DL': '< VALUE_Bq/m²',
         'UNIT': 2,  # Unit ID for Bq/m²
     }
@@ -231,7 +231,7 @@ class SplitSedimentValuesCB(Callback):
             # If any of value/uncertainty/DL exists, keep the row
             has_data = (
                 df[cols['VALUE']].notna() | 
-                df[cols['UNCERTAINTY']].notna() | 
+                df[cols['UNC']].notna() | 
                 df[cols['DL']].notna()
             )
             
@@ -240,7 +240,7 @@ class SplitSedimentValuesCB(Callback):
                 
                 # Copy columns to standardized names
                 df_measure['_VALUE'] = df_measure[cols['VALUE']]
-                df_measure['_UNCERTAINTY'] = df_measure[cols['UNCERTAINTY']]
+                df_measure['_UNC'] = df_measure[cols['UNC']]
                 df_measure['_DL'] = df_measure[cols['DL']]
                 df_measure['_UNIT'] = cols['UNIT']
                 
@@ -283,7 +283,7 @@ def unc_rel2stan(
 # Columns of interest
 coi_units_unc = [('SEAWATER', 'VALUE_Bq/m³', 'ERROR%_m³'),
                  ('BIOTA', 'VALUE_Bq/kg', 'ERROR%'),
-                 ('SEDIMENT', '_VALUE', '_UNCERTAINTY')]
+                 ('SEDIMENT', '_VALUE', '_UNC')]
 
 
 # %% ../../nbs/handlers/helcom.ipynb 75
@@ -299,7 +299,7 @@ class NormalizeUncCB(Callback):
         for grp, val, unc in self.coi:
             if grp in tfm.dfs:
                 df = tfm.dfs[grp]
-                df['UNCERTAINTY'] = self.fn_convert_unc(df, val, unc)
+                df['UNC'] = self.fn_convert_unc(df, val, unc)
 
 # %% ../../nbs/handlers/helcom.ipynb 83
 lut_units = {
@@ -332,14 +332,14 @@ lut_dl = lambda: pd.read_excel(detection_limit_lut_path(), usecols=['name','id']
 
 # %% ../../nbs/handlers/helcom.ipynb 92
 coi_dl = {'SEAWATER' : {'VALUE' : 'VALUE_Bq/m³',
-                       'UNCERTAINTY' : 'ERROR%_m³',
+                       'UNC' : 'ERROR%_m³',
                        'DL' : '< VALUE_Bq/m³'},
           'BIOTA':  {'VALUE' : 'VALUE_Bq/kg',
-                     'UNCERTAINTY' : 'ERROR%',
+                     'UNC' : 'ERROR%',
                      'DL' : '< VALUE_Bq/kg'},
           'SEDIMENT': {
               'VALUE' : 'VALUE_Bq/kg',
-              'UNCERTAINTY' : 'ERROR%_kg',
+              'UNC' : 'ERROR%_kg',
               'DL' : '< VALUE_Bq/kg'}}
 
 
@@ -374,7 +374,7 @@ class RemapDetectionLimitCB(Callback):
         
         # Access column names from coi_dl
         value_col = coi_dl[grp]['VALUE']
-        uncertainty_col = coi_dl[grp]['UNCERTAINTY']
+        uncertainty_col = coi_dl[grp]['UNC']
         detection_col = coi_dl[grp]['DL']
 
         # Initialize detection limit column

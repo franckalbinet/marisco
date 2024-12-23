@@ -181,7 +181,7 @@ class NormalizeUncCB(Callback):
 
     def __call__(self, tfm):
         for df in tfm.dfs.values():
-            df['UNCERTAINTY'] = self.fn_convert_unc(df, self.col_unc)
+            df['UNC'] = self.fn_convert_unc(df, self.col_unc)
 
 # %% ../../nbs/handlers/ospar.ipynb 79
 # Define unit names renaming rules
@@ -264,7 +264,7 @@ class RemapDetectionLimitCB(Callback):
         
         # Condition for setting '='
         condition_eq = (df['VALUE'].notna() & 
-                        df['UNCERTAINTY'].notna() & 
+                        df['UNC'].notna() & 
                         ~df['DL'].isin(lut.keys()))
         
         df.loc[condition_eq, 'DL'] = '='

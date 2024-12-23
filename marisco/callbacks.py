@@ -4,8 +4,8 @@
 
 # %% auto 0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB', 'AddSampleTypeIdColumnCB',
-           'AddNuclideIdColumnCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB', 'UniqueIndexCB',
-           'EncodeTimeCB', 'DecodeTimeCB']
+           'AddNuclideIdColumnCB', 'SelectColumnsCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB',
+           'UniqueIndexCB', 'EncodeTimeCB', 'DecodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb 2
 import copy
@@ -222,6 +222,19 @@ class AddNuclideIdColumnCB(Callback):
     def __call__(self, tfm: Transformer):
         for grp, df in tfm.dfs.items(): 
             df[self.col_name] = df[self.col_value].map(self.lut)
+
+# %% ../nbs/api/callbacks.ipynb 33
+class SelectColumnsCB(Callback):
+    "Select columns of interest."
+    def __init__(self, 
+                 cois: dict # Columns of interest
+                 ): 
+        fc.store_attr()
+        
+    def __call__(self, tfm):
+        "Select columns of interest."
+        for grp, df in tfm.dfs.items(): 
+            tfm.dfs[grp] = df.loc[:, self.cois.keys()]
 
 # %% ../nbs/api/callbacks.ipynb 34
 class RenameColumnsCB(Callback):

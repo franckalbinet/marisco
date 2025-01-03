@@ -122,9 +122,7 @@ class RemapCB(Callback):
                 ):
         fc.store_attr()
         self.lut = None
-        
-        if isinstance(dest_grps, str):
-            self.dest_grps = [dest_grps]
+        if isinstance(dest_grps, str): self.dest_grps = [dest_grps]
         # Format the documentation string based on the type and content of dest_grps
         if isinstance(self.dest_grps, list):
             if len(self.dest_grps) > 1:

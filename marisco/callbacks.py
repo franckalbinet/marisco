@@ -117,14 +117,12 @@ class RemapCB(Callback):
                  col_remap: str, # Name of the column to remap
                  col_src: str, # Name of the column with the source values
                  dest_grps: list[str]|str=NC_GROUPS.keys(), # List of destination groups
-                 default_value: Any = -1, # Default value for unmatched entries
+                 default_value: Any = 0, # Default value for unmatched entries
                  verbose: bool=False # Whether to print the number of unmatched entries
                 ):
         fc.store_attr()
         self.lut = None
-        
-        if isinstance(dest_grps, str):
-            self.dest_grps = [dest_grps]
+        if isinstance(dest_grps, str): self.dest_grps = [dest_grps]
         # Format the documentation string based on the type and content of dest_grps
         if isinstance(self.dest_grps, list):
             if len(self.dest_grps) > 1:

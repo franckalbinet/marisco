@@ -112,7 +112,7 @@ class WFSProcessor:
 
 # %% ../../nbs/handlers/ospar.ipynb 16
 @patch
-def filter_features(self: WFSHandler):
+def filter_features(self: WFSProcessor):
     "Filter features based on search parameters, updating the internal state."
     available_feature_types = list(self.wfs.contents.keys())
     self.features_df = {}
@@ -123,7 +123,7 @@ def filter_features(self: WFSHandler):
 
 # %% ../../nbs/handlers/ospar.ipynb 17
 @patch
-def check_feature_pattern(self: WFSHandler):
+def check_feature_pattern(self: WFSProcessor):
     "Check and retain features conforming to a specific pattern, updating the internal state."
     pattern = re.compile(r'^odims:ospar_(biota|seawater)_(\d{4})_(\d{2})_(\d{3})$')
     for feature_type, df in list(self.features_df.items()):
@@ -133,7 +133,7 @@ def check_feature_pattern(self: WFSHandler):
 
 # %% ../../nbs/handlers/ospar.ipynb 18
 @patch
-def extract_version_from_feature_name(self: WFSHandler):
+def extract_version_from_feature_name(self: WFSProcessor):
     "Extract version from feature name, updating the internal state."
     for feature_type, df in self.features_df.items():
         df['source'] = df['feature'].apply(lambda x: x.split('_')[0])
@@ -144,7 +144,7 @@ def extract_version_from_feature_name(self: WFSHandler):
 
 # %% ../../nbs/handlers/ospar.ipynb 19
 @patch
-def filter_latest_versions(self: WFSHandler):
+def filter_latest_versions(self: WFSProcessor):
     "Filter each DataFrame to include only the latest version of each feature, updating the internal state."
     for feature_type, df in self.features_df.items():
         df[['year', 'month', 'version']] = df[['year', 'month', 'version']].astype(int)
@@ -153,7 +153,7 @@ def filter_latest_versions(self: WFSHandler):
 
 # %% ../../nbs/handlers/ospar.ipynb 20
 @patch
-def fetch_and_combine_csv(self: WFSHandler):
+def fetch_and_combine_csv(self: WFSProcessor):
     "Fetch CSV data for each feature from the WFS and combine into a single DataFrame for each feature type."
     for feature_type, df in self.features_df.items():
         combined_df = pd.DataFrame()

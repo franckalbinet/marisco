@@ -3,16 +3,17 @@
 # %% auto 0
 __all__ = ['fname_in', 'fname_out_nc', 'zotero_key', 'ref_id', 'default_smp_types', 'fixes_nuclide_names', 'lut_nuclides',
            'unc_exp2stan', 'renaming_unit_rules', 'lut_dl', 'coi_dl', 'fixes_biota_species', 'lut_biota',
-           'lut_biota_enhanced', 'fixes_biota_tissues', 'lut_bodyparts', 'lut_biogroup_from_biota', 'kw', 'load_data',
-           'RemapNuclideNameCB', 'ParseTimeCB', 'SanitizeValueCB', 'NormalizeUncCB', 'RemapUnitCB',
-           'RemapDetectionLimitCB', 'EnhanceSpeciesCB', 'AddBodypartTempCB', 'AddSampleIdCB', 'ConvertLonLatCB',
-           'get_attrs', 'encode']
+           'lut_biota_enhanced', 'fixes_biota_tissues', 'lut_bodyparts', 'lut_biogroup_from_biota', 'kw',
+           'WFSProcessor', 'load_data', 'RemapNuclideNameCB', 'ParseTimeCB', 'SanitizeValueCB', 'NormalizeUncCB',
+           'RemapUnitCB', 'RemapDetectionLimitCB', 'EnhanceSpeciesCB', 'AddBodypartTempCB', 'AddSampleIdCB',
+           'ConvertLonLatCB', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/ospar.ipynb 6
 import pandas as pd 
 import numpy as np
 #from functools import partial 
 import fastcore.all as fc 
+from fastcore.basics import patch, store_attr
 from pathlib import Path 
 #from dataclasses import asdict
 from typing import List, Dict, Callable, Tuple, Any 
@@ -88,10 +89,88 @@ fname_out_nc = '../../_data/output/191-OSPAR-2024.nc'
 zotero_key ='LQRA4MMK' # OSPAR MORS zotero key
 ref_id = 191 # OSPAR reference id as defined by MARIS
 
-# %% ../../nbs/handlers/ospar.ipynb 14
+# %% ../../nbs/handlers/ospar.ipynb 15
+class WFSProcessor:
+    "Processor for Web Feature Service operations, managing feature filtering and data fetching."
+    
+    def __init__(self, url, search_params=None, version='2.0.0'):
+        "Initialize with URL, version, and search parameters."
+        fc.store_attr()
+        self.wfs = WebFeatureService(url=self.url, version=self.version)
+        self.features_df = {}
+        self.dfs = {}
+
+    def __call__(self):
+        "Process and fetch data, updating internal state with results."
+        self.filter_features()
+        self.check_feature_pattern()
+        self.extract_version_from_feature_name()
+        self.filter_latest_versions()
+        self.fetch_and_combine_csv()
+
+        return self.dfs
+
+# %% ../../nbs/handlers/ospar.ipynb 16
+@patch
+def filter_features(self: WFSHandler):
+    "Filter features based on search parameters, updating the internal state."
+    available_feature_types = list(self.wfs.contents.keys())
+    self.features_df = {}
+    for key, value in self.search_params.items():
+        filtered_features = [ftype for ftype in available_feature_types if value in ftype]
+        self.features_df[key] = pd.DataFrame([{'feature': ftype} for ftype in filtered_features])
+
+
+# %% ../../nbs/handlers/ospar.ipynb 17
+@patch
+def check_feature_pattern(self: WFSHandler):
+    "Check and retain features conforming to a specific pattern, updating the internal state."
+    pattern = re.compile(r'^odims:ospar_(biota|seawater)_(\d{4})_(\d{2})_(\d{3})$')
+    for feature_type, df in list(self.features_df.items()):
+        conforming_features = df[df['feature'].apply(lambda x: pattern.match(x) is not None)]
+        self.features_df[feature_type] = conforming_features
+
+
+# %% ../../nbs/handlers/ospar.ipynb 18
+@patch
+def extract_version_from_feature_name(self: WFSHandler):
+    "Extract version from feature name, updating the internal state."
+    for feature_type, df in self.features_df.items():
+        df['source'] = df['feature'].apply(lambda x: x.split('_')[0])
+        df['type'] = df['feature'].apply(lambda x: x.split('_')[1])
+        df['year'] = df['feature'].apply(lambda x: x.split('_')[2])
+        df['month'] = df['feature'].apply(lambda x: x.split('_')[3])
+        df['version'] = df['feature'].apply(lambda x: x.split('_')[4])
+
+# %% ../../nbs/handlers/ospar.ipynb 19
+@patch
+def filter_latest_versions(self: WFSHandler):
+    "Filter each DataFrame to include only the latest version of each feature, updating the internal state."
+    for feature_type, df in self.features_df.items():
+        df[['year', 'month', 'version']] = df[['year', 'month', 'version']].astype(int)
+        idx = df.groupby(['source', 'type', 'year', 'month'])['version'].idxmax()
+        self.features_df[feature_type] = df.loc[idx]
+
+# %% ../../nbs/handlers/ospar.ipynb 20
+@patch
+def fetch_and_combine_csv(self: WFSHandler):
+    "Fetch CSV data for each feature from the WFS and combine into a single DataFrame for each feature type."
+    for feature_type, df in self.features_df.items():
+        combined_df = pd.DataFrame()
+        for feature in df['feature']:
+            try:
+                response = self.wfs.getfeature(typename=feature, outputFormat='csv')
+                csv_data = StringIO(response.read().decode('utf-8'))
+                df_csv = pd.read_csv(csv_data)
+                combined_df = pd.concat([combined_df, df_csv], ignore_index=True)
+            except Exception as e:
+                print(f"Failed to fetch data for {feature}: {e}")
+        self.dfs[feature_type] = combined_df
+
+# %% ../../nbs/handlers/ospar.ipynb 26
 default_smp_types = {'Seawater data': 'SEAWATER', 'Biota data': 'BIOTA'}
 
-# %% ../../nbs/handlers/ospar.ipynb 15
+# %% ../../nbs/handlers/ospar.ipynb 27
 def load_data(src_dir:str, # Directory where the source CSV files are located
               lut:dict=default_smp_types # A dictionary with the file name as key and the sample type as value
               ) -> dict: # A dictionary with sample types as keys and their corresponding dataframes as values
@@ -102,7 +181,7 @@ def load_data(src_dir:str, # Directory where the source CSV files are located
         for file_name, sample_type in lut.items()
     }
 
-# %% ../../nbs/handlers/ospar.ipynb 33
+# %% ../../nbs/handlers/ospar.ipynb 45
 fixes_nuclide_names = {
     '99tc': 'tc99',
     '238pu': 'pu238',
@@ -118,7 +197,7 @@ fixes_nuclide_names = {
     '3h': 'h3'
     }
 
-# %% ../../nbs/handlers/ospar.ipynb 39
+# %% ../../nbs/handlers/ospar.ipynb 51
 # Create a lookup table for nuclide names
 lut_nuclides = lambda df: Remapper(provider_lut_df=df,
                                    maris_lut_fn=nuc_lut_path,
@@ -129,7 +208,7 @@ lut_nuclides = lambda df: Remapper(provider_lut_df=df,
                                    fname_cache='nuclides_ospar.pkl').generate_lookup_table(fixes=fixes_nuclide_names, 
                                                                                             as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 40
+# %% ../../nbs/handlers/ospar.ipynb 52
 class RemapNuclideNameCB(Callback):
     "Remap data provider nuclide names to standardized MARIS nuclide names."
     def __init__(self, 
@@ -145,7 +224,7 @@ class RemapNuclideNameCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k]['NUCLIDE'] = tfm.dfs[k][self.col_name].replace(lut)
 
-# %% ../../nbs/handlers/ospar.ipynb 47
+# %% ../../nbs/handlers/ospar.ipynb 59
 class ParseTimeCB(Callback):
     "Parse the time format in the dataframe."
     def __call__(self, tfm):
@@ -153,7 +232,7 @@ class ParseTimeCB(Callback):
             df['TIME'] = pd.to_datetime(df['sampling date'], format='%m/%d/%y %H:%M:%S', errors='coerce')
             df.dropna(subset=['TIME'], inplace=True)
 
-# %% ../../nbs/handlers/ospar.ipynb 55
+# %% ../../nbs/handlers/ospar.ipynb 67
 class SanitizeValueCB(Callback):
     "Sanitize value by removing blank entries and populating `value` column."
     def __init__(self, 
@@ -166,10 +245,10 @@ class SanitizeValueCB(Callback):
             df.dropna(subset=[self.value_col], inplace=True)
             df['VALUE'] = df[self.value_col]
 
-# %% ../../nbs/handlers/ospar.ipynb 60
+# %% ../../nbs/handlers/ospar.ipynb 72
 unc_exp2stan = lambda df, unc_col: df[unc_col] / 2
 
-# %% ../../nbs/handlers/ospar.ipynb 61
+# %% ../../nbs/handlers/ospar.ipynb 73
 class NormalizeUncCB(Callback):
     """Normalize uncertainty values in DataFrames."""
     def __init__(self, 
@@ -182,7 +261,7 @@ class NormalizeUncCB(Callback):
         for df in tfm.dfs.values():
             df['UNC'] = self.fn_convert_unc(df, self.col_unc)
 
-# %% ../../nbs/handlers/ospar.ipynb 80
+# %% ../../nbs/handlers/ospar.ipynb 92
 # Define unit names renaming rules
 renaming_unit_rules = {'Bq/l': 1, #'Bq/m3'
                        'Bq/L': 1,
@@ -190,7 +269,7 @@ renaming_unit_rules = {'Bq/l': 1, #'Bq/m3'
                        'Bq/kg f.w.': 5, # Bq/kgw
                        } 
 
-# %% ../../nbs/handlers/ospar.ipynb 81
+# %% ../../nbs/handlers/ospar.ipynb 93
 class RemapUnitCB(Callback):
     """Callback to update DataFrame 'UNIT' columns based on a lookup table."""
 
@@ -215,15 +294,15 @@ class RemapUnitCB(Callback):
     def _update_units(self, df: pd.DataFrame):
         df['UNIT'] = df['unit'].apply(lambda x: self.lut.get(x, 'Unknown'))
 
-# %% ../../nbs/handlers/ospar.ipynb 90
+# %% ../../nbs/handlers/ospar.ipynb 102
 lut_dl = lambda: pd.read_excel(detection_limit_lut_path(), usecols=['name','id']).set_index('name').to_dict()['id']
 
-# %% ../../nbs/handlers/ospar.ipynb 91
+# %% ../../nbs/handlers/ospar.ipynb 103
 coi_dl = {'SEAWATER' : {'DL' : 'value type'},
           'BIOTA':  {'DL' : 'value type'}
           }
 
-# %% ../../nbs/handlers/ospar.ipynb 92
+# %% ../../nbs/handlers/ospar.ipynb 104
 class RemapDetectionLimitCB(Callback):
     "Remap value type to MARIS format."
     
@@ -274,7 +353,7 @@ class RemapDetectionLimitCB(Callback):
         # Perform lookup to map detection limits
         df['DL'] = df['DL'].map(lut)
 
-# %% ../../nbs/handlers/ospar.ipynb 103
+# %% ../../nbs/handlers/ospar.ipynb 115
 fixes_biota_species = {
     'PECTINIDAE': NA, # Dropped. In Worms as PECTINIDAE is a family.
     'Unknown': NA,
@@ -291,7 +370,7 @@ fixes_biota_species = {
     'Gadus sp.': 'Gadus morhua',
     }
 
-# %% ../../nbs/handlers/ospar.ipynb 107
+# %% ../../nbs/handlers/ospar.ipynb 119
 lut_biota = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name='species', as_df=True),
                              maris_lut_fn=species_lut_path,
                              maris_col_id='species_id',
@@ -300,7 +379,7 @@ lut_biota = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name
                              provider_col_key='value',
                              fname_cache='species_ospar.pkl').generate_lookup_table(fixes=fixes_biota_species, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 122
+# %% ../../nbs/handlers/ospar.ipynb 134
 lut_biota_enhanced = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name='biological group', as_df=True),
                              maris_lut_fn=species_lut_path,
                              maris_col_id='species_id',
@@ -309,7 +388,7 @@ lut_biota_enhanced = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs,
                              provider_col_key='value',
                              fname_cache='enhance_species_ospar.pkl').generate_lookup_table(fixes=fixes_enhanced_biota_species, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 127
+# %% ../../nbs/handlers/ospar.ipynb 139
 class EnhanceSpeciesCB(Callback):
     """Enhance the 'SPECIES' column using the 'enhanced_species' column if conditions are met."""
 
@@ -325,7 +404,7 @@ class EnhanceSpeciesCB(Callback):
             axis=1
         )
 
-# %% ../../nbs/handlers/ospar.ipynb 133
+# %% ../../nbs/handlers/ospar.ipynb 145
 class AddBodypartTempCB(Callback):
     "Add a temporary column with the body part and biological group combined."    
     def __call__(self, tfm):
@@ -334,7 +413,7 @@ class AddBodypartTempCB(Callback):
             tfm.dfs['BIOTA']['biological group']
             ).str.strip().str.lower()                                 
 
-# %% ../../nbs/handlers/ospar.ipynb 140
+# %% ../../nbs/handlers/ospar.ipynb 152
 fixes_biota_tissues = {
     'whole seaweed' : 'Whole plant',
     'flesh fish': 'Flesh with bones', # We assume it as the category 'Flesh with bones' also exists
@@ -348,7 +427,7 @@ fixes_biota_tissues = {
     'tail and claws fish' : NA # TO BE DETERMINED
 }
 
-# %% ../../nbs/handlers/ospar.ipynb 144
+# %% ../../nbs/handlers/ospar.ipynb 156
 lut_bodyparts = lambda: Remapper(provider_lut_df=get_unique_across_dfs(tfm.dfs, col_name='body_part_temp', as_df=True),
                                maris_lut_fn=bodyparts_lut_path,
                                maris_col_id='bodypar_id',
@@ -358,11 +437,11 @@ lut_bodyparts = lambda: Remapper(provider_lut_df=get_unique_across_dfs(tfm.dfs, 
                                fname_cache='tissues_ospar.pkl'
                                ).generate_lookup_table(fixes=fixes_biota_tissues, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 149
+# %% ../../nbs/handlers/ospar.ipynb 161
 lut_biogroup_from_biota = lambda: get_lut(src_dir=species_lut_path().parent, fname=species_lut_path().name, 
                                key='species_id', value='biogroup_id')
 
-# %% ../../nbs/handlers/ospar.ipynb 160
+# %% ../../nbs/handlers/ospar.ipynb 172
 class AddSampleIdCB(Callback):
     "Create a SMP_ID column from the ID column"
     def __call__(self, tfm):
@@ -370,7 +449,7 @@ class AddSampleIdCB(Callback):
             if 'id' in df.columns:
                 df['SMP_ID'] = df['id']
 
-# %% ../../nbs/handlers/ospar.ipynb 168
+# %% ../../nbs/handlers/ospar.ipynb 180
 class ConvertLonLatCB(Callback):
     """Convert Coordinates to decimal degrees (DDD.DDDDD°)."""
     def __init__(self):
@@ -399,7 +478,7 @@ class ConvertLonLatCB(Callback):
         return degrees + minutes / 60 + seconds / 3600
 
 
-# %% ../../nbs/handlers/ospar.ipynb 178
+# %% ../../nbs/handlers/ospar.ipynb 190
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -412,7 +491,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 179
+# %% ../../nbs/handlers/ospar.ipynb 191
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -428,7 +507,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/ospar.ipynb 182
+# %% ../../nbs/handlers/ospar.ipynb 194
 def encode(
     fname_in: str, # Input file name
     fname_out_nc: str, # Output file name

@@ -5,7 +5,7 @@
 # %% auto 0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB', 'AddSampleTypeIdColumnCB',
            'AddNuclideIdColumnCB', 'SelectColumnsCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB',
-           'UniqueIndexCB', 'EncodeTimeCB', 'DecodeTimeCB']
+           'UniqueIndexCB', 'EncodeTimeCB', 'DecodeTimeCB', 'AddZoteroArchiveLocationCB']
 
 # %% ../nbs/api/callbacks.ipynb 2
 import copy
@@ -206,22 +206,6 @@ class AddNuclideIdColumnCB(Callback):
             df[self.col_name] = df[self.col_value].map(self.lut)
 
 # %% ../nbs/api/callbacks.ipynb 32
-class AddNuclideIdColumnCB(Callback):
-    def __init__(self, 
-                 col_value: str, # Column name containing the nuclide name
-                 lut_fname_fn: Callable=nuc_lut_path, # Function returning the lut path
-                 col_name: str='nuclide_id' # Column name to store the nuclide id
-                 ): 
-        "Add a column with the nuclide id."
-        fc.store_attr()
-        self.lut = get_lut(lut_fname_fn().parent, lut_fname_fn().name, 
-                           key='nc_name', value='nuclide_id', reverse=False)
-        
-    def __call__(self, tfm: Transformer):
-        for grp, df in tfm.dfs.items(): 
-            df[self.col_name] = df[self.col_value].map(self.lut)
-
-# %% ../nbs/api/callbacks.ipynb 33
 class SelectColumnsCB(Callback):
     "Select columns of interest."
     def __init__(self, 
@@ -234,7 +218,7 @@ class SelectColumnsCB(Callback):
         for grp, df in tfm.dfs.items(): 
             tfm.dfs[grp] = df.loc[:, self.cois.keys()]
 
-# %% ../nbs/api/callbacks.ipynb 34
+# %% ../nbs/api/callbacks.ipynb 33
 class RenameColumnsCB(Callback):
     "Renaming variables to MARIS standard names."
     def __init__(self,
@@ -245,6 +229,20 @@ class RenameColumnsCB(Callback):
     def __call__(self, tfm):
         for grp in tfm.dfs.keys(): 
             tfm.dfs[grp].rename(columns=self.renaming_rules, inplace=True)
+
+# %% ../nbs/api/callbacks.ipynb 34
+class RemoveAllNAValuesCB(Callback):
+    "Remove rows with all NA values."
+    def __init__(self, 
+                 cols_to_check: Dict[str, str] # A dictionary with the sample type as key and the column name to check as value
+                ):
+        fc.store_attr()
+
+    def __call__(self, tfm):
+        for k in tfm.dfs.keys():
+            col_to_check = self.cols_to_check[k]
+            mask = tfm.dfs[k][col_to_check].isnull().all(axis=1)
+            tfm.dfs[k] = tfm.dfs[k][~mask]
 
 # %% ../nbs/api/callbacks.ipynb 35
 class RemoveAllNAValuesCB(Callback):
@@ -260,21 +258,7 @@ class RemoveAllNAValuesCB(Callback):
             mask = tfm.dfs[k][col_to_check].isnull().all(axis=1)
             tfm.dfs[k] = tfm.dfs[k][~mask]
 
-# %% ../nbs/api/callbacks.ipynb 36
-class RemoveAllNAValuesCB(Callback):
-    "Remove rows with all NA values."
-    def __init__(self, 
-                 cols_to_check: Dict[str, str] # A dictionary with the sample type as key and the column name to check as value
-                ):
-        fc.store_attr()
-
-    def __call__(self, tfm):
-        for k in tfm.dfs.keys():
-            col_to_check = self.cols_to_check[k]
-            mask = tfm.dfs[k][col_to_check].isnull().all(axis=1)
-            tfm.dfs[k] = tfm.dfs[k][~mask]
-
-# %% ../nbs/api/callbacks.ipynb 45
+# %% ../nbs/api/callbacks.ipynb 44
 class CompareDfsAndTfmCB(Callback):
     "Create a dataframe of dropped data. Data included in the `dfs` not in the `tfm`."
     def __init__(self, 
@@ -312,7 +296,7 @@ class CompareDfsAndTfmCB(Callback):
             'Number of rows removed': len(tfm.dfs_dropped[grp].index),
         }
 
-# %% ../nbs/api/callbacks.ipynb 48
+# %% ../nbs/api/callbacks.ipynb 47
 class UniqueIndexCB(Callback):
     "Set unique index for each group."
     def __init__(self,
@@ -326,7 +310,7 @@ class UniqueIndexCB(Callback):
             # Reset the index again and set the name of the new index to `ìndex_name``
             tfm.dfs[k] = tfm.dfs[k].reset_index(names=[self.index_name])
 
-# %% ../nbs/api/callbacks.ipynb 51
+# %% ../nbs/api/callbacks.ipynb 49
 class EncodeTimeCB(Callback):
     "Encode time as seconds since epoch."    
     def __init__(self, 
@@ -346,7 +330,7 @@ class EncodeTimeCB(Callback):
             tfm.dfs[grp] = tfm.dfs[grp][tfm.dfs[grp][self.col_time].notna()]
             tfm.dfs[grp][self.col_time] = tfm.dfs[grp][self.col_time].apply(lambda x: date2num(x, units=self.units))
 
-# %% ../nbs/api/callbacks.ipynb 54
+# %% ../nbs/api/callbacks.ipynb 51
 class DecodeTimeCB(Callback):
     "Decode time from seconds since epoch to datetime format."    
     def __init__(self, 
@@ -367,3 +351,19 @@ class DecodeTimeCB(Callback):
             tfm.dfs[grp][self.col_time] = df[self.col_time].apply(
                 lambda x: num2date(x, units=self.units, only_use_cftime_datetimes=False)
             )
+
+# %% ../nbs/api/callbacks.ipynb 55
+class AddZoteroArchiveLocationCB(Callback):
+    "Fetch and append 'Loc. in Archive' from Zotero to DataFrame."
+    def __init__(self, zotero_key: str, cfg: dict):
+        self.zotero_key = zotero_key
+        self.cfg = cfg
+
+    def __call__(self, tfm):
+        item = ZoteroItem(self.zotero_key, self.cfg['zotero'])
+        if item.exist():
+            loc_in_archive = item.get('Loc. in Archive')  
+            for grp, df in tfm.dfs.items():
+                df['REF_ID'] = int(loc_in_archive)
+        else:
+            print(f"Warning: Zotero item {self.item_id} does not exist.")

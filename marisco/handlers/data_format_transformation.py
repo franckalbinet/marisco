@@ -299,7 +299,7 @@ class RemapToHumanReadableCB(Callback):
                                 print(f"Converted {original_col} in {group_name}")
                                 print("-" * 80)
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 44
+# %% ../../nbs/handlers/data_format_transformation.ipynb 46
 def decode(
     fname_in: str, # Input file name
     dest_out: str | None = None, # Output file name (optional)
@@ -322,6 +322,7 @@ def decode(
             ValidateNetCDFVarsCB(
                 src_fname=fname_in
                 ),
+            
             AddTaxonInformationCB(
                 fn_lut=lut_taxon
                 ),  

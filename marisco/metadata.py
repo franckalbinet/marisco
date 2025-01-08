@@ -114,7 +114,7 @@ class ZoteroItem:
     def __repr__(self):
         return json.dumps(self.item, indent=4) 
 
-# %% ../nbs/api/metadata.ipynb 8
+# %% ../nbs/api/metadata.ipynb 9
 # TBD: put it in callback module
 class ZoteroCB(Callback):
     "Retrieve Zotero metadata."
@@ -122,10 +122,11 @@ class ZoteroCB(Callback):
     def __call__(self, obj):
         item = ZoteroItem(self.itemId, self.cfg['zotero'])
         if item.exist(): 
-            for attr in ['title', 'summary', 'creator_name']:
+            obj.attrs['id'] = item.item['key']
+            for attr in ['title','summary', 'creator_name']:
                 obj.attrs[attr] = getattr(item, attr)()
 
-# %% ../nbs/api/metadata.ipynb 12
+# %% ../nbs/api/metadata.ipynb 13
 class KeyValuePairCB(Callback):
     def __init__(self, k, v): fc.store_attr()
     def __call__(self, obj): obj.attrs[self.k] = self.v

@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['TAXON_KEY_MAP', 'lut_taxon', 'or_mappings', 'load_to_dataframes', 'RemoveNonORVarsCB', 'ValidateEnumsCB',
            'ValidateNetCDFVarsCB', 'get_taxon_info_lut', 'AddTaxonInformationCB', 'RemapToORMappingsCB',
-           'RemapToHumanReadableCB', 'decode']
+           'RemapToHumanReadableCB', 'AddZoteroArchiveLocationCB', 'decode']
 
 # %% ../../nbs/handlers/data_format_transformation.ipynb 5
 from pathlib import Path
@@ -20,7 +20,12 @@ from marisco.configs import (
     OR_DTYPES,
     Enums,
     lut_path,
-    species_lut_path
+    species_lut_path,
+    cfg
+)
+
+from marisco.utils import (
+    get_netcdf_properties
 )
 
 from marisco.callbacks import (
@@ -33,6 +38,9 @@ from marisco.callbacks import (
 from marisco.decoders import (
         NetCDFDecoder
     )
+from marisco.metadata import (
+    ZoteroItem
+)
 
 
 # %% ../../nbs/handlers/data_format_transformation.ipynb 10
@@ -299,7 +307,27 @@ class RemapToHumanReadableCB(Callback):
                                 print(f"Converted {original_col} in {group_name}")
                                 print("-" * 80)
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 46
+# %% ../../nbs/handlers/data_format_transformation.ipynb 43
+class AddZoteroArchiveLocationCB(Callback):
+    "Fetch and append 'Loc. in Archive' from Zotero to DataFrame."
+    def __init__(self, src_fname: str, zotero_key: str, cfg: dict):
+        self.src_fname = src_fname
+        self.cfg = cfg
+
+    def __call__(self, tfm):
+        
+        zotero_key = get_netcdf_properties(self.src_fname)['global_attributes']['id']
+        
+        print (zotero_key)
+        item = ZoteroItem(zotero_key, self.cfg['zotero'])
+        if item.exist():
+            loc_in_archive = item.get('Loc. in Archive')  
+            for grp, df in tfm.dfs.items():
+                df['REF_ID'] = int(loc_in_archive)
+        else:
+            print(f"Warning: Zotero item {self.item_id} does not exist.")
+
+# %% ../../nbs/handlers/data_format_transformation.ipynb 48
 def decode(
     fname_in: str, # Input file name
     dest_out: str | None = None, # Output file name (optional)

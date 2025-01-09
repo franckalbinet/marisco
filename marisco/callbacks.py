@@ -5,7 +5,7 @@
 # %% auto 0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB', 'AddSampleTypeIdColumnCB',
            'AddNuclideIdColumnCB', 'SelectColumnsCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB',
-           'UniqueIndexCB', 'EncodeTimeCB', 'DecodeTimeCB', 'AddZoteroArchiveLocationCB']
+           'UniqueIndexCB', 'EncodeTimeCB', 'DecodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb 2
 import copy
@@ -351,19 +351,3 @@ class DecodeTimeCB(Callback):
             tfm.dfs[grp][self.col_time] = df[self.col_time].apply(
                 lambda x: num2date(x, units=self.units, only_use_cftime_datetimes=False)
             )
-
-# %% ../nbs/api/callbacks.ipynb 55
-class AddZoteroArchiveLocationCB(Callback):
-    "Fetch and append 'Loc. in Archive' from Zotero to DataFrame."
-    def __init__(self, zotero_key: str, cfg: dict):
-        self.zotero_key = zotero_key
-        self.cfg = cfg
-
-    def __call__(self, tfm):
-        item = ZoteroItem(self.zotero_key, self.cfg['zotero'])
-        if item.exist():
-            loc_in_archive = item.get('Loc. in Archive')  
-            for grp, df in tfm.dfs.items():
-                df['REF_ID'] = int(loc_in_archive)
-        else:
-            print(f"Warning: Zotero item {self.item_id} does not exist.")

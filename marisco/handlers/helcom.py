@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import List, Dict, Callable, Tuple, Any 
 import re
 import requests
+import time
 
 from marisco.utils import (
     Remapper, 
@@ -98,25 +99,8 @@ default_smp_types = {
 }
 
 # %% ../../nbs/handlers/helcom.ipynb 15
-def read_csv(file, path=src_dir):
-    file_path = f'{path}/{file}'
-    
-    def is_url(url):
-        """ Check if the string is a URL """
-        return url.startswith('http://') or url.startswith('https://')
-    
-    def file_exists(url_or_path):
-        """ Check if a file exists at a URL or a local path """
-        if is_url(url_or_path):
-            response = requests.head(url_or_path)
-            return response.status_code == 200
-        else:
-            return Path(url_or_path).exists()
-    
-    if not file_exists(file_path):
-        print(f'File not found: {file_path}')
-        return None
-    
+def read_csv(file_name, dir=src_dir):
+    file_path = f'{dir}/{file_name}'
     return pd.read_csv(file_path)
 
 # %% ../../nbs/handlers/helcom.ipynb 16
@@ -124,34 +108,37 @@ def load_data(src_url: str,
               smp_types: dict = default_smp_types, 
               use_cache: bool = False,
               save_to_cache: bool = False,
-             ) -> Dict[str, pd.DataFrame]: 
+              verbose: bool = False) -> Dict[str, pd.DataFrame]:
     "Load HELCOM data and return the data in a dictionary of dataframes with the dictionary key as the sample type."
-    # src_path = Path(src_dir)
+
     
     def load_and_merge(file_prefix: str) -> pd.DataFrame:
-        file_meas_cache = f'{cache_path()}/{file_prefix}02.csv'
-        file_smp_cache = f'{cache_path()}/{file_prefix}01.csv'
+        
+        if use_cache:
+            dir=cache_path()
+        else:
+            dir = src_url
+            
+        file_smp_path = f'{dir}/{file_prefix}01.csv'
+        file_meas_path = f'{dir}/{file_prefix}02.csv'
 
-        try:
-            if use_cache and Path(file_meas_cache).exists() and Path(file_smp_cache).exists():
-                df_meas = pd.read_csv(file_meas_cache)
-                df_smp = pd.read_csv(file_smp_cache)
-            else:
-                df_meas = pd.read_csv(f'{src_url}/{file_prefix}02.csv')
-                df_smp = pd.read_csv(f'{src_url}/{file_prefix}01.csv')
-                
-                if save_to_cache:  # Save to cache if save_to_cache is True
-                    df_meas.to_csv(file_meas_cache, index=False)
-                    df_smp.to_csv(file_smp_cache, index=False)
-
-            # Convert all column names to lowercase to ensure consistency with NC_VARS
-            df_meas.columns = df_meas.columns.str.lower()
-            df_smp.columns = df_smp.columns.str.lower()
-            return pd.merge(df_meas, df_smp, on='key', how='left')
-        except FileNotFoundError as e:
-            print(f"Error loading files: {e}")
-            return pd.DataFrame()  # Return an empty DataFrame if files are not found
+        if use_cache:
+            if not Path(file_smp_path).exists():
+                print(f'{file_smp_path} not found.')            
+            if not Path(file_meas_path).exists():
+                print(f'{file_meas_path} not found.')
+        
+        if verbose:
+            start_time = time.time()
+        df_meas = read_csv(f'{file_prefix}02.csv', dir)
     
+        df_smp = read_csv(f'{file_prefix}01.csv', dir)
+        
+        df_meas.columns = df_meas.columns.str.lower()
+        df_smp.columns = df_smp.columns.str.lower()
+        if verbose:
+            print(f"Downloaded data for {file_prefix}01.csv and {file_prefix}02.csv in {time.time() - start_time:.2f} seconds.")
+        return pd.merge(df_meas, df_smp, on='key', how='left')
     return {smp_type: load_and_merge(file_prefix) for file_prefix, smp_type in smp_types.items()}
 
 # %% ../../nbs/handlers/helcom.ipynb 35

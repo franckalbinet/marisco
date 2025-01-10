@@ -310,18 +310,16 @@ class RemapToHumanReadableCB(Callback):
 # %% ../../nbs/handlers/data_format_transformation.ipynb 43
 class AddZoteroArchiveLocationCB(Callback):
     "Fetch and append 'Loc. in Archive' from Zotero to DataFrame."
-    def __init__(self, src_fname: str, zotero_key: str, cfg: dict):
+    def __init__(self, src_fname: str, cfg: dict):
         self.src_fname = src_fname
         self.cfg = cfg
 
     def __call__(self, tfm):
         
         zotero_key = get_netcdf_properties(self.src_fname)['global_attributes']['id']
-        
-        print (zotero_key)
         item = ZoteroItem(zotero_key, self.cfg['zotero'])
         if item.exist():
-            loc_in_archive = item.get('Loc. in Archive')  
+            loc_in_archive = item.item['data']['archiveLocation'] 
             for grp, df in tfm.dfs.items():
                 df['REF_ID'] = int(loc_in_archive)
         else:

@@ -101,7 +101,8 @@ OR_VARS = {
     'TAXONRANK': 'taxonrank',
     'TAXONDB': 'taxondb',
     'TAXONDBID': 'taxondb_id',
-    'TaxonDBURL': 'taxondb_url',
+    'TAXONDBURL': 'taxondb_url',
+    'REF_ID': 'ref_id'
 
     # OR_VARS not included in current workflow.
     # 'STATION': 'station',
@@ -248,7 +249,8 @@ OR_DTYPES = {
     'TAXONRANK': {'type': 'human_readable'},
     'TAXONDB': {'type': 'human_readable'},
     'TAXONDBID': {'type': 'human_readable'},
-    'TaxonDBURL': {'type': 'human_readable'}
+    'TaxonDBURL': {'type': 'human_readable'},
+    'REF_ID': {'type': 'human_readable'}
 }
 
 # %% ../nbs/api/configs.ipynb 12

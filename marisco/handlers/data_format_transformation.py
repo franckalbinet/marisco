@@ -357,6 +357,7 @@ def decode(
                 src_fname=fname_in),
             DecodeTimeCB(),
             AddSampleTypeIdColumnCB(),
+            AddZoteroArchiveLocationCB(src_fname=fname_in, cfg=cfg())
         ]
     )    
     

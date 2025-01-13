@@ -215,42 +215,27 @@ NC_DTYPES = {
 
 # %% ../nbs/api/configs.ipynb 11
 OR_DTYPES = {
-    'LON': {'type': 'human_readable'},
-    'LAT': {'type': 'human_readable'},
-    'SMP_DEPTH': {'type': 'human_readable'},
-    'TOT_DEPTH': {'type': 'human_readable'},
-    'TIME': {'type': 'human_readable'},
-    'AREA': {'type': 'human_readable'},
-    'NUCLIDE': {'type': 'encoded'},  # nuclide_id
-    'VALUE': {'type': 'human_readable'},
-    'UNIT': {'type': 'encoded'},  # unit_id
-    'UNC': {'type': 'human_readable'},
-    'DL': {'type': 'human_readable'},
-    'FILT': {'type': 'human_readable'},
-    'COUNT_MET': {'type': 'encoded'},  # counmet_id
-    'SAMP_MET': {'type': 'encoded'},  # sampmet_id
-    'PREP_MET': {'type': 'encoded'},  # prepmet_id
-    'VOL': {'type': 'human_readable'},
-    'SAL': {'type': 'human_readable'},
-    'TEMP': {'type': 'human_readable'},
-    'SPECIES': {'type': 'encoded'},  # species_id
-    'BODY_PART': {'type': 'encoded'},  # bodypar_id
-    'SED_TYPE': {'type': 'encoded'},  # sedtype_id
-    'TOP': {'type': 'human_readable'},
-    'BOTTOM': {'type': 'human_readable'},
-    'DRYWT': {'type': 'human_readable'},
-    'WETWT': {'type': 'human_readable'},
-    'PERCENTWT': {'type': 'human_readable'},
-    'LAB': {'type': 'encoded'},  # lab_id
-    'PROFILE_ID': {'type': 'human_readable'},
-    'SAMPLE_TYPE': {'type': 'human_readable'},
-    'TAXONNAME': {'type': 'human_readable'},
-    'TAXONREPNAME': {'type': 'human_readable'},
-    'TAXONRANK': {'type': 'human_readable'},
-    'TAXONDB': {'type': 'human_readable'},
-    'TAXONDBID': {'type': 'human_readable'},
-    'TaxonDBURL': {'type': 'human_readable'},
-    'REF_ID': {'type': 'human_readable'}
+    'TIME': {'state': 'decoded'},
+    'AREA': {'state': 'decoded'},
+    'NUCLIDE': {'state': 'encoded'},  # encoded nuclide_id
+    'UNIT': {'state': 'encoded'},  # encoded unit_id
+    'DL': {'state': 'decoded'},
+    'FILT': {'state': 'decoded'},
+    'COUNT_MET': {'state': 'encoded'},  # encoded counmet_id
+    'SAMP_MET': {'state': 'encoded'},  # encoded sampmet_id
+    'PREP_MET': {'state': 'encoded'},  # encoded prepmet_id
+    'SPECIES': {'state': 'encoded'},  # encoded species_id
+    'BODY_PART': {'state': 'encoded'},  # encoded bodypar_id
+    'SED_TYPE': {'state': 'encoded'},  # encoded sedtype_id
+    'LAB': {'state': 'encoded'},  # encoded lab_id
+    'PROFILE_ID': {'state': 'decoded'},
+    'SAMPLE_TYPE': {'state': 'decoded'},
+    'TAXONNAME': {'state': 'decoded'},
+    'TAXONREPNAME': {'state': 'decoded'},
+    'TAXONRANK': {'state': 'decoded'},
+    'TAXONDB': {'state': 'decoded'},
+    'TAXONDBID': {'state': 'decoded'},
+    'TaxonDBURL': {'state': 'decoded'},
 }
 
 # %% ../nbs/api/configs.ipynb 12

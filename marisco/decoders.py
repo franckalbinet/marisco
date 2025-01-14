@@ -17,7 +17,7 @@ from typing import Dict, Callable
 from marisco.configs import (
     NC_DTYPES, 
     NC_VARS, 
-    OR_VARS,
+    CSV_VARS,
     NC_DIM,
     NC_GROUPS,
     SMP_TYPE_LUT,

@@ -180,9 +180,9 @@ class LowerStripNameCB(Callback):
 class AddSampleTypeIdColumnCB(Callback):
     def __init__(self, 
                  lut: dict=SMP_TYPE_LUT, # Lookup table for sample type
-                 col_name: str='samptype_id' # Column name to store the sample type id
+                 col_name: str='SAMPLE_TYPE' # Column name to store the sample type id
                  ): 
-        "Add a column with the sample type id as defined in the CDL."
+        "Add a column with the sample type as defined in the CDL."
         fc.store_attr()
         
     def __call__(self, tfm):

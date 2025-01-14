@@ -25,10 +25,7 @@ from marisco.utils import (
     ddmm_to_dd,
     Match, 
     get_unique_across_dfs,
-    nc_to_dfs,
-    get_netcdf_properties, 
-    get_netcdf_group_properties,
-    get_netcdf_variable_properties,
+    ExtractNetcdfContents,
     NA
 )
 
@@ -68,8 +65,6 @@ from marisco.configs import (
     sampmet_lut_path,
     counmet_lut_path, 
     lab_lut_path,
-    NC_VARS,
-    OR_VARS,
     SMP_TYPE_LUT,
     cache_path
 )

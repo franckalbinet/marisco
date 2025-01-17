@@ -124,7 +124,7 @@ def check_feature_pattern(self: OsparWfsProcessor):
 # %% ../../nbs/handlers/ospar.ipynb 18
 @patch
 def extract_version_from_feature_name(self: OsparWfsProcessor):
-    "Extract version from feature name."
+    "Extract version from feature."
     for group, df in list(self.features_dfs.items()):
         df['source'] = df['feature'].apply(lambda x: x.split('_')[0])
         df['type'] = df['feature'].apply(lambda x: x.split('_')[1])
@@ -135,7 +135,7 @@ def extract_version_from_feature_name(self: OsparWfsProcessor):
 # %% ../../nbs/handlers/ospar.ipynb 19
 @patch
 def filter_latest_versions(self: OsparWfsProcessor):
-    "Filter each DataFrame to include only the latest version of each feature"
+    "Filter to include only the latest version of each feature"
     for group, df in list(self.features_dfs.items()):
         df[['year', 'month', 'version']] = df[['year', 'month', 'version']].astype(int)
         
@@ -150,9 +150,8 @@ def filter_latest_versions(self: OsparWfsProcessor):
 @patch
 def drop_duplicates(self: OsparWfsProcessor, df, group, index_col='id'):
     """
-    Set a specified column as the index, sort by year, and drop duplicate rows based on this index, keeping the last entry.
-    Additionally, track and report all duplicate entries, storing them in an attribute for later access.
-    This method also sorts the DataFrame on the index to align duplicates side by side for easier review.
+    Drop duplicate rows based on the index provided, keeping the last entry.
+    Additionally, track and report all duplicate entries.
     """
 
     if index_col in df.columns:
@@ -206,7 +205,7 @@ def fetch_and_combine_csv(self: OsparWfsProcessor):
         df_csv = pd.read_csv(csv_data)
         df_csv.columns = df_csv.columns.str.lower()  # Standardize column names to lowercase
 
-        # Extract 'year' from date columns if not present
+        # Extract 'year' from date columns if not present. # TODO: remove adding the column when the data is made consistent (i.e., 'year' column added).
         if 'year' not in df_csv.columns:
             if self.verbose:
                 print(f"Warning: {feature} does not contain a 'year' column, adding it from date column.")
@@ -222,15 +221,58 @@ def fetch_and_combine_csv(self: OsparWfsProcessor):
         return df_csv
 
     for group, df in self.features_dfs.items():
-        # Apply fetch_data function to each row in the DataFrame and combine results
+        # Apply fetch_data function to each row in the features DataFrame and combine the results in a data DataFrame.
         data_frames = df.apply(fetch_data, axis=1).tolist()
         
         combined_df = pd.concat(data_frames, ignore_index=True)
 
-        # Set 'id' as the index and drop duplicates
+        # drop duplicates using the `id` column as the index.
         combined_df = self.drop_duplicates(combined_df, group, 'id')
 
         self.dfs[group] = combined_df
+
+# %% ../../nbs/handlers/ospar.ipynb 22
+@patch
+def display_year_ranges(self: OsparWfsProcessor):
+    """
+    Display the range of years for the data retrieved from the WFS for 'BIOTA' and 'SEAWATER'.
+    """
+    # Extract the DataFrames for 'BIOTA' and 'SEAWATER'
+    biota_df = self.dfs.get('BIOTA', pd.DataFrame()).copy()
+    seawater_df = self.dfs.get('SEAWATER', pd.DataFrame()).copy()
+
+    # Function to process each DataFrame
+    def process_df(df, date_column):
+        if date_column in df.columns:
+            df[date_column] = pd.to_datetime(df[date_column])
+            df['year'] = df[date_column].dt.year
+            min_year = df['year'].min()
+            max_year = df['year'].max()
+            all_years = set(range(min_year, max_year + 1))
+            missing_years = all_years - set(df['year'].unique())
+            return min_year, max_year, sorted(missing_years)
+        return None, None, []
+
+    # Process each DataFrame
+    biota_min, biota_max, biota_missing = process_df(biota_df, 'sampling_d')
+    seawater_min, seawater_max, seawater_missing = process_df(seawater_df, 'sampling_1')
+
+    # Print the results
+    if biota_min and biota_max:
+        biota_message = f"OSPAR 'BIOTA' data retrieved for years from {biota_min} to {biota_max}"
+        if biota_missing:
+            biota_message += f" with the exclusion of {biota_missing}"
+        print(biota_message)
+    else:
+        print("'BIOTA' data is not available or lacks the specified date column.")
+
+    if seawater_min and seawater_max:
+        seawater_message = f"OSPAR 'SEAWATER' data retrieved for years from {seawater_min} to {seawater_max}"
+        if seawater_missing:
+            seawater_message += f" with the exclusion of {seawater_missing}"
+        print(seawater_message)
+    else:
+        print("'SEAWATER' data is not available or lacks the specified date column.")
 
 # %% ../../nbs/handlers/ospar.ipynb 47
 fixes_nuclide_names = {

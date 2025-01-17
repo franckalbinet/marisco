@@ -70,15 +70,16 @@ warnings.filterwarnings('ignore')
 fname_out_nc = '../../_data/output/191-OSPAR-2024.nc'
 zotero_key ='LQRA4MMK' # OSPAR MORS zotero key
 
-# %% ../../nbs/handlers/ospar.ipynb 13
+# %% ../../nbs/handlers/ospar.ipynb 15
 class OsparWfsProcessor:
     "Processor for OSPAR Web Feature Service operations, managing feature filtering and data fetching."
-    def __init__(self, url, search_params=None, version='2.0.0'):
+    def __init__(self, url, search_params=None, version='2.0.0', verbose=False):
         "Initialize with URL, version, and search parameters."
         fc.store_attr()
         self.wfs = WebFeatureService(url=self.url, version=self.version)
         self.features_dfs = {}
         self.dfs = {}
+        self.duplicates_dfs = {}
 
     def __call__(self):
         "Process, fetch and filter OSPAR data"
@@ -87,10 +88,11 @@ class OsparWfsProcessor:
         self.extract_version_from_feature_name()
         self.filter_latest_versions()
         self.fetch_and_combine_csv()
-
+        if self.verbose:
+            self.display_year_ranges()
         return self.dfs
 
-# %% ../../nbs/handlers/ospar.ipynb 14
+# %% ../../nbs/handlers/ospar.ipynb 16
 @patch
 def filter_features(self: OsparWfsProcessor):
     "Filter features based on search parameters."
@@ -100,7 +102,7 @@ def filter_features(self: OsparWfsProcessor):
         self.features_dfs[group] = pd.DataFrame([{'feature': ftype} for ftype in filtered_features])
 
 
-# %% ../../nbs/handlers/ospar.ipynb 15
+# %% ../../nbs/handlers/ospar.ipynb 17
 @patch
 def check_feature_pattern(self: OsparWfsProcessor):
     """
@@ -119,7 +121,7 @@ def check_feature_pattern(self: OsparWfsProcessor):
     if unmatched_features:
         print("Unmatched features:", unmatched_features)
 
-# %% ../../nbs/handlers/ospar.ipynb 16
+# %% ../../nbs/handlers/ospar.ipynb 18
 @patch
 def extract_version_from_feature_name(self: OsparWfsProcessor):
     "Extract version from feature name."
@@ -130,7 +132,7 @@ def extract_version_from_feature_name(self: OsparWfsProcessor):
         df['month'] = df['feature'].apply(lambda x: x.split('_')[3])
         df['version'] = df['feature'].apply(lambda x: x.split('_')[4])
 
-# %% ../../nbs/handlers/ospar.ipynb 17
+# %% ../../nbs/handlers/ospar.ipynb 19
 @patch
 def filter_latest_versions(self: OsparWfsProcessor):
     "Filter each DataFrame to include only the latest version of each feature"
@@ -139,47 +141,98 @@ def filter_latest_versions(self: OsparWfsProcessor):
         
         if group == 'BIOTA':
             # Removing biota data for the year 2022 as the data is unavailable on the WFS.
-            df = df[df['year'] != 2022]
-            
+            df = df[(df['year'] != 2022) & (df['type'] == 'biota')]            
+        
         idx = df.groupby(['source', 'type', 'year', 'month'])['version'].idxmax()
         self.features_dfs[group] = df.loc[idx]
 
-# %% ../../nbs/handlers/ospar.ipynb 19
+# %% ../../nbs/handlers/ospar.ipynb 20
+@patch
+def drop_duplicates(self: OsparWfsProcessor, df, group, index_col='id'):
+    """
+    Set a specified column as the index, sort by year, and drop duplicate rows based on this index, keeping the last entry.
+    Additionally, track and report all duplicate entries, storing them in an attribute for later access.
+    This method also sorts the DataFrame on the index to align duplicates side by side for easier review.
+    """
+
+    if index_col in df.columns:
+        # Set the index but do not modify the original DataFrame yet
+        indexed_df = df.set_index(index_col )
+
+        # Ensure 'year' column is present for sorting
+        if 'year' in indexed_df.columns:
+            indexed_df.sort_values(by='year', ascending=True, inplace=True)
+
+        # remove NaN values in the index . 
+        if self.verbose and df[index_col].isnull().sum() > 0:
+            print(f"Warning: {group} contains {df[index_col].isnull().sum()} NaN values in the {index_col} column.")
+        indexed_df = indexed_df[indexed_df.index.notna()]
+                
+        # Identify all duplicates to keep track of what is removed and kept
+        duplicates = indexed_df[indexed_df.index.duplicated(keep=False)]
+        # Sort duplicates on the index 
+        duplicates.sort_index(inplace=True)
+        # Drop duplicates, keeping the last entry
+        cleaned_df = indexed_df[~indexed_df.index.duplicated(keep='last')]
+        cleaned_df.reset_index(drop=False, inplace=True)
+        # Add a column to indicate removed data in the duplicates DataFrame
+        if not duplicates.empty:
+            self.duplicates_dfs[group] = duplicates
+            if self.verbose:
+                print(f"Duplicates identified using '{index_col}' as the index in {group}. Review the 'duplicates_dfs' attribute for more details.")
+        else:
+            if self.verbose:
+                print("No duplicates found to remove.")
+        return cleaned_df
+    else:
+        if self.verbose:
+            print(f"Warning: '{index_col}' column not found. Using default index.")
+        return df
+
+# %% ../../nbs/handlers/ospar.ipynb 21
 @patch
 def fetch_and_combine_csv(self: OsparWfsProcessor):
     """
     Fetch CSV data for each feature from the WFS and combine it into a single DataFrame for each sample type.
+    This method also handles the 'year' column by extracting it from date columns if not present.
     """
+
+    def fetch_data(row):
+        feature = row['feature']
+        year = row['year']
+        data_type = row['type']  # This can be removed when the data is made consistent (i.e., 'year' column added).
+        response = self.wfs.getfeature(typename=feature, outputFormat='csv')
+        csv_data = StringIO(response.read().decode('utf-8'))
+        df_csv = pd.read_csv(csv_data)
+        df_csv.columns = df_csv.columns.str.lower()  # Standardize column names to lowercase
+
+        # Extract 'year' from date columns if not present
+        if 'year' not in df_csv.columns:
+            if self.verbose:
+                print(f"Warning: {feature} does not contain a 'year' column, adding it from date column.")
+            date_column = 'sampling_d' if data_type == 'biota' else 'sampling_1'
+            df_csv['year'] = pd.to_datetime(df_csv[date_column]).dt.year
+
+        # Validate the 'year' column against the expected year
+        if not df_csv['year'].eq(year).all():
+            years = df_csv['year'].unique()
+            if self.verbose: 
+                print(f"Warning: {feature} contains data for invalid year. This file contains data for years: {list(years)}")
+
+        return df_csv
+
     for group, df in self.features_dfs.items():
-        combined_df = pd.DataFrame()  # Initialize an empty DataFrame to hold combined data
-        for _, row in df.iterrows():  # Iterate over each row in the DataFrame
-            feature = row['feature']
-            year = row['year']
-            try:
-                print(f"Fetching data for feature: {feature}, year: {year}")
-                response = self.wfs.getfeature(typename=feature, outputFormat='csv')
-                csv_data = StringIO(response.read().decode('utf-8'))  # Decode the response content
-                df_csv = pd.read_csv(csv_data)  # Load CSV data into a DataFrame
-                
-                # Standardize column names to lowercase
-                df_csv.columns = df_csv.columns.str.lower()
-                
-                # Check if the data includes additional years
-                if not df_csv['year'].eq(year).all():
-                    additional_years = df_csv['year'].drop_duplicates().difference([year])
-                    print(f"{feature} includes data for additional years: {list(additional_years)}")
-                
-                # Append the fetched data to the combined DataFrame
-                combined_df = pd.concat([combined_df, df_csv], ignore_index=True)
-            
-            except Exception as e:
-                print(f"Failed to fetch data for feature '{feature}': {e}")
+        # Apply fetch_data function to each row in the DataFrame and combine results
+        data_frames = df.apply(fetch_data, axis=1).tolist()
         
-        # Store the combined DataFrame for the group
+        combined_df = pd.concat(data_frames, ignore_index=True)
+
+        # Set 'id' as the index and drop duplicates
+        combined_df = self.drop_duplicates(combined_df, group, 'id')
+
         self.dfs[group] = combined_df
 
-
-# %% ../../nbs/handlers/ospar.ipynb 42
+# %% ../../nbs/handlers/ospar.ipynb 47
 fixes_nuclide_names = {
     '99tc': 'tc99',
     '238pu': 'pu238',
@@ -197,7 +250,7 @@ fixes_nuclide_names = {
     '3h': 'h3'
     }
 
-# %% ../../nbs/handlers/ospar.ipynb 48
+# %% ../../nbs/handlers/ospar.ipynb 53
 # Create a lookup table for nuclide names
 lut_nuclides = lambda df: Remapper(provider_lut_df=df,
                                    maris_lut_fn=nuc_lut_path,
@@ -208,7 +261,7 @@ lut_nuclides = lambda df: Remapper(provider_lut_df=df,
                                    fname_cache='nuclides_ospar.pkl').generate_lookup_table(fixes=fixes_nuclide_names, 
                                                                                             as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 49
+# %% ../../nbs/handlers/ospar.ipynb 54
 class RemapNuclideNameCB(Callback):
     "Remap data provider nuclide names to standardized MARIS nuclide names."
     def __init__(self, 
@@ -224,7 +277,7 @@ class RemapNuclideNameCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k]['NUCLIDE'] = tfm.dfs[k][self.col_name].replace(lut)
 
-# %% ../../nbs/handlers/ospar.ipynb 56
+# %% ../../nbs/handlers/ospar.ipynb 61
 class ParseTimeCB(Callback):
     "Parse the time format in the dataframe and check for inconsistencies."
     def __call__(self, tfm):
@@ -242,7 +295,7 @@ class ParseTimeCB(Callback):
             # Drop rows where TIME is still NaN after processing
             df.dropna(subset=['TIME'], inplace=True)
 
-# %% ../../nbs/handlers/ospar.ipynb 64
+# %% ../../nbs/handlers/ospar.ipynb 69
 class SanitizeValueCB(Callback):
     "Sanitize value by removing blank entries and populating `value` column."
     def __init__(self, 
@@ -255,10 +308,10 @@ class SanitizeValueCB(Callback):
             df.dropna(subset=[self.value_col], inplace=True)
             df['VALUE'] = df[self.value_col]
 
-# %% ../../nbs/handlers/ospar.ipynb 70
+# %% ../../nbs/handlers/ospar.ipynb 75
 unc_exp2stan = lambda df, unc_col: df[unc_col] / 2
 
-# %% ../../nbs/handlers/ospar.ipynb 71
+# %% ../../nbs/handlers/ospar.ipynb 76
 class NormalizeUncCB(Callback):
     """Normalize uncertainty values in DataFrames."""
     def __init__(self, 
@@ -285,7 +338,7 @@ class NormalizeUncCB(Callback):
         """Apply the conversion function to normalize the uncertainty values."""
         df['UNC'] = self.fn_convert_unc(df, self.col_unc)
 
-# %% ../../nbs/handlers/ospar.ipynb 90
+# %% ../../nbs/handlers/ospar.ipynb 95
 # Define unit names renaming rules
 renaming_unit_rules = {'Bq/l': 1, #'Bq/m3'
                        'Bq/L': 1,
@@ -293,7 +346,7 @@ renaming_unit_rules = {'Bq/l': 1, #'Bq/m3'
                        'Bq/kg f.w.': 5, # Bq/kgw
                        } 
 
-# %% ../../nbs/handlers/ospar.ipynb 92
+# %% ../../nbs/handlers/ospar.ipynb 97
 class RemapUnitCB(Callback):
     """Callback to update DataFrame 'UNIT' columns based on a lookup table."""
 
@@ -318,16 +371,16 @@ class RemapUnitCB(Callback):
     def _update_units(self, df: pd.DataFrame):
         df['UNIT'] = df['unit'].apply(lambda x: self.lut.get(x, 'Unknown'))
 
-# %% ../../nbs/handlers/ospar.ipynb 102
+# %% ../../nbs/handlers/ospar.ipynb 107
 lut_dl = lambda: pd.read_excel(detection_limit_lut_path(), usecols=['name','id']).set_index('name').to_dict()['id']
 lut_dl()
 
-# %% ../../nbs/handlers/ospar.ipynb 104
+# %% ../../nbs/handlers/ospar.ipynb 109
 coi_dl = {'SEAWATER' : {'DL' : 'value_type'},
           'BIOTA':  {'DL' : 'value_type'}
           }
 
-# %% ../../nbs/handlers/ospar.ipynb 106
+# %% ../../nbs/handlers/ospar.ipynb 111
 class RemapDetectionLimitCB(Callback):
     """Remap detection limit values to MARIS format using a lookup table."""
 
@@ -354,7 +407,7 @@ class RemapDetectionLimitCB(Callback):
         # Map existing detection limits using the lookup table
         df['DL'] = df['DL'].map(lut)
 
-# %% ../../nbs/handlers/ospar.ipynb 117
+# %% ../../nbs/handlers/ospar.ipynb 122
 fixes_biota_species = {
     'RHODYMENIA PSEUDOPALAMATA & PALMARIA PALMATA': NA,  # Mix of species, no direct mapping
     'Mixture of green, red and brown algae': NA,  # Mix of species, no direct mapping
@@ -368,7 +421,7 @@ fixes_biota_species = {
     'Gadus sp.': NA,  # Not defined
 }
 
-# %% ../../nbs/handlers/ospar.ipynb 121
+# %% ../../nbs/handlers/ospar.ipynb 126
 lut_biota = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name='species', as_df=True),
                              maris_lut_fn=species_lut_path,
                              maris_col_id='species_id',
@@ -377,7 +430,7 @@ lut_biota = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name
                              provider_col_key='value',
                              fname_cache='species_ospar.pkl').generate_lookup_table(fixes=fixes_biota_species, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 136
+# %% ../../nbs/handlers/ospar.ipynb 141
 lut_biota_enhanced = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name='biological', as_df=True),
                              maris_lut_fn=species_lut_path,
                              maris_col_id='species_id',
@@ -386,7 +439,7 @@ lut_biota_enhanced = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs,
                              provider_col_key='value',
                              fname_cache='enhance_species_ospar.pkl').generate_lookup_table(fixes=fixes_enhanced_biota_species, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 141
+# %% ../../nbs/handlers/ospar.ipynb 146
 class EnhanceSpeciesCB(Callback):
     """Enhance the 'SPECIES' column using the 'enhanced_species' column if conditions are met."""
 
@@ -402,7 +455,7 @@ class EnhanceSpeciesCB(Callback):
             axis=1
         )
 
-# %% ../../nbs/handlers/ospar.ipynb 147
+# %% ../../nbs/handlers/ospar.ipynb 152
 class AddBodypartTempCB(Callback):
     "Add a temporary column with the body part and biological group combined."    
     def __call__(self, tfm):
@@ -411,7 +464,7 @@ class AddBodypartTempCB(Callback):
             tfm.dfs['BIOTA']['biological']
             ).str.strip().str.lower()                                 
 
-# %% ../../nbs/handlers/ospar.ipynb 154
+# %% ../../nbs/handlers/ospar.ipynb 159
 fixes_biota_tissues = {
     'whole seaweed' : 'Whole plant',
     'flesh fish': 'Flesh with bones', # We assume it as the category 'Flesh with bones' also exists
@@ -425,7 +478,7 @@ fixes_biota_tissues = {
     'tail and claws fish' : NA # TO BE DETERMINED
 }
 
-# %% ../../nbs/handlers/ospar.ipynb 158
+# %% ../../nbs/handlers/ospar.ipynb 163
 lut_bodyparts = lambda: Remapper(provider_lut_df=get_unique_across_dfs(tfm.dfs, col_name='body_part_temp', as_df=True),
                                maris_lut_fn=bodyparts_lut_path,
                                maris_col_id='bodypar_id',
@@ -435,11 +488,11 @@ lut_bodyparts = lambda: Remapper(provider_lut_df=get_unique_across_dfs(tfm.dfs, 
                                fname_cache='tissues_ospar.pkl'
                                ).generate_lookup_table(fixes=fixes_biota_tissues, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 163
+# %% ../../nbs/handlers/ospar.ipynb 168
 lut_biogroup_from_biota = lambda: get_lut(src_dir=species_lut_path().parent, fname=species_lut_path().name, 
                                key='species_id', value='biogroup_id')
 
-# %% ../../nbs/handlers/ospar.ipynb 175
+# %% ../../nbs/handlers/ospar.ipynb 177
 class AddSampleIdCB(Callback):
     "Create a SMP_ID column from the ID column"
     def __call__(self, tfm):
@@ -447,7 +500,7 @@ class AddSampleIdCB(Callback):
             if 'id' in df.columns:
                 df['SMP_ID'] = df['id']
 
-# %% ../../nbs/handlers/ospar.ipynb 184
+# %% ../../nbs/handlers/ospar.ipynb 185
 class ConvertLonLatCB(Callback):
     """Convert Coordinates to decimal degrees (DDD.DDDDD°)."""
     def __init__(self):
@@ -476,7 +529,7 @@ class ConvertLonLatCB(Callback):
         return degrees + minutes / 60 + seconds / 3600
 
 
-# %% ../../nbs/handlers/ospar.ipynb 194
+# %% ../../nbs/handlers/ospar.ipynb 195
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -489,7 +542,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 195
+# %% ../../nbs/handlers/ospar.ipynb 196
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -505,7 +558,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/ospar.ipynb 198
+# %% ../../nbs/handlers/ospar.ipynb 199
 def encode(
     fname_out_nc: str, # Output file name
     **kwargs # Additional arguments

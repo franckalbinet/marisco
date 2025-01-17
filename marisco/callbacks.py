@@ -344,7 +344,7 @@ class DecodeTimeCB(Callback):
         for grp, df in tfm.dfs.items():
             n_missing = df[self.col_time].isna().sum()
             if n_missing:
-                print(f"Warning: {n_missing} missing time value(s) in {grp}")
+                print(f"Warning: {n_missing} missing time value(s) in {grp}.")
             
             # Remove NaN times and convert to datetime
             tfm.dfs[grp] = tfm.dfs[grp][tfm.dfs[grp][self.col_time].notna()]

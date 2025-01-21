@@ -121,7 +121,6 @@ def load_data(src_url: str,
         if verbose:
             start_time = time.time()
         df_meas = read_csv(f'{file_prefix}02.csv', dir)
-    
         df_smp = read_csv(f'{file_prefix}01.csv', dir)
         
         df_meas.columns = df_meas.columns.str.lower()
@@ -134,9 +133,10 @@ def load_data(src_url: str,
             
         if save_to_cache:
             dir = cache_path()
-            merged_df.to_csv(f'{dir}/{file_prefix}_merged.csv', index=False)
+            df_smp.to_csv(f'{dir}/{file_prefix}01.csv', index=False)
+            df_meas.to_csv(f'{dir}/{file_prefix}02.csv', index=False)
             if verbose:
-                print(f"Saved merged data to cache at {dir}/{file_prefix}_merged.csv")
+                print(f"Saved downloaded data to cache at {dir}/{file_prefix}01.csv and {dir}/{file_prefix}02.csv")
 
         return merged_df
     return {smp_type: load_and_merge(file_prefix) for file_prefix, smp_type in smp_types.items()}

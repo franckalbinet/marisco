@@ -103,7 +103,7 @@ CSV_VARS = {
     'TAXONDBID': 'taxondb_id',
     'TAXONDBURL': 'taxondb_url',
     'REF_ID': 'ref_id',
-    'ID': 'samplelabcode'
+    'SMP_ID': 'samplelabcode'
 
     # CSV_VARS not included in current workflow.
     # 'STATION': 'station',

@@ -2,8 +2,8 @@
 
 # %% auto 0
 __all__ = ['src_dir', 'fname_out_nc', 'zotero_key', 'default_smp_types', 'fixes_nuclide_names', 'lut_nuclides', 'time_cols',
-           'time_format', 'value_cols', 'unc_exp2stan', 'unc_cols', 'renaming_unit_rules', 'lut_dl', 'coi_dl',
-           'fixes_biota_species', 'lut_biota', 'fixes_enhanced_biota_species', 'lut_biota_enhanced',
+           'time_format', 'value_cols', 'unc_exp2stan', 'unc_cols', 'renaming_unit_rules', 'default_units', 'lut_dl',
+           'coi_dl', 'fixes_biota_species', 'lut_biota', 'fixes_enhanced_biota_species', 'lut_biota_enhanced',
            'fixes_biota_tissues', 'lut_bodyparts', 'lut_biogroup_from_biota', 'kw', 'read_csv', 'load_data',
            'RemapNuclideNameCB', 'ParseTimeCB', 'SanitizeValueCB', 'NormalizeUncCB', 'RemapUnitCB',
            'RemapDetectionLimitCB', 'EnhanceSpeciesCB', 'AddBodypartTempCB', 'AddSampleIdCB', 'AddDepthCB',
@@ -289,6 +289,10 @@ renaming_unit_rules = {'Bq/l': 1, #'Bq/m3'
                        'BQ/L': 1,
                        'Bq/kg f.w.': 5, # Bq/kgw
                        } 
+
+# %% ../../nbs/handlers/ospar.ipynb 87
+default_units = {'SEAWATER': 'Bq/l',
+                 'BIOTA': 'Bq/kg f.w.'}
 
 # %% ../../nbs/handlers/ospar.ipynb 88
 class RemapUnitCB(Callback):

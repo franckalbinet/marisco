@@ -126,9 +126,19 @@ def load_data(src_url: str,
         
         df_meas.columns = df_meas.columns.str.lower()
         df_smp.columns = df_smp.columns.str.lower()
+        
+        merged_df = pd.merge(df_meas, df_smp, on='key', how='left')
+        
         if verbose:
             print(f"Downloaded data for {file_prefix}01.csv and {file_prefix}02.csv in {time.time() - start_time:.2f} seconds.")
-        return pd.merge(df_meas, df_smp, on='key', how='left')
+            
+        if save_to_cache:
+            dir = cache_path()
+            merged_df.to_csv(f'{dir}/{file_prefix}_merged.csv', index=False)
+            if verbose:
+                print(f"Saved merged data to cache at {dir}/{file_prefix}_merged.csv")
+
+        return merged_df
     return {smp_type: load_and_merge(file_prefix) for file_prefix, smp_type in smp_types.items()}
 
 # %% ../../nbs/handlers/helcom.ipynb 35

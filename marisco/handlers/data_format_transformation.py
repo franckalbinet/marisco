@@ -42,7 +42,7 @@ from marisco.metadata import (
     ZoteroItem
 )
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 20
+# %% ../../nbs/handlers/data_format_transformation.ipynb 21
 class ValidateEnumsCB(Callback):
     "Validate enumeration mappings between NetCDF file and MARIS lookup tables."
 
@@ -81,7 +81,7 @@ class ValidateEnumsCB(Callback):
                 print(f"   MARISCO standard enum lookup value: {key} -> {maris_enum.get(key, 'Not found')}")
             
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 24
+# %% ../../nbs/handlers/data_format_transformation.ipynb 25
 class RemoveNonCompatibleVariablesCB(Callback):
     "Remove variables not listed in VARS configuration."
     def __init__(self, 
@@ -107,7 +107,7 @@ class RemoveNonCompatibleVariablesCB(Callback):
         return df.drop(columns=cols_to_remove)
 
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 27
+# %% ../../nbs/handlers/data_format_transformation.ipynb 28
 TAXON_MAP = {
     'Taxonname': 'TAXONNAME',
     'Taxonrank': 'TAXONRANK',
@@ -116,7 +116,7 @@ TAXON_MAP = {
     'TaxonDBURL': 'TAXONDBURL'
 }
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 28
+# %% ../../nbs/handlers/data_format_transformation.ipynb 29
 def get_taxon_info_lut(maris_lut: str, key_names: dict = TAXON_MAP) -> dict:
     "Create lookup dictionary for taxon information from MARIS species lookup table."
     species = pd.read_excel(maris_lut)
@@ -127,7 +127,7 @@ def get_taxon_info_lut(maris_lut: str, key_names: dict = TAXON_MAP) -> dict:
 
 lut_taxon = lambda: get_taxon_info_lut(maris_lut=species_lut_path(), key_names=TAXON_MAP)
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 29
+# %% ../../nbs/handlers/data_format_transformation.ipynb 30
 class AddTaxonInformationCB(Callback):
     """Add taxon information to BIOTA group based on species lookup table."""
     
@@ -180,7 +180,7 @@ class AddTaxonInformationCB(Callback):
         if self.verbose and len(unmatched) > 0:
             print(f"Warning: Species IDs not found in lookup table: {', '.join(map(str, unmatched))}")
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 38
+# %% ../../nbs/handlers/data_format_transformation.ipynb 39
 class AddZoteroArchiveLocationCB(Callback):
     "Fetch and append 'Loc. in Archive' from Zotero to DataFrame."
     def __init__(self, attrs: str, cfg: dict):
@@ -197,14 +197,14 @@ class AddZoteroArchiveLocationCB(Callback):
         else:
             print(f"Warning: Zotero item {self.item_id} does not exist.")
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 47
+# %% ../../nbs/handlers/data_format_transformation.ipynb 48
 or_mappings={'DL':
                 {0:'ND',1:'=',2:'<'},
             'FILT':
                 {0:'NA',1:'Y',2:'N'},
             }
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 49
+# %% ../../nbs/handlers/data_format_transformation.ipynb 50
 class RemapToORSpecificMappingsCB(Callback):
     "Convert values using OR mappings if columns exist in dataframe."
     def __init__(self, 
@@ -231,12 +231,12 @@ class RemapToORSpecificMappingsCB(Callback):
         return df
 
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 56
+# %% ../../nbs/handlers/data_format_transformation.ipynb 57
 def get_excluded_enums(output_format: str = 'openrefine_csv') -> dict:
     "Get excluded enums based on output format."
     return or_mappings if output_format == 'openrefine_csv' else {}
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 57
+# %% ../../nbs/handlers/data_format_transformation.ipynb 58
 class DataFormatConversionCB(Callback):
     """
     A callback to convert DataFrame enum values between encoded and decoded formats based on specified settings.
@@ -287,7 +287,7 @@ class DataFormatConversionCB(Callback):
         return df
 
 
-# %% ../../nbs/handlers/data_format_transformation.ipynb 62
+# %% ../../nbs/handlers/data_format_transformation.ipynb 63
 def decode(
     fname_in: str, # Input file name
     dest_out: str | None = None, # Output file name (optional)

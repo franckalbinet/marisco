@@ -222,7 +222,7 @@ class ParseTimeCB(Callback):
             invalid_rows = df[df[self.col_dst].isna()]
             
             if not invalid_rows.empty:     
-                print(f"{len(invalid_rows)} invalid rows found in group '{grp}' during time parsing callback.")
+                print(f"{len(invalid_rows)} invalid rows found in group '{grp}' during time parsing callback (ParseTimeCB).")
                 df.dropna(subset=[self.col_dst], inplace=True)
 
         return tfm
@@ -249,13 +249,13 @@ class SanitizeValueCB(Callback):
                 
             df['VALUE'] = df[self.value_col.get(grp)]
 
-# %% ../../nbs/handlers/ospar.ipynb 66
+# %% ../../nbs/handlers/ospar.ipynb 65
 unc_exp2stan = lambda df, unc_col: df[unc_col] / 2
 
-# %% ../../nbs/handlers/ospar.ipynb 67
+# %% ../../nbs/handlers/ospar.ipynb 66
 unc_cols = {'BIOTA': 'uncertainty', 'SEAWATER': 'uncertainty'}
 
-# %% ../../nbs/handlers/ospar.ipynb 68
+# %% ../../nbs/handlers/ospar.ipynb 67
 class NormalizeUncCB(Callback):
     """Normalize uncertainty values in DataFrames."""
     def __init__(self, 
@@ -282,7 +282,7 @@ class NormalizeUncCB(Callback):
         """Apply the conversion function to normalize the uncertainty values."""
         df['UNC'] = self.fn_convert_unc(df, col_unc)
 
-# %% ../../nbs/handlers/ospar.ipynb 85
+# %% ../../nbs/handlers/ospar.ipynb 84
 # Define unit names renaming rules
 renaming_unit_rules = {'Bq/l': 1, #'Bq/m3'
                        'Bq/L': 1,
@@ -290,11 +290,11 @@ renaming_unit_rules = {'Bq/l': 1, #'Bq/m3'
                        'Bq/kg f.w.': 5, # Bq/kgw
                        } 
 
-# %% ../../nbs/handlers/ospar.ipynb 87
+# %% ../../nbs/handlers/ospar.ipynb 86
 default_units = {'SEAWATER': 'Bq/l',
                  'BIOTA': 'Bq/kg f.w.'}
 
-# %% ../../nbs/handlers/ospar.ipynb 88
+# %% ../../nbs/handlers/ospar.ipynb 87
 class RemapUnitCB(Callback):
     """Callback to update DataFrame 'UNIT' columns based on a lookup table."""
 
@@ -324,15 +324,15 @@ class RemapUnitCB(Callback):
     def _update_units(self, df: pd.DataFrame):
         df['UNIT'] = df['unit'].apply(lambda x: self.lut.get(x, 'Unknown'))
 
-# %% ../../nbs/handlers/ospar.ipynb 98
+# %% ../../nbs/handlers/ospar.ipynb 97
 lut_dl = lambda: pd.read_excel(detection_limit_lut_path(), usecols=['name','id']).set_index('name').to_dict()['id']
 
-# %% ../../nbs/handlers/ospar.ipynb 101
+# %% ../../nbs/handlers/ospar.ipynb 100
 coi_dl = {'SEAWATER' : {'DL' : 'value type'},
           'BIOTA':  {'DL' : 'value type'}
           }
 
-# %% ../../nbs/handlers/ospar.ipynb 103
+# %% ../../nbs/handlers/ospar.ipynb 102
 class RemapDetectionLimitCB(Callback):
     """Remap detection limit values to MARIS format using a lookup table."""
 
@@ -359,7 +359,7 @@ class RemapDetectionLimitCB(Callback):
         # Map existing detection limits using the lookup table
         df['DL'] = df['DL'].map(lut)
 
-# %% ../../nbs/handlers/ospar.ipynb 114
+# %% ../../nbs/handlers/ospar.ipynb 113
 fixes_biota_species = {
     'RHODYMENIA PSEUDOPALAMATA & PALMARIA PALMATA': NA,  # Mix of species, no direct mapping
     'Mixture of green, red and brown algae': NA,  # Mix of species, no direct mapping
@@ -373,7 +373,7 @@ fixes_biota_species = {
     'Gadus sp.': NA,  # Not defined
 }
 
-# %% ../../nbs/handlers/ospar.ipynb 118
+# %% ../../nbs/handlers/ospar.ipynb 117
 lut_biota = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name='species', as_df=True),
                              maris_lut_fn=species_lut_path,
                              maris_col_id='species_id',
@@ -382,7 +382,7 @@ lut_biota = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name
                              provider_col_key='value',
                              fname_cache='species_ospar.pkl').generate_lookup_table(fixes=fixes_biota_species, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 129
+# %% ../../nbs/handlers/ospar.ipynb 128
 fixes_enhanced_biota_species = {
     'fish': 'Pisces',
     'FISH': 'Pisces',
@@ -390,7 +390,7 @@ fixes_enhanced_biota_species = {
 }
 
 
-# %% ../../nbs/handlers/ospar.ipynb 133
+# %% ../../nbs/handlers/ospar.ipynb 132
 lut_biota_enhanced = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name='biological group', as_df=True),
                              maris_lut_fn=species_lut_path,
                              maris_col_id='species_id',
@@ -399,7 +399,7 @@ lut_biota_enhanced = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs,
                              provider_col_key='value',
                              fname_cache='enhance_species_ospar.pkl').generate_lookup_table(fixes=fixes_enhanced_biota_species, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 138
+# %% ../../nbs/handlers/ospar.ipynb 137
 class EnhanceSpeciesCB(Callback):
     """Enhance the 'SPECIES' column using the 'enhanced_species' column if conditions are met."""
 
@@ -415,7 +415,7 @@ class EnhanceSpeciesCB(Callback):
             axis=1
         )
 
-# %% ../../nbs/handlers/ospar.ipynb 144
+# %% ../../nbs/handlers/ospar.ipynb 143
 class AddBodypartTempCB(Callback):
     "Add a temporary column with the body part and biological group combined."    
     def __call__(self, tfm):
@@ -424,7 +424,7 @@ class AddBodypartTempCB(Callback):
             tfm.dfs['BIOTA']['biological group']
             ).str.strip().str.lower()                                 
 
-# %% ../../nbs/handlers/ospar.ipynb 151
+# %% ../../nbs/handlers/ospar.ipynb 150
 fixes_biota_tissues = {
     'whole seaweed' : 'Whole plant',
     'flesh fish': 'Flesh with bones', # We assume it as the category 'Flesh with bones' also exists
@@ -438,7 +438,7 @@ fixes_biota_tissues = {
     'tail and claws fish' : NA # TO BE DETERMINED
 }
 
-# %% ../../nbs/handlers/ospar.ipynb 155
+# %% ../../nbs/handlers/ospar.ipynb 154
 lut_bodyparts = lambda: Remapper(provider_lut_df=get_unique_across_dfs(tfm.dfs, col_name='body_part_temp', as_df=True),
                                maris_lut_fn=bodyparts_lut_path,
                                maris_col_id='bodypar_id',
@@ -448,24 +448,24 @@ lut_bodyparts = lambda: Remapper(provider_lut_df=get_unique_across_dfs(tfm.dfs, 
                                fname_cache='tissues_ospar.pkl'
                                ).generate_lookup_table(fixes=fixes_biota_tissues, as_df=False, overwrite=False)
 
-# %% ../../nbs/handlers/ospar.ipynb 160
+# %% ../../nbs/handlers/ospar.ipynb 159
 lut_biogroup_from_biota = lambda: get_lut(src_dir=species_lut_path().parent, fname=species_lut_path().name, 
                                key='species_id', value='biogroup_id')
 
-# %% ../../nbs/handlers/ospar.ipynb 169
+# %% ../../nbs/handlers/ospar.ipynb 168
 class AddSampleIdCB(Callback):
     "Create a SMP_ID column from the ID column"
     def __call__(self, tfm):
         for grp, df in tfm.dfs.items():
             if 'id' in df.columns:
-                df['ID'] = df['id']                
+                df['SMP_ID'] = df['id']                
                 # Check that the ID is an integer or float.
-                if not pd.api.types.is_numeric_dtype(df['ID']):
+                if not pd.api.types.is_numeric_dtype(df['SMP_ID']):
                     print(f"Non-numeric values detected in 'ID' column of dataframe '{grp}':")
                     print(f"Data type: {df['ID'].dtype}")
                     print("Unique values:", df['ID'].unique())
 
-# %% ../../nbs/handlers/ospar.ipynb 173
+# %% ../../nbs/handlers/ospar.ipynb 172
 class AddDepthCB(Callback):
     "Ensure depth values are floats and add 'SMP_DEPTH' columns."
     def __call__(self, tfm: Transformer):
@@ -474,7 +474,7 @@ class AddDepthCB(Callback):
                 if 'sampling depth' in df.columns:
                     df['SMP_DEPTH'] = df['sampling depth'].astype(float)
 
-# %% ../../nbs/handlers/ospar.ipynb 177
+# %% ../../nbs/handlers/ospar.ipynb 176
 class ConvertLonLatCB(Callback):
     """Convert Coordinates to decimal degrees (DDD.DDDDD°)."""
     def __init__(self):
@@ -503,7 +503,7 @@ class ConvertLonLatCB(Callback):
         return degrees + minutes / 60 + seconds / 3600
 
 
-# %% ../../nbs/handlers/ospar.ipynb 187
+# %% ../../nbs/handlers/ospar.ipynb 186
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -516,7 +516,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 
-# %% ../../nbs/handlers/ospar.ipynb 188
+# %% ../../nbs/handlers/ospar.ipynb 187
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -532,7 +532,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/ospar.ipynb 191
+# %% ../../nbs/handlers/ospar.ipynb 190
 def encode(
     fname_out_nc: str, # Output file name
     **kwargs # Additional arguments

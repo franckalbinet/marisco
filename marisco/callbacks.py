@@ -17,7 +17,7 @@ import pandas as pd
 from functools import partial 
 from pathlib import Path 
 from typing import List, Dict, Callable, Tuple, Any, Optional, Union
-
+from collections import defaultdict
 from marisco.configs import (
     get_lut, 
     nuc_lut_path, 
@@ -58,6 +58,7 @@ class Transformer():
         self.is_single_df = isinstance(data, pd.DataFrame)
         self.df, self.dfs = self._prepare_data(data, inplace)
         self.logs = []
+        self.custom_enums = defaultdict(lambda: defaultdict(dict))
             
     def _prepare_data(self, data, inplace):
         if self.is_single_df:
@@ -260,44 +261,45 @@ class RemoveAllNAValuesCB(Callback):
 
 # %% ../nbs/api/callbacks.ipynb 43
 class CompareDfsAndTfmCB(Callback):
-    "Create a dataframe of removed data. Data included in the `tfm` not in the `dfs`."
+    "Create a dataframe of removed data and track changes in row counts due to transformations."
     def __init__(self, 
-                 dfs: Dict[str, pd.DataFrame] # Original dataframes
+                 dfs: Dict[str, pd.DataFrame]  # Original dataframes
                  ): 
         fc.store_attr()
         
     def __call__(self, tfm: Transformer) -> None:
         self._initialize_tfm_attributes(tfm)
         for grp in tfm.dfs.keys():
-            removed_df = self._get_removed_data(grp, tfm)
-            tfm.dfs_removed[grp] = removed_df
-            tfm.compare_stats[grp] = self._compute_stats(grp, tfm)
-            
+            self._compute_changes(grp, tfm)
 
     def _initialize_tfm_attributes(self, tfm: Transformer) -> None:
         tfm.dfs_removed = {}
         tfm.compare_stats = {}
 
-    def _get_removed_data(self, 
-                          grp: str, # The group key
-                          tfm: Transformer # The transformation object containing `dfs`
-                         ) -> pd.DataFrame: # Dataframe with dropped rows
-        "Return the data that is present in `dfs` but not in `tfm.dfs`."
-        index_diff = self.dfs[grp].index.difference(tfm.dfs[grp].index)
-        return self.dfs[grp].loc[index_diff]
-    
-    def _compute_stats(self, 
-                       grp: str, # The group key
-                       tfm: Transformer # The transformation object containing `dfs`
-                      ) -> Dict[str, int]: # Dictionary with comparison statistics
-        "Compute comparison statistics between `dfs` and `tfm.dfs`."
-        return {
-            'Number of rows in original dataframes (dfs):': len(self.dfs[grp].index),
-            'Number of rows in transformed dataframes (tfm.dfs):': len(tfm.dfs[grp].index),
-            'Number of rows removed (tfm.dfs_removed):': len(tfm.dfs_removed[grp].index),
+    def _compute_changes(self, 
+                         grp: str,  # The group key
+                         tfm: Transformer  # The transformation object containing `dfs`
+                        ) -> None:
+        "Compute and store changes including data removed and created during transformation."
+        original_df = self.dfs[grp]
+        transformed_df = tfm.dfs[grp]
+
+        # Calculate differences
+        original_count = len(original_df.index)
+        transformed_count = len(transformed_df.index)
+        removed_count = len(original_df.index.difference(transformed_df.index))
+        created_count = len(transformed_df.index.difference(original_df.index))
+
+        # Store results
+        tfm.dfs_removed[grp] = original_df.loc[original_df.index.difference(transformed_df.index)]
+        tfm.compare_stats[grp] = {
+            'Original row count (dfs)': original_count,
+            'Transformed row count (tfm.dfs)': transformed_count,
+            'Rows removed from original (tfm.dfs_removed)': removed_count,
+            'Rows created in transformed (tfm.dfs_created)': created_count
         }
 
-# %% ../nbs/api/callbacks.ipynb 46
+# %% ../nbs/api/callbacks.ipynb 45
 class UniqueIndexCB(Callback):
     "Set unique index for each group."
     def __init__(self,
@@ -311,7 +313,7 @@ class UniqueIndexCB(Callback):
             # Reset the index again and set the name of the new index to `ìndex_name``
             tfm.dfs[k] = tfm.dfs[k].reset_index(names=[self.index_name])
 
-# %% ../nbs/api/callbacks.ipynb 48
+# %% ../nbs/api/callbacks.ipynb 47
 class EncodeTimeCB(Callback):
     "Encode time as seconds since epoch."    
     def __init__(self, 
@@ -331,7 +333,7 @@ class EncodeTimeCB(Callback):
             tfm.dfs[grp] = tfm.dfs[grp][tfm.dfs[grp][self.col_time].notna()]
             tfm.dfs[grp][self.col_time] = tfm.dfs[grp][self.col_time].apply(lambda x: date2num(x, units=self.units))
 
-# %% ../nbs/api/callbacks.ipynb 50
+# %% ../nbs/api/callbacks.ipynb 49
 class DecodeTimeCB(Callback):
     "Decode time from seconds since epoch to datetime format."    
     def __init__(self, 

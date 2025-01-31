@@ -454,7 +454,7 @@ lut_biogroup_from_biota = lambda: get_lut(src_dir=species_lut_path().parent, fna
 
 # %% ../../nbs/handlers/ospar.ipynb 161
 class AddSampleIdCB(Callback):
-    "Include a SMP_ID column from the ID column of OSPAR"
+    "Include a SMP_ID column from the `ID` column of OSPAR"
     def __call__(self, tfm):
         for grp, df in tfm.dfs.items():
             if 'id' in df.columns:

@@ -19,6 +19,8 @@ import requests
 from shapely import MultiPoint
 import jellyfish as jf
 from dataclasses import dataclass
+from ast import literal_eval
+
 
 from typing import List, Dict, Callable, Tuple, Optional, Union
 from .configs import cache_path
@@ -361,5 +363,5 @@ class ExtractNetcdfContents:
         for var_name, var in group.variables.items():
             attr=f"{var_name}_map"
             if hasattr(var, attr):
-                custom_maps[attr] =  getattr(var, attr)
+                custom_maps[attr] =  literal_eval(getattr(var, attr))
         return custom_maps

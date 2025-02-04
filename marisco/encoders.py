@@ -13,7 +13,7 @@ from typing import Dict, Callable
 import numpy as np
 from fastcore.basics import patch, store_attr
 import fastcore.all as fc
-import os
+#import os
 
 from marisco.configs import (
     NC_DTYPES, 
@@ -33,13 +33,14 @@ class NetCDFEncoder:
                  dest_fname: str, # Name of output file to produce
                  global_attrs: Dict[str, str], # Global attributes
                  fn_src_fname: Callable=nc_tpl_path, # Function returning file name and path to the MARIS CDL template
-                 custom_enums: Dict[str, Dict[str, int]] = {}, # Custom enums for each group
+                 custom_maps: Dict[str, Dict[str, int]]= None,# Custom maps to encode
                  verbose: bool=False, # Print currently written NetCDF group and variable names
                  ):
         store_attr()
         self.src_fname = fn_src_fname()
         self.enum_dtypes = {}
         self.nc_to_cols = {v:k for k,v in NC_VARS.items()}
+
 
 # %% ../nbs/api/encoders.ipynb 7
 @patch 
@@ -68,6 +69,7 @@ def process_group(self:NetCDFEncoder, grp_name, df):
     grp_dest = self.dest.createGroup(grp_name)
     self.copy_dimensions(grp_dest)
     self.copy_variables(grp_name, df, grp_dest)
+        
 
 # %% ../nbs/api/encoders.ipynb 11
 @patch
@@ -76,6 +78,8 @@ def copy_variables(self:NetCDFEncoder, grp_name, df, grp_dest):
     for var_name, var_src in self.src.groups[grp_name].variables.items():
         if var_name in cols: 
             self.copy_variable(var_name, var_src, df, grp_dest)
+        if self.custom_maps:
+            self.copy_custom_map(var_name, grp_dest)
 
 # %% ../nbs/api/encoders.ipynb 12
 @patch
@@ -119,54 +123,30 @@ def retrieve_all_cols(self:NetCDFEncoder,
 
 # %% ../nbs/api/encoders.ipynb 18
 @patch
-def get_data_type_size(self:NetCDFEncoder,
-                       enum_size
-                       ):
-    size_to_dtype = {
-        2**15 -1 : np.int16,
-        2**31 -1: np.int32,
-        2**63 -1: np.int64
-    }
-    # Determine the appropriate integer type based on the size of the dtype
-    data_type = next((dtype for size_limit, dtype in size_to_dtype.items() if enum_size <= size_limit), np.int64)
-    print('data_type', data_type)
-    return data_type
-
-# %% ../nbs/api/encoders.ipynb 19
-@patch
 def create_enums(self:NetCDFEncoder):
     cols = self.retrieve_all_cols()
     enums = Enums(lut_src_dir=lut_path())
     for col in cols:
         name = NC_DTYPES[col]['name']
-        enum_size = len(enums.types[col])
-        data_type = self.get_data_type_size(enum_size)
-        dtype = self.dest.createEnumType(data_type, name, enums.types[col])
+        if self.verbose: print(f'Creating enum for {name} with values {enums.types[col]}.')
+        dtype = self.dest.createEnumType(np.int64, name, enums.types[col])
         self.enum_dtypes[name] = dtype
-    
-    for grp_name in self.dfs.keys():
-        if grp_name in self.custom_enums:
-            self.create_custom_enums(grp_name, self.custom_enums[grp_name])
+
+# %% ../nbs/api/encoders.ipynb 19
+@patch
+def copy_custom_map(self:NetCDFEncoder, var_name, grp_dest):
+    """Copy custom maps for variables."""
+    custom_maps = self.custom_maps
+    # Convert group names using NC_GROUPS
+    custom_maps = {NC_GROUPS[key]: value for key, value in custom_maps.items()}
+    group_maps = custom_maps.get(grp_dest.name, {})
+    # Convert var names using NC_VARS
+    group_maps = {NC_VARS[key]: value for key, value in group_maps.items()}
+    if var_name in group_maps:
+        # Set the map as an attribute of the variable
+        grp_dest[var_name].setncatts({f"{var_name}_map": str(group_maps[var_name])})
 
 # %% ../nbs/api/encoders.ipynb 20
-@patch 
-def create_custom_enums(self:NetCDFEncoder, grp_name, custom_enums):
-    # Create unique custom enum types for the specific group
-    for enum_name, enum_values in custom_enums.items():
-        nc_enum_name = NC_VARS[enum_name]
-        nc_grp_name = NC_GROUPS[grp_name]
-        name = f'{nc_grp_name}_{nc_enum_name}'
-        enum_values = self.sanitize_custom_enum(enum_values)
-        dtype = self.dest.createEnumType(np.int32, name, enum_values)
-        self.enum_dtypes[name] = dtype
-
-# %% ../nbs/api/encoders.ipynb 22
-@patch 
-def sanitize_custom_enum(self:NetCDFEncoder, enum_values):
-    enum_values = {str(k):int(v) for k,v in enum_values.items()}    
-    return enum_values
-
-# %% ../nbs/api/encoders.ipynb 23
 @patch
 def encode(self:NetCDFEncoder):
     "Encode MARIS NetCDF based on template and dataframes."

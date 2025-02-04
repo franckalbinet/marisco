@@ -8,24 +8,22 @@ __all__ = ['Callback', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 
            'UniqueIndexCB', 'EncodeTimeCB', 'DecodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb 2
-import copy
+#import copy
 import fastcore.all as fc
 from operator import attrgetter
 from cftime import date2num ,num2date
 import numpy as np
 import pandas as pd
-from functools import partial 
-from pathlib import Path 
-from typing import List, Dict, Callable, Tuple, Any, Optional, Union
+from typing import List, Dict, Callable, Any, Optional, Union
 from collections import defaultdict
 from marisco.configs import (
     get_lut, 
     nuc_lut_path, 
-    nc_tpl_path,
+    #nc_tpl_path,
     get_time_units,
     NC_GROUPS,
     SMP_TYPE_LUT,
-    cfg, 
+    #cfg, 
     # cdl_cfg
 )
 
@@ -58,7 +56,7 @@ class Transformer():
         self.is_single_df = isinstance(data, pd.DataFrame)
         self.df, self.dfs = self._prepare_data(data, inplace)
         self.logs = []
-        self.custom_enums = defaultdict(lambda: defaultdict(dict))
+        self.custom_maps = defaultdict(lambda: defaultdict(dict))
             
     def _prepare_data(self, data, inplace):
         if self.is_single_df:

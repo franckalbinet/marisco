@@ -312,6 +312,7 @@ class ExtractNetcdfContents:
         self.dfs = {}  # DataFrames extracted from the NetCDF file
         self.enum_dicts = {}  # Enum dictionaries extracted from the NetCDF file
         self.global_attrs = {}  # Global attributes extracted from the NetCDF file
+        self.custom_maps = {}  # Custom maps extracted from the NetCDF file
         self.extract_all()
 
     def extract_all(self):
@@ -326,6 +327,8 @@ class ExtractNetcdfContents:
                 group = nc.groups[group_name]
                 self.dfs[group_name.upper()] = self.extract_data(group)
                 self.enum_dicts[group_name.upper()] = self.extract_enums(group, group_name)
+                self.custom_maps[group_name.upper()] = self.extract_custom_maps(group, group_name)
+                
             if self.verbose:
                 print("Data extraction complete.")
 
@@ -351,3 +354,12 @@ class ExtractNetcdfContents:
         "Extract global attributes from the NetCDF file."
         globattrs = {attr: getattr(nc, attr) for attr in nc.ncattrs()}
         return globattrs
+    
+    def extract_custom_maps(self, group, group_name: str) -> Dict:
+        "Extract custom maps from the NetCDF file."
+        custom_maps = {}
+        for var_name, var in group.variables.items():
+            attr=f"{var_name}_map"
+            if hasattr(var, attr):
+                custom_maps[attr] =  getattr(var, attr)
+        return custom_maps

@@ -90,7 +90,6 @@ default_smp_types = {
 
 # %% ../../nbs/handlers/helcom.ipynb 16
 def read_csv(file_name, dir=src_dir):
-    dir = cache_path()
     file_path = f'{dir}/{file_name}'
     return pd.read_csv(file_path)
 
@@ -555,34 +554,21 @@ class AddSampleIDCB(Callback):
     "Generate a SMP_ID from the KEY values in the HELCOM dataset. Each KEY is mapped to a unique integer, with the mapping stored in an enumeration (i.e., smp_id)."
     def __call__(self, tfm: Transformer):
         for grp, df in tfm.dfs.items():
-            self._testing(df)
-            # Generate and store the SMP_ID enum
-            smp_id_enum = self._generate_sample_id_enum(df)
-            tfm.custom_enums[grp]['SMP_ID'] = smp_id_enum
+            # Generate and store the SMP_ID map
+            smp_id_map = self._generate_sample_id_map(df)
+            tfm.custom_maps[grp]['SMP_ID'] = smp_id_map
             # Create SMP_ID column in the DataFrame
-            self._create_smp_id(df, smp_id_enum)
-            
-    def _testing(self, df):
-        'lets reduce the number of unique keys'
-        number_of_unique_keys = 4000
-        unique_keys = df['key'].unique()
-        print ('size of unique keys', unique_keys.size)
-        unique_keys_red = df['key'].unique()[:number_of_unique_keys]
-        print('unique_keys_red', unique_keys_red)
-        random_values = np.random.rand(len(unique_keys_red))
-        random_map = dict(zip(unique_keys, random_values))
-        df['key']= df['key'].map(random_map)
-    
+            self._create_smp_id(df, smp_id_map)
         
-    def _generate_sample_id_enum(self, df: pd.DataFrame) -> dict:
+    def _generate_sample_id_map(self, df: pd.DataFrame) -> dict:
         """Enumerate unique 'key' values and map them to integers."""
         return {key: idx for idx, key in enumerate(df['key'].unique())}
 
-    def _create_smp_id(self, df: pd.DataFrame, smp_id_enum: dict) -> None:
+    def _create_smp_id(self, df: pd.DataFrame, smp_id_map: dict) -> None:
         """Map 'key' values to 'SMP_ID' using the provided enum."""
-        df['SMP_ID'] = df['key'].map(smp_id_enum)
+        df['SMP_ID'] = df['key'].map(smp_id_map)
 
-# %% ../../nbs/handlers/helcom.ipynb 173
+# %% ../../nbs/handlers/helcom.ipynb 175
 class AddSalinityCB(Callback):
     def __init__(self, salinity_col: str = 'salin'):
         self.salinity_col = salinity_col
@@ -593,7 +579,7 @@ class AddSalinityCB(Callback):
                 df['SALINITY'] = df[self.salinity_col].astype(float)
 
 
-# %% ../../nbs/handlers/helcom.ipynb 179
+# %% ../../nbs/handlers/helcom.ipynb 181
 class AddTemperatureCB(Callback):
     def __init__(self, temperature_col: str = 'ttemp'):
         self.temperature_col = temperature_col
@@ -604,7 +590,7 @@ class AddTemperatureCB(Callback):
                 df['TEMPERATURE'] = df[self.temperature_col].astype(float)
 
 
-# %% ../../nbs/handlers/helcom.ipynb 182
+# %% ../../nbs/handlers/helcom.ipynb 184
 class RemapSedSliceTopBottomCB(Callback):
     "Remap Sediment slice top and bottom to MARIS format."
     def __call__(self, tfm: Transformer):
@@ -612,7 +598,7 @@ class RemapSedSliceTopBottomCB(Callback):
         tfm.dfs['SEDIMENT']['TOP'] = tfm.dfs['SEDIMENT']['uppsli']
         tfm.dfs['SEDIMENT']['BOTTOM'] = tfm.dfs['SEDIMENT']['lowsli']
 
-# %% ../../nbs/handlers/helcom.ipynb 206
+# %% ../../nbs/handlers/helcom.ipynb 208
 class LookupDryWetPercentWeightCB(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm: Transformer):
@@ -644,7 +630,7 @@ class LookupDryWetPercentWeightCB(Callback):
         df.loc[wet_condition, 'WETWT'] = df['weight']
         df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['weight'] * df['PERCENTWT']
 
-# %% ../../nbs/handlers/helcom.ipynb 215
+# %% ../../nbs/handlers/helcom.ipynb 217
 class ParseCoordinates(Callback):
     "Get geographical coordinates from columns expressed in degrees decimal format or from columns in degrees/minutes decimal format where degrees decimal format is missing or zero."
     def __init__(self, 
@@ -694,7 +680,7 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 228
+# %% ../../nbs/handlers/helcom.ipynb 230
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -706,7 +692,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 229
+# %% ../../nbs/handlers/helcom.ipynb 231
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -722,7 +708,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 232
+# %% ../../nbs/handlers/helcom.ipynb 234
 def encode(
     src_dir: str, # Input file name
     fname_out_nc: str, # Output file name
@@ -758,7 +744,7 @@ def encode(
     encoder = NetCDFEncoder(tfm.dfs, 
                             dest_fname=fname_out_nc, 
                             global_attrs=get_attrs(tfm, zotero_key=zotero_key, kw=kw),
-                            custom_enums=tfm.custom_enums,
+                            custom_maps=tfm.custom_maps,
                             verbose=kwargs.get('verbose', False),
                            )
     encoder.encode()

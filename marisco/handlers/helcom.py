@@ -6,7 +6,7 @@ __all__ = ['src_dir', 'fname_out_nc', 'zotero_key', 'default_smp_types', 'fixes_
            'fixes_biota_tissues', 'lut_tissues', 'lut_biogroup_from_biota', 'fixes_sediments', 'sed_replace_lut',
            'lut_sediments', 'lut_filtered', 'kw', 'read_csv', 'load_data', 'RemapNuclideNameCB', 'ParseTimeCB',
            'SplitSedimentValuesCB', 'SanitizeValueCB', 'unc_rel2stan', 'NormalizeUncCB', 'RemapUnitCB',
-           'RemapDetectionLimitCB', 'RemapSedimentCB', 'RemapFiltCB', 'AddSampleIDCB', 'AddSalinityCB',
+           'RemapDetectionLimitCB', 'RemapSedimentCB', 'RemapFiltCB', 'AddSampleIDCB', 'AddDepthCB', 'AddSalinityCB',
            'AddTemperatureCB', 'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'ParseCoordinates',
            'get_attrs', 'encode']
 
@@ -568,7 +568,17 @@ class AddSampleIDCB(Callback):
         """Map 'key' values to 'SMP_ID' using the provided enum."""
         df['SMP_ID'] = df['key'].map(smp_id_map)
 
-# %% ../../nbs/handlers/helcom.ipynb 175
+# %% ../../nbs/handlers/helcom.ipynb 168
+class AddDepthCB(Callback):
+    "Ensure depth values are floats and add 'SMP_DEPTH' and 'TOT_DEPTH' columns."
+    def __call__(self, tfm: Transformer):
+        for df in tfm.dfs.values():
+            if 'sdepth' in df.columns:
+                df['SMP_DEPTH'] = df['sdepth'].astype(float)
+            if 'tdepth' in df.columns:
+                df['TOT_DEPTH'] = df['tdepth'].astype(float)
+
+# %% ../../nbs/handlers/helcom.ipynb 174
 class AddSalinityCB(Callback):
     def __init__(self, salinity_col: str = 'salin'):
         self.salinity_col = salinity_col
@@ -579,7 +589,7 @@ class AddSalinityCB(Callback):
                 df['SALINITY'] = df[self.salinity_col].astype(float)
 
 
-# %% ../../nbs/handlers/helcom.ipynb 181
+# %% ../../nbs/handlers/helcom.ipynb 180
 class AddTemperatureCB(Callback):
     def __init__(self, temperature_col: str = 'ttemp'):
         self.temperature_col = temperature_col
@@ -590,7 +600,7 @@ class AddTemperatureCB(Callback):
                 df['TEMPERATURE'] = df[self.temperature_col].astype(float)
 
 
-# %% ../../nbs/handlers/helcom.ipynb 184
+# %% ../../nbs/handlers/helcom.ipynb 183
 class RemapSedSliceTopBottomCB(Callback):
     "Remap Sediment slice top and bottom to MARIS format."
     def __call__(self, tfm: Transformer):
@@ -598,7 +608,7 @@ class RemapSedSliceTopBottomCB(Callback):
         tfm.dfs['SEDIMENT']['TOP'] = tfm.dfs['SEDIMENT']['uppsli']
         tfm.dfs['SEDIMENT']['BOTTOM'] = tfm.dfs['SEDIMENT']['lowsli']
 
-# %% ../../nbs/handlers/helcom.ipynb 208
+# %% ../../nbs/handlers/helcom.ipynb 207
 class LookupDryWetPercentWeightCB(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm: Transformer):
@@ -630,7 +640,7 @@ class LookupDryWetPercentWeightCB(Callback):
         df.loc[wet_condition, 'WETWT'] = df['weight']
         df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['weight'] * df['PERCENTWT']
 
-# %% ../../nbs/handlers/helcom.ipynb 217
+# %% ../../nbs/handlers/helcom.ipynb 216
 class ParseCoordinates(Callback):
     "Get geographical coordinates from columns expressed in degrees decimal format or from columns in degrees/minutes decimal format where degrees decimal format is missing or zero."
     def __init__(self, 
@@ -680,7 +690,7 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 230
+# %% ../../nbs/handlers/helcom.ipynb 229
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -692,7 +702,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 231
+# %% ../../nbs/handlers/helcom.ipynb 230
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -708,7 +718,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 234
+# %% ../../nbs/handlers/helcom.ipynb 233
 def encode(
     src_dir: str, # Input file name
     fname_out_nc: str, # Output file name

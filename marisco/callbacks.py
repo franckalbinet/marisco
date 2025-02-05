@@ -50,13 +50,14 @@ class Transformer():
     def __init__(self, 
                  data: Union[Dict[str, pd.DataFrame], pd.DataFrame], # Data to be transformed
                  cbs: Optional[List[Callback]]=None, # List of callbacks to run
+                 custom_maps: Dict = None,
                  inplace: bool=False # Whether to modify the dataframe(s) in place
                  ): 
         fc.store_attr()
         self.is_single_df = isinstance(data, pd.DataFrame)
         self.df, self.dfs = self._prepare_data(data, inplace)
         self.logs = []
-        self.custom_maps = defaultdict(lambda: defaultdict(dict))
+        self.custom_maps = custom_maps or defaultdict(lambda: defaultdict(dict))
             
     def _prepare_data(self, data, inplace):
         if self.is_single_df:

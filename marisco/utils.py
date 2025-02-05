@@ -359,9 +359,10 @@ class ExtractNetcdfContents:
     
     def extract_custom_maps(self, group, group_name: str) -> Dict:
         "Extract custom maps from the NetCDF file."
+        reverse_nc_vars = {v: k for k, v in NC_VARS.items()}        
         custom_maps = {}
         for var_name, var in group.variables.items():
             attr=f"{var_name}_map"
             if hasattr(var, attr):
-                custom_maps[attr] =  literal_eval(getattr(var, attr))
+                custom_maps[reverse_nc_vars[var.name]] =  literal_eval(getattr(var, attr))
         return custom_maps

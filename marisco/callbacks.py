@@ -4,8 +4,7 @@
 
 # %% auto 0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB', 'AddSampleTypeIdColumnCB',
-           'AddNuclideIdColumnCB', 'SelectColumnsCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB',
-           'UniqueIndexCB', 'EncodeTimeCB', 'DecodeTimeCB']
+           'SelectColumnsCB', 'RenameColumnsCB', 'CompareDfsAndTfmCB', 'UniqueIndexCB', 'EncodeTimeCB', 'DecodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb 2
 #import copy
@@ -189,22 +188,6 @@ class AddSampleTypeIdColumnCB(Callback):
         for grp, df in tfm.dfs.items():             
             df[self.col_name] = self.lut[grp]
 
-# %% ../nbs/api/callbacks.ipynb 31
-class AddNuclideIdColumnCB(Callback):
-    def __init__(self, 
-                 col_value: str, # Column name containing the nuclide name
-                 lut_fname_fn: Callable=nuc_lut_path, # Function returning the lut path
-                 col_name: str='nuclide_id' # Column name to store the nuclide id
-                 ): 
-        "Add a column with the nuclide id."
-        fc.store_attr()
-        self.lut = get_lut(lut_fname_fn().parent, lut_fname_fn().name, 
-                           key='nc_name', value='nuclide_id', reverse=False)
-        
-    def __call__(self, tfm: Transformer):
-        for grp, df in tfm.dfs.items(): 
-            df[self.col_name] = df[self.col_value].map(self.lut)
-
 # %% ../nbs/api/callbacks.ipynb 32
 class SelectColumnsCB(Callback):
     "Select columns of interest."
@@ -230,35 +213,7 @@ class RenameColumnsCB(Callback):
         for grp in tfm.dfs.keys(): 
             tfm.dfs[grp].rename(columns=self.renaming_rules, inplace=True)
 
-# %% ../nbs/api/callbacks.ipynb 34
-class RemoveAllNAValuesCB(Callback):
-    "Remove rows with all NA values."
-    def __init__(self, 
-                 cols_to_check: Dict[str, str] # A dictionary with the sample type as key and the column name to check as value
-                ):
-        fc.store_attr()
-
-    def __call__(self, tfm):
-        for k in tfm.dfs.keys():
-            col_to_check = self.cols_to_check[k]
-            mask = tfm.dfs[k][col_to_check].isnull().all(axis=1)
-            tfm.dfs[k] = tfm.dfs[k][~mask]
-
-# %% ../nbs/api/callbacks.ipynb 35
-class RemoveAllNAValuesCB(Callback):
-    "Remove rows with all NA values."
-    def __init__(self, 
-                 cols_to_check: Dict[str, str] # A dictionary with the sample type as key and the column name to check as value
-                ):
-        fc.store_attr()
-
-    def __call__(self, tfm):
-        for k in tfm.dfs.keys():
-            col_to_check = self.cols_to_check[k]
-            mask = tfm.dfs[k][col_to_check].isnull().all(axis=1)
-            tfm.dfs[k] = tfm.dfs[k][~mask]
-
-# %% ../nbs/api/callbacks.ipynb 43
+# %% ../nbs/api/callbacks.ipynb 42
 class CompareDfsAndTfmCB(Callback):
     "Create a dataframe of removed data and track changes in row counts due to transformations."
     def __init__(self, 
@@ -298,7 +253,7 @@ class CompareDfsAndTfmCB(Callback):
             'Rows created in transformed (tfm.dfs_created)': created_count
         }
 
-# %% ../nbs/api/callbacks.ipynb 45
+# %% ../nbs/api/callbacks.ipynb 44
 class UniqueIndexCB(Callback):
     "Set unique index for each group."
     def __init__(self,
@@ -312,7 +267,7 @@ class UniqueIndexCB(Callback):
             # Reset the index again and set the name of the new index to `ìndex_name``
             tfm.dfs[k] = tfm.dfs[k].reset_index(names=[self.index_name])
 
-# %% ../nbs/api/callbacks.ipynb 47
+# %% ../nbs/api/callbacks.ipynb 46
 class EncodeTimeCB(Callback):
     "Encode time as seconds since epoch."    
     def __init__(self, 
@@ -332,7 +287,7 @@ class EncodeTimeCB(Callback):
             tfm.dfs[grp] = tfm.dfs[grp][tfm.dfs[grp][self.col_time].notna()]
             tfm.dfs[grp][self.col_time] = tfm.dfs[grp][self.col_time].apply(lambda x: date2num(x, units=self.units))
 
-# %% ../nbs/api/callbacks.ipynb 49
+# %% ../nbs/api/callbacks.ipynb 48
 class DecodeTimeCB(Callback):
     "Decode time from seconds since epoch to datetime format."    
     def __init__(self, 

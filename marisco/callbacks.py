@@ -147,6 +147,7 @@ class RemapCB(Callback):
     def _remap_value(self, value: str) -> Any:
         value = value.strip() if isinstance(value, str) else value
         match = self.lut.get(value, Match(self.default_value, None, None, None))
+        print(match)
         if isinstance(match, Match):
             if match.matched_id == self.default_value:
                 if self.verbose:

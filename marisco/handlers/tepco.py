@@ -48,7 +48,8 @@ from marisco.metadata import (
 # %% ../../nbs/handlers/tepco.ipynb 6
 fname_coastal_water = 'https://radioactivity.nra.go.jp/cont/en/results/sea/coastal_water.csv'
 fname_clos1F = 'https://radioactivity.nra.go.jp/cont/en/results/sea/close1F_water.xlsx'
-fname_iaea_orbs = 'https://raw.githubusercontent.com/RML-IAEA/iaea.orbs/refs/heads/main/    '
+# fname_iaea_orbs = 'https://raw.githubusercontent.com/RML-IAEA/iaea.orbs/refs/heads/main/'
+fname_iaea_orbs = 'https://raw.githubusercontent.com/RML-IAEA/iaea.orbs/refs/heads/main/src/iaea/orbs/stations/station_points.csv'
 
 fname_out = '../../_data/output/tepco.nc'
 

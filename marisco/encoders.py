@@ -69,7 +69,6 @@ def process_group(self:NetCDFEncoder, grp_name, df):
     grp_dest = self.dest.createGroup(grp_name)
     self.copy_dimensions(grp_dest)
     self.copy_variables(grp_name, df, grp_dest)
-        
 
 # %% ../nbs/api/encoders.ipynb 11
 @patch

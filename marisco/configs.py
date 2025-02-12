@@ -112,7 +112,6 @@ CSV_VARS = {
     # 'MEASURE_NOTE': 'measurenote',
     # 'REFERENCE_NOTE': 'referencenote',
     # 'SAMPLE_NOTE': 'samplenote',
-    
 }
 
 # %% ../nbs/api/configs.ipynb 9

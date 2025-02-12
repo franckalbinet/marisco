@@ -93,8 +93,8 @@ def save_dataframes(self: NetCDFDecoder):
 # %% ../nbs/api/decoders.ipynb 10
 @patch
 def decode(self: NetCDFDecoder):
-    "  Decode NetCDF to Human readable files."
-    # Funvtion to rename the columns. 
+    "Decode NetCDF to Human readable files."
+    # Function to rename the columns. 
     self.process_groups()
     self.save_dataframes()
     return self.dfs    

@@ -46,6 +46,7 @@ from marisco.utils import (
     Remapper
 )
 
+from .data_format_transformation import decode
 from ..encoders import NetCDFEncoder
 
 # %% ../../nbs/handlers/geotraces.ipynb 10

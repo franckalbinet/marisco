@@ -4,7 +4,8 @@
 
 # %% auto 0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB', 'AddSampleTypeIdColumnCB',
-           'SelectColumnsCB', 'RenameColumnsCB', 'CompareDfsAndTfmCB', 'UniqueIndexCB', 'EncodeTimeCB', 'DecodeTimeCB']
+           'SelectColumnsCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB', 'UniqueIndexCB',
+           'EncodeTimeCB', 'DecodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb 2
 #import copy
@@ -147,7 +148,6 @@ class RemapCB(Callback):
     def _remap_value(self, value: str) -> Any:
         value = value.strip() if isinstance(value, str) else value
         match = self.lut.get(value, Match(self.default_value, None, None, None))
-        print(match)
         if isinstance(match, Match):
             if match.matched_id == self.default_value:
                 if self.verbose:
@@ -214,7 +214,28 @@ class RenameColumnsCB(Callback):
         for grp in tfm.dfs.keys(): 
             tfm.dfs[grp].rename(columns=self.renaming_rules, inplace=True)
 
-# %% ../nbs/api/callbacks.ipynb 42
+# %% ../nbs/api/callbacks.ipynb 34
+class RemoveAllNAValuesCB(Callback):
+    "Remove rows with all NA values in specified columns."
+    def __init__(self, 
+                 cols_to_check: Union[Dict[str, list], list],  # Dict or list of columns to check
+                 how: str='all'  # How to handle NA values 'all' or 'any'
+                ):
+        fc.store_attr()
+
+    def __call__(self, tfm):
+        # Convert list to dict if cols_to_check is a list
+        cols_dict = (self.cols_to_check if isinstance(self.cols_to_check, dict) 
+                    else {k: self.cols_to_check for k in tfm.dfs.keys()})
+        
+        for sample_type, columns in cols_dict.items():
+            tfm.dfs[sample_type].dropna(
+                subset=columns,
+                how=self.how,
+                inplace=True
+            )
+
+# %% ../nbs/api/callbacks.ipynb 37
 class CompareDfsAndTfmCB(Callback):
     "Create a dataframe of removed data and track changes in row counts due to transformations."
     def __init__(self, 
@@ -254,7 +275,7 @@ class CompareDfsAndTfmCB(Callback):
             'Rows created in transformed (tfm.dfs_created)': created_count
         }
 
-# %% ../nbs/api/callbacks.ipynb 44
+# %% ../nbs/api/callbacks.ipynb 39
 class UniqueIndexCB(Callback):
     "Set unique index for each group."
     def __init__(self,
@@ -268,7 +289,7 @@ class UniqueIndexCB(Callback):
             # Reset the index again and set the name of the new index to `ìndex_name``
             tfm.dfs[k] = tfm.dfs[k].reset_index(names=[self.index_name])
 
-# %% ../nbs/api/callbacks.ipynb 46
+# %% ../nbs/api/callbacks.ipynb 41
 class EncodeTimeCB(Callback):
     "Encode time as seconds since epoch."    
     def __init__(self, 
@@ -288,7 +309,7 @@ class EncodeTimeCB(Callback):
             tfm.dfs[grp] = tfm.dfs[grp][tfm.dfs[grp][self.col_time].notna()]
             tfm.dfs[grp][self.col_time] = tfm.dfs[grp][self.col_time].apply(lambda x: date2num(x, units=self.units))
 
-# %% ../nbs/api/callbacks.ipynb 48
+# %% ../nbs/api/callbacks.ipynb 43
 class DecodeTimeCB(Callback):
     "Decode time from seconds since epoch to datetime format."    
     def __init__(self, 

@@ -588,7 +588,6 @@ class AddSalinityCB(Callback):
             if self.salinity_col in df.columns:
                 df['SALINITY'] = df[self.salinity_col].astype(float)
 
-
 # %% ../../nbs/handlers/helcom.ipynb 178
 class AddTemperatureCB(Callback):
     def __init__(self, temperature_col: str = 'ttemp'):
@@ -598,7 +597,6 @@ class AddTemperatureCB(Callback):
         for df in tfm.dfs.values():
             if self.temperature_col in df.columns:
                 df['TEMPERATURE'] = df[self.temperature_col].astype(float)
-
 
 # %% ../../nbs/handlers/helcom.ipynb 181
 class RemapSedSliceTopBottomCB(Callback):

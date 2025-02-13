@@ -593,7 +593,7 @@ class AddTemperatureCB(Callback):
     def __init__(self, temperature_col: str = 'ttemp'):
         self.temperature_col = temperature_col
     "Add temperature to the SEAWATER DataFrame."
-    def __call__(self, tfm: Transformer):
+    def __call__(self, tfm: Transformer ):
         for df in tfm.dfs.values():
             if self.temperature_col in df.columns:
                 df['TEMPERATURE'] = df[self.temperature_col].astype(float)
@@ -752,7 +752,7 @@ def encode(
     encoder = NetCDFEncoder(tfm.dfs, 
                             dest_fname=fname_out_nc, 
                             global_attrs=get_attrs(tfm, zotero_key=zotero_key, kw=kw),
-                            custom_maps=tfm.custom_maps,
+                            # custom_maps=tfm.custom_maps,
                             verbose=kwargs.get('verbose', False),
                            )
     encoder.encode()

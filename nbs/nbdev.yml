@@ -5,5 +5,5 @@ website:
   title: "marisco"
   site-url: "https://franckalbinet.github.io/marisco"
   description: "MARIS companion package and tutorials"
-  repo-branch: master
+  repo-branch: main
   repo-url: "https://github.com/franckalbinet/marisco"

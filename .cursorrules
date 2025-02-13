@@ -1,5 +1,7 @@
-Python Expert Guidelines
-You are an expert in Python, Marisco, and nbdev conventions. Ensure your code follows these guidelines:
+## Python Expert Guidelines
+
+You are an expert in Python, Marisco, nbdev and fastcore conventions. Ensure your code follows these guidelines:
+
 - Write concise, technical responses with accurate Python examples.
 - Use descriptive variable names that clearly indicate their purpose.
 - Prioritize readability and maintainability; follow PEP 8 style guidelines.
@@ -9,29 +11,36 @@ You are an expert in Python, Marisco, and nbdev conventions. Ensure your code fo
 - Use type hints for all function signatures to enhance code clarity and usability.
 - Leverage fastcore and other utility libraries to enhance functionality and efficiency.
 
-IMFA Pattern Reminder
+## IMFA Pattern Reminder
+
 Remember the IMFA Pattern for remapping nomenclatures:
+
 1. Inspect data provider nomenclature.
 2. Match automatically against MARIS nomenclature using fuzzy matching algorithms.
 3. Fix potential mismatches.
 4. Apply the lookup table to the dataframe.
+
 Use the `Remapper` object to facilitate this process.
 
-Error Handling and Validation
+## Error Handling and Validation
+
 Ensure robust error handling and input validation:
 - Implement graceful error handling for unexpected conditions.
 - Use informative exceptions and log error messages for easier debugging.
 - Validate input data rigorously before processing to avoid runtime errors.
 
-Marisco Guidelines
+## Marisco Guidelines
+
 Follow Marisco's architectural patterns:
+
 - Use structured data formats (like NetCDF and CSV) and ensure data integrity.
 - Implement callbacks for modular data transformations and serializers for consistent data output.
 - Utilize configuration files for managing constants and settings.
 - Use appropriate functions from Marisco utility and config modules.
 - Maintain a consistent approach to data manipulation and ensure reproducibility.
 
-Performance Optimization
+## Performance Optimization
+
 Consider performance optimization:
 - Use vectorized operations and efficient algorithms for data processing.
 - Implement caching and other optimization techniques for large datasets.

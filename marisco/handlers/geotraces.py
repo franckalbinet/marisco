@@ -37,7 +37,7 @@ from marisco.configs import (
     cfg
 )
 
-from ..netcdf_to_refine import decode
+from ..netcdf2csv import decode
 from ..encoders import NetCDFEncoder
 
 # %% ../../nbs/handlers/geotraces.ipynb 10

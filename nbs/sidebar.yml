@@ -17,7 +17,7 @@ website:
           - api/encoders.ipynb
           - api/decoders.ipynb
           - api/utils.ipynb
-          - api/netcdf_to_refine.ipynb
+          - api/netcdf2csv.ipynb
 
       - section: Metadata
         contents: 

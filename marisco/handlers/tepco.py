@@ -41,7 +41,7 @@ from marisco.metadata import (
     KeyValuePairCB    
     )
 
-from ..netcdf_to_refine import decode
+from ..netcdf2csv import decode
 
 # %% ../../nbs/handlers/tepco.ipynb 6
 fname_coastal_water = 'https://radioactivity.nra.go.jp/cont/en/results/sea/coastal_water.csv'

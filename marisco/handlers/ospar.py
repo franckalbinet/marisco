@@ -55,7 +55,7 @@ from marisco.configs import (
 )
 
 from ..encoders import NetCDFEncoder
-from ..netcdf_to_refine import decode
+from ..netcdf2csv import decode
 from ..utils import ExtractNetcdfContents
 
 # %% ../../nbs/handlers/ospar.ipynb 10

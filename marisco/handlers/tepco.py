@@ -18,8 +18,6 @@ warnings.filterwarnings('ignore')
 import pandas as pd
 import re
 import numpy as np
-from typing import Tuple
-from datetime import datetime
 import fastcore.all as fc
 from tqdm import tqdm
 from collections import defaultdict
@@ -32,20 +30,18 @@ from marisco.callbacks import (
     EncodeTimeCB, 
     )
 
-from ..utils import has_valid_varname
-from ..configs import nc_tpl_path, cfg
+from ..configs import cfg
 from ..encoders import NetCDFEncoder
 
 from marisco.metadata import (
     GlobAttrsFeeder, 
     BboxCB,
-    DepthRangeCB, 
     TimeRangeCB,
     ZoteroCB, 
     KeyValuePairCB    
     )
 
-from .data_format_transformation import decode
+from ..netcdf_to_refine import decode
 
 # %% ../../nbs/handlers/tepco.ipynb 6
 fname_coastal_water = 'https://radioactivity.nra.go.jp/cont/en/results/sea/coastal_water.csv'

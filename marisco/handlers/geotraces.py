@@ -8,8 +8,6 @@ __all__ = ['fname_in', 'fname_out_nc', 'zotero_key', 'load_data', 'common_coi', 
            'encode']
 
 # %% ../../nbs/handlers/geotraces.ipynb 6
-from tqdm import tqdm
-from pathlib import Path
 import fastcore.all as fc
 import pandas as pd
 import numpy as np
@@ -34,19 +32,12 @@ from marisco.metadata import (
 
 from marisco.configs import (
     AVOGADRO,
-    NC_VARS,
     get_lut,
     lut_path,
-    cfg, 
-    nc_tpl_path, 
-    Enums
+    cfg
 )
 
-from marisco.utils import (
-    Remapper
-)
-
-from .data_format_transformation import decode
+from ..netcdf_to_refine import decode
 from ..encoders import NetCDFEncoder
 
 # %% ../../nbs/handlers/geotraces.ipynb 10

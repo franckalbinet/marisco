@@ -13,15 +13,10 @@ __all__ = ['src_dir', 'fname_out_nc', 'zotero_key', 'default_smp_types', 'nan_co
 import pandas as pd 
 import numpy as np
 import fastcore.all as fc 
-from fastcore.basics import patch
 from typing import  Dict, Callable 
-import re
-from io import StringIO
 from pathlib import Path 
 import time
-from urllib.parse import quote
 from rich import print
-
 
 from marisco.utils import (
     Remapper, 
@@ -59,17 +54,9 @@ from marisco.configs import (
     cache_path
 )
 
-from marisco.encoders import (
-    NetCDFEncoder, 
-)
-
-from marisco.handlers.data_format_transformation import (
-    decode, 
-)
-
-from marisco.utils import (
-    ExtractNetcdfContents,
-)
+from ..encoders import NetCDFEncoder
+from ..netcdf_to_refine import decode
+from ..utils import ExtractNetcdfContents
 
 # %% ../../nbs/handlers/ospar.ipynb 10
 src_dir = 'https://raw.githubusercontent.com/franckalbinet/maris-crawlers/refs/heads/main/data/processed/OSPAR'

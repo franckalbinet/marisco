@@ -112,24 +112,25 @@ All commands accept a `-h` argument to get access to its documentation.
 
 #### `maris_init`
 
-Donwload configuration file, NetCDF MAris template and required lookup
+Download configuration file, NetCDF MARIS template and required lookup
 tables (nomenclatures).
 
-#### `maris_netcdfy`
+#### `maris_to_nc`
 
-Encode MARIS dataset as NetCDF
+Convert `helcom`, `geotraces`, `tepco` or `ospar` marine radioactivity
+datasets to MARIS NetCDF4 format.
 
-Positional arguments:
+    usage: maris_to_nc [-h] [--src SRC] ds dest
 
-- `handler_name`: Handler’s name (e.g helcom, …)
-- `str`: Path to dataset to encode
-- `dest`: Path to converted NetCDF4
+    positional arguments:
+      ds          Name of the dataset to encode as NetCDF4
+      dest        Output path for NetCDF file
 
-Example:
+    options:
+      -h, --help  show this help message and exit
+      --src SRC   Optional input data path only required for the 'GEOTRACES' dataset
 
-``` console
-maris_netcdfy helcom _data/accdb/mors/csv _data/output/helcom.nc
-```
+For instance: `maris_to_nc ospar my_output_dir`
 
 ## Development
 

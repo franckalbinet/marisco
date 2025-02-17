@@ -47,20 +47,29 @@ ensuring they remain in sync.
 
 ### See It in Action
 
-For a concrete example of this approach, check out our [HELCOM dataset
+For a concrete example of this approach, check out our [OSPAR dataset
 handler
-implementation](https://fr.anckalbi.net/marisco/handlers/helcom.html).
+implementation](https://fr.anckalbi.net/marisco/handlers/ospar.html).
 
-Please note that this project is **still under development**.
+### List of currently available handlers
 
-We have implemented the [MARIS Legacy
-handler](https://fr.anckalbi.net/marisco/handlers/maris_legacy.html) to
-convert all existing datasets from the MARIS master database into NetCDF
-format. For datasets that are frequently updated, such as
-[HELCOM](https://fr.anckalbi.net/marisco/handlers/helcom.html),
-[OSPAR](https://www.ospar.org/), and TEPCO/Fukushima-related datasets,
-individual handlers are currently being developed and will be available
-soon.
+MARISCO includes a suite of specialized data handlers designed to:
+
+- Convert provider-specific data formats into standardized MARIS NetCDF
+  files
+- Ensure data quality and consistency across providers
+- Facilitate integration with the MARIS marine radioactivity database
+- Support automated data processing workflows
+
+The following handlers are currently implemented:
+
+| Handler | Description | Link to Data Source |
+|----|----|----|
+| [MARIS Legacy](https://fr.anckalbi.net/marisco/handlers/maris_legacy.html) | All legacy MARIS datasets from the MARIS Master Database | \- |
+| [HELCOM](https://fr.anckalbi.net/marisco/handlers/helcom.html) | HELCOM marine environment protection datasets | [HELCOM](https://helcom.fi/about-us) |
+| [OSPAR](https://fr.anckalbi.net/marisco/handlers/ospar.html) | OSPAR marine environment datasets | [ODIMS OSPAR](https://odims.ospar.org/en/) |
+| [TEPCO](https://fr.anckalbi.net/marisco/handlers/tepco.html) | TEPCO Fukushima monitoring data | [TEPCO Monitoring](https://radioactivity.nsr.go.jp/ja/list/349/list-1.html) |
+| [GEOTRACES](https://fr.anckalbi.net/marisco/handlers/geotraces.html) | BODC GEOTRACES oceanographic data | [GEOTRACES IDP2021](https://www.geotraces.org/geotraces-intermediate-data-product-2021/) |
 
 ## Install
 
@@ -86,15 +95,6 @@ This command:
 3.  downloads several MARIS DB nomenclature/lookup table into
     `.marisco/lut/` directory;
 4.  downloads `maris-template.nc`, the MARIS NetCDF4 template.
-
-> [!TIP]
->
-> For inexperienced Python users, please refers to [How to setup
-> `Marisco` with
-> Anaconda](https://github.com/franckalbinet/marisco/tree/main/install_configure_guide/windows_anaconda)
-> or [How to setup `Marisco` with Windows Subsystem for Linux (WSL) and
-> Visual Studio Code
-> editor](https://github.com/franckalbinet/marisco/tree/main/install_configure_guide//windows_ubuntu_sub_system).
 
 ### Zotero API key
 

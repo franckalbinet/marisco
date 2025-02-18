@@ -164,6 +164,46 @@ For instance:
   `maris_db_to_nc "~/pro/data/maris/2024-11-20 MARIS_QA_shapetype_id=1.txt" ~/pro/tmp/output --ref_ids="16,30"`
   for a subset of the MARIS Master Database.
 
+#### `maris_nc_to_csv`
+
+This utility converts NetCDF files to CSV files that conform to the
+MARIS Standard format, originally designed for OpenRefine workflows.
+
+Although MARISCO has now superseded OpenRefine in the data preparation
+pipeline, the MARIS master database continues to require CSV inputs in
+this legacy format. This command-line utility, built with the MARISCO
+library, handles the conversion process.
+
+    usage: maris_nc_to_csv [-h] src dest
+
+    Converts NetCDF files into CSV files that follow the MARIS Standard format.
+
+    positional arguments:
+      src         Input path and filename for NetCDF file
+      dest        Output path and filename (without extension) for CSV file
+
+    options:
+      -h, --help  show this help message and exit
+
+For instance:
+`maris_nc_to_csv ~/pro/tmp/output/191-OSPAR-2024.nc ~/pro/tmp/output/191-OSPAR-2024`
+
+> [!TIP]
+>
+> ### Note
+>
+> When specifying the destination path (e.g.,
+> `~/pro/tmp/output/191-OSPAR-2024`), the utility automatically appends
+> the MARIS sample type to the filename. For example:
+>
+> - `191-OSPAR-2024_BIOTA.csv` for biological samples
+>
+> While this specific example produces only a BIOTA file, the utility
+> can generate multiple files (one per sample type) depending on the
+> content of the source dataset. This reflects the NetCDF4 file
+> structure, where each MARIS sample type is stored as a separate group
+> within the file.
+
 ## Development
 
 The MARIS NetCDF template is generated from `nbs/files/cdl/maris.cdl`

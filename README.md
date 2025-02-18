@@ -130,7 +130,7 @@ datasets to MARIS NetCDF4 format.
       -h, --help  show this help message and exit
       --src SRC   Optional input data path only required for the 'GEOTRACES' dataset
 
-For instance: `maris_to_nc ospar my_output_dir`
+For instance: `maris_to_nc ospar 191-OSPAR-2024.nc`
 
 ## Development
 

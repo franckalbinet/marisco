@@ -194,7 +194,9 @@ def encode(
     ):
     "Encode MARIS dump to NetCDF."
     dataloader = DataLoader(fname_in)
-    ref_ids = kwargs.get('ref_ids', dataloader.df.ref_id.unique())
+    ref_ids = kwargs.get('ref_ids')
+    if ref_ids is None:
+        ref_ids = dataloader.df.ref_id.unique()
     print('Encoding ...')
     for ref_id in tqdm(ref_ids, leave=False):
         dfs = dataloader(ref_id=ref_id)

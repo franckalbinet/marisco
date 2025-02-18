@@ -18,7 +18,6 @@ website:
           - api/decoders.ipynb
           - api/utils.ipynb
           - api/netcdf2csv.ipynb
-
       - section: Metadata
         contents: 
           - metadata/data-curation-rules.ipynb

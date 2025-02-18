@@ -132,6 +132,38 @@ datasets to MARIS NetCDF4 format.
 
 For instance: `maris_to_nc ospar 191-OSPAR-2024.nc`
 
+#### `maris_db_to_nc`
+
+The MARIS Master Database integrates two types of datasets:
+
+- Historical datasets retrieved from published scientific papers
+- Ongoing monitoring data from international programs like `HELCOM`,
+  `OSPAR`, `TEPCO`, and `GEOTRACES`
+
+This command-line utility converts MARIS datasets from their legacy
+format to NetCDF4, making them more accessible for modern data analysis
+workflows. Users can either convert the entire database or specify
+particular datasets by their reference IDs for selective conversion.
+
+    usage: maris_db_to_nc [-h] [--ref_ids REF_IDS] src dest
+
+    Convert MARIS legacy database to NetCDF4 format. If ref_ids is provided as comma-separated values, only encodes those subsets.
+
+    positional arguments:
+      src                Path to MARIS database dump as `.txt` file
+      dest               Output path for NetCDF file(s)
+
+    options:
+      -h, --help         show this help message and exit
+      --ref_ids REF_IDS  Optional comma-separated reference IDs (e.g., "123,456,789") (default: )
+
+For instance:
+
+- `maris_db_to_nc "~/pro/data/maris/2024-11-20 MARIS_QA_shapetype_id=1.txt" ~/pro/tmp/output`  
+- or
+  `maris_db_to_nc "~/pro/data/maris/2024-11-20 MARIS_QA_shapetype_id=1.txt" ~/pro/tmp/output --ref_ids="16,30"`
+  for a subset of the MARIS Master Database.
+
 ## Development
 
 The MARIS NetCDF template is generated from `nbs/files/cdl/maris.cdl`

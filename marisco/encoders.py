@@ -84,7 +84,6 @@ def copy_variables(self:NetCDFEncoder, grp_name, df, grp_dest):
 @patch
 def copy_variable(self:NetCDFEncoder, var_name, var_src, df, grp_dest):
     dtype_name = var_src.datatype.name
-    enums_src = self.src.enumtypes
     if self.verbose: 
         print(80*'-')
         print(f'Group: {grp_dest.name}, Variable: {var_name}')
@@ -93,26 +92,48 @@ def copy_variable(self:NetCDFEncoder, var_name, var_src, df, grp_dest):
 
 # %% ../nbs/api/encoders.ipynb 13
 @patch
-def _create_and_copy_variable(self:NetCDFEncoder, var_name, var_src, df, grp_dest, dtype_name):
-    variable_type = self.enum_dtypes.get(dtype_name, var_src.datatype)    
-    grp_dest.createVariable(var_name, variable_type, NC_DIM, compression='zlib', complevel=9)            
-    isNotEnum = type(variable_type) != netCDF4._netCDF4.EnumType
-    values = df[self.nc_to_cols[var_name]].values
-    grp_dest[var_name][:] = values if isNotEnum else self.sanitize_if_enum_and_nan(values)
+def _create_and_copy_variable(self:NetCDFEncoder, var_name:str, var_src, df, grp_dest, dtype_name:str):
+    "Create and populate a NetCDF variable with data from the dataframe"
+    variable_type = self._get_variable_type(dtype_name, var_src)
+    self._create_netcdf_variable(grp_dest, var_name, variable_type)
+    self._populate_variable_data(grp_dest, var_name, variable_type, df)
 
 # %% ../nbs/api/encoders.ipynb 14
+@patch
+def _get_variable_type(self:NetCDFEncoder, dtype_name:str, var_src):
+    "Determine the appropriate variable type for NetCDF creation"
+    if var_src.dtype == str: return str
+    return self.enum_dtypes.get(dtype_name, var_src.datatype)
+
+# %% ../nbs/api/encoders.ipynb 15
+@patch
+def _create_netcdf_variable(self:NetCDFEncoder, grp_dest, var_name:str, variable_type):
+    "Create a NetCDF variable with appropriate compression settings"
+    compression_kwargs = {'compression': None} if variable_type == str else {'compression': 'zlib', 'complevel': 9}
+    grp_dest.createVariable(var_name, variable_type, (NC_DIM,), **compression_kwargs)
+
+# %% ../nbs/api/encoders.ipynb 16
+@patch
+def _populate_variable_data(self:NetCDFEncoder, grp_dest, var_name:str, variable_type, df):
+    "Populate the NetCDF variable with data from the dataframe"
+    values = df[self.nc_to_cols[var_name]].values
+    is_enum_type = hasattr(variable_type, '__class__') and 'EnumType' in str(type(variable_type))
+    if is_enum_type: values = self.sanitize_if_enum_and_nan(values)
+    grp_dest[var_name][:] = values
+
+# %% ../nbs/api/encoders.ipynb 17
 @patch
 def sanitize_if_enum_and_nan(self:NetCDFEncoder, values, fill_value=-1):
     values[np.isnan(values)] = int(fill_value)
     values = values.astype(int)
     return values
 
-# %% ../nbs/api/encoders.ipynb 16
+# %% ../nbs/api/encoders.ipynb 19
 @patch
 def copy_variable_attributes(self:NetCDFEncoder, var_name, var_src, grp_dest):
     grp_dest[var_name].setncatts(var_src.__dict__)
 
-# %% ../nbs/api/encoders.ipynb 17
+# %% ../nbs/api/encoders.ipynb 20
 @patch
 def retrieve_all_cols(self:NetCDFEncoder, 
                       dtypes=NC_DTYPES
@@ -120,7 +141,7 @@ def retrieve_all_cols(self:NetCDFEncoder,
     "Retrieve all unique columns from the dict of dataframes." 
     return list(set(col for df in self.dfs.values() for col in df.columns if col in dtypes.keys()))
 
-# %% ../nbs/api/encoders.ipynb 18
+# %% ../nbs/api/encoders.ipynb 21
 @patch
 def create_enums(self:NetCDFEncoder):
     cols = self.retrieve_all_cols()
@@ -131,7 +152,7 @@ def create_enums(self:NetCDFEncoder):
         dtype = self.dest.createEnumType(np.int64, name, enums.types[col])
         self.enum_dtypes[name] = dtype
 
-# %% ../nbs/api/encoders.ipynb 19
+# %% ../nbs/api/encoders.ipynb 22
 @patch
 def copy_custom_map(self:NetCDFEncoder, var_name, grp_dest):
     """Copy custom maps for variables."""
@@ -145,7 +166,7 @@ def copy_custom_map(self:NetCDFEncoder, var_name, grp_dest):
         # Set the map as an attribute of the variable
         grp_dest[var_name].setncatts({f"{var_name}_map": str(group_maps[var_name])})
 
-# %% ../nbs/api/encoders.ipynb 20
+# %% ../nbs/api/encoders.ipynb 23
 @patch
 def encode(self:NetCDFEncoder):
     "Encode MARIS NetCDF based on template and dataframes."

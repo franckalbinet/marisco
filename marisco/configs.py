@@ -62,6 +62,7 @@ NC_VARS = {
     'PERCENTWT': 'percentwt',
     'LAB': 'lab',
     'PROFILE_ID': 'profile_id', # NEED TO INCLUDE.
+    'STATION': 'station'
     }
 
 # %% ../nbs/api/configs.ipynb 8
@@ -103,10 +104,10 @@ CSV_VARS = {
     'TAXONDBID': 'taxondb_id',
     'TAXONDBURL': 'taxondb_url',
     'REF_ID': 'ref_id',
-    'SMP_ID': 'samplabcode'
+    'SMP_ID': 'samplabcode',
+    'STATION': 'station'
 
     # CSV_VARS not included in current workflow.
-    # 'STATION': 'station',
     # 'SAMPLE_LAB_CODE': 'samplelabcode',
     # 'SED_REPNAME': 'sedrepname',
     # 'MEASURE_NOTE': 'measurenote',

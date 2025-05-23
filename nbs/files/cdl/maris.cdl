@@ -141,7 +141,6 @@ group: biota {
         float ph(id) ;
             ph:long_name = "pH" ;
             ph:standard_name = "pH" ;
-
         // Biota specific variables
         bio_group_t bio_group(id) ;
             bio_group:long_name = "Biota group" ;
@@ -200,6 +199,9 @@ group: seawater {
         area_t area(id) ;
             area:long_name = "Marine area/region id" ;
             area:standard_name = "area_id" ;
+        string station(id) ;
+            station:long_name = "Station" ;
+            station:standard_name = "station" ;
         uint64 smp_id(id) ;
             smp_id:long_name = "Data provider sample ID" ;
             smp_id:standard_name = "sample_id" ;

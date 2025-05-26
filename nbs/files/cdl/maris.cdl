@@ -96,6 +96,9 @@ group: biota {
         area_t area(id) ;
             area:long_name = "Marine area/region id" ;
             area:standard_name = "area_id" ;
+        string station(id) ;
+            station:long_name = "Station" ;
+            station:standard_name = "station" ;
         uint64 smp_id(id) ;
             smp_id:long_name = "Data provider sample ID" ;
             smp_id:standard_name = "sample_id" ;
@@ -286,6 +289,9 @@ group: sediment {
         area_t area(id) ;
             area:long_name = "Marine area/region id" ;
             area:standard_name = "area_id" ;
+        string station(id) ;
+            station:long_name = "Station" ;
+            station:standard_name = "station" ;
         uint64 smp_id(id) ;
             smp_id:long_name = "Data provider sample ID" ;
             smp_id:standard_name = "sample_id" ;
@@ -389,6 +395,9 @@ group: suspended_matter {
         area_t area(id) ;
             area:long_name = "Marine area/region id" ;
             area:standard_name = "area_id" ;
+        string station(id) ;
+            station:long_name = "Station" ;
+            station:standard_name = "station" ;
         uint64 smp_id(id) ;
             smp_id:long_name = "Data provider sample ID" ;
             smp_id:standard_name = "sample_id" ;

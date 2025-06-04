@@ -42,7 +42,7 @@ from marisco.metadata import (
     ZoteroItem
 )
 
-# %% ../nbs/api/netcdf2csv.ipynb 26
+# %% ../nbs/api/netcdf2csv.ipynb 27
 class ValidateEnumsCB(Callback):
     "Validate enumeration mappings between NetCDF file and MARIS lookup tables."
 
@@ -81,7 +81,7 @@ class ValidateEnumsCB(Callback):
                 print(f"   MARISCO standard enum lookup value: {key} -> {maris_enum.get(key, 'Not found')}")
             
 
-# %% ../nbs/api/netcdf2csv.ipynb 30
+# %% ../nbs/api/netcdf2csv.ipynb 31
 class RemoveNonCompatibleVariablesCB(Callback):
     "Remove variables not listed in VARS configuration."
     def __init__(self, 
@@ -91,7 +91,7 @@ class RemoveNonCompatibleVariablesCB(Callback):
         fc.store_attr()
         
     def __call__(self, tfm: Transformer):
-        """Remove non-OR variables from all dataframes."""
+        """Remove non-OR variables fro  m all dataframes."""
         for group_name in tfm.dfs:
             tfm.dfs[group_name] = self._remove_non_vars(tfm.dfs[group_name], group_name)
             
@@ -102,12 +102,11 @@ class RemoveNonCompatibleVariablesCB(Callback):
         cols_to_remove = current_cols - vars_cols
         
         if self.verbose and cols_to_remove:
-            print(f"Removing variables that are not compatible with vars provided. \nRemoving {', '.join(cols_to_remove)} from {group_name} dataset.")
-                        
+            print(f"Removing variables that are not compatible with vars provided. \nRemoving {', '.join(cols_to_remove)} from {group_name} dataset.")           
         return df.drop(columns=cols_to_remove)
 
 
-# %% ../nbs/api/netcdf2csv.ipynb 33
+# %% ../nbs/api/netcdf2csv.ipynb 35
 TAXON_MAP = {
     'Taxonname': 'TAXONNAME',
     'Taxonrank': 'TAXONRANK',
@@ -116,7 +115,7 @@ TAXON_MAP = {
     'TaxonDBURL': 'TAXONDBURL'
 }
 
-# %% ../nbs/api/netcdf2csv.ipynb 34
+# %% ../nbs/api/netcdf2csv.ipynb 36
 def get_taxon_info_lut(maris_lut: str, key_names: dict = TAXON_MAP) -> dict:
     "Create lookup dictionary for taxon information from MARIS species lookup table."
     species = pd.read_excel(maris_lut)
@@ -127,7 +126,7 @@ def get_taxon_info_lut(maris_lut: str, key_names: dict = TAXON_MAP) -> dict:
 
 lut_taxon = lambda: get_taxon_info_lut(maris_lut=species_lut_path(), key_names=TAXON_MAP)
 
-# %% ../nbs/api/netcdf2csv.ipynb 35
+# %% ../nbs/api/netcdf2csv.ipynb 37
 class AddTaxonInformationCB(Callback):
     """Add taxon information to BIOTA group based on species lookup table."""
     
@@ -180,7 +179,7 @@ class AddTaxonInformationCB(Callback):
         if self.verbose and len(unmatched) > 0:
             print(f"Warning: Species IDs not found in lookup table: {', '.join(map(str, unmatched))}")
 
-# %% ../nbs/api/netcdf2csv.ipynb 44
+# %% ../nbs/api/netcdf2csv.ipynb 46
 class AddZoteroArchiveLocationCB(Callback):
     "Fetch and append 'Loc. in Archive' from Zotero to DataFrame."
     def __init__(self, attrs: str, cfg: dict):
@@ -197,7 +196,7 @@ class AddZoteroArchiveLocationCB(Callback):
         else:
             print(f"Warning: Zotero item {self.item_id} does not exist.")
 
-# %% ../nbs/api/netcdf2csv.ipynb 48
+# %% ../nbs/api/netcdf2csv.ipynb 50
 class RemapCustomMapsCB(Callback):
     "Remap encoded custom maps to decoded values."
     def __init__(self, verbose: bool = False):
@@ -221,14 +220,14 @@ class RemapCustomMapsCB(Callback):
                     # Apply mapping
                     tfm.dfs[grp][var] = tfm.dfs[grp][var].map(reverse_custom_map)
 
-# %% ../nbs/api/netcdf2csv.ipynb 57
+# %% ../nbs/api/netcdf2csv.ipynb 59
 or_mappings={'DL':
-                {0:'ND',1:'=',2:'<'},
+                {3:'ND',1:'=',2:'<'},
             'FILT':
                 {0:'NA',1:'Y',2:'N'},
             }
 
-# %% ../nbs/api/netcdf2csv.ipynb 59
+# %% ../nbs/api/netcdf2csv.ipynb 61
 class RemapToORSpecificMappingsCB(Callback):
     "Convert values using OR mappings if columns exist in dataframe."
     def __init__(self, 
@@ -255,12 +254,12 @@ class RemapToORSpecificMappingsCB(Callback):
         return df
 
 
-# %% ../nbs/api/netcdf2csv.ipynb 65
+# %% ../nbs/api/netcdf2csv.ipynb 67
 def get_excluded_enums(output_format: str = 'openrefine_csv') -> dict:
     "Get excluded enums based on output format."
     return or_mappings if output_format == 'openrefine_csv' else {}
 
-# %% ../nbs/api/netcdf2csv.ipynb 66
+# %% ../nbs/api/netcdf2csv.ipynb 68
 class DataFormatConversionCB(Callback):
     """
     A callback to convert DataFrame enum values between encoded and decoded formats based on specified settings.
@@ -310,7 +309,7 @@ class DataFormatConversionCB(Callback):
                             print(f"No enum mapping found for column: {column}, skipping decoding.")
         return df
 
-# %% ../nbs/api/netcdf2csv.ipynb 71
+# %% ../nbs/api/netcdf2csv.ipynb 73
 def decode(
     fname_in: str, # Input file name
     dest_out: str | None = None, # Output file name (optional)

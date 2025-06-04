@@ -118,8 +118,11 @@ def _populate_variable_data(self:NetCDFEncoder, grp_dest, var_name:str, variable
     "Populate the NetCDF variable with data from the dataframe"
     values = df[self.nc_to_cols[var_name]].values
     is_enum_type = hasattr(variable_type, '__class__') and 'EnumType' in str(type(variable_type))
-    if is_enum_type: values = self.sanitize_if_enum_and_nan(values)
-    grp_dest[var_name][:] = values
+    if is_enum_type: values = self.sanitize_if_enum_and_nan(values) 
+    if variable_type == str:
+        for i, v in enumerate(values): grp_dest[var_name][i] = v
+    else:
+        grp_dest[var_name][:] = values
 
 # %% ../nbs/api/encoders.ipynb 17
 @patch

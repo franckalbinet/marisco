@@ -79,7 +79,7 @@ CSV_VARS = {
     'UNIT': 'unit_id',
     'UNC': 'uncertaint',
     'DL': 'detection',
-    'DLV': 'detection_val',
+    'DLV': 'detection_lim',
     'FILT': 'filtered',
     'COUNT_MET': 'counmet_id',
     #'DRY_MET': 'drymet_id', # NOT IN USE, no LUT for this. 

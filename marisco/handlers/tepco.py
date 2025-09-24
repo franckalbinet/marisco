@@ -9,7 +9,7 @@ __all__ = ['fname_coastal_water', 'fname_clos1F', 'fname_iaea_orbs', 'fname_out'
            'concat_locs', 'align_dfs', 'concat_dfs', 'georef_data', 'load_data', 'RemoveJapanaseCharCB',
            'FixRangeValueStringCB', 'SelectColsOfInterestCB', 'WideToLongCB', 'extract_nuclide', 'ExtractNuclideNameCB',
            'ExtractUnitCB', 'ExtractValueTypeCB', 'LongToWideCB', 'RemapUnitNameCB', 'RemapNuclideNameCB',
-           'RemapVALUE_DL_DLV_CB', 'ParseTimeCB', 'get_attrs', 'encode']
+           'RemapVALUE_DL_DLV_CB', 'ConvertToBqM3CB', 'ParseTimeCB', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/tepco.ipynb 3
 import warnings
@@ -319,10 +319,10 @@ class LongToWideCB(Callback):
         tfm.dfs['SEAWATER'].reset_index(inplace=True)
         tfm.dfs['SEAWATER'].rename(columns={'index': 'SMP_ID'}, inplace=True)
 
-# %% ../../nbs/handlers/tepco.ipynb 88
-unit_mapping = {'Bq/L': 3}
-
 # %% ../../nbs/handlers/tepco.ipynb 89
+unit_mapping = {'Bq/L': 1}
+
+# %% ../../nbs/handlers/tepco.ipynb 90
 class RemapUnitNameCB(Callback):
     """
     Remap `UNIT` name to MARIS id.
@@ -332,7 +332,7 @@ class RemapUnitNameCB(Callback):
         tfm.dfs['SEAWATER']['UNIT'] = tfm.dfs['SEAWATER']['UNIT'].map(self.unit_mapping)
 
 
-# %% ../../nbs/handlers/tepco.ipynb 92
+# %% ../../nbs/handlers/tepco.ipynb 93
 nuclide_mapping = {
     '131I': 29,
     '134Cs': 31,
@@ -358,14 +358,14 @@ nuclide_mapping = {
     '54Mn': 6
 }
 
-# %% ../../nbs/handlers/tepco.ipynb 93
+# %% ../../nbs/handlers/tepco.ipynb 94
 class RemapNuclideNameCB(Callback):
     "Remap `NUCLIDE` name to MARIS id."
     def __init__(self, nuclide_mapping): fc.store_attr()
     def __call__(self, tfm):
         tfm.dfs['SEAWATER']['NUCLIDE'] = tfm.dfs['SEAWATER']['NUCLIDE'].map(self.nuclide_mapping)
 
-# %% ../../nbs/handlers/tepco.ipynb 99
+# %% ../../nbs/handlers/tepco.ipynb 100
 class RemapVALUE_DL_DLV_CB(Callback):
     "Remap `DL`, `DLV`, `VALUE` based on TEPCO -> MARIS rules."    
     def map_all_columns(self, row):
@@ -397,7 +397,16 @@ class RemapVALUE_DL_DLV_CB(Callback):
         tfm.dfs['SEAWATER']['DL'] = tfm.dfs['SEAWATER']['DL'].astype(int)
         tfm.dfs['SEAWATER']['VALUE'] = tfm.dfs['SEAWATER']['VALUE'].astype(float)
 
-# %% ../../nbs/handlers/tepco.ipynb 102
+# %% ../../nbs/handlers/tepco.ipynb 104
+class ConvertToBqM3CB(Callback):
+    "Convert from Bq/L to Bq/m3."    
+    def __call__(self, tfm, factor=1000):
+        tfm.dfs['SEAWATER']['VALUE'] = tfm.dfs['SEAWATER']['VALUE'] * factor
+        # Convert DLV to float, handling NaN values
+        tfm.dfs['SEAWATER']['DLV'] = pd.to_numeric(tfm.dfs['SEAWATER']['DLV'], errors='coerce')
+        tfm.dfs['SEAWATER']['DLV'] = tfm.dfs['SEAWATER']['DLV'] * factor
+
+# %% ../../nbs/handlers/tepco.ipynb 107
 class ParseTimeCB(Callback):
     "Parse time column from TEPCO."
     def __init__(self, time_name='TIME'): fc.store_attr()
@@ -405,7 +414,7 @@ class ParseTimeCB(Callback):
         tfm.dfs['SEAWATER'][self.time_name] = pd.to_datetime(tfm.dfs['SEAWATER'][self.time_name], 
                                                              format='%Y/%m/%d %H:%M:%S', errors='coerce')
 
-# %% ../../nbs/handlers/tepco.ipynb 109
+# %% ../../nbs/handlers/tepco.ipynb 114
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -417,7 +426,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/tepco.ipynb 110
+# %% ../../nbs/handlers/tepco.ipynb 115
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve global attributes from MARIS dump."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -428,7 +437,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/tepco.ipynb 112
+# %% ../../nbs/handlers/tepco.ipynb 117
 def encode(
     fname_out: str, # Path to the folder where the NetCDF output will be saved
     **kwargs # Additional keyword arguments
@@ -448,6 +457,7 @@ def encode(
         RemapUnitNameCB(unit_mapping),
         RemapNuclideNameCB(nuclide_mapping),
         RemapVALUE_DL_DLV_CB(),
+        ConvertToBqM3CB(),
         ParseTimeCB(),
         EncodeTimeCB(),
         SanitizeLonLatCB()

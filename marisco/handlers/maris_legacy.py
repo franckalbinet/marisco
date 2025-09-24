@@ -51,7 +51,7 @@ fname_in = Path().home() / 'pro/data/maris/2025-06-03 MARIS_QA_shapetype_id = 1.
 
 dir_dest = '../../_data/output/dump'
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 15
+# %% ../../nbs/handlers/maris_legacy.ipynb 17
 class DataLoader:
     "Load specific MARIS dataset through its ref_id."
     LUT = {
@@ -78,17 +78,17 @@ class DataLoader:
         df = self.df[self.df.ref_id == ref_id].copy() if ref_id else self.df.copy()
         return {self.LUT[name]: grp for name, grp in df.groupby('samptype') if name in self.LUT}
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 16
+# %% ../../nbs/handlers/maris_legacy.ipynb 18
 def get_zotero_key(dfs):
     "Retrieve Zotero key from MARIS dump."
     return dfs[next(iter(dfs))][['zoterourl']].iloc[0].values[0].split('/')[-1]
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 17
+# %% ../../nbs/handlers/maris_legacy.ipynb 19
 def get_fname(dfs):
     "Get NetCDF filename."
     return f"{next(iter(dfs.values()))['ref_id'].iloc[0]}.nc"
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 23
+# %% ../../nbs/handlers/maris_legacy.ipynb 25
 cois_renaming_rules = {
     'sample_id': 'SMP_ID',
     'latitude': 'LAT',
@@ -117,7 +117,7 @@ cois_renaming_rules = {
     'slicedown': 'BOTTOM'
 }
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 28
+# %% ../../nbs/handlers/maris_legacy.ipynb 30
 class CastStationToStringCB(Callback):
     "Convert STATION column to string type, filling any missing values with empty string"
     def __call__(self, tfm):
@@ -125,7 +125,7 @@ class CastStationToStringCB(Callback):
             if 'STATION' in tfm.dfs[k].columns:
                 tfm.dfs[k]['STATION'] = tfm.dfs[k]['STATION'].fillna('').astype('string')
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 32
+# %% ../../nbs/handlers/maris_legacy.ipynb 34
 class DropNAColumnsCB(Callback):
     "Drop variable containing only NaN or 'Not available' (id=0 in MARIS lookup tables)."
     def __init__(self, na_value=0): fc.store_attr()
@@ -141,13 +141,13 @@ class DropNAColumnsCB(Callback):
             tfm.dfs[k] = tfm.dfs[k].dropna(axis=1, how='all')
             tfm.dfs[k] = self.dropMarisNA(tfm.dfs[k])
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 36
+# %% ../../nbs/handlers/maris_legacy.ipynb 38
 dl_name_to_id = lambda: get_lut(lut_path(), 
                                 'dbo_detectlimit.xlsx', 
                                 key='name', 
                                 value='id')
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 38
+# %% ../../nbs/handlers/maris_legacy.ipynb 40
 class SanitizeDetectionLimitCB(Callback):
     "Assign Detection Limit name to its id based on MARIS nomenclature."
     def __init__(self,
@@ -160,7 +160,7 @@ class SanitizeDetectionLimitCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k][self.dl_name] = tfm.dfs[k][self.dl_name].replace(lut)
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 42
+# %% ../../nbs/handlers/maris_legacy.ipynb 44
 class ParseTimeCB(Callback):
     "Parse time column from MARIS dump."
     def __init__(self,
@@ -171,7 +171,7 @@ class ParseTimeCB(Callback):
         for k in tfm.dfs.keys():
             tfm.dfs[k][self.time_name] = pd.to_datetime(tfm.dfs[k][self.time_name], format='ISO8601')
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 52
+# %% ../../nbs/handlers/maris_legacy.ipynb 54
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -183,7 +183,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 53
+# %% ../../nbs/handlers/maris_legacy.ipynb 55
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve global attributes from MARIS dump."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -195,7 +195,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/maris_legacy.ipynb 55
+# %% ../../nbs/handlers/maris_legacy.ipynb 57
 def encode(
     fname_in: str, # Path to the MARIS dump data in CSV format
     dir_dest: str, # Path to the folder where the NetCDF output will be saved

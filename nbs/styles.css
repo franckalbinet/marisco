@@ -50,7 +50,7 @@ div.description {
     font-family: 'Montserrat', sans-serif;
     font-size: 1.2rem;
 
-    background-image: url('./img/logo.png');
+    background-image: url('./assets/logo.png');
     background-repeat: no-repeat;
     background-position: left center;
     background-size: 70px 70px;

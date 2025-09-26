@@ -29,7 +29,8 @@ NC_DIM = 'id'
 # %% ../nbs/api/configs.ipynb 6
 # Lookup variables names to MARIS NetCDF4 template variable names
 NC_VARS = {
-    'ID': 'id',
+    'SMP_ID': 'id',
+    'SMP_ID_PROVIDER': 'id_provider',
     'LON': 'lon',
     'LAT': 'lat',
     'SMP_DEPTH': 'smp_depth',
@@ -106,7 +107,8 @@ CSV_VARS = {
     'TAXONDBID': 'taxondb_id',
     'TAXONDBURL': 'taxondb_url',
     'REF_ID': 'ref_id',
-    'SMP_ID': 'samplabcode',
+    # 'SMP_ID': 'samplabcode',
+    'SMP_ID_PROVIDER': 'samplabcode',
     'STATION': 'station'
 
     # CSV_VARS not included in current workflow.

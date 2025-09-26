@@ -66,8 +66,6 @@ group: biota {
         // Common variables
         uint64 id(id) ;
             id:long_name = "Measurement ID" ;
-        string id_provider(id) ;
-            id_provider:long_name = "Measurement ID as defined by data provider" ;
         float lon(id) ;   
             lon:long_name = "Measurement longitude" ;
             lon:standard_name = "longitude" ;
@@ -177,8 +175,6 @@ group: seawater {
         // Common variables
         uint64 id(id) ;
             id:long_name = "Measurement ID" ;
-        string id_provider(id) ;
-            id_provider:long_name = "Measurement ID as defined by data provider" ;
         float lon(id) ;   
             lon:long_name = "Measurement longitude" ;
             lon:standard_name = "longitude" ;
@@ -269,8 +265,6 @@ group: sediment {
         // Common variables
         uint64 id(id) ;
             id:long_name = "Measurement ID" ;
-        string id_provider(id) ;
-            id_provider:long_name = "Measurement ID as defined by data provider" ;
         float lon(id) ;   
             lon:long_name = "Measurement longitude" ;
             lon:standard_name = "longitude" ;
@@ -380,8 +374,6 @@ group: suspended_matter {
     variables:
         uint64 id(id) ;
             id:long_name = "Measurement ID" ;
-        string id_provider(id) ;
-            id_provider:long_name = "Measurement ID as defined by data provider" ;
         float lon(id) ;   
             lon:long_name = "Measurement longitude" ;
             lon:standard_name = "longitude" ;

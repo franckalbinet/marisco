@@ -2,8 +2,8 @@
 
 # %% auto 0
 __all__ = ['TAXON_MAP', 'lut_taxon', 'or_mappings', 'ValidateEnumsCB', 'RemoveNonCompatibleVariablesCB', 'SampleIDConversionCB',
-           'get_taxon_info_lut', 'AddTaxonInformationCB', 'AddZoteroArchiveLocationCB', 'RemapCustomMapsCB',
-           'RemapToORSpecificMappingsCB', 'get_excluded_enums', 'DataFormatConversionCB', 'decode']
+           'get_taxon_info_lut', 'AddTaxonInformationCB', 'AddZoteroArchiveLocationCB', 'RemapToORSpecificMappingsCB',
+           'get_excluded_enums', 'DataFormatConversionCB', 'decode']
 
 # %% ../nbs/api/netcdf2csv.ipynb 6
 from pathlib import Path
@@ -106,7 +106,7 @@ class RemoveNonCompatibleVariablesCB(Callback):
         return df.drop(columns=cols_to_remove)
 
 
-# %% ../nbs/api/netcdf2csv.ipynb 35
+# %% ../nbs/api/netcdf2csv.ipynb 34
 class SampleIDConversionCB(Callback):
     "Convert auto-generated `SMP_ID` values to `None` while preserving original provider-supplied IDs."
     def __init__(self, 
@@ -119,7 +119,7 @@ class SampleIDConversionCB(Callback):
             if self.nonify: 
                 tfm.dfs[group_name]['SMP_ID'] = None
 
-# %% ../nbs/api/netcdf2csv.ipynb 38
+# %% ../nbs/api/netcdf2csv.ipynb 37
 TAXON_MAP = {
     'Taxonname': 'TAXONNAME',
     'Taxonrank': 'TAXONRANK',
@@ -128,7 +128,7 @@ TAXON_MAP = {
     'TaxonDBURL': 'TAXONDBURL'
 }
 
-# %% ../nbs/api/netcdf2csv.ipynb 39
+# %% ../nbs/api/netcdf2csv.ipynb 38
 def get_taxon_info_lut(maris_lut: str, key_names: dict = TAXON_MAP) -> dict:
     "Create lookup dictionary for taxon information from MARIS species lookup table."
     species = pd.read_excel(maris_lut)
@@ -139,7 +139,7 @@ def get_taxon_info_lut(maris_lut: str, key_names: dict = TAXON_MAP) -> dict:
 
 lut_taxon = lambda: get_taxon_info_lut(maris_lut=species_lut_path(), key_names=TAXON_MAP)
 
-# %% ../nbs/api/netcdf2csv.ipynb 40
+# %% ../nbs/api/netcdf2csv.ipynb 39
 class AddTaxonInformationCB(Callback):
     """Add taxon information to BIOTA group based on species lookup table."""
     
@@ -192,7 +192,7 @@ class AddTaxonInformationCB(Callback):
         if self.verbose and len(unmatched) > 0:
             print(f"Warning: Species IDs not found in lookup table: {', '.join(map(str, unmatched))}")
 
-# %% ../nbs/api/netcdf2csv.ipynb 49
+# %% ../nbs/api/netcdf2csv.ipynb 48
 class AddZoteroArchiveLocationCB(Callback):
     "Fetch and append 'Loc. in Archive' from Zotero to DataFrame."
     def __init__(self, attrs: str, cfg: dict):
@@ -209,38 +209,14 @@ class AddZoteroArchiveLocationCB(Callback):
         else:
             print(f"Warning: Zotero item {self.item_id} does not exist.")
 
-# %% ../nbs/api/netcdf2csv.ipynb 53
-class RemapCustomMapsCB(Callback):
-    "Remap encoded custom maps to decoded values."
-    def __init__(self, verbose: bool = False):
-        fc.store_attr()
-        
-    def __call__(self, tfm):
-        """Remap encoded custom maps to decoded values."""
-        
-        for grp in tfm.dfs:
-            for var in tfm.dfs[grp].columns:
-                if var in tfm.custom_maps[grp]:
-                    if self.verbose:
-                        print(f"Remapping {var} from {grp} group")
-                    
-                    # Convert column to int type to ensure proper mapping
-                    tfm.dfs[grp][var] = tfm.dfs[grp][var].astype(int)
-                    
-                    # Create reverse mapping dictionary
-                    reverse_custom_map = {int(v): k for k, v in tfm.custom_maps[grp][var].items()}
-                    
-                    # Apply mapping
-                    tfm.dfs[grp][var] = tfm.dfs[grp][var].map(reverse_custom_map)
-
-# %% ../nbs/api/netcdf2csv.ipynb 62
+# %% ../nbs/api/netcdf2csv.ipynb 57
 or_mappings={'DL':
                 {3:'ND',1:'=',2:'<'},
             'FILT':
                 {0:'NA',1:'Y',2:'N'},
             }
 
-# %% ../nbs/api/netcdf2csv.ipynb 64
+# %% ../nbs/api/netcdf2csv.ipynb 59
 class RemapToORSpecificMappingsCB(Callback):
     "Convert values using OR mappings if columns exist in dataframe."
     def __init__(self, 
@@ -267,12 +243,12 @@ class RemapToORSpecificMappingsCB(Callback):
         return df
 
 
-# %% ../nbs/api/netcdf2csv.ipynb 70
+# %% ../nbs/api/netcdf2csv.ipynb 65
 def get_excluded_enums(output_format: str = 'openrefine_csv') -> dict:
     "Get excluded enums based on output format."
     return or_mappings if output_format == 'openrefine_csv' else {}
 
-# %% ../nbs/api/netcdf2csv.ipynb 71
+# %% ../nbs/api/netcdf2csv.ipynb 66
 class DataFormatConversionCB(Callback):
     """
     A callback to convert DataFrame enum values between encoded and decoded formats based on specified settings.
@@ -322,14 +298,14 @@ class DataFormatConversionCB(Callback):
                             print(f"No enum mapping found for column: {column}, skipping decoding.")
         return df
 
-# %% ../nbs/api/netcdf2csv.ipynb 76
+# %% ../nbs/api/netcdf2csv.ipynb 71
 def decode(
     fname_in: str, # Input file name
     dest_out: str | None = None, # Output file name (optional)
     output_format: str = 'openrefine_csv', # Output format
     remap_vars: Dict[str, str] = CSV_VARS, # Mapping of OR vars to NC vars
     remap_dtypes: Dict[str, str] = CSV_DTYPES, # Mapping of OR vars to NC dtypes
-    has_smp_id: bool = True, # If False, do not convert auto-generated `SMP_ID` values to `None`
+    # has_smp_id: bool = True, # If False, do not convert auto-generated `SMP_ID` values to `None`
     verbose: bool = False, # If True, print verbose output
     **kwargs # Additional arguments
     ) -> None:
@@ -353,8 +329,8 @@ def decode(
             maris_enums=Enums(lut_src_dir=lut_path())
         ),
         RemoveNonCompatibleVariablesCB(vars=remap_vars),
-        SampleIDConversionCB(nonify=not has_smp_id),
-        RemapCustomMapsCB(),
+        # SampleIDConversionCB(nonify=not has_smp_id),
+        # RemapCustomMapsCB(),
         RemapToORSpecificMappingsCB(output_format=output_format),
         AddTaxonInformationCB(
             fn_lut=lut_taxon

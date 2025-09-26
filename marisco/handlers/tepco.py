@@ -9,7 +9,7 @@ __all__ = ['fname_coastal_water', 'fname_clos1F', 'fname_iaea_orbs', 'fname_out'
            'concat_locs', 'align_dfs', 'concat_dfs', 'georef_data', 'load_data', 'RemoveJapanaseCharCB',
            'FixRangeValueStringCB', 'SelectColsOfInterestCB', 'WideToLongCB', 'extract_nuclide', 'ExtractNuclideNameCB',
            'ExtractUnitCB', 'ExtractValueTypeCB', 'LongToWideCB', 'RemapUnitNameCB', 'RemapNuclideNameCB',
-           'RemapVALUE_DL_DLV_CB', 'ConvertToBqM3CB', 'ParseTimeCB', 'get_attrs', 'encode']
+           'RemapVALUE_DL_DLV_CB', 'ConvertToBqM3CB', 'ParseTimeCB', 'AddSampleIdCB', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/tepco.ipynb 3
 import warnings
@@ -414,7 +414,14 @@ class ParseTimeCB(Callback):
         tfm.dfs['SEAWATER'][self.time_name] = pd.to_datetime(tfm.dfs['SEAWATER'][self.time_name], 
                                                              format='%Y/%m/%d %H:%M:%S', errors='coerce')
 
-# %% ../../nbs/handlers/tepco.ipynb 114
+# %% ../../nbs/handlers/tepco.ipynb 113
+class AddSampleIdCB(Callback):
+    "Convert from Bq/L to Bq/m3."    
+    def __call__(self, tfm, factor=1000):
+        tfm.dfs['SEAWATER']['SMP_ID'] = range(1, len(tfm.dfs['SEAWATER']) + 1)
+        tfm.dfs['SEAWATER']['SMP_ID_PROVIDER'] = ""
+
+# %% ../../nbs/handlers/tepco.ipynb 118
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -426,7 +433,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/tepco.ipynb 115
+# %% ../../nbs/handlers/tepco.ipynb 119
 def get_attrs(tfm, zotero_key, kw=kw):
     "Retrieve global attributes from MARIS dump."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
@@ -437,7 +444,7 @@ def get_attrs(tfm, zotero_key, kw=kw):
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/tepco.ipynb 117
+# %% ../../nbs/handlers/tepco.ipynb 121
 def encode(
     fname_out: str, # Path to the folder where the NetCDF output will be saved
     **kwargs # Additional keyword arguments
@@ -460,7 +467,8 @@ def encode(
         ConvertToBqM3CB(),
         ParseTimeCB(),
         EncodeTimeCB(),
-        SanitizeLonLatCB()
+        SanitizeLonLatCB(),
+        AddSampleIdCB()
     ])        
     tfm()
     encoder = NetCDFEncoder(tfm.dfs, 

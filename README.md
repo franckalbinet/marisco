@@ -209,10 +209,10 @@ For instance:
 The MARIS NetCDF template is generated from `nbs/files/cdl/maris.cdl`
 Common Data Language (CDL) file as defined by
 [Unidata](https://docs.unidata.ucar.edu/). To generate the MARIS NetCDF
-template `nbs/files/nc/maris-template.nc`, install the
+template `nbs/api/files/nc/maris-template.nc`, install the
 [NetCDF-C](https://pjbartlein.github.io/REarthSysSci/install_netCDF.html)
 utilities, once in `Marisco` home directory, run:
 
 ``` console
-ncgen -4 -o nc/maris-template.nc cdl/maris.cdl
+ncgen -4 -o nbs/api/files/nc/maris-template.nc nbs/api/files/cdl/maris.cdl
 ```

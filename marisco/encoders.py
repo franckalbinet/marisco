@@ -33,7 +33,6 @@ class NetCDFEncoder:
                  dest_fname: str, # Name of output file to produce
                  global_attrs: Dict[str, str], # Global attributes
                  fn_src_fname: Callable=nc_tpl_path, # Function returning file name and path to the MARIS CDL template
-                 custom_maps: Dict[str, Dict[str, int]]= None,# Custom maps to encode
                  verbose: bool=False, # Print currently written NetCDF group and variable names
                  ):
         store_attr()
@@ -77,8 +76,6 @@ def copy_variables(self:NetCDFEncoder, grp_name, df, grp_dest):
     for var_name, var_src in self.src.groups[grp_name].variables.items():
         if var_name in cols: 
             self.copy_variable(var_name, var_src, df, grp_dest)
-        if self.custom_maps:
-            self.copy_custom_map(var_name, grp_dest)
 
 # %% ../nbs/api/encoders.ipynb 12
 @patch
@@ -131,12 +128,12 @@ def sanitize_if_enum_and_nan(self:NetCDFEncoder, values, fill_value=-1):
     values = values.astype(int)
     return values
 
-# %% ../nbs/api/encoders.ipynb 19
+# %% ../nbs/api/encoders.ipynb 18
 @patch
 def copy_variable_attributes(self:NetCDFEncoder, var_name, var_src, grp_dest):
     grp_dest[var_name].setncatts(var_src.__dict__)
 
-# %% ../nbs/api/encoders.ipynb 20
+# %% ../nbs/api/encoders.ipynb 19
 @patch
 def retrieve_all_cols(self:NetCDFEncoder, 
                       dtypes=NC_DTYPES
@@ -144,7 +141,7 @@ def retrieve_all_cols(self:NetCDFEncoder,
     "Retrieve all unique columns from the dict of dataframes." 
     return list(set(col for df in self.dfs.values() for col in df.columns if col in dtypes.keys()))
 
-# %% ../nbs/api/encoders.ipynb 21
+# %% ../nbs/api/encoders.ipynb 20
 @patch
 def create_enums(self:NetCDFEncoder):
     cols = self.retrieve_all_cols()
@@ -155,21 +152,7 @@ def create_enums(self:NetCDFEncoder):
         dtype = self.dest.createEnumType(np.int64, name, enums.types[col])
         self.enum_dtypes[name] = dtype
 
-# %% ../nbs/api/encoders.ipynb 22
-@patch
-def copy_custom_map(self:NetCDFEncoder, var_name, grp_dest):
-    """Copy custom maps for variables."""
-    custom_maps = self.custom_maps
-    # Convert group names using NC_GROUPS
-    custom_maps = {NC_GROUPS[key]: value for key, value in custom_maps.items()}
-    group_maps = custom_maps.get(grp_dest.name, {})
-    # Convert var names using NC_VARS
-    group_maps = {NC_VARS[key]: value for key, value in group_maps.items()}
-    if var_name in group_maps:
-        # Set the map as an attribute of the variable
-        grp_dest[var_name].setncatts({f"{var_name}_map": str(group_maps[var_name])})
-
-# %% ../nbs/api/encoders.ipynb 23
+# %% ../nbs/api/encoders.ipynb 21
 @patch
 def encode(self:NetCDFEncoder):
     "Encode MARIS NetCDF based on template and dataframes."

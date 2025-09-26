@@ -539,26 +539,15 @@ class RemapFiltCB(Callback):
             if 'filt' in df.columns:
                 df['FILT'] = df['filt'].map(lambda x: self.lut_filtered.get(x, 0))
 
-# %% ../../nbs/handlers/helcom.ipynb 161
+# %% ../../nbs/handlers/helcom.ipynb 160
 class AddSampleIDCB(Callback):
-    "Generate a SMP_ID from the KEY values in the HELCOM dataset. Each KEY is mapped to a unique integer, with the mapping stored in an enumeration (i.e., smp_id)."
+    "Generate a SMP_ID from the KEY values in the HELCOM dataset."
     def __call__(self, tfm: Transformer):
-        for grp, df in tfm.dfs.items():
-            # Generate and store the SMP_ID map
-            smp_id_map = self._generate_sample_id_map(df)
-            tfm.custom_maps[grp]['SMP_ID'] = smp_id_map
-            # Create SMP_ID column in the DataFrame
-            self._create_smp_id(df, smp_id_map)
-        
-    def _generate_sample_id_map(self, df: pd.DataFrame) -> dict:
-        """Enumerate unique 'key' values and map them to integers."""
-        return {key: idx for idx, key in enumerate(df['key'].unique())}
+        for _, df in tfm.dfs.items():
+            df['SMP_ID'] = range(1, len(df) + 1)
+            df['SMP_ID_PROVIDER'] = df['key'].astype(str)
 
-    def _create_smp_id(self, df: pd.DataFrame, smp_id_map: dict) -> None:
-        """Map 'key' values to 'SMP_ID' using the provided enum."""
-        df['SMP_ID'] = df['key'].map(smp_id_map)
-
-# %% ../../nbs/handlers/helcom.ipynb 166
+# %% ../../nbs/handlers/helcom.ipynb 165
 class AddDepthCB(Callback):
     "Ensure depth values are floats and add 'SMP_DEPTH' and 'TOT_DEPTH' columns."
     def __call__(self, tfm: Transformer):
@@ -568,7 +557,7 @@ class AddDepthCB(Callback):
             if 'tdepth' in df.columns:
                 df['TOT_DEPTH'] = df['tdepth'].astype(float)
 
-# %% ../../nbs/handlers/helcom.ipynb 172
+# %% ../../nbs/handlers/helcom.ipynb 171
 class AddSalinityCB(Callback):
     def __init__(self, salinity_col: str = 'salin'):
         self.salinity_col = salinity_col
@@ -578,7 +567,7 @@ class AddSalinityCB(Callback):
             if self.salinity_col in df.columns:
                 df['SALINITY'] = df[self.salinity_col].astype(float)
 
-# %% ../../nbs/handlers/helcom.ipynb 178
+# %% ../../nbs/handlers/helcom.ipynb 177
 class AddTemperatureCB(Callback):
     def __init__(self, temperature_col: str = 'ttemp'):
         self.temperature_col = temperature_col
@@ -588,7 +577,7 @@ class AddTemperatureCB(Callback):
             if self.temperature_col in df.columns:
                 df['TEMPERATURE'] = df[self.temperature_col].astype(float)
 
-# %% ../../nbs/handlers/helcom.ipynb 181
+# %% ../../nbs/handlers/helcom.ipynb 180
 class RemapSedSliceTopBottomCB(Callback):
     "Remap Sediment slice top and bottom to MARIS format."
     def __call__(self, tfm: Transformer):
@@ -596,7 +585,7 @@ class RemapSedSliceTopBottomCB(Callback):
         tfm.dfs['SEDIMENT']['TOP'] = tfm.dfs['SEDIMENT']['uppsli']
         tfm.dfs['SEDIMENT']['BOTTOM'] = tfm.dfs['SEDIMENT']['lowsli']
 
-# %% ../../nbs/handlers/helcom.ipynb 205
+# %% ../../nbs/handlers/helcom.ipynb 204
 class LookupDryWetPercentWeightCB(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm: Transformer):
@@ -611,7 +600,7 @@ class LookupDryWetPercentWeightCB(Callback):
     def _apply_dry_wet_ratio(self, df: pd.DataFrame) -> None:
         "Apply dry-wet ratio conversion and formatting to the given DataFrame."
         df['PERCENTWT'] = df['dw%'] / 100  # Convert percentage to fraction
-        df.loc[df['PERCENTWT'] == 0, 'PERCENTWT'] = np.NaN  # Convert 0% to NaN
+        df.loc[df['PERCENTWT'] == 0, 'PERCENTWT'] = np.nan  # Convert 0% to nan
 
     def _correct_basis(self, df: pd.DataFrame) -> None:
         "Correct BASIS values. Assuming F = Fresh weight, so F = W"
@@ -628,7 +617,7 @@ class LookupDryWetPercentWeightCB(Callback):
         df.loc[wet_condition, 'WETWT'] = df['weight']
         df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['weight'] * df['PERCENTWT']
 
-# %% ../../nbs/handlers/helcom.ipynb 214
+# %% ../../nbs/handlers/helcom.ipynb 213
 class ParseCoordinates(Callback):
     "Get geographical coordinates from columns expressed in degrees decimal format or from columns in degrees/minutes decimal format where degrees decimal format is missing or zero."
     def __init__(self, 

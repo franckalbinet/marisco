@@ -44,7 +44,7 @@ div.description {
     background-color: #3a6494
 }
 
-.navbar-brand {
+.navbar-brand:not(.navbar-brand-logo) {
     text-transform: uppercase;
     font-weight: bold;
     font-family: 'Montserrat', sans-serif;

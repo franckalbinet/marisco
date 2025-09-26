@@ -7,8 +7,8 @@ __all__ = ['src_dir', 'fname_out', 'zotero_key', 'default_smp_types', 'fixes_nuc
            'lut_sediments', 'lut_filtered', 'kw', 'read_csv', 'load_data', 'RemapNuclideNameCB', 'ParseTimeCB',
            'SplitSedimentValuesCB', 'SanitizeValueCB', 'unc_rel2stan', 'NormalizeUncCB', 'RemapUnitCB',
            'RemapDetectionLimitCB', 'RemapSedimentCB', 'RemapFiltCB', 'AddSampleIDCB', 'AddDepthCB', 'AddSalinityCB',
-           'AddTemperatureCB', 'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'ParseCoordinates',
-           'get_attrs', 'encode']
+           'AddStationCB', 'AddTemperatureCB', 'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB',
+           'ParseCoordinates', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb 6
 import pandas as pd 
@@ -567,7 +567,14 @@ class AddSalinityCB(Callback):
             if self.salinity_col in df.columns:
                 df['SALINITY'] = df[self.salinity_col].astype(float)
 
-# %% ../../nbs/handlers/helcom.ipynb 177
+# %% ../../nbs/handlers/helcom.ipynb 174
+class AddStationCB(Callback):
+    "Add station to all DataFrames."
+    def __call__(self, tfm: Transformer):
+        for df in tfm.dfs.values():
+            df['STATION'] = df['station'].astype(str)
+
+# %% ../../nbs/handlers/helcom.ipynb 180
 class AddTemperatureCB(Callback):
     def __init__(self, temperature_col: str = 'ttemp'):
         self.temperature_col = temperature_col
@@ -577,7 +584,7 @@ class AddTemperatureCB(Callback):
             if self.temperature_col in df.columns:
                 df['TEMPERATURE'] = df[self.temperature_col].astype(float)
 
-# %% ../../nbs/handlers/helcom.ipynb 180
+# %% ../../nbs/handlers/helcom.ipynb 183
 class RemapSedSliceTopBottomCB(Callback):
     "Remap Sediment slice top and bottom to MARIS format."
     def __call__(self, tfm: Transformer):
@@ -585,7 +592,7 @@ class RemapSedSliceTopBottomCB(Callback):
         tfm.dfs['SEDIMENT']['TOP'] = tfm.dfs['SEDIMENT']['uppsli']
         tfm.dfs['SEDIMENT']['BOTTOM'] = tfm.dfs['SEDIMENT']['lowsli']
 
-# %% ../../nbs/handlers/helcom.ipynb 204
+# %% ../../nbs/handlers/helcom.ipynb 207
 class LookupDryWetPercentWeightCB(Callback):
     "Lookup dry-wet ratio and format for MARIS."
     def __call__(self, tfm: Transformer):
@@ -617,7 +624,7 @@ class LookupDryWetPercentWeightCB(Callback):
         df.loc[wet_condition, 'WETWT'] = df['weight']
         df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['weight'] * df['PERCENTWT']
 
-# %% ../../nbs/handlers/helcom.ipynb 213
+# %% ../../nbs/handlers/helcom.ipynb 216
 class ParseCoordinates(Callback):
     "Get geographical coordinates from columns expressed in degrees decimal format or from columns in degrees/minutes decimal format where degrees decimal format is missing or zero."
     def __init__(self, 
@@ -667,7 +674,7 @@ class ParseCoordinates(Callback):
             print(f"Error converting value {value}: {e}")
             return value
 
-# %% ../../nbs/handlers/helcom.ipynb 227
+# %% ../../nbs/handlers/helcom.ipynb 230
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
       'Earth Science > Oceans > Ocean Chemistry > Ocean Tracers, Earth Science > Oceans > Marine Sediments',
@@ -679,7 +686,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Animals/Invertebrates > Arthropods > Crustaceans',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
-# %% ../../nbs/handlers/helcom.ipynb 228
+# %% ../../nbs/handlers/helcom.ipynb 231
 def get_attrs(
     tfm: Transformer, # Transformer object
     zotero_key: str, # Zotero dataset record key
@@ -695,7 +702,7 @@ def get_attrs(
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()
 
-# %% ../../nbs/handlers/helcom.ipynb 231
+# %% ../../nbs/handlers/helcom.ipynb 234
 def encode(
     fname_out: str, # Output file name
     **kwargs # Additional arguments

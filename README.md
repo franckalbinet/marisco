@@ -206,13 +206,23 @@ For instance:
 
 ## Development
 
-The MARIS NetCDF template is generated from `nbs/files/cdl/maris.cdl`
-Common Data Language (CDL) file as defined by
-[Unidata](https://docs.unidata.ucar.edu/). To generate the MARIS NetCDF
-template `nbs/api/files/nc/maris-template.nc`, install the
-[NetCDF-C](https://pjbartlein.github.io/REarthSysSci/install_netCDF.html)
-utilities, once in `Marisco` home directory, run:
+As already explained the `maris_init` command will download the
+`maris-template.nc` file from [MARISCO GitHub
+repository](https://github.com/franckalbinet/marisco) from the following
+path: `nbs/api/files/nc/maris-template.nc` to your home directory under
+`.marisco/` folder.
+
+You have to know that the MARIS NetCDF template is generated from
+`nbs/api/files/cdl/maris.cdl` Common Data Language (CDL) file as defined
+by [Unidata](https://docs.unidata.ucar.edu/). During development, to
+generate the MARIS NetCDF template `nbs/api/files/nc/maris-template.nc`:
+
+1.  install the
+    [NetCDF-C](https://pjbartlein.github.io/REarthSysSci/install_netCDF.html)
+    utilities
+2.  once in `Marisco` home directory, run:
 
 ``` console
-ncgen -4 -o nbs/api/files/nc/maris-template.nc nbs/api/files/cdl/maris.cdl
+ncgen -4 -o nbs/files/nc/maris-template.nc nbs/files/cdl/maris.cdl
+cp nbs/files/nc/maris-template.nc ~/.marisco/
 ```

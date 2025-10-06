@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Callback used in handlers">
+
+<title>Callbacks – marisco</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-cd333c7267348b54b15a9ec2a617d176.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="Callbacks – marisco">
+<meta property="og:description" content="Callback used in handlers">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="Callbacks – marisco">
+<meta name="twitter:description" content="Callback used in handlers">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/franckalbinet/marisco"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/callbacks.html">API</a></li><li class="breadcrumb-item"><a href="../api/callbacks.html">Callbacks</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="../index.html" class="sidebar-logo-link">
+      </a>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARISCO</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/ospar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OSPAR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/geotraces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geotraces</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/maris_legacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Legacy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/tepco.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TEPCO</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/encoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Encoders</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/decoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Decoders</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Utilities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/netcdf2csv.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NetCDF2CSV</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Metadata</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../metadata/data-curation-rules.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data curation rules</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../metadata/field-definition.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Field definitions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#core" id="toc-core" class="nav-link active" data-scroll-target="#core">Core</a>
+  <ul>
+  <li><a href="#callback" id="toc-callback" class="nav-link" data-scroll-target="#callback">Callback</a></li>
+  <li><a href="#run_cbs" id="toc-run_cbs" class="nav-link" data-scroll-target="#run_cbs">run_cbs</a></li>
+  <li><a href="#transformer" id="toc-transformer" class="nav-link" data-scroll-target="#transformer">Transformer</a></li>
+  </ul></li>
+  <li><a href="#geographical" id="toc-geographical" class="nav-link" data-scroll-target="#geographical">Geographical</a>
+  <ul>
+  <li><a href="#sanitizelonlatcb" id="toc-sanitizelonlatcb" class="nav-link" data-scroll-target="#sanitizelonlatcb">SanitizeLonLatCB</a></li>
+  </ul></li>
+  <li><a href="#map-standardize" id="toc-map-standardize" class="nav-link" data-scroll-target="#map-standardize">Map &amp; Standardize</a>
+  <ul>
+  <li><a href="#remapcb" id="toc-remapcb" class="nav-link" data-scroll-target="#remapcb">RemapCB</a></li>
+  <li><a href="#lowerstripnamecb" id="toc-lowerstripnamecb" class="nav-link" data-scroll-target="#lowerstripnamecb">LowerStripNameCB</a></li>
+  </ul></li>
+  <li><a href="#change-structure" id="toc-change-structure" class="nav-link" data-scroll-target="#change-structure">Change structure</a>
+  <ul>
+  <li><a href="#addsampletypeidcolumncb" id="toc-addsampletypeidcolumncb" class="nav-link" data-scroll-target="#addsampletypeidcolumncb">AddSampleTypeIdColumnCB</a></li>
+  <li><a href="#selectcolumnscb" id="toc-selectcolumnscb" class="nav-link" data-scroll-target="#selectcolumnscb">SelectColumnsCB</a></li>
+  <li><a href="#renamecolumnscb" id="toc-renamecolumnscb" class="nav-link" data-scroll-target="#renamecolumnscb">RenameColumnsCB</a></li>
+  <li><a href="#removeallnavaluescb" id="toc-removeallnavaluescb" class="nav-link" data-scroll-target="#removeallnavaluescb">RemoveAllNAValuesCB</a></li>
+  <li><a href="#comparedfsandtfmcb" id="toc-comparedfsandtfmcb" class="nav-link" data-scroll-target="#comparedfsandtfmcb">CompareDfsAndTfmCB</a></li>
+  <li><a href="#uniqueindexcb" id="toc-uniqueindexcb" class="nav-link" data-scroll-target="#uniqueindexcb">UniqueIndexCB</a></li>
+  </ul></li>
+  <li><a href="#time" id="toc-time" class="nav-link" data-scroll-target="#time">Time</a>
+  <ul>
+  <li><a href="#encodetimecb" id="toc-encodetimecb" class="nav-link" data-scroll-target="#encodetimecb">EncodeTimeCB</a></li>
+  <li><a href="#decodetimecb" id="toc-decodetimecb" class="nav-link" data-scroll-target="#decodetimecb">DecodeTimeCB</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/callbacks.html">API</a></li><li class="breadcrumb-item"><a href="../api/callbacks.html">Callbacks</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Callbacks</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+</div>
+
+<div>
+  <div class="description">
+    Callback used in handlers
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="core" class="level2">
+<h2 class="anchored" data-anchor-id="core">Core</h2>
+<p>The <a href="https://franckalbinet.github.io/marisco/api/callbacks.html#transformer"><code>Transformer</code></a> class is designed to facilitate the application of a series of callbacks to a set of dataframes. It provides a structured way to apply transformations (i.e <a href="https://franckalbinet.github.io/marisco/api/callbacks.html#callback"><code>Callback</code></a>) to the data, with a focus on flexibility and ease of use.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L33" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="callback" class="level3">
+<h3 class="anchored" data-anchor-id="callback">Callback</h3>
+<blockquote class="blockquote">
+<pre><code> Callback ()</code></pre>
+</blockquote>
+<p><em>Base class for callbacks.</em></p>
+<div id="4e58c73c" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Callback(): </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Base class for callbacks."</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    order <span class="op">=</span> <span class="dv">0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L38" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="run_cbs" class="level3">
+<h3 class="anchored" data-anchor-id="run_cbs">run_cbs</h3>
+<blockquote class="blockquote">
+<pre><code> run_cbs (cbs:List[__main__.Callback], obj:Any)</code></pre>
+</blockquote>
+<p><em>Run the callbacks in the order they are specified.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>cbs</td>
+<td>List</td>
+<td>List of callbacks to run</td>
+</tr>
+<tr class="even">
+<td>obj</td>
+<td>Any</td>
+<td>Object to pass to the callbacks</td>
+</tr>
+</tbody>
+</table>
+<div id="61702d17" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_cbs(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    cbs: List[Callback], <span class="co"># List of callbacks to run</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    obj: Any <span class="co"># Object to pass to the callbacks</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    ):</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Run the callbacks in the order they are specified."</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> cb <span class="kw">in</span> <span class="bu">sorted</span>(cbs, key<span class="op">=</span>attrgetter(<span class="st">'order'</span>)):</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> cb.__doc__: obj.logs.append(cb.__doc__)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        cb(obj)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L48" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="transformer" class="level3">
+<h3 class="anchored" data-anchor-id="transformer">Transformer</h3>
+<blockquote class="blockquote">
+<pre><code> Transformer (data:Union[Dict[str,pandas.core.frame.DataFrame],pandas.core
+              .frame.DataFrame],
+              cbs:Optional[List[__main__.Callback]]=None,
+              custom_maps:Dict=None, inplace:bool=False)</code></pre>
+</blockquote>
+<p><em>Transform the dataframe(s) according to the specified callbacks.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>data</td>
+<td>Union</td>
+<td></td>
+<td>Data to be transformed</td>
+</tr>
+<tr class="even">
+<td>cbs</td>
+<td>Optional</td>
+<td>None</td>
+<td>List of callbacks to run</td>
+</tr>
+<tr class="odd">
+<td>custom_maps</td>
+<td>Dict</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>inplace</td>
+<td>bool</td>
+<td>False</td>
+<td>Whether to modify the dataframe(s) in place</td>
+</tr>
+</tbody>
+</table>
+<div id="82a6611d" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Transformer():</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Transform the dataframe(s) according to the specified callbacks."</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                 data: Union[Dict[<span class="bu">str</span>, pd.DataFrame], pd.DataFrame], <span class="co"># Data to be transformed</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                 cbs: Optional[List[Callback]]<span class="op">=</span><span class="va">None</span>, <span class="co"># List of callbacks to run</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                 custom_maps: Dict <span class="op">=</span> <span class="va">None</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                 inplace: <span class="bu">bool</span><span class="op">=</span><span class="va">False</span> <span class="co"># Whether to modify the dataframe(s) in place</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                 ): </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.is_single_df <span class="op">=</span> <span class="bu">isinstance</span>(data, pd.DataFrame)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.df, <span class="va">self</span>.dfs <span class="op">=</span> <span class="va">self</span>._prepare_data(data, inplace)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.logs <span class="op">=</span> []</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.custom_maps <span class="op">=</span> custom_maps <span class="kw">or</span> defaultdict(<span class="kw">lambda</span>: defaultdict(<span class="bu">dict</span>))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _prepare_data(<span class="va">self</span>, data, inplace):</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.is_single_df:</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> (data <span class="cf">if</span> inplace <span class="cf">else</span> data.copy()), <span class="va">None</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">None</span>, (data <span class="cf">if</span> inplace <span class="cf">else</span> {k: v.copy() <span class="cf">for</span> k, v <span class="kw">in</span> data.items()})</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> unique(<span class="va">self</span>, col_name: <span class="bu">str</span>) <span class="op">-&gt;</span> np.ndarray:</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Distinct values of a specific column present in all groups."</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.is_single_df:</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>            values <span class="op">=</span> <span class="va">self</span>.df.get(col_name, pd.Series()).dropna().values</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>            columns <span class="op">=</span> [df.get(col_name) <span class="cf">for</span> df <span class="kw">in</span> <span class="va">self</span>.dfs.values() <span class="cf">if</span> df.get(col_name) <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>]</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>            values <span class="op">=</span> np.concatenate([col.dropna().values <span class="cf">for</span> col <span class="kw">in</span> columns]) <span class="cf">if</span> columns <span class="cf">else</span> []</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> np.unique(values)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>):</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Transform the dataframe(s) according to the specified callbacks."</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.cbs: run_cbs(<span class="va">self</span>.cbs, <span class="va">self</span>)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.df <span class="cf">if</span> <span class="va">self</span>.dfs <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> <span class="va">self</span>.dfs</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Below, a few examples of how to use the <a href="https://franckalbinet.github.io/marisco/api/callbacks.html#transformer"><code>Transformer</code></a> class. Let’s define first a test callback that adds <code>1</code> to the <code>depth</code>:</p>
+<div id="f913c2dc" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TestCB(Callback):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"A test callback to add 1 to the depth."</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm: Transformer):</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp, df <span class="kw">in</span> tfm.dfs.items(): </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>            df[<span class="st">'depth'</span>] <span class="op">=</span> df[<span class="st">'depth'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: x<span class="op">+</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>And apply it to the following dataframes:</p>
+<div id="106ee79f" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> {<span class="st">'biota'</span>: pd.DataFrame({<span class="st">'id'</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">'species'</span>: [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">0</span>], <span class="st">'depth'</span>: [<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]}),</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>       <span class="st">'seawater'</span>: pd.DataFrame({<span class="st">'id'</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">'depth'</span>: [<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>]})}</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[TestCB()])</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>dfs_test <span class="op">=</span> tfm()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>fc.test_eq(dfs_test[<span class="st">'biota'</span>][<span class="st">'depth'</span>].to_list(), [<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>])</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>fc.test_eq(dfs_test[<span class="st">'seawater'</span>][<span class="st">'depth'</span>].to_list(), [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="ac6bde01" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TestCB(Callback):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"A test callback to add 1 to the depth."</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm: Transformer):</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        tfm.df[<span class="st">'depth'</span>] <span class="op">=</span> tfm.df[<span class="st">'depth'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: x<span class="op">+</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="0e71d632" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'id'</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">'species'</span>: [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">0</span>], <span class="st">'depth'</span>: [<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]})</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(df, cbs<span class="op">=</span>[TestCB()])</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>df_test <span class="op">=</span> tfm()</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>fc.test_eq(df_test[<span class="st">'depth'</span>].to_list(), [<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="geographical" class="level2">
+<h2 class="anchored" data-anchor-id="geographical">Geographical</h2>
+<p>This section gathers callbacks that are used to transform the geographical coordinates.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L83" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="sanitizelonlatcb" class="level3">
+<h3 class="anchored" data-anchor-id="sanitizelonlatcb">SanitizeLonLatCB</h3>
+<blockquote class="blockquote">
+<pre><code> SanitizeLonLatCB (lon_col:str='LON', lat_col:str='LAT',
+                   verbose:bool=False)</code></pre>
+</blockquote>
+<p><em>Drop rows with invalid longitude &amp; latitude values. Convert <code>,</code> separator to <code>.</code> separator.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>lon_col</td>
+<td>str</td>
+<td>LON</td>
+<td>Longitude column name</td>
+</tr>
+<tr class="even">
+<td>lat_col</td>
+<td>str</td>
+<td>LAT</td>
+<td>Latitude column name</td>
+</tr>
+<tr class="odd">
+<td>verbose</td>
+<td>bool</td>
+<td>False</td>
+<td>Whether to print the number of invalid longitude &amp; latitude values</td>
+</tr>
+</tbody>
+</table>
+<div id="097d66b6" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SanitizeLonLatCB(Callback):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Drop rows with invalid longitude &amp; latitude values. Convert `,` separator to `.` separator."</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                 lon_col: <span class="bu">str</span><span class="op">=</span><span class="st">'LON'</span>, <span class="co"># Longitude column name</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                 lat_col: <span class="bu">str</span><span class="op">=</span><span class="st">'LAT'</span>, <span class="co"># Latitude column name</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                 verbose: <span class="bu">bool</span><span class="op">=</span><span class="va">False</span> <span class="co"># Whether to print the number of invalid longitude &amp; latitude values</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                 ):</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm: Transformer):</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp, df <span class="kw">in</span> tfm.dfs.items():</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Convert `,` separator to `.` separator</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>            df[<span class="va">self</span>.lon_col] <span class="op">=</span> df[<span class="va">self</span>.lon_col].<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="bu">float</span>(<span class="bu">str</span>(x).replace(<span class="st">','</span>, <span class="st">'.'</span>)))</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>            df[<span class="va">self</span>.lat_col] <span class="op">=</span> df[<span class="va">self</span>.lat_col].<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="bu">float</span>(<span class="bu">str</span>(x).replace(<span class="st">','</span>, <span class="st">'.'</span>)))</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Mask zero values</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>            mask_zeroes <span class="op">=</span> (df[<span class="va">self</span>.lon_col] <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (df[<span class="va">self</span>.lat_col] <span class="op">==</span> <span class="dv">0</span>) </span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>            nZeroes <span class="op">=</span> mask_zeroes.<span class="bu">sum</span>()</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> nZeroes <span class="kw">and</span> <span class="va">self</span>.verbose: </span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f'The "</span><span class="sc">{</span>grp<span class="sc">}</span><span class="ss">" group contains </span><span class="sc">{</span>nZeroes<span class="sc">}</span><span class="ss"> data points whose (</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>lon_col<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>lat_col<span class="sc">}</span><span class="ss">) = (0, 0)'</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Mask out of bounds values</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>            mask_goob <span class="op">=</span> (df[<span class="va">self</span>.lon_col] <span class="op">&lt;</span> <span class="op">-</span><span class="dv">180</span>) <span class="op">|</span> (df[<span class="va">self</span>.lon_col] <span class="op">&gt;</span> <span class="dv">180</span>) <span class="op">|</span> (df[<span class="va">self</span>.lat_col] <span class="op">&lt;</span> <span class="op">-</span><span class="dv">90</span>) <span class="op">|</span> (df[<span class="va">self</span>.lat_col] <span class="op">&gt;</span> <span class="dv">90</span>)</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>            nGoob <span class="op">=</span> mask_goob.<span class="bu">sum</span>()</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> nGoob <span class="kw">and</span> <span class="va">self</span>.verbose: </span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f'The "</span><span class="sc">{</span>grp<span class="sc">}</span><span class="ss">" group contains </span><span class="sc">{</span>nGoob<span class="sc">}</span><span class="ss"> data points with unrealistic </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>lon_col<span class="sc">}</span><span class="ss"> or </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>lat_col<span class="sc">}</span><span class="ss"> values.'</span>)</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[grp] <span class="op">=</span> df.loc[<span class="op">~</span>(mask_zeroes <span class="op">|</span> mask_goob)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="efd3a0b6" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check that measurements located at (0,0) get removed</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> {<span class="st">'BIOTA'</span>: pd.DataFrame({<span class="st">'LON'</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>], <span class="st">'LAT'</span>: [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">0</span>]})}</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[SanitizeLonLatCB()])</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>tfm()[<span class="st">'BIOTA'</span>]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>expected <span class="op">=</span> [<span class="fl">1.</span>, <span class="fl">2.</span>]</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>fc.test_eq(tfm()[<span class="st">'BIOTA'</span>].iloc[<span class="dv">0</span>].to_list(), expected)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="378851b1" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check that comma decimal separator get replaced by point instead</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> {<span class="st">'BIOTA'</span>: pd.DataFrame({<span class="st">'LON'</span>: [<span class="st">'45,2'</span>], <span class="st">'LAT'</span>: [<span class="st">'43,1'</span>]})}</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[SanitizeLonLatCB()])</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>tfm()[<span class="st">'BIOTA'</span>]</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>expected <span class="op">=</span> [<span class="fl">45.2</span>, <span class="fl">43.1</span>]</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>fc.test_eq(tfm()[<span class="st">'BIOTA'</span>].iloc[<span class="dv">0</span>].to_list(), expected)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="d3dd0096" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check that out of bounds lon or lat get removed</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> {<span class="st">'BIOTA'</span>: pd.DataFrame({<span class="st">'LON'</span>: [<span class="op">-</span><span class="dv">190</span>, <span class="dv">190</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="fl">1.1</span>], <span class="st">'LAT'</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">91</span>, <span class="op">-</span><span class="dv">91</span>, <span class="fl">2.2</span>]})}</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[SanitizeLonLatCB()])</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>tfm()[<span class="st">'BIOTA'</span>]</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>expected <span class="op">=</span> [<span class="fl">1.1</span>, <span class="fl">2.2</span>]</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>fc.test_eq(tfm()[<span class="st">'BIOTA'</span>].iloc[<span class="dv">0</span>].to_list(), expected)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="map-standardize" class="level2">
+<h2 class="anchored" data-anchor-id="map-standardize">Map &amp; Standardize</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L113" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="remapcb" class="level3">
+<h3 class="anchored" data-anchor-id="remapcb">RemapCB</h3>
+<blockquote class="blockquote">
+<pre><code> RemapCB (fn_lut:Callable, col_remap:str, col_src:str,
+          dest_grps:list[str]|str=dict_keys(['BIOTA', 'SEAWATER',
+          'SEDIMENT', 'SUSPENDED_MATTER']), default_value:Any=0,
+          verbose:bool=False)</code></pre>
+</blockquote>
+<p><em>Generic MARIS remapping callback.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fn_lut</td>
+<td>Callable</td>
+<td></td>
+<td>Function that returns the lookup table dictionary</td>
+</tr>
+<tr class="even">
+<td>col_remap</td>
+<td>str</td>
+<td></td>
+<td>Name of the column to remap</td>
+</tr>
+<tr class="odd">
+<td>col_src</td>
+<td>str</td>
+<td></td>
+<td>Name of the column with the source values</td>
+</tr>
+<tr class="even">
+<td>dest_grps</td>
+<td>list[str] | str</td>
+<td>dict_keys([‘BIOTA’, ‘SEAWATER’, ‘SEDIMENT’, ‘SUSPENDED_MATTER’])</td>
+<td>List of destination groups</td>
+</tr>
+<tr class="odd">
+<td>default_value</td>
+<td>Any</td>
+<td>0</td>
+<td>Default value for unmatched entries</td>
+</tr>
+<tr class="even">
+<td>verbose</td>
+<td>bool</td>
+<td>False</td>
+<td>Whether to print the number of unmatched entries</td>
+</tr>
+</tbody>
+</table>
+<div id="8c905654" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RemapCB(Callback):</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Generic MARIS remapping callback."</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                 fn_lut: Callable, <span class="co"># Function that returns the lookup table dictionary</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                 col_remap: <span class="bu">str</span>, <span class="co"># Name of the column to remap</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                 col_src: <span class="bu">str</span>, <span class="co"># Name of the column with the source values</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                 dest_grps: <span class="bu">list</span>[<span class="bu">str</span>]<span class="op">|</span><span class="bu">str</span><span class="op">=</span>NC_GROUPS.keys(), <span class="co"># List of destination groups</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                 default_value: Any <span class="op">=</span> <span class="dv">0</span>, <span class="co"># Default value for unmatched entries</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>                 verbose: <span class="bu">bool</span><span class="op">=</span><span class="va">False</span> <span class="co"># Whether to print the number of unmatched entries</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>                ):</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.lut <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(dest_grps, <span class="bu">str</span>): <span class="va">self</span>.dest_grps <span class="op">=</span> [dest_grps]</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Format the documentation string based on the type and content of dest_grps</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(<span class="va">self</span>.dest_grps, <span class="bu">list</span>):</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">len</span>(<span class="va">self</span>.dest_grps) <span class="op">&gt;</span> <span class="dv">1</span>:</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>                grp_str <span class="op">=</span> <span class="st">', '</span>.join(<span class="va">self</span>.dest_grps[:<span class="op">-</span><span class="dv">1</span>]) <span class="op">+</span> <span class="st">' and '</span> <span class="op">+</span> <span class="va">self</span>.dest_grps[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>                grp_str <span class="op">=</span> <span class="va">self</span>.dest_grps[<span class="dv">0</span>]</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>            grp_str <span class="op">=</span> <span class="va">self</span>.dest_grps</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.__doc__ <span class="op">=</span> <span class="ss">f"Remap values from '</span><span class="sc">{</span>col_src<span class="sc">}</span><span class="ss">' to '</span><span class="sc">{</span>col_remap<span class="sc">}</span><span class="ss">' for groups: </span><span class="sc">{</span>grp_str<span class="sc">}</span><span class="ss">."</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.lut <span class="op">=</span> <span class="va">self</span>.fn_lut()</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp <span class="kw">in</span> <span class="va">self</span>.dest_grps:</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> grp <span class="kw">in</span> tfm.dfs:</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>._remap_group(tfm.dfs[grp])</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"Group </span><span class="sc">{</span>grp<span class="sc">}</span><span class="ss"> not found in the dataframes."</span>)</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _remap_group(<span class="va">self</span>, df: pd.DataFrame):</span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>        df[<span class="va">self</span>.col_remap] <span class="op">=</span> df[<span class="va">self</span>.col_src].<span class="bu">apply</span>(<span class="va">self</span>._remap_value)</span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _remap_value(<span class="va">self</span>, value: <span class="bu">str</span>) <span class="op">-&gt;</span> Any:</span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>        value <span class="op">=</span> value.strip() <span class="cf">if</span> <span class="bu">isinstance</span>(value, <span class="bu">str</span>) <span class="cf">else</span> value</span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>        match <span class="op">=</span> <span class="va">self</span>.lut.get(value, Match(<span class="va">self</span>.default_value, <span class="va">None</span>, <span class="va">None</span>, <span class="va">None</span>))</span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(match, Match):</span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> match.matched_id <span class="op">==</span> <span class="va">self</span>.default_value:</span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="va">self</span>.verbose:</span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>                    <span class="bu">print</span>(<span class="ss">f"Unmatched value: </span><span class="sc">{</span>value<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> match.matched_id </span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> match</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L160" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lowerstripnamecb" class="level3">
+<h3 class="anchored" data-anchor-id="lowerstripnamecb">LowerStripNameCB</h3>
+<blockquote class="blockquote">
+<pre><code> LowerStripNameCB (col_src:str, col_dst:str=None,
+                   fn_transform:Callable=&lt;function &lt;lambda&gt;&gt;)</code></pre>
+</blockquote>
+<p><em>Convert values to lowercase and strip any trailing spaces.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>col_src</td>
+<td>str</td>
+<td></td>
+<td>Source column name e.g.&nbsp;‘Nuclide’</td>
+</tr>
+<tr class="even">
+<td>col_dst</td>
+<td>str</td>
+<td>None</td>
+<td>Destination column name</td>
+</tr>
+<tr class="odd">
+<td>fn_transform</td>
+<td>Callable</td>
+<td><lambda></lambda></td>
+<td>Transformation function</td>
+</tr>
+</tbody>
+</table>
+<div id="bd1917a0" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LowerStripNameCB(Callback):</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Convert values to lowercase and strip any trailing spaces."</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                 col_src: <span class="bu">str</span>, <span class="co"># Source column name e.g. 'Nuclide'</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                 col_dst: <span class="bu">str</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Destination column name</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                 fn_transform: Callable<span class="op">=</span><span class="kw">lambda</span> x: x.lower().strip() <span class="co"># Transformation function</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                 ):</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.__doc__ <span class="op">=</span> <span class="ss">f"Convert '</span><span class="sc">{</span>col_src<span class="sc">}</span><span class="ss">' column values to lowercase, strip spaces, and store in '</span><span class="sc">{</span>col_dst<span class="sc">}</span><span class="ss">' column."</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> col_dst: <span class="va">self</span>.col_dst <span class="op">=</span> col_src</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _safe_transform(<span class="va">self</span>, value):</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Ensure value is not NA and apply transformation function."</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value <span class="cf">if</span> pd.isna(value) <span class="cf">else</span> <span class="va">self</span>.fn_transform(<span class="bu">str</span>(value))</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> key <span class="kw">in</span> tfm.dfs.keys():</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[key][<span class="va">self</span>.col_dst] <span class="op">=</span> tfm.dfs[key][<span class="va">self</span>.col_src].<span class="bu">apply</span>(<span class="va">self</span>._safe_transform)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Let’s test the callback:</p>
+<div id="11da226d" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> {<span class="st">'seawater'</span>: pd.DataFrame({<span class="st">'Nuclide'</span>: [<span class="st">'CS137'</span>, <span class="st">'226RA'</span>]})}</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripNameCB(col_src<span class="op">=</span><span class="st">'Nuclide'</span>, col_dst<span class="op">=</span><span class="st">'NUCLIDE'</span>)])</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>fc.test_eq(tfm()[<span class="st">'seawater'</span>][<span class="st">'NUCLIDE'</span>].to_list(), [<span class="st">'cs137'</span>, <span class="st">'226ra'</span>])</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[LowerStripNameCB(col_src<span class="op">=</span><span class="st">'Nuclide'</span>)])</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>fc.test_eq(tfm()[<span class="st">'seawater'</span>][<span class="st">'Nuclide'</span>].to_list(), [<span class="st">'cs137'</span>, <span class="st">'226ra'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The point is when (semi-automatic) remapping names generally:</p>
+<ol type="1">
+<li>we need first to guess (fuzzy matching or other) the right nuclide name.</li>
+<li>Then manually check the result and eventually update the lookup table.</li>
+<li>Finally we can apply the lookup table to the dataframe.</li>
+</ol>
+</section>
+</section>
+<section id="change-structure" class="level2">
+<h2 class="anchored" data-anchor-id="change-structure">Change structure</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L180" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="addsampletypeidcolumncb" class="level3">
+<h3 class="anchored" data-anchor-id="addsampletypeidcolumncb">AddSampleTypeIdColumnCB</h3>
+<blockquote class="blockquote">
+<pre><code> AddSampleTypeIdColumnCB (lut:dict={'SEAWATER': 1, 'BIOTA': 2, 'SEDIMENT':
+                          3, 'SUSPENDED_MATTER': 4},
+                          col_name:str='SAMPLE_TYPE')</code></pre>
+</blockquote>
+<p><em>Base class for callbacks.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>lut</td>
+<td>dict</td>
+<td>{‘SEAWATER’: 1, ‘BIOTA’: 2, ‘SEDIMENT’: 3, ‘SUSPENDED_MATTER’: 4}</td>
+<td>Lookup table for sample type</td>
+</tr>
+<tr class="even">
+<td>col_name</td>
+<td>str</td>
+<td>SAMPLE_TYPE</td>
+<td>Column name to store the sample type id</td>
+</tr>
+</tbody>
+</table>
+<div id="949d6471" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> AddSampleTypeIdColumnCB(Callback):</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                 lut: <span class="bu">dict</span><span class="op">=</span>SMP_TYPE_LUT, <span class="co"># Lookup table for sample type</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                 col_name: <span class="bu">str</span><span class="op">=</span><span class="st">'SAMPLE_TYPE'</span> <span class="co"># Column name to store the sample type id</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                 ): </span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Add a column with the sample type as defined in the CDL."</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp, df <span class="kw">in</span> tfm.dfs.items():             </span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>            df[<span class="va">self</span>.col_name] <span class="op">=</span> <span class="va">self</span>.lut[grp]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Let’s test the callback:</p>
+<div id="c1b44b11" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> {smp_type: pd.DataFrame({<span class="st">'col_test'</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>]}) <span class="cf">for</span> smp_type <span class="kw">in</span> SMP_TYPE_LUT.keys()}<span class="op">;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[AddSampleTypeIdColumnCB()])</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>dfs_test <span class="op">=</span> tfm()</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> smp_type <span class="kw">in</span> SMP_TYPE_LUT.keys():</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    fc.test_eq(dfs_test[smp_type][<span class="st">'SAMPLE_TYPE'</span>].unique().item(), SMP_TYPE_LUT[smp_type])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="c9a06891" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">''' 05 Feb 2025 - NM - AddNuclideIdColumnCB is not used anymore.</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| exports</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">class AddNuclideIdColumnCB(Callback):</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">    def __init__(self, </span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co">                 col_value: str, # Column name containing the nuclide name</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co">                 lut_fname_fn: Callable=nuc_lut_path, # Function returning the lut path</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co">                 col_name: str='nuclide_id' # Column name to store the nuclide id</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co">                 ): </span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co">        "Add a column with the nuclide id."</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co">        fc.store_attr()</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co">        self.lut = get_lut(lut_fname_fn().parent, lut_fname_fn().name, </span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="co">                           key='nc_name', value='nuclide_id', reverse=False)</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co">        </span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co">    def __call__(self, tfm: Transformer):</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="co">        for grp, df in tfm.dfs.items(): </span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="co">            df[self.col_name] = df[self.col_value].map(self.lut)</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="co">'''</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>' 05 Feb 2025 - NM - AddNuclideIdColumnCB is not used anymore.\n#| exports\nclass AddNuclideIdColumnCB(Callback):\n    def __init__(self, \n                 col_value: str, # Column name containing the nuclide name\n                 lut_fname_fn: Callable=nuc_lut_path, # Function returning the lut path\n                 col_name: str=\'nuclide_id\' # Column name to store the nuclide id\n                 ): \n        "Add a column with the nuclide id."\n        fc.store_attr()\n        self.lut = get_lut(lut_fname_fn().parent, lut_fname_fn().name, \n                           key=\'nc_name\', value=\'nuclide_id\', reverse=False)\n        \n    def __call__(self, tfm: Transformer):\n        for grp, df in tfm.dfs.items(): \n            df[self.col_name] = df[self.col_value].map(self.lut)\n'</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L193" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="selectcolumnscb" class="level3">
+<h3 class="anchored" data-anchor-id="selectcolumnscb">SelectColumnsCB</h3>
+<blockquote class="blockquote">
+<pre><code> SelectColumnsCB (cois:dict)</code></pre>
+</blockquote>
+<p><em>Select columns of interest.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>cois</td>
+<td>dict</td>
+<td>Columns of interest</td>
+</tr>
+</tbody>
+</table>
+<div id="efe41950" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SelectColumnsCB(Callback):</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Select columns of interest."</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                 cois: <span class="bu">dict</span> <span class="co"># Columns of interest</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                 ): </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Select columns of interest."</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp, df <span class="kw">in</span> tfm.dfs.items(): </span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[grp] <span class="op">=</span> df.loc[:, <span class="va">self</span>.cois.keys()]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L206" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="renamecolumnscb" class="level3">
+<h3 class="anchored" data-anchor-id="renamecolumnscb">RenameColumnsCB</h3>
+<blockquote class="blockquote">
+<pre><code> RenameColumnsCB (renaming_rules:dict)</code></pre>
+</blockquote>
+<p><em>Renaming variables to MARIS standard names.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>renaming_rules</td>
+<td>dict</td>
+<td>Renaming rules</td>
+</tr>
+</tbody>
+</table>
+<div id="9da3e703" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RenameColumnsCB(Callback):</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Renaming variables to MARIS standard names."</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                 renaming_rules: <span class="bu">dict</span> <span class="co"># Renaming rules</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                 ): </span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp <span class="kw">in</span> tfm.dfs.keys(): </span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[grp].rename(columns<span class="op">=</span><span class="va">self</span>.renaming_rules, inplace<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L218" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="removeallnavaluescb" class="level3">
+<h3 class="anchored" data-anchor-id="removeallnavaluescb">RemoveAllNAValuesCB</h3>
+<blockquote class="blockquote">
+<pre><code> RemoveAllNAValuesCB (cols_to_check:Union[Dict[str,list],list],
+                      how:str='all')</code></pre>
+</blockquote>
+<p><em>Remove rows with all NA values in specified columns.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>cols_to_check</td>
+<td>Union</td>
+<td></td>
+<td>Dict or list of columns to check</td>
+</tr>
+<tr class="even">
+<td>how</td>
+<td>str</td>
+<td>all</td>
+<td>How to handle NA values ‘all’ or ‘any’</td>
+</tr>
+</tbody>
+</table>
+<div id="1ea2cc64" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RemoveAllNAValuesCB(Callback):</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Remove rows with all NA values in specified columns."</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                 cols_to_check: Union[Dict[<span class="bu">str</span>, <span class="bu">list</span>], <span class="bu">list</span>],  <span class="co"># Dict or list of columns to check</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                 how: <span class="bu">str</span><span class="op">=</span><span class="st">'all'</span>  <span class="co"># How to handle NA values 'all' or 'any'</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>                ):</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Convert list to dict if cols_to_check is a list</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>        cols_dict <span class="op">=</span> (<span class="va">self</span>.cols_to_check <span class="cf">if</span> <span class="bu">isinstance</span>(<span class="va">self</span>.cols_to_check, <span class="bu">dict</span>) </span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">else</span> {k: <span class="va">self</span>.cols_to_check <span class="cf">for</span> k <span class="kw">in</span> tfm.dfs.keys()})</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> sample_type, columns <span class="kw">in</span> cols_dict.items():</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[sample_type].dropna(</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>                subset<span class="op">=</span>columns,</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>                how<span class="op">=</span><span class="va">self</span>.how,</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>                inplace<span class="op">=</span><span class="va">True</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>            )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Let’s test the callback:</p>
+<div id="4e194d5e" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_remove_all_na_values_cb():</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Test RemoveAllNAValuesCB with both dict and list inputs."""</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create sample data</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    sample_data <span class="op">=</span> {</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">'SEAWATER'</span>: pd.DataFrame({</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">'value'</span>: [<span class="fl">1.0</span>, np.nan, np.nan, <span class="fl">4.0</span>],</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">'uncertainty'</span>: [<span class="fl">0.1</span>, np.nan, np.nan, <span class="fl">0.4</span>],</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">'other_col'</span>: [<span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'c'</span>, <span class="st">'d'</span>]</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>        }),</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">'SEDIMENT'</span>: pd.DataFrame({</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">'value'</span>: [np.nan, <span class="fl">2.0</span>, np.nan, np.nan],</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">'uncertainty'</span>: [np.nan, <span class="fl">0.2</span>, np.nan, np.nan],</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">'meta'</span>: [<span class="st">'x'</span>, <span class="st">'y'</span>, <span class="st">'z'</span>, <span class="st">'w'</span>]</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>    tfm <span class="op">=</span> Transformer(sample_data)</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Test with list input</span></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>    cb1 <span class="op">=</span> RemoveAllNAValuesCB(cols_to_check<span class="op">=</span>[<span class="st">'value'</span>, <span class="st">'uncertainty'</span>], how<span class="op">=</span><span class="st">'all'</span>)</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>    tfm_list <span class="op">=</span> copy.deepcopy(tfm)</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>    cb1(tfm_list)</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Test with dict input</span></span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>    cb2 <span class="op">=</span> RemoveAllNAValuesCB(</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>        cols_to_check<span class="op">=</span>{<span class="st">'SEAWATER'</span>: [<span class="st">'value'</span>, <span class="st">'uncertainty'</span>], </span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>                       <span class="st">'SEDIMENT'</span>: [<span class="st">'value'</span>, <span class="st">'uncertainty'</span>]},</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>        how<span class="op">=</span><span class="st">'all'</span></span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>    tfm_dict <span class="op">=</span> copy.deepcopy(tfm)</span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>    cb2(tfm_dict)</span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Verify both approaches give same results</span></span>
+<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> tfm.dfs.keys():</span>
+<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> tfm_list.dfs[k].equals(tfm_dict.dfs[k])</span>
+<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="bu">len</span>(tfm_list.dfs[k]) <span class="op">==</span> <span class="bu">len</span>(tfm_dict.dfs[k])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L239" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="comparedfsandtfmcb" class="level3">
+<h3 class="anchored" data-anchor-id="comparedfsandtfmcb">CompareDfsAndTfmCB</h3>
+<blockquote class="blockquote">
+<pre><code> CompareDfsAndTfmCB (dfs:Dict[str,pandas.core.frame.DataFrame])</code></pre>
+</blockquote>
+<p><em>Create a dataframe of removed data and track changes in row counts due to transformations.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dfs</td>
+<td>Dict</td>
+<td>Original dataframes</td>
+</tr>
+</tbody>
+</table>
+<div id="8cf07327" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> CompareDfsAndTfmCB(Callback):</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Create a dataframe of removed data and track changes in row counts due to transformations."</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                 dfs: Dict[<span class="bu">str</span>, pd.DataFrame]  <span class="co"># Original dataframes</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>                 ): </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm: Transformer) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._initialize_tfm_attributes(tfm)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp <span class="kw">in</span> tfm.dfs.keys():</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._compute_changes(grp, tfm)</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _initialize_tfm_attributes(<span class="va">self</span>, tfm: Transformer) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>        tfm.dfs_removed <span class="op">=</span> {}</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>        tfm.compare_stats <span class="op">=</span> {}</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _compute_changes(<span class="va">self</span>, </span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>                         grp: <span class="bu">str</span>,  <span class="co"># The group key</span></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>                         tfm: Transformer  <span class="co"># The transformation object containing `dfs`</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>                        ) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Compute and store changes including data removed and created during transformation."</span></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>        original_df <span class="op">=</span> <span class="va">self</span>.dfs[grp]</span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>        transformed_df <span class="op">=</span> tfm.dfs[grp]</span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Calculate differences</span></span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>        original_count <span class="op">=</span> <span class="bu">len</span>(original_df.index)</span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>        transformed_count <span class="op">=</span> <span class="bu">len</span>(transformed_df.index)</span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>        removed_count <span class="op">=</span> <span class="bu">len</span>(original_df.index.difference(transformed_df.index))</span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>        created_count <span class="op">=</span> <span class="bu">len</span>(transformed_df.index.difference(original_df.index))</span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Store results</span></span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>        tfm.dfs_removed[grp] <span class="op">=</span> original_df.loc[original_df.index.difference(transformed_df.index)]</span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a>        tfm.compare_stats[grp] <span class="op">=</span> {</span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Original row count (dfs)'</span>: original_count,</span>
+<span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Transformed row count (tfm.dfs)'</span>: transformed_count,</span>
+<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Rows removed from original (tfm.dfs_removed)'</span>: removed_count,</span>
+<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Rows created in transformed (tfm.dfs_created)'</span>: created_count</span>
+<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>        }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p><a href="https://franckalbinet.github.io/marisco/api/callbacks.html#comparedfsandtfmcb"><code>CompareDfsAndTfmCB</code></a> compares the original dataframes to the transformed dataframe. A dictionary of dataframes, <code>tfm.dfs_dropped</code>, is created to include the data present in the original dataset but absent from the transformed data. <code>tfm.compare_stats</code> provides a quick overview of the number of rows in both the original dataframes and the transformed dataframe.</p>
+<p>For instance:</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L279" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="uniqueindexcb" class="level3">
+<h3 class="anchored" data-anchor-id="uniqueindexcb">UniqueIndexCB</h3>
+<blockquote class="blockquote">
+<pre><code> UniqueIndexCB (index_name='ID')</code></pre>
+</blockquote>
+<p><em>Set unique index for each group.</em></p>
+<div id="3653a68d" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> UniqueIndexCB(Callback):</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Set unique index for each group."</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                 index_name<span class="op">=</span><span class="st">'ID'</span>):</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k <span class="kw">in</span> tfm.dfs.keys():</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Reset the index of the DataFrame and drop the old index</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[k] <span class="op">=</span> tfm.dfs[k].reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Reset the index again and set the name of the new index to `ìndex_name``</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[k] <span class="op">=</span> tfm.dfs[k].reset_index(names<span class="op">=</span>[<span class="va">self</span>.index_name])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
+<section id="time" class="level2">
+<h2 class="anchored" data-anchor-id="time">Time</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L293" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="encodetimecb" class="level3">
+<h3 class="anchored" data-anchor-id="encodetimecb">EncodeTimeCB</h3>
+<blockquote class="blockquote">
+<pre><code> EncodeTimeCB (col_time:str='TIME', fn_units:Callable=&lt;function
+               get_time_units&gt;)</code></pre>
+</blockquote>
+<p><em>Encode time as seconds since epoch.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>col_time</td>
+<td>str</td>
+<td>TIME</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>fn_units</td>
+<td>Callable</td>
+<td>get_time_units</td>
+<td>Function returning the time units</td>
+</tr>
+</tbody>
+</table>
+<div id="7f03e81c" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EncodeTimeCB(Callback):</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Encode time as seconds since epoch."</span>    </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, </span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                 col_time: <span class="bu">str</span><span class="op">=</span><span class="st">'TIME'</span>,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                 fn_units: Callable<span class="op">=</span>get_time_units <span class="co"># Function returning the time units</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>                 ): </span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.units <span class="op">=</span> fn_units()</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm): </span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp, df <span class="kw">in</span> tfm.dfs.items():</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>            n_missing <span class="op">=</span> df[<span class="va">self</span>.col_time].isna().<span class="bu">sum</span>()</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> n_missing:</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"Warning: </span><span class="sc">{</span>n_missing<span class="sc">}</span><span class="ss"> missing time value(s) in </span><span class="sc">{</span>grp<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Remove NaN times and convert to seconds since epoch</span></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[grp] <span class="op">=</span> tfm.dfs[grp][tfm.dfs[grp][<span class="va">self</span>.col_time].notna()]</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[grp][<span class="va">self</span>.col_time] <span class="op">=</span> tfm.dfs[grp][<span class="va">self</span>.col_time].<span class="bu">apply</span>(<span class="kw">lambda</span> x: date2num(x, units<span class="op">=</span><span class="va">self</span>.units))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="43e22765" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>dfs_test <span class="op">=</span> {</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SEAWATER'</span>: pd.DataFrame({</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">'TIME'</span>: [pd.Timestamp(<span class="ss">f'2023-01-0</span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">'</span>) <span class="cf">for</span> t <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">2</span>]],</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">'value'</span>: [<span class="dv">1</span>, <span class="dv">2</span>]</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>        }),</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SEDIMENT'</span>: pd.DataFrame({</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'TIME'</span>: [pd.Timestamp(<span class="ss">f'2023-01-0</span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">'</span>) <span class="cf">for</span> t <span class="kw">in</span> [<span class="dv">3</span>, <span class="dv">4</span>]],</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'value'</span>: [<span class="dv">3</span>, <span class="dv">4</span>]</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>        }),</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>units <span class="op">=</span> <span class="st">'seconds since 1970-01-01 00:00:00.0'</span></span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs_test, cbs<span class="op">=</span>[</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>    EncodeTimeCB(fn_units<span class="op">=</span><span class="kw">lambda</span>: units)</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>    ], inplace<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>dfs_result <span class="op">=</span> tfm()</span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>fc.test_eq(dfs_result[<span class="st">'SEAWATER'</span>].TIME.dtype, <span class="st">'int64'</span>)</span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>fc.test_eq(dfs_result[<span class="st">'SEDIMENT'</span>].TIME.dtype, <span class="st">'int64'</span>)</span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>fc.test_eq(dfs_result[<span class="st">'SEAWATER'</span>].TIME, dfs_test[<span class="st">'SEAWATER'</span>].TIME.<span class="bu">apply</span>(<span class="kw">lambda</span> x: date2num(x, units<span class="op">=</span>units)))</span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>fc.test_eq(dfs_result[<span class="st">'SEDIMENT'</span>].TIME, dfs_test[<span class="st">'SEDIMENT'</span>].TIME.<span class="bu">apply</span>(<span class="kw">lambda</span> x: date2num(x, units<span class="op">=</span>units)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/callbacks.py#L313" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="decodetimecb" class="level3">
+<h3 class="anchored" data-anchor-id="decodetimecb">DecodeTimeCB</h3>
+<blockquote class="blockquote">
+<pre><code> DecodeTimeCB (col_time:str='TIME', fn_units:Callable=&lt;function
+               get_time_units&gt;)</code></pre>
+</blockquote>
+<p><em>Decode time from seconds since epoch to datetime format.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>col_time</td>
+<td>str</td>
+<td>TIME</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>fn_units</td>
+<td>Callable</td>
+<td>get_time_units</td>
+<td>Function returning the time units</td>
+</tr>
+</tbody>
+</table>
+<div id="41dcef31" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DecodeTimeCB(Callback):</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Decode time from seconds since epoch to datetime format."</span>    </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, </span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>                 col_time: <span class="bu">str</span><span class="op">=</span><span class="st">'TIME'</span>,</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>                 fn_units: Callable<span class="op">=</span>get_time_units <span class="co"># Function returning the time units</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>                 ): </span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.units <span class="op">=</span> fn_units()</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm): </span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp, df <span class="kw">in</span> tfm.dfs.items():</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>            n_missing <span class="op">=</span> df[<span class="va">self</span>.col_time].isna().<span class="bu">sum</span>()</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> n_missing:</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"Warning: </span><span class="sc">{</span>n_missing<span class="sc">}</span><span class="ss"> missing time value(s) in </span><span class="sc">{</span>grp<span class="sc">}</span><span class="ss">."</span>)</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Remove NaN times and convert to datetime</span></span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[grp] <span class="op">=</span> tfm.dfs[grp][tfm.dfs[grp][<span class="va">self</span>.col_time].notna()]</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>            tfm.dfs[grp][<span class="va">self</span>.col_time] <span class="op">=</span> df[<span class="va">self</span>.col_time].<span class="bu">apply</span>(</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>                <span class="kw">lambda</span> x: num2date(x, units<span class="op">=</span><span class="va">self</span>.units, only_use_cftime_datetimes<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>            )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="30f47871" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>dfs_test <span class="op">=</span> {</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SEAWATER'</span>: pd.DataFrame({</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">'TIME'</span>: [<span class="dv">1672531200</span>, <span class="dv">1672617600</span>],  <span class="co"># 2023-01-01, 2023-01-02 in seconds since epoch</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">'value'</span>: [<span class="dv">1</span>, <span class="dv">2</span>]</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>        }),</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SEDIMENT'</span>: pd.DataFrame({</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'TIME'</span>: [<span class="dv">1672704000</span>, <span class="dv">1672790400</span>],  <span class="co"># 2023-01-03, 2023-01-04 in seconds since epoch</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'value'</span>: [<span class="dv">3</span>, <span class="dv">4</span>]</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>        }),</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>units <span class="op">=</span> <span class="st">'seconds since 1970-01-01 00:00:00.0'</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs_test, cbs<span class="op">=</span>[</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    DecodeTimeCB(fn_units<span class="op">=</span><span class="kw">lambda</span>: units)</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>    ], inplace<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>dfs_result <span class="op">=</span> tfm()</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Test that times were converted to datetime</span></span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>fc.test_eq(dfs_result[<span class="st">'SEAWATER'</span>].TIME.dtype, <span class="st">'datetime64[ns]'</span>)</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>fc.test_eq(dfs_result[<span class="st">'SEDIMENT'</span>].TIME.dtype, <span class="st">'datetime64[ns]'</span>)</span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Test specific datetime values</span></span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>expected_times_seawater <span class="op">=</span> pd.to_datetime([<span class="st">'2023-01-01'</span>, <span class="st">'2023-01-02'</span>])</span>
+<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>expected_times_sediment <span class="op">=</span> pd.to_datetime([<span class="st">'2023-01-03'</span>, <span class="st">'2023-01-04'</span>])</span>
+<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a>fc.test_eq(dfs_result[<span class="st">'SEAWATER'</span>].TIME.dt.date, expected_times_seawater.date)</span>
+<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a>fc.test_eq(dfs_result[<span class="st">'SEDIMENT'</span>].TIME.dt.date, expected_times_sediment.date)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

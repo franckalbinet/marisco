@@ -1,0 +1,2222 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Various utilities">
+
+<title>Utilities – marisco</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-cd333c7267348b54b15a9ec2a617d176.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="Utilities – marisco">
+<meta property="og:description" content="Various utilities">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="Utilities – marisco">
+<meta name="twitter:description" content="Various utilities">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/franckalbinet/marisco"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/callbacks.html">API</a></li><li class="breadcrumb-item"><a href="../api/utils.html">Utilities</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="../index.html" class="sidebar-logo-link">
+      </a>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARISCO</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/ospar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OSPAR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/geotraces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geotraces</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/maris_legacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Legacy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/tepco.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TEPCO</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/encoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Encoders</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/decoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Decoders</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/utils.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Utilities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/netcdf2csv.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NetCDF2CSV</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Metadata</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../metadata/data-curation-rules.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data curation rules</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../metadata/field-definition.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Field definitions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#core" id="toc-core" class="nav-link active" data-scroll-target="#core">Core</a>
+  <ul>
+  <li><a href="#get_unique_across_dfs" id="toc-get_unique_across_dfs" class="nav-link" data-scroll-target="#get_unique_across_dfs">get_unique_across_dfs</a></li>
+  <li><a href="#remapper" id="toc-remapper" class="nav-link" data-scroll-target="#remapper">Remapper</a></li>
+  </ul></li>
+  <li><a href="#validation" id="toc-validation" class="nav-link" data-scroll-target="#validation">Validation</a>
+  <ul>
+  <li><a href="#has_valid_varname" id="toc-has_valid_varname" class="nav-link" data-scroll-target="#has_valid_varname">has_valid_varname</a></li>
+  </ul></li>
+  <li><a href="#geoprocessing" id="toc-geoprocessing" class="nav-link" data-scroll-target="#geoprocessing">Geoprocessing</a>
+  <ul>
+  <li><a href="#get_bbox" id="toc-get_bbox" class="nav-link" data-scroll-target="#get_bbox">get_bbox</a></li>
+  <li><a href="#ddmm_to_dd" id="toc-ddmm_to_dd" class="nav-link" data-scroll-target="#ddmm_to_dd">ddmm_to_dd</a></li>
+  </ul></li>
+  <li><a href="#downloaders" id="toc-downloaders" class="nav-link" data-scroll-target="#downloaders">Downloaders</a>
+  <ul>
+  <li><a href="#download_file" id="toc-download_file" class="nav-link" data-scroll-target="#download_file">download_file</a></li>
+  <li><a href="#download_files_in_folder" id="toc-download_files_in_folder" class="nav-link" data-scroll-target="#download_files_in_folder">download_files_in_folder</a></li>
+  </ul></li>
+  <li><a href="#worrms" id="toc-worrms" class="nav-link" data-scroll-target="#worrms">WorRMS</a>
+  <ul>
+  <li><a href="#match_worms" id="toc-match_worms" class="nav-link" data-scroll-target="#match_worms">match_worms</a></li>
+  </ul></li>
+  <li><a href="#fuzzy-matching-for-maris-lookup-tables" id="toc-fuzzy-matching-for-maris-lookup-tables" class="nav-link" data-scroll-target="#fuzzy-matching-for-maris-lookup-tables">Fuzzy matching for MARIS Lookup Tables</a>
+  <ul>
+  <li><a href="#match" id="toc-match" class="nav-link" data-scroll-target="#match">Match</a></li>
+  <li><a href="#match_maris_lut" id="toc-match_maris_lut" class="nav-link" data-scroll-target="#match_maris_lut">match_maris_lut</a></li>
+  </ul></li>
+  <li><a href="#downloaders-1" id="toc-downloaders-1" class="nav-link" data-scroll-target="#downloaders-1">Downloaders</a>
+  <ul>
+  <li><a href="#download_file-1" id="toc-download_file-1" class="nav-link" data-scroll-target="#download_file-1">download_file</a></li>
+  <li><a href="#download_files_in_folder-1" id="toc-download_files_in_folder-1" class="nav-link" data-scroll-target="#download_files_in_folder-1">download_files_in_folder</a></li>
+  </ul></li>
+  <li><a href="#test" id="toc-test" class="nav-link" data-scroll-target="#test">Test</a>
+  <ul>
+  <li><a href="#test_dfs" id="toc-test_dfs" class="nav-link" data-scroll-target="#test_dfs">test_dfs</a></li>
+  </ul></li>
+  <li><a href="#netcdf-utilities" id="toc-netcdf-utilities" class="nav-link" data-scroll-target="#netcdf-utilities">NetCDF Utilities</a>
+  <ul>
+  <li><a href="#extractnetcdfcontents" id="toc-extractnetcdfcontents" class="nav-link" data-scroll-target="#extractnetcdfcontents">ExtractNetcdfContents</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/callbacks.html">API</a></li><li class="breadcrumb-item"><a href="../api/utils.html">Utilities</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Utilities</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+</div>
+
+<div>
+  <div class="description">
+    Various utilities
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>We define below useful constants throughout the package.</p>
+<div id="6dff2deb" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TBD</span><span class="co">: move to configs</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>NA <span class="op">=</span> <span class="st">'Not available'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<section id="core" class="level2">
+<h2 class="anchored" data-anchor-id="core">Core</h2>
+<p>Abstracting some common operations.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L38" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="get_unique_across_dfs" class="level3">
+<h3 class="anchored" data-anchor-id="get_unique_across_dfs">get_unique_across_dfs</h3>
+<blockquote class="blockquote">
+<pre><code> get_unique_across_dfs (dfs:Dict[str,pandas.core.frame.DataFrame],
+                        col_name:str='NUCLIDE', as_df:bool=False,
+                        include_nchars:bool=False)</code></pre>
+</blockquote>
+<p><em>Get a list of unique column values across dataframes.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dfs</td>
+<td>Dict</td>
+<td></td>
+<td>Dictionary of dataframes</td>
+</tr>
+<tr class="even">
+<td>col_name</td>
+<td>str</td>
+<td>NUCLIDE</td>
+<td>Column name to extract unique values from</td>
+</tr>
+<tr class="odd">
+<td>as_df</td>
+<td>bool</td>
+<td>False</td>
+<td>Return a DataFrame of unique values</td>
+</tr>
+<tr class="even">
+<td>include_nchars</td>
+<td>bool</td>
+<td>False</td>
+<td>Add a column with the number of characters in the value</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>List</strong></td>
+<td></td>
+<td><strong>Returns a list of unique column values across dataframes</strong></td>
+</tr>
+</tbody>
+</table>
+<div id="31569370" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_unique_across_dfs(dfs: Dict[<span class="bu">str</span>, pd.DataFrame],  <span class="co"># Dictionary of dataframes</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                          col_name: <span class="bu">str</span><span class="op">=</span><span class="st">'NUCLIDE'</span>, <span class="co"># Column name to extract unique values from</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                          as_df: <span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Return a DataFrame of unique values</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                          include_nchars: <span class="bu">bool</span><span class="op">=</span><span class="va">False</span> <span class="co"># Add a column with the number of characters in the value</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                          ) <span class="op">-&gt;</span> List[<span class="bu">str</span>]: <span class="co"># Returns a list of unique column values across dataframes</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Get a list of unique column values across dataframes."</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    unique_values <span class="op">=</span> <span class="bu">list</span>(<span class="bu">set</span>().union(<span class="op">*</span>(df[col_name].unique() <span class="cf">for</span> df <span class="kw">in</span> dfs.values() <span class="cf">if</span> col_name <span class="kw">in</span> df.columns)))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> as_df:</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> unique_values</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        df_uniques <span class="op">=</span> pd.DataFrame(unique_values, columns<span class="op">=</span>[<span class="st">'value'</span>]).reset_index()</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> include_nchars: df_uniques[<span class="st">'n_chars'</span>] <span class="op">=</span> df_uniques[<span class="st">'value'</span>].<span class="bu">str</span>.<span class="bu">len</span>()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> df_uniques</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Example of use:</p>
+<div id="609599ed" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dfs_test <span class="op">=</span> {<span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>            <span class="st">'BIOTA'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">'SEDIMENT'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>]})}</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>fc.test_eq(<span class="bu">set</span>(get_unique_across_dfs(dfs_test, col_name<span class="op">=</span><span class="st">'NUCLIDE'</span>)), </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>           <span class="bu">set</span>([<span class="st">'cs134'</span>, <span class="st">'cs137'</span>, <span class="st">'cs134_137_tot'</span>]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>What if the column name is not in one of the dataframe?</p>
+<div id="24161871" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dfs_test <span class="op">=</span> {<span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>            <span class="st">'BIOTA'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">'SEDIMENT'</span>: pd.DataFrame({<span class="st">'NONUCLIDE'</span>: [<span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>]})}</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>fc.test_eq(<span class="bu">set</span>(get_unique_across_dfs(dfs_test, col_name<span class="op">=</span><span class="st">'NUCLIDE'</span>)), </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>           <span class="bu">set</span>([<span class="st">'cs134'</span>, <span class="st">'cs137'</span>, <span class="st">'cs134_137_tot'</span>]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="08e26bb1" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>get_unique_across_dfs(dfs_test, col_name<span class="op">=</span><span class="st">'NUCLIDE'</span>, as_df<span class="op">=</span><span class="va">True</span>, include_nchars<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">index</th>
+<th data-quarto-table-cell-role="th">value</th>
+<th data-quarto-table-cell-role="th">n_chars</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>0</td>
+<td>cs134_137_tot</td>
+<td>13</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>1</td>
+<td>cs137</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>2</td>
+<td>cs134</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L53" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="remapper" class="level3">
+<h3 class="anchored" data-anchor-id="remapper">Remapper</h3>
+<blockquote class="blockquote">
+<pre><code> Remapper (provider_lut_df:pandas.core.frame.DataFrame,
+           maris_lut_fn:Union[Callable,pandas.core.frame.DataFrame],
+           maris_col_id:str, maris_col_name:str,
+           provider_col_to_match:str, provider_col_key:str,
+           fname_cache:str)</code></pre>
+</blockquote>
+<p><em>Remap a data provider lookup table to a MARIS lookup table using fuzzy matching.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>provider_lut_df</td>
+<td>DataFrame</td>
+<td>Data provider lookup table to be remapped</td>
+</tr>
+<tr class="even">
+<td>maris_lut_fn</td>
+<td>Union</td>
+<td>MARIS lookup table or function returning the path</td>
+</tr>
+<tr class="odd">
+<td>maris_col_id</td>
+<td>str</td>
+<td>MARIS lookup table column name for the id</td>
+</tr>
+<tr class="even">
+<td>maris_col_name</td>
+<td>str</td>
+<td>MARIS lookup table column name for the name</td>
+</tr>
+<tr class="odd">
+<td>provider_col_to_match</td>
+<td>str</td>
+<td>Data provider lookup table column name for the name to match</td>
+</tr>
+<tr class="even">
+<td>provider_col_key</td>
+<td>str</td>
+<td>Data provider lookup table column name for the key</td>
+</tr>
+<tr class="odd">
+<td>fname_cache</td>
+<td>str</td>
+<td>Cache file name</td>
+</tr>
+</tbody>
+</table>
+<div id="cf58241b" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Remapper():</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Remap a data provider lookup table to a MARIS lookup table using fuzzy matching."</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                 provider_lut_df: pd.DataFrame, <span class="co"># Data provider lookup table to be remapped</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                 maris_lut_fn: Union[Callable, pd.DataFrame], <span class="co"># MARIS lookup table or function returning the path</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                 maris_col_id: <span class="bu">str</span>, <span class="co"># MARIS lookup table column name for the id</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                 maris_col_name: <span class="bu">str</span>, <span class="co"># MARIS lookup table column name for the name</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                 provider_col_to_match: <span class="bu">str</span>, <span class="co"># Data provider lookup table column name for the name to match</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                 provider_col_key: <span class="bu">str</span>, <span class="co"># Data provider lookup table column name for the key</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                 fname_cache: <span class="bu">str</span> <span class="co"># Cache file name</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                 ):</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        fc.store_attr()</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cache_file <span class="op">=</span> cache_path() <span class="op">/</span> fname_cache</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Check if maris_lut is a callable function or already a DataFrame</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">callable</span>(maris_lut_fn):</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.maris_lut <span class="op">=</span> maris_lut_fn()</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.maris_lut <span class="op">=</span> maris_lut_fn</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.lut <span class="op">=</span> {}</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> generate_lookup_table(<span class="va">self</span>, </span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>                              fixes<span class="op">=</span>{}, <span class="co"># Lookup table fixes</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>                              as_df<span class="op">=</span><span class="va">True</span>, <span class="co"># Whether to return a DataFrame</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>                              overwrite<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Generate a lookup table from a data provider lookup table to a MARIS lookup table using fuzzy matching."</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fixes <span class="op">=</span> fixes</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.as_df <span class="op">=</span> as_df</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> overwrite <span class="kw">or</span> <span class="kw">not</span> <span class="va">self</span>.cache_file.exists():</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._create_lookup_table()</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>            fc.save_pickle(<span class="va">self</span>.cache_file, <span class="va">self</span>.lut)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.lut <span class="op">=</span> fc.load_pickle(<span class="va">self</span>.cache_file)</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._format_output()</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _create_lookup_table(<span class="va">self</span>):</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> <span class="va">self</span>.provider_lut_df</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _, row <span class="kw">in</span> tqdm(df.iterrows(), total<span class="op">=</span><span class="bu">len</span>(df), desc<span class="op">=</span><span class="st">"Processing"</span>): </span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._process_row(row)</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _process_row(<span class="va">self</span>, row):</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>        value_to_match <span class="op">=</span> row[<span class="va">self</span>.provider_col_to_match]</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(value_to_match, <span class="bu">str</span>):  <span class="co"># Only process if value is a string</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>            <span class="co"># If value is in fixes, use the fixed value</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>            name_to_match <span class="op">=</span> <span class="va">self</span>.fixes.get(value_to_match, value_to_match)</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> match_maris_lut(<span class="va">self</span>.maris_lut, name_to_match, <span class="va">self</span>.maris_col_id, <span class="va">self</span>.maris_col_name).iloc[<span class="dv">0</span>]</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>            match <span class="op">=</span> Match(result[<span class="va">self</span>.maris_col_id], result[<span class="va">self</span>.maris_col_name], </span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>                          value_to_match, result[<span class="st">'score'</span>])</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.lut[row[<span class="va">self</span>.provider_col_key]] <span class="op">=</span> match</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Handle non-string values (e.g., NaN)</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.lut[row[<span class="va">self</span>.provider_col_key]] <span class="op">=</span> Match(<span class="op">-</span><span class="dv">1</span>, <span class="st">"Unknown"</span>, value_to_match, <span class="dv">0</span>)</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> select_match(<span class="va">self</span>, match_score_threshold:<span class="bu">int</span><span class="op">=</span><span class="dv">1</span>, verbose:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>):</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> verbose:</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>            matched_len<span class="op">=</span> <span class="bu">len</span>([v <span class="cf">for</span> v <span class="kw">in</span> <span class="va">self</span>.lut.values() <span class="cf">if</span> v.match_score <span class="op">&lt;</span> match_score_threshold])</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>matched_len<span class="sc">}</span><span class="ss"> entries matched the criteria, while </span><span class="sc">{</span><span class="bu">len</span>(<span class="va">self</span>.lut) <span class="op">-</span> matched_len<span class="sc">}</span><span class="ss"> entries had a match score of </span><span class="sc">{</span>match_score_threshold<span class="sc">}</span><span class="ss"> or higher."</span>)</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.lut <span class="op">=</span> {k: v <span class="cf">for</span> k, v <span class="kw">in</span> <span class="va">self</span>.lut.items() <span class="cf">if</span> v.match_score <span class="op">&gt;=</span> match_score_threshold}</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._format_output()</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _format_output(<span class="va">self</span>):</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.as_df: <span class="cf">return</span> <span class="va">self</span>.lut</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>        df_lut <span class="op">=</span> pd.DataFrame.from_dict(<span class="va">self</span>.lut, orient<span class="op">=</span><span class="st">'index'</span>, </span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>                                        columns<span class="op">=</span>[<span class="st">'matched_maris_name'</span>, <span class="st">'source_name'</span>, <span class="st">'match_score'</span>])</span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>        df_lut.index.name <span class="op">=</span> <span class="st">'source_key'</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> df_lut.sort_values(by<span class="op">=</span><span class="st">'match_score'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
+<section id="validation" class="level2">
+<h2 class="anchored" data-anchor-id="validation">Validation</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L123" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="has_valid_varname" class="level3">
+<h3 class="anchored" data-anchor-id="has_valid_varname">has_valid_varname</h3>
+<blockquote class="blockquote">
+<pre><code> has_valid_varname (var_names:List[str], cdl_path:str,
+                    group:Optional[str]=None)</code></pre>
+</blockquote>
+<p><em>Check that proposed variable names are in MARIS CDL</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>var_names</td>
+<td>List</td>
+<td></td>
+<td>variable names</td>
+</tr>
+<tr class="even">
+<td>cdl_path</td>
+<td>str</td>
+<td></td>
+<td>Path to MARIS CDL file (point of truth)</td>
+</tr>
+<tr class="odd">
+<td>group</td>
+<td>Optional</td>
+<td>None</td>
+<td>Check if the variable names is contained in the group</td>
+</tr>
+</tbody>
+</table>
+<div id="d571a8c9" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TBD</span><span class="co">: Assess if still needed</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> has_valid_varname(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    var_names: List[<span class="bu">str</span>], <span class="co"># variable names</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    cdl_path: <span class="bu">str</span>, <span class="co"># Path to MARIS CDL file (point of truth)</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    group: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span>, <span class="co"># Check if the variable names is contained in the group</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Check that proposed variable names are in MARIS CDL"</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    has_valid <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> Dataset(cdl_path) <span class="im">as</span> nc:</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        cdl_vars<span class="op">=</span>{}</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        all_vars<span class="op">=</span>[]</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># get variable names in CDL </span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp <span class="kw">in</span> nc.groups.values():</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Create a list of var for each group</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>            <span class="bu">vars</span> <span class="op">=</span> <span class="bu">list</span>(grp.variables.keys())</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>            cdl_vars[grp.name] <span class="op">=</span> <span class="bu">vars</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>            all_vars.extend(<span class="bu">vars</span>)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> group <span class="op">!=</span> <span class="va">None</span>:</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>        allowed_vars<span class="op">=</span> cdl_vars[group]</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>: </span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        <span class="co"># get unique </span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>        allowed_vars <span class="op">=</span> <span class="bu">list</span>(<span class="bu">set</span>(all_vars))</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name <span class="kw">in</span> var_names:</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> name <span class="kw">not</span> <span class="kw">in</span> allowed_vars:</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>            has_valid <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> group <span class="op">!=</span> <span class="va">None</span>:</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f'"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">" variable name not found in group "</span><span class="sc">{</span>group<span class="sc">}</span><span class="ss">" of MARIS CDL'</span>)</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f'"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">" variable name not found in MARIS CDL'</span>)</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> has_valid</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="169dddf3" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># VARNAMES = ['lat', 'lon']</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># test_eq(has_valid_varname(VARNAMES, './files/nc/maris-cdl.nc'), True)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="8dff3d6f" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># VARNAMES = ['ba140_invalid', 'ba140_dl']</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># test_eq(has_valid_varname(VARNAMES, './files/nc/maris-cdl.nc'), False)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="geoprocessing" class="level2">
+<h2 class="anchored" data-anchor-id="geoprocessing">Geoprocessing</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L156" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="get_bbox" class="level3">
+<h3 class="anchored" data-anchor-id="get_bbox">get_bbox</h3>
+<blockquote class="blockquote">
+<pre><code> get_bbox (df, coord_cols:Tuple[str,str]=('LON', 'LAT'))</code></pre>
+</blockquote>
+<p><em>Get the bounding box of a DataFrame.</em></p>
+<div id="0430678d" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_bbox(df,</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>             coord_cols: Tuple[<span class="bu">str</span>, <span class="bu">str</span>] <span class="op">=</span> (<span class="st">'LON'</span>, <span class="st">'LAT'</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>            ):</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Get the bounding box of a DataFrame."</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    x, y <span class="op">=</span> coord_cols        </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    arr <span class="op">=</span> [(row[x], row[y]) <span class="cf">for</span> _, row <span class="kw">in</span> df.iterrows()]</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> MultiPoint(arr).envelope</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="634c1197" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'LON'</span>: np.linspace(<span class="op">-</span><span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">20</span>), <span class="st">'LAT'</span>:  np.linspace(<span class="dv">40</span>, <span class="dv">50</span>, <span class="dv">20</span>)})</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>bbox <span class="op">=</span> get_bbox(df)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="0e607512" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To get `lon_min`, `lon_max`, `lat_min`, `lat_max`</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>bbox.bounds</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>(-10.0, 40.0, 5.0, 50.0)</code></pre>
+</div>
+</div>
+<div id="c761fbd8" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># And its Well-Know Text representation</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>bbox.wkt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>'POLYGON ((-10 40, 5 40, 5 50, -10 50, -10 40))'</code></pre>
+</div>
+</div>
+<div id="ec103c78" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If unique (lon, lat)</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'LON'</span>: [<span class="dv">0</span>, <span class="dv">0</span>], <span class="st">'LAT'</span>:  [<span class="dv">1</span>, <span class="dv">1</span>]})</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>bbox <span class="op">=</span> get_bbox(df)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="52704a39" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>bbox.bounds</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>(0.0, 1.0, 0.0, 1.0)</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L165" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="ddmm_to_dd" class="level3">
+<h3 class="anchored" data-anchor-id="ddmm_to_dd">ddmm_to_dd</h3>
+<blockquote class="blockquote">
+<pre><code> ddmm_to_dd (ddmmmm:float)</code></pre>
+</blockquote>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ddmmmm</td>
+<td>float</td>
+<td>Coordinates in degrees/minutes decimal format</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>Coordinates in degrees decimal format</strong></td>
+</tr>
+</tbody>
+</table>
+<div id="b53eebaf" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ddmm_to_dd(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    ddmmmm: <span class="bu">float</span> <span class="co"># Coordinates in degrees/minutes decimal format</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">-&gt;</span> <span class="bu">float</span>: <span class="co"># Coordinates in degrees decimal format</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert degrees/minutes decimal to degrees decimal.</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    mins, degs <span class="op">=</span> modf(ddmmmm)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    mins <span class="op">=</span> mins <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">round</span>(<span class="bu">int</span>(degs) <span class="op">+</span> (mins <span class="op">/</span> <span class="dv">60</span>), <span class="dv">6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="763602a6" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>fc.test_close(ddmm_to_dd(<span class="fl">45.34</span>), <span class="fl">45.566667</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="downloaders" class="level2">
+<h2 class="anchored" data-anchor-id="downloaders">Downloaders</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L285" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="download_file" class="level3">
+<h3 class="anchored" data-anchor-id="download_file">download_file</h3>
+<blockquote class="blockquote">
+<pre><code> download_file (owner, repo, src_dir, dest_dir, fname)</code></pre>
+</blockquote>
+<div id="2a8da64c" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> download_files_in_folder(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    owner: <span class="bu">str</span>, <span class="co"># GitHub owner</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    repo: <span class="bu">str</span>, <span class="co"># GitHub repository</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    src_dir: <span class="bu">str</span>, <span class="co"># Source directory</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    dest_dir: <span class="bu">str</span> <span class="co"># Destination directory</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    ):</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Make a GET request to the GitHub API to get the contents of the folder."</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="ss">f"https://api.github.com/repos/</span><span class="sc">{</span>owner<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>repo<span class="sc">}</span><span class="ss">/contents/</span><span class="sc">{</span>src_dir<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> requests.get(url)</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>        contents <span class="op">=</span> response.json()</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Iterate over the files and download them</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> item <span class="kw">in</span> contents:</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> item[<span class="st">"type"</span>] <span class="op">==</span> <span class="st">"file"</span>:</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>                fname <span class="op">=</span> item[<span class="st">"name"</span>]</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>                download_file(owner, repo, src_dir, dest_dir, fname)</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Error: </span><span class="sc">{</span>response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> download_file(owner, repo, src_dir, dest_dir, fname):</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Make a GET request to the GitHub API to get the raw file contents</span></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="ss">f"https://raw.githubusercontent.com/</span><span class="sc">{</span>owner<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>repo<span class="sc">}</span><span class="ss">/master/</span><span class="sc">{</span>src_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>fname<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> requests.get(url)</span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Save the file locally</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> <span class="bu">open</span>(Path(dest_dir) <span class="op">/</span> fname, <span class="st">"wb"</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>            <span class="bu">file</span>.write(response.content)</span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>fname<span class="sc">}</span><span class="ss"> downloaded successfully."</span>)</span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Error: </span><span class="sc">{</span>response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L264" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="download_files_in_folder" class="level3">
+<h3 class="anchored" data-anchor-id="download_files_in_folder">download_files_in_folder</h3>
+<blockquote class="blockquote">
+<pre><code> download_files_in_folder (owner:str, repo:str, src_dir:str, dest_dir:str)</code></pre>
+</blockquote>
+<p><em>Make a GET request to the GitHub API to get the contents of the folder.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>owner</td>
+<td>str</td>
+<td>GitHub owner</td>
+</tr>
+<tr class="even">
+<td>repo</td>
+<td>str</td>
+<td>GitHub repository</td>
+</tr>
+<tr class="odd">
+<td>src_dir</td>
+<td>str</td>
+<td>Source directory</td>
+</tr>
+<tr class="even">
+<td>dest_dir</td>
+<td>str</td>
+<td>Destination directory</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="worrms" class="level2">
+<h2 class="anchored" data-anchor-id="worrms">WorRMS</h2>
+<p>The <a href="https://www.marinespecies.org">World Register of Marine Species (WorMS)</a> is an authoritative classification and catalogue of marine names. It provides a REST API (among others) allowing to “fuzzy” match any species name you might encounter in marine data sources names againt their own database. There are several types of matches as described <a href="https://www.marinespecies.org/tutorial_taxonmatch.php">here</a>.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L209" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="match_worms" class="level3">
+<h3 class="anchored" data-anchor-id="match_worms">match_worms</h3>
+<blockquote class="blockquote">
+<pre><code> match_worms (name:str)</code></pre>
+</blockquote>
+<p><em>Lookup <code>name</code> in WoRMS (fuzzy match).</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>name</td>
+<td>str</td>
+<td>Name of species to look up in WoRMS</td>
+</tr>
+</tbody>
+</table>
+<div id="05afdcf0" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> match_worms(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    name: <span class="bu">str</span> <span class="co"># Name of species to look up in WoRMS</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    ):</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Lookup `name` in WoRMS (fuzzy match)."</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="st">'https://www.marinespecies.org/rest/AphiaRecordsByMatchNames'</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    params <span class="op">=</span> {</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'scientificnames[]'</span>: [name],</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'marine_only'</span>: <span class="st">'true'</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    headers <span class="op">=</span> {</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">'accept'</span>: <span class="st">'application/json'</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check if the request was successful (status code 200)</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>        data <span class="op">=</span> response.json()</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> data</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span><span class="dv">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>For instance:</p>
+<div id="b096a3e8" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>match_worms(<span class="st">'Aristeus antennatus'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>[[{'AphiaID': 107083,
+   'url': 'https://www.marinespecies.org/aphia.php?p=taxdetails&amp;id=107083',
+   'scientificname': 'Aristeus antennatus',
+   'authority': '(Risso, 1816)',
+   'status': 'accepted',
+   'unacceptreason': None,
+   'taxonRankID': 220,
+   'rank': 'Species',
+   'valid_AphiaID': 107083,
+   'valid_name': 'Aristeus antennatus',
+   'valid_authority': '(Risso, 1816)',
+   'parentNameUsageID': 106807,
+   'kingdom': 'Animalia',
+   'phylum': 'Arthropoda',
+   'class': 'Malacostraca',
+   'order': 'Decapoda',
+   'family': 'Aristeidae',
+   'genus': 'Aristeus',
+   'citation': 'DecaNet eds. (2025). DecaNet. Aristeus antennatus (Risso, 1816). Accessed through: World Register of Marine Species at: https://www.marinespecies.org/aphia.php?p=taxdetails&amp;id=107083 on 2025-05-28',
+   'lsid': 'urn:lsid:marinespecies.org:taxname:107083',
+   'isMarine': 1,
+   'isBrackish': 0,
+   'isFreshwater': 0,
+   'isTerrestrial': 0,
+   'isExtinct': 0,
+   'match_type': 'exact',
+   'modified': '2022-08-24T09:48:14.813Z'}]]</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="fuzzy-matching-for-maris-lookup-tables" class="level2">
+<h2 class="anchored" data-anchor-id="fuzzy-matching-for-maris-lookup-tables">Fuzzy matching for MARIS Lookup Tables</h2>
+<p>Using https://jamesturk.github.io/jellyfish fuzzy matching distance metrics.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L233" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="match" class="level3">
+<h3 class="anchored" data-anchor-id="match">Match</h3>
+<blockquote class="blockquote">
+<pre><code> Match (matched_id:int, matched_maris_name:str, source_name:str,
+        match_score:int)</code></pre>
+</blockquote>
+<p><em>Match between a data provider name and a MARIS lookup table.</em></p>
+<div id="a523f5b5" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Match:</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Match between a data provider name and a MARIS lookup table."</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    matched_id: <span class="bu">int</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    matched_maris_name: <span class="bu">str</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    source_name: <span class="bu">str</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    match_score: <span class="bu">int</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L241" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="match_maris_lut" class="level3">
+<h3 class="anchored" data-anchor-id="match_maris_lut">match_maris_lut</h3>
+<blockquote class="blockquote">
+<pre><code> match_maris_lut (lut:Union[str,pandas.core.frame.DataFrame,pathlib.Path],
+                  data_provider_name:str, maris_id:str, maris_name:str,
+                  dist_fn:Callable=&lt;built-in function
+                  levenshtein_distance&gt;, nresults:int=10)</code></pre>
+</blockquote>
+<p><em>Fuzzy matching data provider and MARIS lookup tables (e.g biota species, sediments, …).</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>lut</td>
+<td>Union</td>
+<td></td>
+<td>Either str, Path or DataFrame</td>
+</tr>
+<tr class="even">
+<td>data_provider_name</td>
+<td>str</td>
+<td></td>
+<td>Name of data provider nomenclature item to look up</td>
+</tr>
+<tr class="odd">
+<td>maris_id</td>
+<td>str</td>
+<td></td>
+<td>Id of MARIS lookup table nomenclature item to match</td>
+</tr>
+<tr class="even">
+<td>maris_name</td>
+<td>str</td>
+<td></td>
+<td>Name of MARIS lookup table nomenclature item to match</td>
+</tr>
+<tr class="odd">
+<td>dist_fn</td>
+<td>Callable</td>
+<td>levenshtein_distance</td>
+<td>Distance function</td>
+</tr>
+<tr class="even">
+<td>nresults</td>
+<td>int</td>
+<td>10</td>
+<td>Maximum number of results to return</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>DataFrame</strong></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div id="6a40fd78" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> match_maris_lut(</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    lut: Union[<span class="bu">str</span>, pd.DataFrame, Path], <span class="co"># Either str, Path or DataFrame</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    data_provider_name: <span class="bu">str</span>, <span class="co"># Name of data provider nomenclature item to look up </span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    maris_id: <span class="bu">str</span>, <span class="co"># Id of MARIS lookup table nomenclature item to match</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    maris_name: <span class="bu">str</span>, <span class="co"># Name of MARIS lookup table nomenclature item to match</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    dist_fn: Callable <span class="op">=</span> jf.levenshtein_distance, <span class="co"># Distance function</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    nresults: <span class="bu">int</span> <span class="op">=</span> <span class="dv">10</span> <span class="co"># Maximum number of results to return</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>) <span class="op">-&gt;</span> pd.DataFrame:</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Fuzzy matching data provider and MARIS lookup tables (e.g biota species, sediments, ...)."</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(lut, <span class="bu">str</span>) <span class="kw">or</span> <span class="bu">isinstance</span>(lut, Path):</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> pd.read_excel(lut)  <span class="co"># Load the LUT if a path is provided</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">isinstance</span>(lut, pd.DataFrame):</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> lut  <span class="co"># Use the DataFrame directly if provided</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"lut must be either a file path or a DataFrame"</span>)</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.dropna(subset<span class="op">=</span>[maris_name])</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.astype({maris_id: <span class="st">'int'</span>})</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'score'</span>] <span class="op">=</span> df[maris_name].<span class="bu">str</span>.lower().<span class="bu">apply</span>(<span class="kw">lambda</span> x: dist_fn(data_provider_name.lower(), x))</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.sort_values(by<span class="op">=</span><span class="st">'score'</span>, ascending<span class="op">=</span><span class="va">True</span>)[:nresults]</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df[[maris_id, maris_name, <span class="st">'score'</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Below an example trying to match the name “PLANKTON” with <code>dbo_species_cleaned.xlsx</code> MARIS biota species lookup table:</p>
+<div id="282aa570" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>lut_fname <span class="op">=</span> <span class="st">'../files/lut/dbo_species_cleaned.xlsx'</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>match_maris_lut(lut_fname, data_provider_name<span class="op">=</span><span class="st">'PLANKTON'</span>, </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>                maris_id<span class="op">=</span><span class="st">'species_id'</span>, maris_name<span class="op">=</span><span class="st">'species'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">species_id</th>
+<th data-quarto-table-cell-role="th">species</th>
+<th data-quarto-table-cell-role="th">score</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">281</th>
+<td>280</td>
+<td>Plankton</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">696</th>
+<td>695</td>
+<td>Zooplankton</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">633</th>
+<td>632</td>
+<td>Palaemon</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">697</th>
+<td>696</td>
+<td>Phytoplankton</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">812</th>
+<td>811</td>
+<td>Chanos</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">160</th>
+<td>159</td>
+<td>Neuston</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">234</th>
+<td>233</td>
+<td>Penaeus</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1458</th>
+<td>1457</td>
+<td>Lamnidae</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">1438</th>
+<td>1437</td>
+<td>Labrus</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1527</th>
+<td>1526</td>
+<td>Favites</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Below, we demonstrate matching the laboratory name “Central Mining Institute, Poland” with the MARIS lab lookup table from <code>dbo_lab.xlsx</code>. This example utilizes the <code>lab</code> and <code>country</code> columns. Note that in this instance, <code>df_lut</code> is passed directly as the <code>lut</code> argument.</p>
+<div id="5751b366" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>lut_fname <span class="op">=</span> <span class="st">'../files/lut/dbo_lab.xlsx'</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>df_lut<span class="op">=</span>pd.read_excel(lut_fname)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>df_lut[<span class="st">'lab_country'</span>] <span class="op">=</span> df_lut[<span class="st">'lab'</span>] <span class="op">+</span> <span class="st">'_'</span> <span class="op">+</span> df_lut[<span class="st">'country'</span>]</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>match_maris_lut(lut<span class="op">=</span>df_lut, data_provider_name<span class="op">=</span><span class="st">'Central Mining Institute, Poland'</span>, </span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>                maris_id<span class="op">=</span><span class="st">'lab_id'</span>, maris_name<span class="op">=</span><span class="st">'lab_country'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">lab_id</th>
+<th data-quarto-table-cell-role="th">lab_country</th>
+<th data-quarto-table-cell-role="th">score</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">6</th>
+<td>5</td>
+<td>Central Mining Institute_Poland</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">203</th>
+<td>202</td>
+<td>Polytechnic Institute_Romania</td>
+<td>18</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">282</th>
+<td>281</td>
+<td>Norwegian Polar Institute_Norway</td>
+<td>21</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">113</th>
+<td>112</td>
+<td>Nuclear Research Institute_Vietnam</td>
+<td>22</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">246</th>
+<td>245</td>
+<td>Paul Scherrer Institute_Switzerland</td>
+<td>22</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">136</th>
+<td>135</td>
+<td>Nuclear Energy Board_Ireland</td>
+<td>23</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">471</th>
+<td>474</td>
+<td>Kobe University_Japan</td>
+<td>23</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">429</th>
+<td>432</td>
+<td>Qatar University_Qatar</td>
+<td>23</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">174</th>
+<td>173</td>
+<td>Interfaculty Reactor Institute_Netherlands</td>
+<td>23</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">177</th>
+<td>176</td>
+<td>RIKILT_Netherlands</td>
+<td>23</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Below an example trying to match the name “GLACIAL” with dbo_sedtype.xlsx MARIS sediment lookup table:</p>
+<div id="8ab4bc84" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>lut_fname <span class="op">=</span> <span class="st">'../files/lut/dbo_sedtype.xlsx'</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>match_maris_lut(lut_fname, data_provider_name<span class="op">=</span><span class="st">'GLACIAL'</span>, </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                maris_id<span class="op">=</span><span class="st">'sedtype_id'</span>, maris_name<span class="op">=</span><span class="st">'sedtype'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">sedtype_id</th>
+<th data-quarto-table-cell-role="th">sedtype</th>
+<th data-quarto-table-cell-role="th">score</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">26</th>
+<td>25</td>
+<td>Glacial</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>2</td>
+<td>Gravel</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>1</td>
+<td>Clay</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">51</th>
+<td>50</td>
+<td>Glacial clay</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>3</td>
+<td>Marsh</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">7</th>
+<td>6</td>
+<td>Sand</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">13</th>
+<td>12</td>
+<td>Silt</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">15</th>
+<td>14</td>
+<td>Sludge</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">27</th>
+<td>26</td>
+<td>Soft</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">52</th>
+<td>51</td>
+<td>Soft clay</td>
+<td>7</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="0fa12ef7" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>lut_fname <span class="op">=</span> <span class="st">'../files/lut/dbo_nuclide.xlsx'</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>match_maris_lut(lut_fname, data_provider_name<span class="op">=</span><span class="st">'CS-137'</span>, </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                maris_id<span class="op">=</span><span class="st">'nuclide_id'</span>, maris_name<span class="op">=</span><span class="st">'nc_name'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">nuclide_id</th>
+<th data-quarto-table-cell-role="th">nc_name</th>
+<th data-quarto-table-cell-role="th">score</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">31</th>
+<td>33</td>
+<td>cs137</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">30</th>
+<td>31</td>
+<td>cs134</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">29</th>
+<td>30</td>
+<td>cs127</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">99</th>
+<td>102</td>
+<td>cs136</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">109</th>
+<td>112</td>
+<td>sb127</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">111</th>
+<td>114</td>
+<td>ce139</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">25</th>
+<td>24</td>
+<td>sb125</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">36</th>
+<td>38</td>
+<td>pm147</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">28</th>
+<td>29</td>
+<td>i131</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">110</th>
+<td>113</td>
+<td>ba133</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="downloaders-1" class="level2">
+<h2 class="anchored" data-anchor-id="downloaders-1">Downloaders</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L285" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="download_file-1" class="level3">
+<h3 class="anchored" data-anchor-id="download_file-1">download_file</h3>
+<blockquote class="blockquote">
+<pre><code> download_file (owner, repo, src_dir, dest_dir, fname)</code></pre>
+</blockquote>
+<div id="96c2bf33" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> download_files_in_folder(</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    owner: <span class="bu">str</span>, <span class="co"># GitHub owner</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    repo: <span class="bu">str</span>, <span class="co"># GitHub repository</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    src_dir: <span class="bu">str</span>, <span class="co"># Source directory</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    dest_dir: <span class="bu">str</span> <span class="co"># Destination directory</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    ):</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Make a GET request to the GitHub API to get the contents of the folder"</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="ss">f"https://api.github.com/repos/</span><span class="sc">{</span>owner<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>repo<span class="sc">}</span><span class="ss">/contents/</span><span class="sc">{</span>src_dir<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> requests.get(url)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>        contents <span class="op">=</span> response.json()</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Iterate over the files and download them</span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> item <span class="kw">in</span> contents:</span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> item[<span class="st">"type"</span>] <span class="op">==</span> <span class="st">"file"</span>:</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>                fname <span class="op">=</span> item[<span class="st">"name"</span>]</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>                download_file(owner, repo, src_dir, dest_dir, fname)</span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Error: </span><span class="sc">{</span>response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> download_file(owner, repo, src_dir, dest_dir, fname):</span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Make a GET request to the GitHub API to get the raw file contents</span></span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="ss">f"https://raw.githubusercontent.com/</span><span class="sc">{</span>owner<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>repo<span class="sc">}</span><span class="ss">/master/</span><span class="sc">{</span>src_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>fname<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> requests.get(url)</span>
+<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
+<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Save the file locally</span></span>
+<span id="cb42-29"><a href="#cb42-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> <span class="bu">open</span>(Path(dest_dir) <span class="op">/</span> fname, <span class="st">"wb"</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
+<span id="cb42-30"><a href="#cb42-30" aria-hidden="true" tabindex="-1"></a>            <span class="bu">file</span>.write(response.content)</span>
+<span id="cb42-31"><a href="#cb42-31" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>fname<span class="sc">}</span><span class="ss"> downloaded successfully."</span>)</span>
+<span id="cb42-32"><a href="#cb42-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb42-33"><a href="#cb42-33" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Error: </span><span class="sc">{</span>response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L264" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="download_files_in_folder-1" class="level3">
+<h3 class="anchored" data-anchor-id="download_files_in_folder-1">download_files_in_folder</h3>
+<blockquote class="blockquote">
+<pre><code> download_files_in_folder (owner:str, repo:str, src_dir:str, dest_dir:str)</code></pre>
+</blockquote>
+<p><em>Make a GET request to the GitHub API to get the contents of the folder</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>owner</td>
+<td>str</td>
+<td>GitHub owner</td>
+</tr>
+<tr class="even">
+<td>repo</td>
+<td>str</td>
+<td>GitHub repository</td>
+</tr>
+<tr class="odd">
+<td>src_dir</td>
+<td>str</td>
+<td>Source directory</td>
+</tr>
+<tr class="even">
+<td>dest_dir</td>
+<td>str</td>
+<td>Destination directory</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="test" class="level2">
+<h2 class="anchored" data-anchor-id="test">Test</h2>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L299" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="test_dfs" class="level3">
+<h3 class="anchored" data-anchor-id="test_dfs">test_dfs</h3>
+<blockquote class="blockquote">
+<pre><code> test_dfs (dfs1:Dict[str,pandas.core.frame.DataFrame],
+           dfs2:Dict[str,pandas.core.frame.DataFrame])</code></pre>
+</blockquote>
+<p><em>Compare two dictionaries of DataFrames for equality (also ensuring that columns are in the same order).</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dfs1</td>
+<td>Dict</td>
+<td>First dictionary of DataFrames to compare</td>
+</tr>
+<tr class="even">
+<td>dfs2</td>
+<td>Dict</td>
+<td>Second dictionary of DataFrames to compare</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>None</strong></td>
+<td><strong>It raises an <code>AssertionError</code> if the DataFrames are not equal</strong></td>
+</tr>
+</tbody>
+</table>
+<div id="16144ea7" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_dfs(</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    dfs1: Dict[<span class="bu">str</span>, pd.DataFrame], <span class="co"># First dictionary of DataFrames to compare </span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    dfs2: Dict[<span class="bu">str</span>, pd.DataFrame] <span class="co"># Second dictionary of DataFrames to compare</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">-&gt;</span> <span class="va">None</span>: <span class="co"># It raises an `AssertionError` if the DataFrames are not equal</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Compare two dictionaries of DataFrames for equality (also ensuring that columns are in the same order)."</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> grp <span class="kw">in</span> dfs1.keys():</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>        df1, df2 <span class="op">=</span> (df.sort_index() <span class="cf">for</span> df <span class="kw">in</span> (dfs1[grp], dfs2[grp]))</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>        fc.test_eq(df1, df2.reindex(columns<span class="op">=</span>df1.columns))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
+<section id="netcdf-utilities" class="level2">
+<h2 class="anchored" data-anchor-id="netcdf-utilities">NetCDF Utilities</h2>
+<p>Extract NetCDF contents</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/utils.py#L309" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="extractnetcdfcontents" class="level3">
+<h3 class="anchored" data-anchor-id="extractnetcdfcontents">ExtractNetcdfContents</h3>
+<blockquote class="blockquote">
+<pre><code> ExtractNetcdfContents (filename:str, verbose:bool=False)</code></pre>
+</blockquote>
+<p><em>Initialize and extract data from a NetCDF file.</em></p>
+<div id="a9e02f49" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ExtractNetcdfContents:</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, filename: <span class="bu">str</span>, verbose: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span>):</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Initialize and extract data from a NetCDF file."</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.filename <span class="op">=</span> filename</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.verbose <span class="op">=</span> verbose</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dfs <span class="op">=</span> {}  <span class="co"># DataFrames extracted from the NetCDF file</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.enum_dicts <span class="op">=</span> {}  <span class="co"># Enum dictionaries extracted from the NetCDF file</span></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.global_attrs <span class="op">=</span> {}  <span class="co"># Global attributes extracted from the NetCDF file</span></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.custom_maps <span class="op">=</span> {}  <span class="co"># Custom maps extracted from the NetCDF file</span></span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.extract_all()</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> extract_all(<span class="va">self</span>):</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Extract data, enums, and global attributes from the NetCDF file."</span></span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> Path(<span class="va">self</span>.filename).exists():</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f'File </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>filename<span class="sc">}</span><span class="ss"> not found.'</span>)</span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> Dataset(<span class="va">self</span>.filename, <span class="st">'r'</span>) <span class="im">as</span> nc:</span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.global_attrs <span class="op">=</span> <span class="va">self</span>.extract_global_attributes(nc)</span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> group_name <span class="kw">in</span> nc.groups:</span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a>                group <span class="op">=</span> nc.groups[group_name]</span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.dfs[group_name.upper()] <span class="op">=</span> <span class="va">self</span>.extract_data(group)</span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.enum_dicts[group_name.upper()] <span class="op">=</span> <span class="va">self</span>.extract_enums(group, group_name)</span>
+<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.custom_maps[group_name.upper()] <span class="op">=</span> <span class="va">self</span>.extract_custom_maps(group, group_name)</span>
+<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb47-26"><a href="#cb47-26" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.verbose:</span>
+<span id="cb47-27"><a href="#cb47-27" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">"Data extraction complete."</span>)</span>
+<span id="cb47-28"><a href="#cb47-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-29"><a href="#cb47-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> extract_data(<span class="va">self</span>, group) <span class="op">-&gt;</span> pd.DataFrame:</span>
+<span id="cb47-30"><a href="#cb47-30" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Extract data from a group and convert to DataFrame."</span></span>
+<span id="cb47-31"><a href="#cb47-31" aria-hidden="true" tabindex="-1"></a>        data <span class="op">=</span> {var_name: var[:] <span class="cf">for</span> var_name, var <span class="kw">in</span> group.variables.items() <span class="cf">if</span> var_name <span class="kw">not</span> <span class="kw">in</span> group.dimensions}</span>
+<span id="cb47-32"><a href="#cb47-32" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> pd.DataFrame(data)</span>
+<span id="cb47-33"><a href="#cb47-33" aria-hidden="true" tabindex="-1"></a>        rename_map <span class="op">=</span> {nc_var: col <span class="cf">for</span> col, nc_var <span class="kw">in</span> NC_VARS.items() <span class="cf">if</span> nc_var <span class="kw">in</span> df.columns}</span>
+<span id="cb47-34"><a href="#cb47-34" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> df.rename(columns<span class="op">=</span>rename_map)</span>
+<span id="cb47-35"><a href="#cb47-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> df</span>
+<span id="cb47-36"><a href="#cb47-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-37"><a href="#cb47-37" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> extract_enums(<span class="va">self</span>, group, group_name: <span class="bu">str</span>) <span class="op">-&gt;</span> Dict:</span>
+<span id="cb47-38"><a href="#cb47-38" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Extract enum dictionaries for variables in a group."</span></span>
+<span id="cb47-39"><a href="#cb47-39" aria-hidden="true" tabindex="-1"></a>        local_enum_dicts <span class="op">=</span> {}</span>
+<span id="cb47-40"><a href="#cb47-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> var_name, var <span class="kw">in</span> group.variables.items():</span>
+<span id="cb47-41"><a href="#cb47-41" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">hasattr</span>(var.datatype, <span class="st">'enum_dict'</span>):</span>
+<span id="cb47-42"><a href="#cb47-42" aria-hidden="true" tabindex="-1"></a>                local_enum_dicts[var_name] <span class="op">=</span> {<span class="bu">str</span>(k): <span class="bu">str</span>(v) <span class="cf">for</span> k, v <span class="kw">in</span> var.datatype.enum_dict.items()}</span>
+<span id="cb47-43"><a href="#cb47-43" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="va">self</span>.verbose:</span>
+<span id="cb47-44"><a href="#cb47-44" aria-hidden="true" tabindex="-1"></a>                    <span class="bu">print</span>(<span class="ss">f"Extracted enum_dict for </span><span class="sc">{</span>var_name<span class="sc">}</span><span class="ss"> in </span><span class="sc">{</span>group_name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb47-45"><a href="#cb47-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> local_enum_dicts</span>
+<span id="cb47-46"><a href="#cb47-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-47"><a href="#cb47-47" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> extract_global_attributes(<span class="va">self</span>, nc) <span class="op">-&gt;</span> Dict:</span>
+<span id="cb47-48"><a href="#cb47-48" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Extract global attributes from the NetCDF file."</span></span>
+<span id="cb47-49"><a href="#cb47-49" aria-hidden="true" tabindex="-1"></a>        globattrs <span class="op">=</span> {attr: <span class="bu">getattr</span>(nc, attr) <span class="cf">for</span> attr <span class="kw">in</span> nc.ncattrs()}</span>
+<span id="cb47-50"><a href="#cb47-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> globattrs</span>
+<span id="cb47-51"><a href="#cb47-51" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb47-52"><a href="#cb47-52" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> extract_custom_maps(<span class="va">self</span>, group, group_name: <span class="bu">str</span>) <span class="op">-&gt;</span> Dict:</span>
+<span id="cb47-53"><a href="#cb47-53" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Extract custom maps from the NetCDF file."</span></span>
+<span id="cb47-54"><a href="#cb47-54" aria-hidden="true" tabindex="-1"></a>        reverse_nc_vars <span class="op">=</span> {v: k <span class="cf">for</span> k, v <span class="kw">in</span> NC_VARS.items()}        </span>
+<span id="cb47-55"><a href="#cb47-55" aria-hidden="true" tabindex="-1"></a>        custom_maps <span class="op">=</span> {}</span>
+<span id="cb47-56"><a href="#cb47-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> var_name, var <span class="kw">in</span> group.variables.items():</span>
+<span id="cb47-57"><a href="#cb47-57" aria-hidden="true" tabindex="-1"></a>            attr<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>var_name<span class="sc">}</span><span class="ss">_map"</span></span>
+<span id="cb47-58"><a href="#cb47-58" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">hasattr</span>(var, attr):</span>
+<span id="cb47-59"><a href="#cb47-59" aria-hidden="true" tabindex="-1"></a>                custom_maps[reverse_nc_vars[var.name]] <span class="op">=</span>  literal_eval(<span class="bu">getattr</span>(var, attr))</span>
+<span id="cb47-60"><a href="#cb47-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> custom_maps</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="381c121c" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fname = Path('../../_data/output/190-geotraces-2021.nc')</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="co">#fname = Path('../../_data/output/tepco.nc')</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>fname <span class="op">=</span> Path(<span class="st">'../../_data/output/tepco.nc'</span>)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="co">#fname = Path('./files/nc/encoding-test.nc')</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>contents<span class="op">=</span> ExtractNetcdfContents(fname)</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(contents.dfs)</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(contents.enum_dicts)</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(contents.global_attrs)</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(contents.custom_maps)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'SEAWATER':               LON        LAT        TIME STATION  NUCLIDE   VALUE  UNIT  UNC  \
+0      140.603882  36.299721  1318512060     T-C       29     NaN     3  NaN   
+1      140.603882  36.299721  1318512060     T-C       31     NaN     3  NaN   
+2      140.603882  36.299721  1318512060     T-C       33     NaN     3  NaN   
+3      140.603882  36.299721  1318512180     T-C       29     NaN     3  NaN   
+4      140.603882  36.299721  1318512180     T-C       31     NaN     3  NaN   
+...           ...        ...         ...     ...      ...     ...   ...  ...   
+81491  141.666672  38.299999  1722930660   T-MG2       33  0.0016     3  NaN   
+81492  141.666672  38.299999  1725956340   T-MG2       31     NaN     3  NaN   
+81493  141.666672  38.299999  1725956340   T-MG2       33  0.0015     3  NaN   
+81494  141.666672  38.299999  1725957120   T-MG2       31     NaN     3  NaN   
+81495  141.666672  38.299999  1725957120   T-MG2       33  0.0014     3  NaN   
+
+       DL     DLV  
+0       3  4.0000  
+1       3  6.0000  
+2       3  9.0000  
+3       3  4.0000  
+4       3  6.0000  
+...    ..     ...  
+81491   1     NaN  
+81492   3  0.0011  
+81493   1     NaN  
+81494   3  0.0011  
+81495   1     NaN  
+
+[81496 rows x 10 columns]}
+{'SEAWATER': {'nuclide': {'NOT APPLICABLE': '-1', 'NOT AVAILABLE': '0', 'h3': '1', 'be7': '2', 'c14': '3', 'k40': '4', 'cr51': '5', 'mn54': '6', 'co57': '7', 'co58': '8', 'co60': '9', 'zn65': '10', 'sr89': '11', 'sr90': '12', 'zr95': '13', 'nb95': '14', 'tc99': '15', 'ru103': '16', 'ru106': '17', 'rh106': '18', 'ag106m': '19', 'ag108': '20', 'ag108m': '21', 'ag110m': '22', 'sb124': '23', 'sb125': '24', 'te129m': '25', 'i129': '28', 'i131': '29', 'cs127': '30', 'cs134': '31', 'cs137': '33', 'ba140': '34', 'la140': '35', 'ce141': '36', 'ce144': '37', 'pm147': '38', 'eu154': '39', 'eu155': '40', 'pb210': '41', 'pb212': '42', 'pb214': '43', 'bi207': '44', 'bi211': '45', 'bi214': '46', 'po210': '47', 'rn220': '48', 'rn222': '49', 'ra223': '50', 'ra224': '51', 'ra225': '52', 'ra226': '53', 'ra228': '54', 'ac228': '55', 'th227': '56', 'th228': '57', 'th232': '59', 'th234': '60', 'pa234': '61', 'u234': '62', 'u235': '63', 'u238': '64', 'np237': '65', 'np239': '66', 'pu238': '67', 'pu239': '68', 'pu240': '69', 'pu241': '70', 'am240': '71', 'am241': '72', 'cm242': '73', 'cm243': '74', 'cm244': '75', 'cs134_137_tot': '76', 'pu239_240_tot': '77', 'pu239_240_iii_iv_tot': '78', 'pu239_240_v_vi_tot': '79', 'cm243_244_tot': '80', 'pu238_pu239_240_tot_ratio': '81', 'am241_pu239_240_tot_ratio': '82', 'cs137_134_ratio': '83', 'cd109': '84', 'eu152': '85', 'fe59': '86', 'gd153': '87', 'ir192': '88', 'pu238_240_tot': '89', 'rb86': '90', 'sc46': '91', 'sn113': '92', 'sn117m': '93', 'tl208': '94', 'mo99': '95', 'tc99m': '96', 'ru105': '97', 'te129': '98', 'te132': '99', 'i132': '100', 'i135': '101', 'cs136': '102', 'tbeta': '103', 'talpha': '104', 'i133': '105', 'th230': '106', 'pa231': '107', 'u236': '108', 'ag111': '109', 'in116m': '110', 'te123m': '111', 'sb127': '112', 'ba133': '113', 'ce139': '114', 'tl201': '116', 'hg203': '117', 'na22': '122', 'pa234m': '123', 'am243': '124', 'se75': '126', 'sr85': '127', 'y88': '128', 'ce140': '129', 'bi212': '130', 'u236_238_ratio': '131', 'i125': '132', 'ba137m': '133', 'u232': '134', 'pa233': '135', 'ru106_rh106_tot': '136', 'tu': '137', 'tbeta40k': '138', 'fe55': '139', 'ce144_pr144_tot': '140', 'pu240_pu239_ratio': '141', 'u233': '142', 'pu239_242_tot': '143', 'ac227': '144'}, 'unit': {'Not applicable': '-1', 'NOT AVAILABLE': '0', 'Bq per m3': '1', 'Bq per m2': '2', 'Bq per kg': '3', 'Bq per kgd': '4', 'Bq per kgw': '5', 'kg per kg': '6', 'TU': '7', 'DELTA per mill': '8', 'atom per kg': '9', 'atom per kgd': '10', 'atom per kgw': '11', 'atom per l': '12', 'Bq per kgC': '13'}, 'dlt': {'Not applicable': '-1', 'Not available': '0', 'Detected value': '1', 'Detection limit': '2', 'Not detected': '3', 'Derived': '4'}}}
+{'id': 'JEV6HP5A', 'title': "Readings of Sea Area Monitoring - Monitoring of sea water - Sea area close to TEPCO's Fukushima Daiichi NPS / Coastal area - Readings of Sea Area Monitoring [TEPCO]", 'summary': '', 'keywords': 'oceanography, Earth Science &gt; Oceans &gt; Ocean Chemistry&gt; Radionuclides, Earth Science &gt; Human Dimensions &gt; Environmental Impacts &gt; Nuclear Radiation Exposure, Earth Science &gt; Oceans &gt; Ocean Chemistry &gt; Ocean Tracers, Earth Science &gt; Oceans &gt; Marine Sediments, Earth Science &gt; Oceans &gt; Ocean Chemistry, Earth Science &gt; Oceans &gt; Sea Ice &gt; Isotopes, Earth Science &gt; Oceans &gt; Water Quality &gt; Ocean Contaminants, Earth Science &gt; Biological Classification &gt; Animals/Vertebrates &gt; Fish, Earth Science &gt; Biosphere &gt; Ecosystems &gt; Marine Ecosystems, Earth Science &gt; Biological Classification &gt; Animals/Invertebrates &gt; Mollusks, Earth Science &gt; Biological Classification &gt; Animals/Invertebrates &gt; Arthropods &gt; Crustaceans, Earth Science &gt; Biological Classification &gt; Plants &gt; Macroalgae (Seaweeds)', 'history': 'TBD', 'keywords_vocabulary': 'GCMD Science Keywords', 'keywords_vocabulary_url': 'https://gcmd.earthdata.nasa.gov/static/kms/', 'record': 'TBD', 'featureType': 'TBD', 'cdm_data_type': 'TBD', 'Conventions': 'CF-1.10 ACDD-1.3', 'publisher_name': 'Paul MCGINNITY, Iolanda OSVATH, Florence DESCROIX-COMANDUCCI', 'publisher_email': 'p.mc-ginnity@iaea.org, i.osvath@iaea.org, F.Descroix-Comanducci@iaea.org', 'publisher_url': 'https://maris.iaea.org', 'publisher_institution': 'International Atomic Energy Agency - IAEA', 'creator_name': '[{"creatorType": "author", "firstName": "", "lastName": "TEPCO - Tokyo Electric Power Company"}]', 'institution': 'TBD', 'metadata_link': 'TBD', 'creator_email': 'TBD', 'creator_url': 'TBD', 'references': 'TBD', 'license': 'Without prejudice to the applicable Terms and Conditions (https://nucleus.iaea.org/Pages/Others/Disclaimer.aspx), I hereby agree that any use of the data will contain appropriate acknowledgement of the data source(s) and the IAEA Marine Radioactivity Information System (MARIS).', 'comment': 'TBD', 'geospatial_lat_min': '141.66666667', 'geospatial_lon_min': '140.60388889', 'geospatial_lat_max': '38.63333333', 'geospatial_lon_max': '35.79611111', 'geospatial_vertical_min': 'TBD', 'geospatial_vertical_max': 'TBD', 'geospatial_bounds': 'POLYGON ((140.60388889 35.79611111, 141.66666667 35.79611111, 141.66666667 38.63333333, 140.60388889 38.63333333, 140.60388889 35.79611111))', 'geospatial_bounds_crs': 'EPSG:4326', 'time_coverage_start': '2011-03-21T14:30:00', 'time_coverage_end': '2025-01-25T07:24:00', 'local_time_zone': 'TBD', 'date_created': 'TBD', 'date_modified': 'TBD', 'publisher_postprocess_logs': "Remove 約 (about) char, Replace range values (e.g '4.0E+00&lt;&amp;&lt;8.0E+00' or '1.0～2.7') by their mean, Select columns of interest., \n    Get TEPCO nuclide names as values not column names \n    to extract contained information (nuclide name, unc, dl, ...).\n    , Extract nuclide name from TEPCO data., Extract unit from TEPCO data., Extract value type from TEPCO data., Reshape: long to wide, \n    Remap `UNIT` name to MARIS id.\n    , Remap `NUCLIDE` name to MARIS id., Remap `DL` name to MARIS id., Cast `VALUE` to float., Parse time column from TEPCO., Encode time as seconds since epoch., Drop rows with invalid longitude &amp; latitude values. Convert `,` separator to `.` separator."}
+{'SEAWATER': {}}</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

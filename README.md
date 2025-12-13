@@ -79,7 +79,59 @@ Now, to install `marisco` simply run
 pip install marisco
 ```
 
-Once successfully installed, run the following command:
+### Zotero API key
+
+Before initializing `marisco`, you need to set up your Zotero API key.
+`marisco` automatically retrieves bibliographic metadata for MARIS
+datasets from [Zotero](https://www.zotero.org/).
+
+To do so, define the following environment variable containing the MARIS
+Zotero API key:
+
+``` console
+export ZOTERO_API_KEY=your_api_key_here
+```
+
+> [!IMPORTANT]
+>
+> Please contact [MARIS Administrators](https://maris.iaea.org/home) to
+> get your API key.
+
+What would be the proper way to mention the maris team email address
+above? I don’t want this email address to be abused
+
+##### 🤖Reply🤖<!-- SOLVEIT_SEPARATOR_7f3a9b2c -->
+
+Good question! You’re right to be cautious about email addresses and
+spam/abuse. Here are a few approaches, from most to least protective:
+
+1.  **Generic contact form/page reference**:
+
+        Please contact the MARIS team through their [contact page](https://maris.iaea.org/contact)
+
+2.  **Obfuscated but clear instruction**:
+
+        Please contact the MARIS team at maris [at] iaea [dot] org
+
+3.  **Instruction to find it elsewhere**:
+
+        Please contact the MARIS team (contact information available on the MARIS website)
+
+4.  **Generic organizational email pattern**:
+
+        Please contact the MARIS team at the IAEA Marine Environment Laboratories
+
+For documentation like this, I’d recommend **option 1** (linking to a
+contact page) if one exists, or **option 2** (the obfuscated format) as
+it’s clear enough for humans but harder for automated scrapers to
+harvest.
+
+Which approach fits best with how the MARIS team prefers to be
+contacted?
+
+### Initialize marisco
+
+Once the API key is set, run the following command:
 
 ``` console
 maris_init
@@ -88,141 +140,105 @@ maris_init
 This command:
 
 1.  creates a `.marisco/` directory containing various
-    configuration/configurable files ((below)) in your `/home`
-    directory;
+    configuration/configurable files in your `/home` directory;
 2.  creates a `configs.toml` file containing default but configurable
     settings (default paths, …);
-3.  downloads several MARIS DB nomenclature/lookup table into
+3.  downloads several MARIS DB nomenclature/lookup tables into
     `.marisco/lut/` directory;
 4.  downloads `maris-template.nc`, the MARIS NetCDF4 template.
 
-### Zotero API key
+<!-- -->
 
-Upon conversion, `marisco` will automatically retrieve the bibliographic
-metadata of each MARIS dataset from [Zotero](https://www.zotero.org/).
-To do so, you need to define the following environment variable
-`ZOTERO_API_KEY` containing the MARIS Zotero API key. Please contact the
-MARIS team to get your API key.
 
-## Getting started
+    ## Getting started
 
-### Command line utilities
+    ### Command line utilities
 
-All commands accept a `-h` argument to get access to its documentation.
+    All commands accept a `-h` argument to get access to its documentation.
 
-#### `maris_init`
+    #### `maris_init`
 
-Download configuration file, NetCDF MARIS template and required lookup
-tables (nomenclatures).
+    Download configuration file, NetCDF MARIS template and required lookup tables (nomenclatures).
 
-#### `maris_to_nc`
+    #### `maris_to_nc`
 
-Convert `helcom`, `geotraces`, `tepco` or `ospar` marine radioactivity
-datasets to MARIS NetCDF4 format.
+    Convert `helcom`, `geotraces`, `tepco` or `ospar` marine radioactivity datasets to MARIS NetCDF4 format.
 
-    usage: maris_to_nc [-h] [--src SRC] ds dest
+usage: maris_to_nc \[-h\] \[–src SRC\] ds dest
 
-    positional arguments:
-      ds          Name of the dataset to encode as NetCDF4
-      dest        Output path for NetCDF file
+positional arguments: ds Name of the dataset to encode as NetCDF4 dest
+Output path for NetCDF file
 
-    options:
-      -h, --help  show this help message and exit
-      --src SRC   Optional input data path only required for the 'GEOTRACES' dataset
+options: -h, –help show this help message and exit –src SRC Optional
+input data path only required for the ‘GEOTRACES’ dataset
 
-For instance: `maris_to_nc ospar 191-OSPAR-2024.nc`
 
-#### `maris_db_to_nc`
+    For instance: `maris_to_nc ospar 191-OSPAR-2024.nc`
 
-The MARIS Master Database integrates two types of datasets:
+    #### `maris_db_to_nc`
 
-- Historical datasets retrieved from published scientific papers
-- Ongoing monitoring data from international programs like `HELCOM`,
-  `OSPAR`, `TEPCO`, and `GEOTRACES`
+    The MARIS Master Database integrates two types of datasets:
 
-This command-line utility converts MARIS datasets from their legacy
-format to NetCDF4, making them more accessible for modern data analysis
-workflows. Users can either convert the entire database or specify
-particular datasets by their reference IDs for selective conversion.
+    - Historical datasets retrieved from published scientific papers
+    - Ongoing monitoring data from international programs like `HELCOM`, `OSPAR`, `TEPCO`, and `GEOTRACES`
 
-    usage: maris_db_to_nc [-h] [--ref_ids REF_IDS] src dest
+    This command-line utility converts MARIS datasets from their legacy format to NetCDF4, making them more accessible for modern data analysis workflows. Users can either convert the entire database or specify particular datasets by their reference IDs for selective conversion.
 
-    Convert MARIS legacy database to NetCDF4 format. If ref_ids is provided as comma-separated values, only encodes those subsets.
+usage: maris_db_to_nc \[-h\] \[–ref_ids REF_IDS\] src dest
 
-    positional arguments:
-      src                Path to MARIS database dump as `.txt` file
-      dest               Output path for NetCDF file(s)
+Convert MARIS legacy database to NetCDF4 format. If ref_ids is provided
+as comma-separated values, only encodes those subsets.
 
-    options:
-      -h, --help         show this help message and exit
-      --ref_ids REF_IDS  Optional comma-separated reference IDs (e.g., "123,456,789") (default: )
+positional arguments: src Path to MARIS database dump as `.txt` file
+dest Output path for NetCDF file(s)
 
-For instance:
+options: -h, –help show this help message and exit –ref_ids REF_IDS
+Optional comma-separated reference IDs (e.g., “123,456,789”) (default: )
 
-- `maris_db_to_nc "~/pro/data/maris/2024-11-20 MARIS_QA_shapetype_id=1.txt" ~/pro/tmp/output`  
-- or
-  `maris_db_to_nc "~/pro/data/maris/2024-11-20 MARIS_QA_shapetype_id=1.txt" ~/pro/tmp/output --ref_ids="16,30"`
-  for a subset of the MARIS Master Database.
 
-#### `maris_nc_to_csv`
+    For instance:
 
-This utility converts NetCDF files to CSV files that conform to the
-MARIS Standard format, originally designed for OpenRefine workflows.
+    - `maris_db_to_nc "~/pro/data/maris/2024-11-20 MARIS_QA_shapetype_id=1.txt" ~/pro/tmp/output`   
+    - or `maris_db_to_nc "~/pro/data/maris/2024-11-20 MARIS_QA_shapetype_id=1.txt" ~/pro/tmp/output --ref_ids="16,30"` for a subset of the MARIS Master Database.
 
-Although MARISCO has now superseded OpenRefine in the data preparation
-pipeline, the MARIS master database continues to require CSV inputs in
-this legacy format. This command-line utility, built with the MARISCO
-library, handles the conversion process.
+    #### `maris_nc_to_csv`
 
-    usage: maris_nc_to_csv [-h] src dest
+    This utility converts NetCDF files to CSV files that conform to the MARIS Standard format, originally designed for OpenRefine workflows.
 
-    Converts NetCDF files into CSV files that follow the MARIS Standard format.
+    Although MARISCO has now superseded OpenRefine in the data preparation pipeline, the MARIS master database continues to require CSV inputs in this legacy format. This command-line utility, built with the MARISCO library, handles the conversion process.
 
-    positional arguments:
-      src         Input path and filename for NetCDF file
-      dest        Output path and filename (without extension) for CSV file
+usage: maris_nc_to_csv \[-h\] src dest
 
-    options:
-      -h, --help  show this help message and exit
+Converts NetCDF files into CSV files that follow the MARIS Standard
+format.
 
-For instance:
-`maris_nc_to_csv ~/pro/tmp/output/191-OSPAR-2024.nc ~/pro/tmp/output/191-OSPAR-2024`
+positional arguments: src Input path and filename for NetCDF file dest
+Output path and filename (without extension) for CSV file
 
-> [!TIP]
->
-> ### Note
->
-> When specifying the destination path (e.g.,
-> `~/pro/tmp/output/191-OSPAR-2024`), the utility automatically appends
-> the MARIS sample type to the filename. For example:
->
-> - `191-OSPAR-2024_BIOTA.csv` for biological samples
->
-> While this specific example produces only a BIOTA file, the utility
-> can generate multiple files (one per sample type) depending on the
-> content of the source dataset. This reflects the NetCDF4 file
-> structure, where each MARIS sample type is stored as a separate group
-> within the file.
+options: -h, –help show this help message and exit
 
-## Development
 
-As already explained the `maris_init` command will download the
-`maris-template.nc` file from [MARISCO GitHub
-repository](https://github.com/franckalbinet/marisco) from the following
-path: `nbs/api/files/nc/maris-template.nc` to your home directory under
-`.marisco/` folder.
+    For instance: `maris_nc_to_csv ~/pro/tmp/output/191-OSPAR-2024.nc ~/pro/tmp/output/191-OSPAR-2024` 
 
-You have to know that the MARIS NetCDF template is generated from
-`nbs/api/files/cdl/maris.cdl` Common Data Language (CDL) file as defined
-by [Unidata](https://docs.unidata.ucar.edu/). During development, to
-generate the MARIS NetCDF template `nbs/api/files/nc/maris-template.nc`:
+    ::: {.callout-tip}
+    ## Note
 
-1.  install the
-    [NetCDF-C](https://pjbartlein.github.io/REarthSysSci/install_netCDF.html)
-    utilities
-2.  once in `Marisco` home directory, run:
+    When specifying the destination path (e.g., `~/pro/tmp/output/191-OSPAR-2024`), the utility automatically appends the MARIS sample type to the filename. For example:
 
-``` console
-ncgen -4 -o nbs/files/nc/maris-template.nc nbs/files/cdl/maris.cdl
-cp nbs/files/nc/maris-template.nc ~/.marisco/
-```
+    - `191-OSPAR-2024_BIOTA.csv` for biological samples
+
+    While this specific example produces only a BIOTA file, the utility can generate multiple files (one per sample type) depending on the content of the source dataset. This reflects the NetCDF4 file structure, where each MARIS sample type is stored as a separate group within the file.
+    :::
+
+    ## Development
+
+    As already explained the `maris_init` command will download the `maris-template.nc` file from [MARISCO GitHub repository](https://github.com/franckalbinet/marisco) from the following path: `nbs/api/files/nc/maris-template.nc` to your home directory under `.marisco/` folder.
+
+    You have to know that the MARIS NetCDF template is generated from `nbs/api/files/cdl/maris.cdl` Common Data Language (CDL) file as defined by [Unidata](https://docs.unidata.ucar.edu/). During development, to generate the MARIS NetCDF template `nbs/api/files/nc/maris-template.nc`:
+
+    1. install the [NetCDF-C](https://pjbartlein.github.io/REarthSysSci/install_netCDF.html) utilities
+    2. once in `Marisco` home directory, run: 
+
+    ```console
+    ncgen -4 -o nbs/files/nc/maris-template.nc nbs/files/cdl/maris.cdl
+    cp nbs/files/nc/maris-template.nc ~/.marisco/

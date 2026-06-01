@@ -155,3 +155,6 @@ checklink/cookies.txt
 
 # nbdev
 .nbdev
+
+/.quarto/
+**/*.quarto_ipynb

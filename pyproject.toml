@@ -1,11 +1,41 @@
 [build-system]
-requires = ["setuptools>=64.0"]
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name="marisco"
-requires-python=">=3.7"
-dynamic = [ "keywords", "description", "version", "dependencies", "optional-dependencies", "readme", "license", "authors", "classifiers", "entry-points", "scripts", "urls"]
+name = "marisco"
+dynamic = ["version"]
+description = "MARIS companion package and tutorials"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "Apache-2.0"}
+authors = [{name = "Franck Albinet, Niall Murphy", email = "franckalbinet@gmail.com"}]
+keywords = ['nbdev', 'jupyter', 'notebook', 'python', 'netcdf', 'marine', 'radioactivity', 'data']
+classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 :: Only"]
+dependencies = ['pandas', 'openpyxl', 'fastcore', 'rich', 'tqdm', 'netcdf4', 'tomli', 'tomli-w', 'shapely', 'pyzotero', 'jellyfish', 'requests', 'pyarrow', 'gevent>=22.10.2']
 
-[tool.uv]
-cache-keys = [{ file = "pyproject.toml" }, { file = "settings.ini" }, { file = "setup.py" }]
+[project.urls]
+Repository = "https://github.com/franckalbinet/marisco"
+Documentation = "https://franckalbinet.github.io/marisco"
+
+[project.entry-points.nbdev]
+marisco = "marisco._modidx:d"
+
+[project.optional-dependencies]
+dev = ['nbdev', 'ipykernel', 'twine']
+
+
+[project.scripts]
+maris_init = "marisco.cli.init:main"
+maris_to_nc = "marisco.cli.to_nc:main"
+maris_db_to_nc = "marisco.cli.db_to_nc:main"
+maris_nc_to_csv = "marisco.cli.nc_to_csv:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "marisco.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["marisco"]
+
+[tool.nbdev]
+custom_sidebar = true

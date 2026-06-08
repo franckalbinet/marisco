@@ -17,7 +17,7 @@ import pandas as pd
 import numpy as np
 import fastcore.all as fc 
 from pathlib import Path 
-from typing import List, Dict, Callable, Tuple, Any 
+from typing import List, Dict, Callable, Tuple, Any, Optional 
 import re
 import time
 
@@ -80,10 +80,88 @@ default_smp_types = {
     'SED': 'SEDIMENT'
 }
 
+_COORDINATE_COLUMN_ALIASES = {
+    'latitudeddmmmm': 'lat_ddmmmm',
+    'latitudedddddd': 'lat_dddddd',
+    'longitudeddmmmm': 'lon_ddmmmm',
+    'longitudedddddd': 'lon_dddddd',
+}
+
+_CANONICAL_COORDINATE_COLUMNS = (
+    'lat_ddmmmm',
+    'lat_dddddd',
+    'lon_ddmmmm',
+    'lon_dddddd',
+)
+
 # %% ../../nbs/handlers/helcom.ipynb #b840f3f3
 def read_csv(file_name, dir=src_dir):
     file_path = f'{dir}/{file_name}'
     return pd.read_csv(file_path)
+
+
+def _clean_column_name(name: str) -> str:
+    "Clean a provider column name to support structural normalization."
+    return re.sub(r'[^a-z0-9]+', '', name.lower())
+
+
+def _normalize_coordinate_columns(df: pd.DataFrame) -> pd.DataFrame:
+    "Normalize provider-specific coordinate column names to canonical names." 
+    rename_map = {}
+    for col in df.columns:
+        canonical_name = _COORDINATE_COLUMN_ALIASES.get(_clean_column_name(col))
+        if canonical_name:
+            rename_map[col] = canonical_name
+
+    df = df.rename(columns=rename_map)
+    for canonical_name in _CANONICAL_COORDINATE_COLUMNS:
+        if canonical_name not in df.columns:
+            df[canonical_name] = pd.NA
+    return df
+
+
+def _normalize_coordinate_rows(df: pd.DataFrame) -> pd.DataFrame:
+    "Return coordinate columns in an unambiguous form or fail fast." 
+    df = df.copy()
+
+    has_decimal_pair = df['lat_dddddd'].notna() & df['lon_dddddd'].notna()
+    has_minute_pair = df['lat_ddmmmm'].notna() & df['lon_ddmmmm'].notna()
+
+    # Prefer decimal representation when both are present in the provider data.
+    df.loc[has_decimal_pair, ['lat_ddmmmm', 'lon_ddmmmm']] = pd.NA
+
+    has_minute_pair = df['lat_ddmmmm'].notna() & df['lon_ddmmmm'].notna()
+    df.loc[has_minute_pair, ['lat_dddddd', 'lon_dddddd']] = pd.NA
+
+    has_decimal_lat = df['lat_dddddd'].notna()
+    has_decimal_lon = df['lon_dddddd'].notna()
+    has_minute_lat = df['lat_ddmmmm'].notna()
+    has_minute_lon = df['lon_ddmmmm'].notna()
+
+    partial_decimal = has_decimal_lat ^ has_decimal_lon
+    partial_minute = has_minute_lat ^ has_minute_lon
+    has_decimal_pair = has_decimal_lat & has_decimal_lon
+    has_minute_pair = has_minute_lat & has_minute_lon
+    conflicting_pairs = has_decimal_pair & has_minute_pair
+
+    invalid_rows = partial_decimal | partial_minute | conflicting_pairs
+    if invalid_rows.any():
+        preview_cols = [
+            col for col in ['key', 'station', *_CANONICAL_COORDINATE_COLUMNS]
+            if col in df.columns
+        ]
+        preview = df.loc[invalid_rows, preview_cols].head(5).to_dict('records')
+        raise ValueError(
+            'HELCOM loader produced invalid coordinate rows; expected decimal pair, '
+            f'degree-minute pair, or full coordinate absence. Sample rows: {preview}'
+        )
+
+    return df
+
+
+def _normalize_loaded_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    "Apply structural normalization expected by the HELCOM loader contract." 
+    return _normalize_coordinate_rows(_normalize_coordinate_columns(df))
 
 # %% ../../nbs/handlers/helcom.ipynb #93f0655f
 def load_data(src_url: str, 
@@ -114,6 +192,7 @@ def load_data(src_url: str,
         df_smp.columns = df_smp.columns.str.lower()
         
         merged_df = pd.merge(df_meas, df_smp, on='key', how='left')
+        merged_df = _normalize_loaded_dataframe(merged_df)
         
         if verbose:
             print(f"Downloaded data for {file_prefix}01.csv and {file_prefix}02.csv in {time.time() - start_time:.2f} seconds.")
@@ -362,18 +441,24 @@ coi_dl = {'SEAWATER' : {'DL' : '< value_bq/m³'},
           'BIOTA':  {'DL' : '< value_bq/kg'},
           'SEDIMENT': {'DL' : '_DL'}}
 
+lut_dl = lambda: pd.read_excel(detection_limit_lut_path(), usecols=['name', 'id']).set_index('name').to_dict()['id']
+
 # %% ../../nbs/handlers/helcom.ipynb #5ae05527
 class RemapDetectionLimitCB(Callback):
     def __init__(self, 
                  coi: dict,  # Dict of column hosting the detection limit info for each sample type
+                 fn_lut: Callable=lut_dl,  # Function returning detection-limit lookups
                 ):
         fc.store_attr()
         
     def __call__(self, tfm: Transformer):
+        lut = self.fn_lut()
         for grp in tfm.dfs:
             df = tfm.dfs[grp]
             dl = self.coi[grp]['DL']
-            df['DL'] = df[dl].apply(lambda x: 2 if x == '<' else 1)
+            values = df[dl].apply(lambda x: x.strip() if isinstance(x, str) else x).fillna('=')
+            values = values.where(values.isin(lut.keys()), '=')
+            df['DL'] = values.map(lut)
 
 # %% ../../nbs/handlers/helcom.ipynb #8290222e
 fixes_biota_species = {
@@ -522,7 +607,7 @@ class AddStationCB(Callback):
     "Add station to all DataFrames."
     def __call__(self, tfm: Transformer):
         for df in tfm.dfs.values():
-            df['STATION'] = df['station'].fillna('').astype(str)
+            df['STATION'] = df['station'].astype(str)
 
 # %% ../../nbs/handlers/helcom.ipynb #047afa7e
 class AddTemperatureCB(Callback):
@@ -655,10 +740,12 @@ def get_attrs(
 # %% ../../nbs/handlers/helcom.ipynb #1923236b-db58-4173-93ea-c416f5343eba
 def encode(
     fname_out: str, # Output file name
+    data_loader: Optional[Callable[[], Dict[str, pd.DataFrame]]]=None, # Optional seam for loading provider data
     **kwargs # Additional arguments
     ) -> None:
     "Encode data to NetCDF."
-    dfs = load_data(src_dir)
+    data_loader = data_loader or (lambda: load_data(src_dir))
+    dfs = data_loader()
     tfm = Transformer(dfs, cbs=[
                             LowerStripNameCB(col_src='nuclide', col_dst='NUCLIDE'),
                             RemapNuclideNameCB(lut_nuclides, col_name='NUCLIDE'),
@@ -668,7 +755,7 @@ def encode(
                             SanitizeValueCB(coi_val),       
                             NormalizeUncCB(),
                             RemapUnitCB(),
-                            RemapDetectionLimitCB(coi_dl),                           
+                            RemapDetectionLimitCB(coi_dl, lut_dl),                           
                             RemapCB(fn_lut=lut_biota, col_remap='SPECIES', col_src='rubin', dest_grps='BIOTA'),
                             RemapCB(fn_lut=lut_tissues, col_remap='BODY_PART', col_src='tissue', dest_grps='BIOTA'),
                             RemapCB(fn_lut=lut_biogroup_from_biota, col_remap='BIO_GROUP', col_src='SPECIES', dest_grps='BIOTA'),

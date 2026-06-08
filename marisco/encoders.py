@@ -126,9 +126,12 @@ def _populate_variable_data(self:NetCDFEncoder, grp_dest, var_name:str, variable
 # %% ../nbs/api/encoders.ipynb #c3042eed
 @patch
 def sanitize_if_enum_and_nan(self:NetCDFEncoder, values, fill_value=-1):
-    values[np.isnan(values)] = int(fill_value)
-    values = values.astype(int)
-    return values
+    try:
+        values = values.astype(float)
+    except (ValueError, TypeError):
+        values = np.array(values, dtype=float)
+    values[np.isnan(values)] = fill_value
+    return values.astype(np.int64)
 
 # %% ../nbs/api/encoders.ipynb #6068704d
 @patch

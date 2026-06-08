@@ -151,3 +151,7 @@ checklink/cookies.txt
 
 # Quarto
 .quarto
+
+# Windows Alternative Data Streams (Zone.Identifier)
+*:Zone.Identifier
+*.Zone.Identifier

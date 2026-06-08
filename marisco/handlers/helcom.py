@@ -95,7 +95,7 @@ def load_data(src_url: str,
 
     def load_and_merge(file_prefix: str) -> pd.DataFrame:
                 
-        dir = cache_path if use_cache else src_url
+        dir = cache_path() if use_cache else src_url
         file_smp_path = f'{dir}/{file_prefix}01.csv'
         file_meas_path = f'{dir}/{file_prefix}02.csv'
 
@@ -522,7 +522,7 @@ class AddStationCB(Callback):
     "Add station to all DataFrames."
     def __call__(self, tfm: Transformer):
         for df in tfm.dfs.values():
-            df['STATION'] = df['station'].astype(str)
+            df['STATION'] = df['station'].fillna('').astype(str)
 
 # %% ../../nbs/handlers/helcom.ipynb #047afa7e
 class AddTemperatureCB(Callback):
@@ -668,7 +668,7 @@ def encode(
                             SanitizeValueCB(coi_val),       
                             NormalizeUncCB(),
                             RemapUnitCB(),
-                            RemapDetectionLimitCB(coi_dl, lut_dl),                           
+                            RemapDetectionLimitCB(coi_dl),                           
                             RemapCB(fn_lut=lut_biota, col_remap='SPECIES', col_src='rubin', dest_grps='BIOTA'),
                             RemapCB(fn_lut=lut_tissues, col_remap='BODY_PART', col_src='tissue', dest_grps='BIOTA'),
                             RemapCB(fn_lut=lut_biogroup_from_biota, col_remap='BIO_GROUP', col_src='SPECIES', dest_grps='BIOTA'),

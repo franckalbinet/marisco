@@ -93,14 +93,9 @@ def load_data(src_url: str,
               verbose: bool = False) -> Dict[str, pd.DataFrame]:
     "Load HELCOM data and return the data in a dictionary of dataframes with the dictionary key as the sample type."
 
-    
     def load_and_merge(file_prefix: str) -> pd.DataFrame:
-        
-        if use_cache:
-            dir=cache_path()
-        else:
-            dir = src_url
-            
+                
+        dir = cache_path if use_cache else src_url
         file_smp_path = f'{dir}/{file_prefix}01.csv'
         file_meas_path = f'{dir}/{file_prefix}02.csv'
 
@@ -173,7 +168,6 @@ class RemapNuclideNameCB(Callback):
 
     def __call__(self, tfm: Transformer):
         df_uniques = get_unique_across_dfs(tfm.dfs, col_name=self.col_name, as_df=True)
-        #lut = {k: v.matched_maris_name for k, v in self.fn_lut(df_uniques).items()}    
         lut = {k: v.matched_id for k, v in self.fn_lut(df_uniques).items()}    
         for k in tfm.dfs.keys():
             tfm.dfs[k]['NUCLIDE'] = tfm.dfs[k][self.col_name].replace(lut)

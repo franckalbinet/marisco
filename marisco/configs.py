@@ -219,7 +219,6 @@ NC_DTYPES = {
     }
 }
 
-
 # %% ../nbs/api/configs.ipynb #f0f94538
 CSV_DTYPES = {
     'AREA': {'state': 'decoded'},
@@ -265,12 +264,8 @@ CONFIGS = {
         'nc_template': 'nbs/files/nc',
         'luts': 'nbs/files/lut'
     },
-    # TO BE REMOVED:Now read directly from `maris.cdl` file
-    # 'units': {
-    #     'time': 'seconds since 1970-01-01 00:00:00.0'
-    # },
     'zotero': {
-        'api_key': os.getenv('ZOTERO_API_KEY'),
+        'api_key': os.getenv('ZOTERO_API_KEY', 'your-zotero-api-key'),
         'lib_id': '2432820'
     }
 }

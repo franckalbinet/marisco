@@ -6,6 +6,7 @@ __all__ = ['main']
 # %% ../../nbs/cli/init.ipynb #3f92bc7b
 from pathlib import Path
 import sys
+import os
 
 from fastcore.script import *
 from fastcore.xtras import mkdir
@@ -57,3 +58,7 @@ def main():
                   src_dir=CONFIGS['paths']['nc_template'], 
                   dest_dir=str(base_path()),
                   fname=CONFIGS['names']['nc_template'])
+    
+    if not os.getenv('ZOTERO_API_KEY'):
+        print(S.red('Warning: ZOTERO_API_KEY environment variable is not set. '
+                    f'Update "api_key" in {path / CFG_FNAME} or set the env var before use.'))

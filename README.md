@@ -217,10 +217,10 @@ For instance:
 
 ## Documentation
 
-- [MARIS Data Guide](metadata/guide.ipynb) — overview of sample types,
+- [MARIS Data Guide](reference/guide.ipynb) — overview of sample types,
   measurement fields, nomenclature, curation pipeline, and available
   datasets; aimed at data providers and data users
-- [Field Definitions](metadata/field-definition.ipynb) — complete
+- [Field Definitions](reference/field-definition.ipynb) — complete
   field-by-field reference with MARISCO column names, NetCDF variable
   names, CSV variable names, types, and lookup tables
 

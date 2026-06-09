@@ -20,5 +20,5 @@ website:
           - api/netcdf2csv.ipynb
       - section: "Data Reference"
         contents:
-          - metadata/guide.ipynb
-          - metadata/field-definition.ipynb
+          - reference/guide.ipynb
+          - reference/field-definition.ipynb

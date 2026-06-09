@@ -97,38 +97,6 @@ export ZOTERO_API_KEY=your_api_key_here
 > Please contact [MARIS Administrators](https://maris.iaea.org/home) to
 > get your API key.
 
-What would be the proper way to mention the maris team email address
-above? I don’t want this email address to be abused
-
-##### 🤖Reply🤖<!-- SOLVEIT_SEPARATOR_7f3a9b2c -->
-
-Good question! You’re right to be cautious about email addresses and
-spam/abuse. Here are a few approaches, from most to least protective:
-
-1.  **Generic contact form/page reference**:
-
-        Please contact the MARIS team through their [contact page](https://maris.iaea.org/contact)
-
-2.  **Obfuscated but clear instruction**:
-
-        Please contact the MARIS team at maris [at] iaea [dot] org
-
-3.  **Instruction to find it elsewhere**:
-
-        Please contact the MARIS team (contact information available on the MARIS website)
-
-4.  **Generic organizational email pattern**:
-
-        Please contact the MARIS team at the IAEA Marine Environment Laboratories
-
-For documentation like this, I’d recommend **option 1** (linking to a
-contact page) if one exists, or **option 2** (the obfuscated format) as
-it’s clear enough for humans but harder for automated scrapers to
-harvest.
-
-Which approach fits best with how the MARIS team prefers to be
-contacted?
-
 ### Initialize marisco
 
 Once the API key is set, run the following command:
@@ -247,6 +215,15 @@ For instance:
 > structure, where each MARIS sample type is stored as a separate group
 > within the file.
 
+## Documentation
+
+- [MARIS Data Guide](metadata/guide.ipynb) — overview of sample types,
+  measurement fields, nomenclature, curation pipeline, and available
+  datasets; aimed at data providers and data users
+- [Field Definitions](metadata/field-definition.ipynb) — complete
+  field-by-field reference with MARISCO column names, NetCDF variable
+  names, CSV variable names, types, and lookup tables
+
 ## Development
 
 As already explained the `maris_init` command will download the
@@ -269,3 +246,15 @@ generate the MARIS NetCDF template `nbs/api/files/nc/maris-template.nc`:
 ncgen -4 -o nbs/files/nc/maris-template.nc nbs/files/cdl/maris.cdl
 cp nbs/files/nc/maris-template.nc ~/.marisco/
 ```
+
+### Developer documentation
+
+In-depth guidance for contributors is captured in a hierarchy of
+`CLAUDE.md` files co-located with the code they describe:
+
+| File | Covers |
+|----|----|
+| [`CLAUDE.md`](../CLAUDE.md) | Project overview, architecture, setup |
+| [`nbs/CLAUDE.md`](CLAUDE.md) | nbdev workflow — edit/export cycle, template regeneration |
+| [`nbs/api/CLAUDE.md`](api/CLAUDE.md) | Core abstractions: Callback/Transformer, Remapper, configs, encoders |
+| [`nbs/handlers/CLAUDE.md`](handlers/CLAUDE.md) | Handler pattern, column naming, data curation rules, IMFA remapping |

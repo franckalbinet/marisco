@@ -9,8 +9,8 @@ __all__ = ['src_dir', 'fname_out', 'zotero_key', 'default_smp_types', 'fixes_nuc
            'lut_filtered', 'kw', 'read_csv', 'load_data', 'RemapNuclideNameCB', 'ParseTimeCB', 'SplitSedimentValuesCB',
            'SanitizeValueCB', 'unc_rel2stan', 'NormalizeUncCB', 'RemapUnitCB', 'RemapDetectionLimitCB',
            'RemapSedimentCB', 'RemapFiltCB', 'AddSampleIDCB', 'AddDepthCB', 'AddSalinityCB', 'AddStationCB',
-           'AddTemperatureCB', 'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'ParseCoordinates',
-           'get_attrs', 'encode']
+           'AddTemperatureCB', 'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'NormalizeCoordinatesCB',
+           'ParseCoordinates', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb #3a8d979f
 import pandas as pd 
@@ -176,8 +176,17 @@ class RemapNuclideNameCB(Callback):
 class ParseTimeCB(Callback):
     "Standardize time format across all dataframes."
     def __call__(self, tfm: Transformer):
-        for df in tfm.dfs.values():
+        for grp, df in tfm.dfs.items():
+            zero_day = int((df['day'] == 0).sum())
+            zero_month = int((df['month'] == 0).sum())
+            missing_day_month = int(((df['day'].isna()) & (df['month'].isna()) & (df['year'].notna())).sum())
+            missing_time_before = int(self._parse_date(df).isna().sum())
             self._process_dates(df)
+            reconstructed = max(missing_time_before - int(df['TIME'].isna().sum()), 0)
+            if zero_day or zero_month or missing_day_month or reconstructed:
+                tfm.logs.append(
+                    f"ParseTimeCB[{grp}]: replaced {zero_day} zero day value(s), {zero_month} zero month value(s), filled {missing_day_month} year-only record(s) with day=1/month=1, and reconstructed {reconstructed} TIME value(s) from year/month/day."
+                )
 
     def _process_dates(self, df: pd.DataFrame) -> None:
         "Process and correct date and time information in the DataFrame."
@@ -366,14 +375,22 @@ coi_dl = {'SEAWATER' : {'DL' : '< value_bq/m³'},
 class RemapDetectionLimitCB(Callback):
     def __init__(self, 
                  coi: dict,  # Dict of column hosting the detection limit info for each sample type
+                 fn_lut: Callable = None,
                 ):
+        fn_lut = fn_lut if fn_lut is not None else (lambda: {'<': 2})
         fc.store_attr()
+        self.__doc__ = (
+            "Remap detection limit columns into MARIS-standard flags using "
+            "an injected lookup function or the HELCOM default mapping "
+            "('<' -> 2, all other values -> 1)."
+        )
         
     def __call__(self, tfm: Transformer):
+        lut = self.fn_lut()
         for grp in tfm.dfs:
             df = tfm.dfs[grp]
             dl = self.coi[grp]['DL']
-            df['DL'] = df[dl].apply(lambda x: 2 if x == '<' else 1)
+            df['DL'] = df[dl].apply(lambda x: lut.get(x.strip() if isinstance(x, str) else x, 1))
 
 # %% ../../nbs/handlers/helcom.ipynb #8290222e
 fixes_biota_species = {
@@ -442,8 +459,14 @@ class RemapSedimentCB(Callback):
     def __call__(self, tfm: Transformer):
         "Remap sediment types using lookup table."
         df = tfm.dfs[self.sed_grp_name]
+        legacy_flags = int(df[self.sed_col_name].isin(self.replace_lut.keys()).sum()) if self.replace_lut else 0
+        missing_codes = int(df[self.sed_col_name].isna().sum()) if self.replace_lut and NA in self.replace_lut else 0
         self._fix_inconsistent_values(df)
         self._map_sediment_types(df)
+        if legacy_flags or missing_codes:
+            tfm.logs.append(
+                f"RemapSedimentCB[{self.sed_grp_name}]: normalized {legacy_flags} legacy sediment code(s) and filled {missing_codes} missing sediment code(s) with {self.replace_lut.get(NA)} before lookup."
+            )
 
     def _fix_inconsistent_values(self, df: pd.DataFrame) -> None:
         "Fix inconsistent values using the replace lookup table."
@@ -511,11 +534,13 @@ class AddDepthCB(Callback):
 class AddSalinityCB(Callback):
     def __init__(self, salinity_col: str = 'salin'):
         self.salinity_col = salinity_col
-    "Add salinity to the SEAWATER DataFrame."
+        self.__doc__ = (
+            f"Populate the MARIS SAL column from the HELCOM '{self.salinity_col}' source column so seawater salinity is preserved during export."
+        )
     def __call__(self, tfm: Transformer):
         for df in tfm.dfs.values():
             if self.salinity_col in df.columns:
-                df['SALINITY'] = df[self.salinity_col].astype(float)
+                df['SAL'] = df[self.salinity_col].astype(float)
 
 # %% ../../nbs/handlers/helcom.ipynb #55ea4c29
 class AddStationCB(Callback):
@@ -528,11 +553,13 @@ class AddStationCB(Callback):
 class AddTemperatureCB(Callback):
     def __init__(self, temperature_col: str = 'ttemp'):
         self.temperature_col = temperature_col
-    "Add temperature to the SEAWATER DataFrame."
+        self.__doc__ = (
+            f"Populate the MARIS TEMP column from the HELCOM '{self.temperature_col}' source column so seawater temperature is preserved during export."
+        )
     def __call__(self, tfm: Transformer ):
         for df in tfm.dfs.values():
             if self.temperature_col in df.columns:
-                df['TEMPERATURE'] = df[self.temperature_col].astype(float)
+                df['TEMP'] = df[self.temperature_col].astype(float)
 
 # %% ../../nbs/handlers/helcom.ipynb #cf398df9
 class RemapSedSliceTopBottomCB(Callback):
@@ -575,6 +602,47 @@ class LookupDryWetPercentWeightCB(Callback):
         df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['weight'] * df['PERCENTWT']
 
 # %% ../../nbs/handlers/helcom.ipynb #61afcc23
+def _normalize_coordinate_columns(df: pd.DataFrame) -> pd.DataFrame:
+    renamed = {}
+    for col in df.columns:
+        normalized = col.strip().lower().replace('(', '').replace(')', '')
+        normalized = re.sub(r'\s+', '', normalized)
+        is_coordinate_column = re.search(r'(lat|lon).*(dddddd|ddmmmm)', normalized, re.IGNORECASE)
+        if is_coordinate_column and normalized != col:
+            renamed[col] = normalized
+    return df.rename(columns=renamed) if renamed else df
+
+def _normalize_coordinate_rows(df: pd.DataFrame) -> pd.DataFrame:
+    coord_cols = [col for col in df.columns if re.search(r'(lat|lon)', col, re.IGNORECASE)]
+    for col in coord_cols:
+        df[col] = df[col].apply(lambda x: x.replace(',', '.').strip() if isinstance(x, str) else x)
+    return df
+
+class NormalizeCoordinatesCB(Callback):
+    "Normalize HELCOM coordinate column names and raw coordinate values before ParseCoordinates."
+
+    def __init__(self,
+                 fn_normalize_coordinate_columns: Callable,
+                 fn_normalize_coordinate_rows: Callable):
+        fc.store_attr()
+
+    def __call__(self, tfm: Transformer):
+        for grp, df in tfm.dfs.items():
+            has_coordinate_columns = any(re.search(r'(lat|lon)', col, re.IGNORECASE) for col in df.columns)
+            if not has_coordinate_columns:
+                continue
+            before_rows = len(df)
+            before_columns = list(df.columns)
+            df = self.fn_normalize_coordinate_columns(df)
+            df = self.fn_normalize_coordinate_rows(df)
+            tfm.dfs[grp] = df
+            after_columns = list(df.columns)
+            renamed_columns = sum(1 for before, after in zip(before_columns, after_columns) if before != after)
+            row_delta = before_rows - len(df)
+            tfm.logs.append(
+                f"NormalizeCoordinatesCB[{grp}]: normalized raw coordinate columns before ParseCoordinates; row delta={row_delta}, renamed columns={renamed_columns}."
+            )
+
 class ParseCoordinates(Callback):
     "Get geographical coordinates from columns expressed in degrees decimal format or from columns in degrees/minutes decimal format where degrees decimal format is missing or zero."
     def __init__(self, 
@@ -583,8 +651,15 @@ class ParseCoordinates(Callback):
         self.fn_convert_cor = fn_convert_cor
 
     def __call__(self, tfm:Transformer):
-        for df in tfm.dfs.values():
+        for grp, df in tfm.dfs.items():
+            self._conversion_failures = 0
+            before_rows = len(df)
             self._format_coordinates(df)
+            dropped = before_rows - len(df)
+            if self._conversion_failures or dropped:
+                tfm.logs.append(
+                    f"ParseCoordinates[{grp}]: dropped {dropped} row(s) with unusable coordinates and retained {self._conversion_failures} value(s) after coordinate conversion fallback."
+                )
 
     def _format_coordinates(self, df:pd.DataFrame) -> None:
         coord_cols = self._get_coord_columns(df.columns)
@@ -620,8 +695,8 @@ class ParseCoordinates(Callback):
             return value
         try:
             return self.fn_convert_cor(value)
-        except Exception as e:
-            print(f"Error converting value {value}: {e}")
+        except Exception:
+            self._conversion_failures += 1
             return value
 
 # %% ../../nbs/handlers/helcom.ipynb #8c293bb1
@@ -680,6 +755,7 @@ def encode(
                             AddTemperatureCB(),
                             RemapSedSliceTopBottomCB(),
                             LookupDryWetPercentWeightCB(),
+                            NormalizeCoordinatesCB(_normalize_coordinate_columns, _normalize_coordinate_rows),
                             ParseCoordinates(ddmm_to_dd),
                             SanitizeLonLatCB(),
                             AddStationCB()

@@ -254,7 +254,7 @@ In-depth guidance for contributors is captured in a hierarchy of
 
 | File | Covers |
 |----|----|
-| [`CLAUDE.md`](../CLAUDE.md) | Project overview, architecture, setup |
-| [`nbs/CLAUDE.md`](CLAUDE.md) | nbdev workflow — edit/export cycle, template regeneration |
-| [`nbs/api/CLAUDE.md`](api/CLAUDE.md) | Core abstractions: Callback/Transformer, Remapper, configs, encoders |
-| [`nbs/handlers/CLAUDE.md`](handlers/CLAUDE.md) | Handler pattern, column naming, data curation rules, IMFA remapping |
+| [`CLAUDE.md`](https://github.com/franckalbinet/marisco/blob/main/CLAUDE.md) | Project overview, architecture, setup |
+| [`nbs/CLAUDE.md`](https://github.com/franckalbinet/marisco/blob/main/nbs/CLAUDE.md) | nbdev workflow — edit/export cycle, template regeneration |
+| [`nbs/api/CLAUDE.md`](https://github.com/franckalbinet/marisco/blob/main/nbs/api/CLAUDE.md) | Core abstractions: Callback/Transformer, Remapper, configs, encoders |
+| [`nbs/handlers/CLAUDE.md`](https://github.com/franckalbinet/marisco/blob/main/nbs/handlers/CLAUDE.md) | Handler pattern, column naming, data curation rules, IMFA remapping |

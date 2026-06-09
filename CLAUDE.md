@@ -19,6 +19,17 @@
 
 **Never edit `.py` files in `marisco/`. They are auto-generated from notebooks.** All code lives in `nbs/`. After editing a notebook, run `nbdev_export` to regenerate modules.
 
+Documentation follows the [`fastcore.docments`](https://fastcore.fast.ai/docments.html) convention: parameter documentation lives inline with the argument, not in a docstring body. nbdev picks these up automatically and renders them into the Quarto-based documentation site.
+
+```python
+def draw_n(n:int,        # Number of cards to draw
+           replace:bool=True  # Draw with replacement?
+          )->list:        # List of cards
+    "Draw `n` cards."
+```
+
+Always use this style — inline `#` comments after type annotations — rather than numpy/Google-style docstrings.
+
 ## The four sample type groups
 
 All measurements belong to one of four groups (also the NetCDF4 groups within each output file):
@@ -36,6 +47,10 @@ Each data provider has a **handler** (`nbs/handlers/*.ipynb`). Every handler exp
 2. Runs a `Transformer` with an ordered list of `Callback` objects that standardise the data
 3. Feeds transformed data to `GlobAttrsFeeder` for NetCDF global attributes (bbox, time range, Zotero bibliographic metadata)
 4. Writes output via `NetCDFEncoder`
+
+## CLI tools
+
+The CLI commands (`maris_init`, `maris_to_nc`, etc.) are defined in `nbs/cli/` and built with [`fastcore.script`](https://fastcore.fast.ai/script.html). The `@call_parse` decorator on a function generates the CLI entry point — arguments are inferred from the function signature. Entry points are declared in `settings.ini` under `console_scripts`.
 
 ## Setup
 

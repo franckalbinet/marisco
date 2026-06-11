@@ -16,8 +16,6 @@
 
 ## Handler fixes
 
-- **helcom** (`nbs/handlers/helcom.ipynb`): uses `SALINITY` and `TEMPERATURE` as DataFrame column names, but `NC_VARS` defines `SAL` and `TEMP`. These callbacks need to be updated to use the correct names.
-
 ## Cleanup / dead code
 
 - **`CONFIGS_CDL` block in configs** (`nbs/api/configs.ipynb`): large dict already marked `# TO BE REMOVED` (generated module lines 289–648), plus commented-out `cdl_cfg`, `cdl_cfg()`, and `name2grp` references. Remove entirely once confirmed unused.
@@ -38,6 +36,8 @@
   - `WideToLongCB` (geotraces/tepco both `pd.melt`; geotraces adds regex column selection + dropna) → parameterisable with defaults
   - `NormalizeUncCB` (helcom/ospar both inject `fn_convert_unc`, identical structure) → move to `callbacks.py` unchanged
   - `ExtractUnitCB` (geotraces uses `[unit]` brackets, tepco uses `(unit)` parens) → one callback with configurable regex
+
+- **Validate** in handlers that dataframe columns (uppercase) are all in the NC_VARS keys in nbs/api/configs.ipynb
 
 ## Features
 

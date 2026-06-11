@@ -22,3 +22,4 @@ website:
         contents:
           - reference/guide.ipynb
           - reference/field-definition.ipynb
+          - reference/sample-id-coverage.ipynb

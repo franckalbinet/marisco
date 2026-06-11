@@ -6,8 +6,8 @@
 __all__ = ['fname_in', 'fname_out', 'zotero_key', 'load_data', 'common_coi', 'nuclides_pattern', 'phase', 'smp_method',
            'nuclides_name', 'units_lut', 'renaming_rules', 'lut_nuclides', 'kw', 'SelectColsOfInterestCB',
            'WideToLongCB', 'ExtractUnitCB', 'ExtractFilteringStatusCB', 'ExtractSamplingMethodCB', 'RenameNuclideCB',
-           'StandardizeUnitCB', 'RenameColumnCB', 'UnshiftLongitudeCB', 'DispatchToGroupCB', 'ParseTimeCB', 'get_attrs',
-           'encode']
+           'StandardizeUnitCB', 'RenameColumnCB', 'UnshiftLongitudeCB', 'DispatchToGroupCB', 'AddSampleIDCB',
+           'ParseTimeCB', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/geotraces.ipynb #3a8d979f
 import fastcore.all as fc
@@ -213,7 +213,7 @@ renaming_rules = {
     'Latitude [degrees_north]': 'LAT',
     'DEPTH [m]': 'SMP_DEPTH',
     'Bot. Depth [m]': 'TOT_DEPTH',
-    'BODC Bottle Number:INTEGER': 'SMP_ID'
+    'BODC Bottle Number:INTEGER': 'SMP_ID_PROVIDER'
 }
 
 # %% ../../nbs/handlers/geotraces.ipynb #5a1b1521-a4d4-4839-a2c1-444c31332ef2
@@ -243,6 +243,14 @@ class DispatchToGroupCB(Callback):
         tfm.dfs = dict(tuple(tfm.df.groupby(self.group_name)))
         for key in tfm.dfs:
             tfm.dfs[key] = tfm.dfs[key].drop(self.group_name, axis=1)
+
+# %% ../../nbs/handlers/geotraces.ipynb #6da45d74
+class AddSampleIDCB(Callback):
+    "Assign a sequential SMP_ID per sample-type group; cast SMP_ID_PROVIDER (BODC Bottle Number) to string for NetCDF VLEN compatibility."
+    def __call__(self, tfm: Transformer):
+        for _, df in tfm.dfs.items():
+            df['SMP_ID'] = range(1, len(df) + 1)
+            df['SMP_ID_PROVIDER'] = df['SMP_ID_PROVIDER'].astype(str)
 
 # %% ../../nbs/handlers/geotraces.ipynb #61cfaf02-7d25-4663-8804-48fa4b219e2b
 class ParseTimeCB(Callback):
@@ -293,6 +301,7 @@ def encode(fname_in, fname_out, **kwargs):
         RenameColumnCB(renaming_rules),
         UnshiftLongitudeCB(),
         DispatchToGroupCB(),
+        AddSampleIDCB(),
         ParseTimeCB(),
         EncodeTimeCB(),
         SanitizeLonLatCB(),

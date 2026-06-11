@@ -515,7 +515,7 @@ class AddSalinityCB(Callback):
     def __call__(self, tfm: Transformer):
         for df in tfm.dfs.values():
             if self.salinity_col in df.columns:
-                df['SALINITY'] = df[self.salinity_col].astype(float)
+                df['SAL'] = df[self.salinity_col].astype(float)
 
 # %% ../../nbs/handlers/helcom.ipynb #55ea4c29
 class AddStationCB(Callback):
@@ -532,7 +532,7 @@ class AddTemperatureCB(Callback):
     def __call__(self, tfm: Transformer ):
         for df in tfm.dfs.values():
             if self.temperature_col in df.columns:
-                df['TEMPERATURE'] = df[self.temperature_col].astype(float)
+                df['TEMP'] = df[self.temperature_col].astype(float)
 
 # %% ../../nbs/handlers/helcom.ipynb #cf398df9
 class RemapSedSliceTopBottomCB(Callback):

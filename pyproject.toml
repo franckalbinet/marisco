@@ -7,7 +7,7 @@ name = "marisco"
 dynamic = ["version"]
 description = "MARIS companion package and tutorials"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 license = {text = "Apache-2.0"}
 authors = [{name = "Franck Albinet, Niall Murphy", email = "franckalbinet@gmail.com"}]
 keywords = ['nbdev', 'jupyter', 'notebook', 'python', 'netcdf', 'marine', 'radioactivity', 'data']
@@ -22,7 +22,7 @@ Documentation = "https://franckalbinet.github.io/marisco"
 marisco = "marisco._modidx:d"
 
 [project.optional-dependencies]
-dev = ['nbdev', 'ipykernel', 'twine']
+dev = ['nbdev', 'ipykernel', 'twine', 'toolslm']
 
 
 [project.scripts]

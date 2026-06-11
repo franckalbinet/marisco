@@ -15,6 +15,26 @@
 
 **How MARIS data is disseminated:** Via the web interface (https://maris.iaea.org), a data API, and as NetCDF files — marisco-generated NetCDF files feed all three channels.
 
+## Critical rule — reading notebooks
+
+**Never use `Read` on `.ipynb` files.** Use this tiered approach instead:
+
+```bash
+# 1. Locate a cell by symbol (Bash tool)
+rg -n "sample_id" nbs/handlers/helcom.ipynb
+
+# 2. View the relevant chunk by line range (Bash tool)
+uv run python -c "from fastcore.tools import view; print(view('nbs/handlers/helcom.ipynb', (42, 65)))"
+
+# 3. Broad survey — signatures only, no outputs (Bash tool)
+uv run python -c "from toolslm.xml import folder2ctx; print(folder2ctx('nbs/api', sigs_only=True, out=False, file_re=r'.*\.ipynb', skip_folder_re=r'.*checkpoints.*'))"
+
+# 4. Single notebook as clean XML (Bash tool)
+uv run python -c "from toolslm.xml import nb2xml; print(nb2xml('nbs/foo.ipynb', out=False))"
+```
+
+Prefer scoped paths (`nbs/api`, `nbs/cli`) over full `nbs/` — handlers alone is 200KB, full tree is 387KB. Use full `nbs/` only when explicitly asked for a broad survey. See `nbs/CLAUDE.md` for full parameter reference.
+
 ## Critical rule — nbdev
 
 **Never edit `.py` files in `marisco/`. They are auto-generated from notebooks.** All code lives in `nbs/`. After editing a notebook, run `nbdev_export` to regenerate modules.

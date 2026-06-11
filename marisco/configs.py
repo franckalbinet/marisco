@@ -39,7 +39,6 @@ NC_VARS = {
     'TOT_DEPTH': 'tot_depth',
     'TIME': 'time',
     'AREA': 'area',
-    # 'SMP_ID': 'smp_id',
     'NUCLIDE': 'nuclide',
     'VALUE': 'value',
     'UNIT': 'unit',

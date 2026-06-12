@@ -69,3 +69,39 @@ Apply these when adding a new callback, handler, or core API function. Full prin
 - [ ] Am I introducing mutable state? Can I make it local and bounded?
 - [ ] Is there a lazy/streaming version that decouples production from consumption?
 - [ ] If I describe this as data, can it be inspected, tested, or replayed?
+
+## Coding style
+
+Follows the [fastai style guide](https://docs.fast.ai/dev/style.html) and [abbreviation guide](https://docs.fast.ai/dev/abbr.html).
+
+### Naming
+
+- **Huffman coding**: frequently used / generic concepts get shorter names; rare or specific ones get longer names.
+- CamelCase for classes, `under_score` for everything else.
+- Assume domain knowledge — use standard terminology (`kl_divergence`, not `kullback_leibler_divergence`).
+
+**Common abbreviations (use these, don't spell them out):**
+
+| Abbrev | Meaning | | Abbrev | Meaning |
+|--------|---------|---|--------|---------|
+| `f` | function (short scope) | | `fn` | function (module scope) |
+| `x` | input / tensor | | `o` | object |
+| `i` | index | | `k`, `v` | key, value |
+| `s` | string or plural suffix | | `n_` | count prefix |
+| `is_` | boolean predicate | | `to_` | conversion prefix |
+| `2` | conversion infix (`name2idx`) | | `tfm` | transform |
+| `cfg` | configuration | | `col` | column |
+| `idx` | index | | `ds` | dataset |
+| `sz` | size | | `n` | number of elements |
+| `bs` | batch size | | `pred` | prediction |
+| `tok` | token | | `lm` | language model |
+
+### Layout
+
+- Max line width: 160 characters.
+- One line = one complete idea; put `if` body on the same line when it fits: `if cond: return x`.
+- Ternary over multi-line if/else: `x = a if cond else b`.
+- Group related assignments: `self.a,self.b = a,b`.
+- No blank lines between related one-liners.
+- No automatic linters or formatters.
+- Comments explain *why*, not *what*.

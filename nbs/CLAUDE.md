@@ -13,10 +13,17 @@ Key parameters for notebook access tools (rule and examples in root `CLAUDE.md`)
 
 ## Edit → export cycle
 
+After **every** notebook edit, run both commands — export first, then test the specific notebook:
+
 ```bash
-# After editing any notebook:
-nbdev-export      # regenerates marisco/*.py and marisco/**/*.py
-nbdev-test        # runs notebook tests
+uv run nbdev-export
+uv run nbdev-test --path nbs/path/to/notebook.ipynb
+```
+
+Run the full test suite only when touching core abstractions (e.g. `callbacks.ipynb`) that other notebooks depend on:
+
+```bash
+uv run nbdev-test
 ```
 
 ## Regenerating the NetCDF template

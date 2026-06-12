@@ -28,6 +28,7 @@ from marisco.utils import (
 
 from marisco.callbacks import (
     Callback, 
+    PerGroupCB,
     Transformer, 
     EncodeTimeCB, 
     LowerStripNameCB, 
@@ -168,7 +169,7 @@ lut_nuclides = lambda df: Remapper(provider_lut_df=df,
                                                                                             as_df=False, overwrite=True)
 
 # %% ../../nbs/handlers/ospar.ipynb #66944861
-class RemapNuclideNameCB(Callback):
+class RemapNuclideNameCB(PerGroupCB):
     "Remap data provider nuclide names to standardized MARIS nuclide names."
     def __init__(self, 
                  fn_lut: Callable, # Function that returns the lookup table dictionary
@@ -176,18 +177,20 @@ class RemapNuclideNameCB(Callback):
                 ):
         fc.store_attr()
 
-    def __call__(self, tfm: Transformer):
+    def __call__(self, tfm):
         df_uniques = get_unique_across_dfs(tfm.dfs, col_name=self.col_name, as_df=True)
-        lut = {k: v.matched_id for k, v in self.fn_lut(df_uniques).items()}    
-        for k in tfm.dfs.keys():
-            tfm.dfs[k]['NUCLIDE'] = tfm.dfs[k][self.col_name].replace(lut)
+        self.lut = {k: v.matched_id for k, v in self.fn_lut(df_uniques).items()}
+        super().__call__(tfm)
+
+    def each_grp(self, grp, df, tfm):
+        df['NUCLIDE'] = df[self.col_name].replace(self.lut)
 
 # %% ../../nbs/handlers/ospar.ipynb #4d5ed206
 time_cols = {'BIOTA': 'sampling date', 'SEAWATER': 'sampling date'}
 time_format = '%m/%d/%y %H:%M:%S'
 
 # %% ../../nbs/handlers/ospar.ipynb #bcd2893e
-class ParseTimeCB(Callback):
+class ParseTimeCB(PerGroupCB):
     "Parse the time format in the dataframe and check for inconsistencies."
     def __init__(self, 
                  col_src: dict=time_cols, # Column name to remap
@@ -195,33 +198,27 @@ class ParseTimeCB(Callback):
                  format: str=time_format # Time format
                  ):
         fc.store_attr()
-    
-    def __call__(self, tfm):
-        for grp, df in tfm.dfs.items():
-            src_col = self.col_src.get(grp)
-            df[self.col_dst] = pd.to_datetime(df[src_col], format=self.format, errors='coerce')
-        return tfm
+
+    def each_grp(self, grp, df, tfm):
+        df[self.col_dst] = pd.to_datetime(df[self.col_src.get(grp)], format=self.format, errors='coerce')
 
 # %% ../../nbs/handlers/ospar.ipynb #84fece8a
 value_cols = {'BIOTA': 'activity or mda', 'SEAWATER': 'activity or mda'}
 
 # %% ../../nbs/handlers/ospar.ipynb #38538f9f
-class SanitizeValueCB(Callback):
+class SanitizeValueCB(PerGroupCB):
     "Sanitize value by removing blank entries and populating `value` column."
     def __init__(self, 
                  value_col: dict = value_cols # Column name to sanitize
                  ):
         fc.store_attr()
 
-    def __call__(self, tfm):
-        for grp, df in tfm.dfs.items():
-            # Drop rows where parsing failed (NaT values in TIME column)
-            invalid_rows = df[df[self.value_col.get(grp)].isna()]
-            if not invalid_rows.empty:     
-                print(f"{len(invalid_rows)} invalid rows found in group '{grp}' during sanitize value callback.")
-                df.dropna(subset=[self.value_col.get(grp)], inplace=True)
-                
-            df['VALUE'] = df[self.value_col.get(grp)]
+    def each_grp(self, grp, df, tfm):
+        col = self.value_col.get(grp)
+        n_invalid = df[col].isna().sum()
+        if n_invalid: print(f"{n_invalid} invalid rows found in group '{grp}' during sanitize value callback.")
+        tfm.dfs[grp] = df.dropna(subset=[col])
+        tfm.dfs[grp]['VALUE'] = tfm.dfs[grp][col]
 
 # %% ../../nbs/handlers/ospar.ipynb #d6c84351
 unc_exp2stan = lambda df, unc_col: df[unc_col] / 2
@@ -230,31 +227,18 @@ unc_exp2stan = lambda df, unc_col: df[unc_col] / 2
 unc_cols = {'BIOTA': 'uncertainty', 'SEAWATER': 'uncertainty'}
 
 # %% ../../nbs/handlers/ospar.ipynb #ecb2866d
-class NormalizeUncCB(Callback):
-    """Normalize uncertainty values in DataFrames."""
+class NormalizeUncCB(PerGroupCB):
+    "Normalize uncertainty values in DataFrames."
     def __init__(self, 
                  col_unc: dict = unc_cols, # Column name to normalize
                  fn_convert_unc: Callable=unc_exp2stan, # Function correcting coverage factor
                  ): 
         fc.store_attr()
 
-    def __call__(self, tfm):
-        for grp, df in tfm.dfs.items():
-            self._convert_commas_to_periods(df, self.col_unc.get(grp)   )
-            self._convert_to_float(df, self.col_unc.get(grp))
-            self._apply_conversion_function(df, self.col_unc.get(grp))
-
-    def _convert_commas_to_periods(self, df, col_unc    ):
-        """Convert commas to periods in the uncertainty column."""
-        df[col_unc] = df[col_unc].astype(str).str.replace(',', '.')
-
-    def _convert_to_float(self, df, col_unc):
-        """Convert uncertainty column to float, handling errors by setting them to NaN."""
-        df[col_unc] = pd.to_numeric(df[col_unc], errors='coerce')
-
-    def _apply_conversion_function(self, df, col_unc):
-        """Apply the conversion function to normalize the uncertainty values."""
-        df['UNC'] = self.fn_convert_unc(df, col_unc)
+    def each_grp(self, grp, df, tfm):
+        col = self.col_unc.get(grp)
+        df[col] = pd.to_numeric(df[col].astype(str).str.replace(',', '.'), errors='coerce')
+        df['UNC'] = self.fn_convert_unc(df, col)
 
 # %% ../../nbs/handlers/ospar.ipynb #8dc50af9
 # Define unit names renaming rules
@@ -269,33 +253,17 @@ default_units = {'SEAWATER': 'Bq/l',
                  'BIOTA': 'Bq/kg f.w.'}
 
 # %% ../../nbs/handlers/ospar.ipynb #a4e4e652
-class RemapUnitCB(Callback):
-    """Callback to update DataFrame 'UNIT' columns based on a lookup table."""
+class RemapUnitCB(PerGroupCB):
+    "Update DataFrame 'UNIT' columns based on a lookup table."
 
     def __init__(self,
                  lut: Dict[str, str],
                  default_units: Dict[str, str] = default_units,
-                 verbose: bool = False
                  ):
-        fc.store_attr()  # Store the lookup table as an attribute
+        fc.store_attr()
 
-    def __call__(self, tfm: 'Transformer'):
-        for grp, df in tfm.dfs.items():
-            # Apply default units to SEAWATER dataset
-            if grp == 'SEAWATER':
-                self._apply_default_units(df, unit=self.default_units.get(grp))
-            # self._print_na_units(df)
-            self._update_units(df)
-
-    def _apply_default_units(self, df: pd.DataFrame , unit = None):
-        df.loc[df['unit'].isnull(), 'unit'] = unit
-
-    # def _print_na_units(self, df: pd.DataFrame):
-    #     na_count = df['unit'].isnull().sum()
-    #     if na_count > 0 and self.verbose:
-    #         print(f"Number of rows with NaN in 'unit' column: {na_count}")
-
-    def _update_units(self, df: pd.DataFrame):
+    def each_grp(self, grp, df, tfm):
+        if grp == 'SEAWATER': df.loc[df['unit'].isnull(), 'unit'] = self.default_units.get(grp)
         df['UNIT'] = df['unit'].apply(lambda x: self.lut.get(x, 'Unknown'))
 
 # %% ../../nbs/handlers/ospar.ipynb #b099b147
@@ -307,31 +275,21 @@ coi_dl = {'SEAWATER' : {'DL' : 'value type'},
           }
 
 # %% ../../nbs/handlers/ospar.ipynb #80d93d13
-class RemapDetectionLimitCB(Callback):
-    """Remap detection limit values to MARIS format using a lookup table."""
+class RemapDetectionLimitCB(PerGroupCB):
+    "Remap detection limit values to MARIS format using a lookup table."
 
-    def __init__(self, coi: dict, fn_lut: Callable):
-        """Initialize with column configuration and a function to get the lookup table."""
-        fc.store_attr()        
+    def __init__(self, coi: dict, fn_lut: Callable): fc.store_attr()
 
-    def __call__(self, tfm: Transformer):
-        """Apply the remapping of detection limits across all dataframes"""
-        lut = self.fn_lut()  # Retrieve the lookup table
-        for grp, df in tfm.dfs.items():
-            df['DL'] = df[self.coi[grp]['DL']]
-            self._set_detection_limits(df, lut)
+    def __call__(self, tfm):
+        self.lut = self.fn_lut()
+        super().__call__(tfm)
 
-    def _set_detection_limits(self, df: pd.DataFrame, lut: dict):
-        """Set detection limits based on value and uncertainty columns using specified conditions."""
-        # Condition to set '=' when value and uncertainty are present and the current detection limit is not in the lookup keys
-        condition_eq = (df['VALUE'].notna() & df['UNC'].notna() & ~df['DL'].isin(lut.keys()))
+    def each_grp(self, grp, df, tfm):
+        df['DL'] = df[self.coi[grp]['DL']]
+        condition_eq = df['VALUE'].notna() & df['UNC'].notna() & ~df['DL'].isin(self.lut.keys())
         df.loc[condition_eq, 'DL'] = '='
-
-        # Set 'Not Available' for unmatched detection limits
-        df.loc[~df['DL'].isin(lut.keys()), 'DL'] = 'Not Available'
-
-        # Map existing detection limits using the lookup table
-        df['DL'] = df['DL'].map(lut)
+        df.loc[~df['DL'].isin(self.lut.keys()), 'DL'] = 'Not Available'
+        df['DL'] = df['DL'].map(self.lut)
 
 # %% ../../nbs/handlers/ospar.ipynb #f073cc1b
 fixes_biota_species = {
@@ -377,29 +335,23 @@ lut_biota_enhanced = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs,
                                  overwrite=False)
 
 # %% ../../nbs/handlers/ospar.ipynb #358de0aa
-class EnhanceSpeciesCB(Callback):
-    """Enhance the 'SPECIES' column using the 'enhanced_species' column if conditions are met."""
+class EnhanceSpeciesCB(PerGroupCB):
+    "Enhance the 'SPECIES' column using 'enhanced_species' if conditions are met."
+    grps = ['BIOTA']
 
-    def __init__(self):
-        fc.store_attr()
-
-    def __call__(self, tfm: 'Transformer'):
-        self._enhance_species(tfm.dfs['BIOTA'])
-
-    def _enhance_species(self, df: pd.DataFrame):
+    def each_grp(self, grp, df, tfm):
         df['SPECIES'] = df.apply(
             lambda row: row['enhanced_species'] if row['SPECIES'] in [-1, 0] and pd.notnull(row['enhanced_species']) else row['SPECIES'],
             axis=1
         )
 
 # %% ../../nbs/handlers/ospar.ipynb #268eb1e3
-class AddBodypartTempCB(Callback):
-    "Add a temporary column with the body part and biological group combined."    
-    def __call__(self, tfm):
-        tfm.dfs['BIOTA']['body_part_temp'] = (
-            tfm.dfs['BIOTA']['body part'] + ' ' + 
-            tfm.dfs['BIOTA']['biological group']
-            ).str.strip().str.lower()                                 
+class AddBodypartTempCB(PerGroupCB):
+    "Add a temporary column with the body part and biological group combined."
+    grps = ['BIOTA']
+
+    def each_grp(self, grp, df, tfm):
+        df['body_part_temp'] = (df['body part'] + ' ' + df['biological group']).str.strip().str.lower()
 
 # %% ../../nbs/handlers/ospar.ipynb #952b57d7
 fixes_biota_tissues = {
@@ -430,57 +382,42 @@ lut_biogroup_from_biota = lambda: get_lut(src_dir=species_lut_path().parent, fna
                                key='species_id', value='biogroup_id')
 
 # %% ../../nbs/handlers/ospar.ipynb #a065b30a
-class AddSampleIdCB(Callback):
+class AddSampleIdCB(PerGroupCB):
     "Create incremental SMP_ID and store original sample id in SMP_ID_PROVIDER"
-    def __call__(self, tfm):
-        for _, df in tfm.dfs.items():
-            df['SMP_ID'] = range(1, len(df) + 1)
-            df['SMP_ID_PROVIDER'] = df['sample id'].astype(str)
+    def each_grp(self, grp, df, tfm):
+        df['SMP_ID'] = range(1, len(df) + 1)
+        df['SMP_ID_PROVIDER'] = df['sample id'].fillna('').astype(str)
 
 # %% ../../nbs/handlers/ospar.ipynb #1c1a7db8
-class AddDepthCB(Callback):
+class AddDepthCB(PerGroupCB):
     "Ensure depth values are floats and add 'SMP_DEPTH' columns."
-    def __call__(self, tfm: Transformer):
-        for grp, df in tfm.dfs.items():
-            if grp == 'SEAWATER':
-                if 'sampling depth' in df.columns:
-                    df['SMP_DEPTH'] = df['sampling depth'].astype(float)
+    grps = ['SEAWATER']
+
+    def each_grp(self, grp, df, tfm):
+        if 'sampling depth' in df.columns: df['SMP_DEPTH'] = df['sampling depth'].astype(float)
 
 # %% ../../nbs/handlers/ospar.ipynb #94730c0b
-class ConvertLonLatCB(Callback):
-    """Convert Coordinates to decimal degrees (DDD.DDDDD°)."""
-    def __init__(self):
-        fc.store_attr()
+class ConvertLonLatCB(PerGroupCB):
+    "Convert Coordinates to decimal degrees (DDD.DDDDD°)."
 
-    def __call__(self, tfm: 'Transformer'):
-        for grp, df in tfm.dfs.items():
-            df['LAT'] = self._convert_latitude(df)
-            df['LON'] = self._convert_longitude(df)
+    def each_grp(self, grp, df, tfm):
+        df['LAT'] = self._convert_lat(df)
+        df['LON'] = self._convert_lon(df)
 
-    def _convert_latitude(self, df: pd.DataFrame) -> pd.Series:
-        return np.where(
-            df['latdir'].isin(['S']),
-            self._dms_to_decimal(df['latd'], df['latm'], df['lats']) * -1,
-            self._dms_to_decimal(df['latd'], df['latm'], df['lats'])
-        )
+    def _dms_to_decimal(self, deg, m, s): return deg + m / 60 + s / 3600
 
-    def _convert_longitude(self, df: pd.DataFrame) -> pd.Series:
-        return np.where(
-            df['longdir'].isin(['W']),
-            self._dms_to_decimal(df['longd'], df['longm'], df['longs']) * -1,
-            self._dms_to_decimal(df['longd'], df['longm'], df['longs'])
-        )
+    def _convert_lat(self, df):
+        dec = self._dms_to_decimal(df['latd'], df['latm'], df['lats'])
+        return np.where(df['latdir'].isin(['S']), -dec, dec)
 
-    def _dms_to_decimal(self, degrees: pd.Series, minutes: pd.Series, seconds: pd.Series) -> pd.Series:
-        return degrees + minutes / 60 + seconds / 3600
-
+    def _convert_lon(self, df):
+        dec = self._dms_to_decimal(df['longd'], df['longm'], df['longs'])
+        return np.where(df['longdir'].isin(['W']), -dec, dec)
 
 # %% ../../nbs/handlers/ospar.ipynb #67f0cde0
-class AddStationCB(Callback):
-    "Ensure station values are floats and add 'STATION' columns."
-    def __call__(self, tfm: Transformer):
-        for grp, df in tfm.dfs.items():
-            df['STATION'] = df['station id'].astype(str)
+class AddStationCB(PerGroupCB):
+    "Add STATION column to all DataFrames."
+    def each_grp(self, grp, df, tfm): df['STATION'] = df['station id'].fillna('').astype(str)
 
 # %% ../../nbs/handlers/ospar.ipynb #c42cfdf0
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',

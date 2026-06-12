@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file. The format 
 
 ---
 
+## [1.0.11] - 2026-06-12
+
+### Refactoring
+- Completed `PerGroupCB` migration across all handlers (helcom, ospar, geotraces, maris_legacy); TEPCO is excluded — a new structured data source is now available and the handler will be redeveloped
+- Extracted shared `ParseTimeCB` (ISO8601 string → datetime) to `callbacks.py`; removed duplicate definitions from geotraces and maris_legacy handlers
+
+### Documentation
+- Added "Writing a new handler" section to the data guide: handler anatomy, IMFA nomenclature pattern, curation rules reference table, and verification checklist
+
+---
+
 ## [1.0.10] - 2026-06-01
 
 ### Maintenance

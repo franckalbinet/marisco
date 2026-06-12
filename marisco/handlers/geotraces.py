@@ -7,7 +7,7 @@ __all__ = ['fname_in', 'fname_out', 'zotero_key', 'load_data', 'common_coi', 'nu
            'nuclides_name', 'units_lut', 'renaming_rules', 'lut_nuclides', 'kw', 'SelectColsOfInterestCB',
            'WideToLongCB', 'ExtractUnitCB', 'ExtractFilteringStatusCB', 'ExtractSamplingMethodCB', 'RenameNuclideCB',
            'StandardizeUnitCB', 'RenameColumnCB', 'UnshiftLongitudeCB', 'DispatchToGroupCB', 'AddSampleIDCB',
-           'ParseTimeCB', 'get_attrs', 'encode']
+           'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/geotraces.ipynb #3a8d979f
 import fastcore.all as fc
@@ -17,7 +17,9 @@ import re
 
 from marisco.callbacks import (
     Callback, 
+    PerGroupCB,
     Transformer, 
+    ParseTimeCB,
     SanitizeLonLatCB, 
     EncodeTimeCB,
     RemapCB
@@ -245,19 +247,11 @@ class DispatchToGroupCB(Callback):
             tfm.dfs[key] = tfm.dfs[key].drop(self.group_name, axis=1)
 
 # %% ../../nbs/handlers/geotraces.ipynb #6da45d74
-class AddSampleIDCB(Callback):
+class AddSampleIDCB(PerGroupCB):
     "Assign a sequential SMP_ID per sample-type group; cast SMP_ID_PROVIDER (BODC Bottle Number) to string for NetCDF VLEN compatibility."
-    def __call__(self, tfm: Transformer):
-        for _, df in tfm.dfs.items():
-            df['SMP_ID'] = range(1, len(df) + 1)
-            df['SMP_ID_PROVIDER'] = df['SMP_ID_PROVIDER'].astype(str)
-
-# %% ../../nbs/handlers/geotraces.ipynb #61cfaf02-7d25-4663-8804-48fa4b219e2b
-class ParseTimeCB(Callback):
-    def __call__(self, tfm, time_col_name='TIME'):
-        for k in tfm.dfs.keys():
-            tfm.dfs[k][time_col_name] = pd.to_datetime(tfm.dfs[k][time_col_name], 
-                                                       format='ISO8601')
+    def each_grp(self, grp, df, tfm):
+        df['SMP_ID'] = range(1, len(df) + 1)
+        df['SMP_ID_PROVIDER'] = df['SMP_ID_PROVIDER'].astype(str)
 
 # %% ../../nbs/handlers/geotraces.ipynb #57f34e80
 lut_nuclides = lambda: get_lut(lut_path(), 'dbo_nuclide.xlsx', 

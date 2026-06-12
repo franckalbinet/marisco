@@ -18,6 +18,7 @@ Each callback implements `__call__(self, tfm: Transformer)`. Use the `order` att
 | `SanitizeLonLatCB` | Remove rows with (0,0) or out-of-range coordinates |
 | `RemapCB(fn_lut, col_remap, col_src, dest_grps)` | Generic LUT remapping, optionally scoped to specific groups |
 | `LowerStripNameCB(col_src, col_dst)` | Normalise a column to lowercase stripped strings |
+| `ParseTimeCB` | Parse TIME column from ISO8601 string to datetime |
 | `EncodeTimeCB` / `DecodeTimeCB` | Convert datetime ↔ seconds-since-epoch |
 | `SelectColumnsCB` | Keep only specified columns |
 | `RenameColumnsCB` | Rename columns to MARIS standard names |

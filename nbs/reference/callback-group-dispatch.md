@@ -1,5 +1,17 @@
 # Callback group dispatch — audit, diagnosis, and design
 
+## Status
+
+| Notebook | Status |
+|---|---|
+| `nbs/api/callbacks.ipynb` | ✅ done |
+| `nbs/handlers/helcom.ipynb` | ✅ done |
+| `nbs/handlers/ospar.ipynb` | ✅ done |
+| `nbs/handlers/geotraces.ipynb` | ✅ done |
+| `nbs/handlers/maris_legacy.ipynb` | ✅ done |
+
+---
+
 ## Context
 
 Every handler callback that operates on `tfm.dfs` must iterate over the groups
@@ -46,23 +58,30 @@ iteration is pure boilerplate and should not be visible in the subclass.
 
 ## Design — `PerGroupCB`
 
+**Implemented in `nbs/api/callbacks.ipynb`.** Key decisions made during implementation:
+
+- Template method is named `each_grp`: `process_group` was too verbose; `each` was too generic (hides the group aspect); `each_grp` is short, uses the `grp` abbreviation already established in the codebase, and is unambiguous
+- Loop iterates over `self.grps or tfm.dfs` directly (dict iteration yields keys; no intermediate variable)
+- Missing-group guard lives in `__call__`, not in subclasses
+
 ```python
 class PerGroupCB(Callback):
-    "Calls process_group for each group; set grps to restrict to specific groups."
-    grps: list = None  # None → all groups
+    "Calls `each_grp` for each group in `tfm.dfs`; set `grps` to restrict to specific groups."
+    grps: list = None  # None → all groups; explicit list restricts to those groups only
 
     def __call__(self, tfm):
-        groups = self.grps or list(tfm.dfs.keys())
-        for grp in groups:
-            if grp in tfm.dfs:
-                self.process_group(grp, tfm.dfs[grp], tfm)
+        for grp in (self.grps or tfm.dfs):
+            if grp in tfm.dfs: self.each_grp(grp, tfm.dfs[grp], tfm)
 
-    def process_group(self, grp: str, df: pd.DataFrame, tfm: Transformer):
-        raise NotImplementedError
+    def each_grp(self,
+                 grp: str,          # Group key e.g. 'SEAWATER', 'BIOTA'
+                 df: pd.DataFrame,  # DataFrame for this group
+                 tfm,               # Parent Transformer
+                 ): raise NotImplementedError
 ```
 
 `__call__` owns: which groups to visit, the missing-group guard, and the loop.  
-`process_group` owns: the transformation logic for a single group.
+`each_grp` owns: the transformation logic for a single group.
 
 The `grps` class variable is the scoping hook:
 - `grps = None` → all groups (default)
@@ -71,6 +90,45 @@ The `grps` class variable is the scoping hook:
 
 Cross-group callbacks (`CompareDfsAndTfmCB`, `SplitSedimentValuesCB`) keep
 their full `__call__` override — they legitimately need cross-group state.
+
+### callbacks.ipynb — migrated ✅
+
+| Callback | Note |
+|---|---|
+| `SanitizeLonLatCB` | migrated |
+| `LowerStripNameCB` | migrated |
+| `AddSampleTypeIdColumnCB` | migrated |
+| `SelectColumnsCB` | migrated |
+| `RenameColumnsCB` | migrated |
+| `ParseTimeCB` | added as shared callback (ISO8601 string → datetime) |
+| `EncodeTimeCB` | migrated |
+| `DecodeTimeCB` | migrated |
+| `UniqueIndexCB` | migrated |
+| `RemapCB` | **kept as `Callback`** — has own `dest_grps` scoping + loads LUT in `__call__` |
+| `RemoveAllNAValuesCB` | **kept as `Callback`** — iterates over derived `cols_dict`, not directly over `tfm.dfs` |
+| `CompareDfsAndTfmCB` | **kept as `Callback`** — cross-group by design |
+
+### helcom.ipynb — migrated ✅
+
+| Callback | Note |
+|---|---|
+| `ParseTimeCB` | migrated |
+| `SanitizeValueCB` | migrated — `dfs_dropped` side-channel removed (see TODO below) |
+| `RemapUnitCB` | migrated — per-group if/elif in `each_grp` |
+| `RemapDetectionLimitCB` | migrated |
+| `RemapSedimentCB` | migrated — `grps` set from `sed_grp_name` in `__init__` |
+| `RemapFiltCB` | migrated |
+| `AddSampleIDCB` | migrated |
+| `AddDepthCB` | migrated |
+| `AddSalinityCB` | migrated |
+| `AddStationCB` | migrated |
+| `AddTemperatureCB` | migrated |
+| `RemapSedSliceTopBottomCB` | migrated — `grps = ['SEDIMENT']` |
+| `LookupDryWetPercentWeightCB` | migrated |
+| `RemapNuclideNameCB` | migrated — `__call__` builds LUT, `each_grp` applies it |
+| `ParseCoordinates` | migrated + **renamed `ParseCoordinatesCB`** |
+| `SplitSedimentValuesCB` | **kept as `Callback`** — creates new groups by splitting |
+| `NormalizeUncCB` | **kept as `Callback`** — iterates `self.coi` (list of tuples), not `tfm.dfs` |
 
 ---
 
@@ -94,7 +152,7 @@ After:
 ```python
 class AddDepthCB(PerGroupCB):
     "Ensure depth values are floats and add 'SMP_DEPTH' and 'TOT_DEPTH' columns."
-    def process_group(self, grp, df, tfm):
+    def each_grp(self, grp, df, tfm):
         if 'sdepth' in df.columns: df['SMP_DEPTH'] = df['sdepth'].astype(float)
         if 'tdepth' in df.columns: df['TOT_DEPTH'] = df['tdepth'].astype(float)
 ```
@@ -117,7 +175,7 @@ After:
 ```python
 class ParseTimeCB(PerGroupCB):
     def __init__(self, col_src, col_dst, format): fc.store_attr()
-    def process_group(self, grp, df, tfm):
+    def each_grp(self, grp, df, tfm):
         df[self.col_dst] = pd.to_datetime(df[self.col_src.get(grp)], format=self.format, errors='coerce')
 ```
 
@@ -139,7 +197,7 @@ After:
 ```python
 class EnhanceSpeciesCB(PerGroupCB):
     grps = ['BIOTA']
-    def process_group(self, grp, df, tfm):
+    def each_grp(self, grp, df, tfm):
         df['SPECIES'] = df.apply(
             lambda row: row['enhanced_species'] if row['SPECIES'] in [-1, 0]
                         and pd.notnull(row['enhanced_species']) else row['SPECIES'], axis=1)
@@ -151,6 +209,51 @@ now the base class handles it uniformly for all subclasses.
 
 ---
 
+## TODO — redesign `dfs_dropped` tracking
+
+`SanitizeValueCB` used to populate `tfm.dfs_dropped` (a side-channel dict of removed rows)
+alongside the sanitizing logic. These are two concerns in one place:
+
+1. Sanitizing — drop NaN rows, standardize to `VALUE` column → belongs in `SanitizeValueCB`
+2. Tracking removals — before/after row diff → `CompareDfsAndTfmCB` already does this properly
+
+During the `PerGroupCB` migration, the `dfs_dropped` mechanism was removed from
+`SanitizeValueCB`. A proper removal-tracking design should be revisited separately,
+likely by ensuring `CompareDfsAndTfmCB` is composed after `SanitizeValueCB` in every
+handler pipeline that needs it.
+
+---
+
+## TODO — revisit data-dependent LUT lambdas
+
+`lut_nuclides` takes `df` (unique values from runtime data) unlike all other zero-arg LUT lambdas.
+This creates a redundancy with the exploration workflow and leaks data-gathering into the callback.
+Needs further design thought to align with the broader LUT closure pattern.
+
+---
+
+### geotraces.ipynb — migrated ✅
+
+| Callback | Note |
+|---|---|
+| `AddSampleIDCB` | migrated |
+| `ParseTimeCB` | migrated — `time_col_name` moved from `__call__` arg to `__init__` param |
+
+Pre-dispatch callbacks (`SelectColsOfInterestCB`, `WideToLongCB`, `ExtractUnitCB`, `ExtractFilteringStatusCB`, `ExtractSamplingMethodCB`, `RenameNuclideCB`, `StandardizeUnitCB`, `RenameColumnCB`, `UnshiftLongitudeCB`) operate on `tfm.df` (single dataframe, before `DispatchToGroupCB`) — these remain as `Callback` by design.
+
+`DispatchToGroupCB` keeps its full `__call__` — it *produces* `tfm.dfs` from `tfm.df` (cross-group by design).
+
+### maris_legacy.ipynb — migrated ✅
+
+| Callback | Note |
+|---|---|
+| `CastStationToStringCB` | migrated — conditional `if 'STATION' in df.columns` moves into `each_grp` |
+| `DropNAColumnsCB` | migrated — `each_grp` writes back via `tfm.dfs[grp]` (returns new DataFrame) |
+| `SanitizeDetectionLimitCB` | migrated — `fn_lut()` called in `each_grp` (cheap static LUT) |
+| `ParseTimeCB` | **extracted to `callbacks.ipynb`** as shared callback; removed from both geotraces and maris_legacy; both handlers now import from `marisco.callbacks` |
+
+---
+
 ## What does NOT change
 
 Callbacks that require cross-group state or a fundamentally different dispatch
@@ -158,7 +261,7 @@ strategy keep their full `__call__`:
 
 - `CompareDfsAndTfmCB` — computes diffs *between* original and transformed dfs
 - `SplitSedimentValuesCB` — creates new groups by splitting one group
-- `GroupBySampleTypeCB` (geotraces) — *produces* `tfm.dfs` from `tfm.df`
+- `DispatchToGroupCB` (geotraces) — *produces* `tfm.dfs` from `tfm.df`
 - `RemapNuclideNameCB` (helcom/ospar) — calls `get_unique_across_dfs` first
 
 These are not special cases to be worked around — they are legitimately

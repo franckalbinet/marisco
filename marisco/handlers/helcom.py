@@ -9,7 +9,7 @@ __all__ = ['src_dir', 'fname_out', 'zotero_key', 'default_smp_types', 'fixes_nuc
            'lut_filtered', 'kw', 'read_csv', 'load_data', 'RemapNuclideNameCB', 'ParseTimeCB', 'SplitSedimentValuesCB',
            'SanitizeValueCB', 'unc_rel2stan', 'NormalizeUncCB', 'RemapUnitCB', 'RemapDetectionLimitCB',
            'RemapSedimentCB', 'RemapFiltCB', 'AddSampleIDCB', 'AddDepthCB', 'AddSalinityCB', 'AddStationCB',
-           'AddTemperatureCB', 'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'ParseCoordinates',
+           'AddTemperatureCB', 'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'ParseCoordinatesCB',
            'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb #3a8d979f
@@ -32,6 +32,7 @@ from marisco.utils import (
 
 from marisco.callbacks import (
     Callback, 
+    PerGroupCB,
     Transformer, 
     EncodeTimeCB, 
     LowerStripNameCB, 
@@ -158,7 +159,7 @@ lut_nuclides = lambda df: Remapper(provider_lut_df=df,
                                                                                             as_df=False, overwrite=False)
 
 # %% ../../nbs/handlers/helcom.ipynb #03d47237
-class RemapNuclideNameCB(Callback):
+class RemapNuclideNameCB(PerGroupCB):
     "Remap data provider nuclide names to standardized MARIS nuclide names."
     def __init__(self, 
                  fn_lut: Callable, # Function that returns the lookup table dictionary
@@ -166,39 +167,34 @@ class RemapNuclideNameCB(Callback):
                 ):
         fc.store_attr()
 
-    def __call__(self, tfm: Transformer):
+    def __call__(self, tfm):
         df_uniques = get_unique_across_dfs(tfm.dfs, col_name=self.col_name, as_df=True)
-        lut = {k: v.matched_id for k, v in self.fn_lut(df_uniques).items()}    
-        for k in tfm.dfs.keys():
-            tfm.dfs[k]['NUCLIDE'] = tfm.dfs[k][self.col_name].replace(lut)
+        self.lut = {k: v.matched_id for k, v in self.fn_lut(df_uniques).items()}
+        super().__call__(tfm)
+
+    def each_grp(self, grp, df, tfm):
+        df['NUCLIDE'] = df[self.col_name].replace(self.lut)
 
 # %% ../../nbs/handlers/helcom.ipynb #ae547a0c
-class ParseTimeCB(Callback):
+class ParseTimeCB(PerGroupCB):
     "Standardize time format across all dataframes."
-    def __call__(self, tfm: Transformer):
-        for df in tfm.dfs.values():
-            self._process_dates(df)
+    def each_grp(self, grp, df, tfm): self._process_dates(df)
 
     def _process_dates(self, df: pd.DataFrame) -> None:
-        "Process and correct date and time information in the DataFrame."
         df['TIME'] = self._parse_date(df)
         self._handle_missing_dates(df)
         self._fill_missing_time(df)
 
     def _parse_date(self, df: pd.DataFrame) -> pd.Series:
-        "Parse the DATE column if present."
         return pd.to_datetime(df['date'], format='%m/%d/%y %H:%M:%S', errors='coerce')
 
     def _handle_missing_dates(self, df: pd.DataFrame):
-        "Handle cases where DAY or MONTH is 0 or missing."
         df.loc[df["day"] == 0, "day"] = 1
         df.loc[df["month"] == 0, "month"] = 1
-        
         missing_day_month = (df["day"].isna()) & (df["month"].isna()) & (df["year"].notna())
         df.loc[missing_day_month, ["day", "month"]] = 1
 
     def _fill_missing_time(self, df: pd.DataFrame) -> None:
-        "Fill missing time values using year, month, and day columns."
         missing_time = df['TIME'].isna()
         df.loc[missing_time, 'TIME'] = pd.to_datetime(
             df.loc[missing_time, ['year', 'month', 'day']], 
@@ -267,7 +263,7 @@ coi_val = {'SEAWATER' : {'VALUE': 'value_bq/m³'},
            'SEDIMENT': {'VALUE': '_VALUE'}}
 
 # %% ../../nbs/handlers/helcom.ipynb #15d74eed
-class SanitizeValueCB(Callback):
+class SanitizeValueCB(PerGroupCB):
     "Sanitize measurement values by removing blanks and standardizing to use the `VALUE` column."
     def __init__(self, 
                  coi: Dict[str, Dict[str, str]], # Columns of interest. Format: {group_name: {'val': 'column_name'}}
@@ -275,28 +271,13 @@ class SanitizeValueCB(Callback):
                  ): 
         fc.store_attr()
 
-    def __call__(self, tfm: Transformer):
-        tfm.dfs_dropped = {}
-        for grp, df in tfm.dfs.items():
-            value_col = self.coi[grp]['VALUE']
-            # Count NaN values before dropping
-            initial_nan_count = df[value_col].isna().sum()
-                        
-            # define a dataframe with the rows that were dropped    
-            tfm.dfs_dropped[grp] = df[df[value_col].isna()]
-            
-            df.dropna(subset=[value_col], inplace=True)
-
-            # Count NaN values after dropping
-            final_nan_count = df[value_col].isna().sum()
-            dropped_nan_count = initial_nan_count - final_nan_count
-            
-            # Print the number of dropped NaN values
-            if dropped_nan_count > 0 and self.verbose:
-                print(f"Warning: {dropped_nan_count} missing value(s) in {value_col} for group {grp}.")
-            
-            
-            df['VALUE'] = df[value_col]
+    def each_grp(self, grp, df, tfm):
+        value_col = self.coi[grp]['VALUE']
+        n_dropped = df[value_col].isna().sum()
+        if n_dropped and self.verbose:
+            print(f"Warning: {n_dropped} missing value(s) in {value_col} for group {grp}.")
+        tfm.dfs[grp] = df.dropna(subset=[value_col])
+        tfm.dfs[grp]['VALUE'] = tfm.dfs[grp][value_col]
 
 # %% ../../nbs/handlers/helcom.ipynb #76077d40
 def unc_rel2stan(
@@ -341,21 +322,17 @@ lut_units = {
 }
 
 # %% ../../nbs/handlers/helcom.ipynb #5ec5a0ef
-class RemapUnitCB(Callback):
+class RemapUnitCB(PerGroupCB):
     "Set the `unit` id column in the DataFrames based on a lookup table."
     def __init__(self, 
                  lut_units: dict=lut_units # Dictionary containing renaming rules for different unit categories
                 ):
         fc.store_attr()
 
-    def __call__(self, tfm: Transformer):
-        for grp in tfm.dfs.keys():
-            if grp == 'SEAWATER':
-                tfm.dfs[grp]['UNIT'] = self.lut_units[grp]
-            elif grp == 'BIOTA':
-                tfm.dfs[grp]['UNIT'] = tfm.dfs[grp]['basis'].apply(lambda x: lut_units[grp].get(x, 0))
-            elif grp == 'SEDIMENT':
-                tfm.dfs[grp]['UNIT'] = tfm.dfs[grp]['_UNIT']
+    def each_grp(self, grp, df, tfm):
+        if grp == 'SEAWATER': df['UNIT'] = self.lut_units[grp]
+        elif grp == 'BIOTA': df['UNIT'] = df['basis'].apply(lambda x: lut_units[grp].get(x, 0))
+        elif grp == 'SEDIMENT': df['UNIT'] = df['_UNIT']
 
 # %% ../../nbs/handlers/helcom.ipynb #23cdb129
 coi_dl = {'SEAWATER' : {'DL' : '< value_bq/m³'},
@@ -363,17 +340,15 @@ coi_dl = {'SEAWATER' : {'DL' : '< value_bq/m³'},
           'SEDIMENT': {'DL' : '_DL'}}
 
 # %% ../../nbs/handlers/helcom.ipynb #5ae05527
-class RemapDetectionLimitCB(Callback):
+class RemapDetectionLimitCB(PerGroupCB):
     def __init__(self, 
                  coi: dict,  # Dict of column hosting the detection limit info for each sample type
                 ):
         fc.store_attr()
         
-    def __call__(self, tfm: Transformer):
-        for grp in tfm.dfs:
-            df = tfm.dfs[grp]
-            dl = self.coi[grp]['DL']
-            df['DL'] = df[dl].apply(lambda x: 2 if x == '<' else 1)
+    def each_grp(self, grp, df, tfm):
+        dl = self.coi[grp]['DL']
+        df['DL'] = df[dl].apply(lambda x: 2 if x == '<' else 1)
 
 # %% ../../nbs/handlers/helcom.ipynb #8290222e
 fixes_biota_species = {
@@ -429,7 +404,7 @@ sed_replace_lut = {
 }
 
 # %% ../../nbs/handlers/helcom.ipynb #82d99eb0
-class RemapSedimentCB(Callback):
+class RemapSedimentCB(PerGroupCB):
     "Lookup sediment id using lookup table."
     def __init__(self, 
                  fn_lut: Callable,  # Function that returns the lookup table dictionary
@@ -438,22 +413,19 @@ class RemapSedimentCB(Callback):
                  replace_lut: dict = None  # Dictionary for replacing SEDI values
                  ):
         fc.store_attr()
+        self.grps = [sed_grp_name]
 
-    def __call__(self, tfm: Transformer):
-        "Remap sediment types using lookup table."
-        df = tfm.dfs[self.sed_grp_name]
+    def each_grp(self, grp, df, tfm):
         self._fix_inconsistent_values(df)
         self._map_sediment_types(df)
 
     def _fix_inconsistent_values(self, df: pd.DataFrame) -> None:
-        "Fix inconsistent values using the replace lookup table."
         if self.replace_lut:
             df[self.sed_col_name] = df[self.sed_col_name].replace(self.replace_lut)
             if NA in self.replace_lut:
                 df[self.sed_col_name] = df[self.sed_col_name].fillna(self.replace_lut[NA])
 
     def _map_sediment_types(self, df: pd.DataFrame) -> None:
-        "Map sediment types using the lookup table."
         lut = self.fn_lut()
         df['SED_TYPE'] = df[self.sed_col_name].map(
             lambda x: lut.get(x, Match(0, None, None, None)).matched_id
@@ -477,129 +449,103 @@ lut_filtered = {
 }
 
 # %% ../../nbs/handlers/helcom.ipynb #e8f58336
-class RemapFiltCB(Callback):
+class RemapFiltCB(PerGroupCB):
     "Lookup filt value in dataframe using the lookup table."
     def __init__(self,
                  lut_filtered: dict=lut_filtered, # Dictionary mapping filt codes to their corresponding names
                 ):
         fc.store_attr()
 
-    def __call__(self, tfm):
-        for df in tfm.dfs.values():
-            if 'filt' in df.columns:
-                df['FILT'] = df['filt'].map(lambda x: self.lut_filtered.get(x, 0))
+    def each_grp(self, grp, df, tfm):
+        if 'filt' in df.columns: df['FILT'] = df['filt'].map(lambda x: self.lut_filtered.get(x, 0))
 
 # %% ../../nbs/handlers/helcom.ipynb #b030cb94
-class AddSampleIDCB(Callback):
+class AddSampleIDCB(PerGroupCB):
     "Generate a SMP_ID from the KEY values in the HELCOM dataset."
-    def __call__(self, tfm: Transformer):
-        for _, df in tfm.dfs.items():
-            df['SMP_ID'] = range(1, len(df) + 1)
-            df['SMP_ID_PROVIDER'] = df['key'].astype(str)
+    def each_grp(self, grp, df, tfm):
+        df['SMP_ID'] = range(1, len(df) + 1)
+        df['SMP_ID_PROVIDER'] = df['key'].astype(str)
 
 # %% ../../nbs/handlers/helcom.ipynb #28f14b73
-class AddDepthCB(Callback):
+class AddDepthCB(PerGroupCB):
     "Ensure depth values are floats and add 'SMP_DEPTH' and 'TOT_DEPTH' columns."
-    def __call__(self, tfm: Transformer):
-        for df in tfm.dfs.values():
-            if 'sdepth' in df.columns:
-                df['SMP_DEPTH'] = df['sdepth'].astype(float)
-            if 'tdepth' in df.columns:
-                df['TOT_DEPTH'] = df['tdepth'].astype(float)
+    def each_grp(self, grp, df, tfm):
+        if 'sdepth' in df.columns: df['SMP_DEPTH'] = df['sdepth'].astype(float)
+        if 'tdepth' in df.columns: df['TOT_DEPTH'] = df['tdepth'].astype(float)
 
 # %% ../../nbs/handlers/helcom.ipynb #1faa14fb
-class AddSalinityCB(Callback):
-    def __init__(self, salinity_col: str = 'salin'):
-        self.salinity_col = salinity_col
-    "Add salinity to the SEAWATER DataFrame."
-    def __call__(self, tfm: Transformer):
-        for df in tfm.dfs.values():
-            if self.salinity_col in df.columns:
-                df['SAL'] = df[self.salinity_col].astype(float)
+class AddSalinityCB(PerGroupCB):
+    "Add salinity to all DataFrames."
+    def __init__(self, salinity_col: str = 'salin'): fc.store_attr()
+
+    def each_grp(self, grp, df, tfm):
+        if self.salinity_col in df.columns: df['SAL'] = df[self.salinity_col].astype(float)
 
 # %% ../../nbs/handlers/helcom.ipynb #55ea4c29
-class AddStationCB(Callback):
+class AddStationCB(PerGroupCB):
     "Add station to all DataFrames."
-    def __call__(self, tfm: Transformer):
-        for df in tfm.dfs.values():
-            df['STATION'] = df['station'].fillna('').astype(str)
+    def each_grp(self, grp, df, tfm): df['STATION'] = df['station'].fillna('').astype(str)
 
 # %% ../../nbs/handlers/helcom.ipynb #047afa7e
-class AddTemperatureCB(Callback):
-    def __init__(self, temperature_col: str = 'ttemp'):
-        self.temperature_col = temperature_col
-    "Add temperature to the SEAWATER DataFrame."
-    def __call__(self, tfm: Transformer ):
-        for df in tfm.dfs.values():
-            if self.temperature_col in df.columns:
-                df['TEMP'] = df[self.temperature_col].astype(float)
+class AddTemperatureCB(PerGroupCB):
+    "Add temperature to all DataFrames."
+    def __init__(self, temperature_col: str = 'ttemp'): fc.store_attr()
+
+    def each_grp(self, grp, df, tfm):
+        if self.temperature_col in df.columns: df['TEMP'] = df[self.temperature_col].astype(float)
 
 # %% ../../nbs/handlers/helcom.ipynb #cf398df9
-class RemapSedSliceTopBottomCB(Callback):
+class RemapSedSliceTopBottomCB(PerGroupCB):
     "Remap Sediment slice top and bottom to MARIS format."
-    def __call__(self, tfm: Transformer):
-        "Iterate through all DataFrames in the transformer object and remap sediment slice top and bottom."
-        tfm.dfs['SEDIMENT']['TOP'] = tfm.dfs['SEDIMENT']['uppsli']
-        tfm.dfs['SEDIMENT']['BOTTOM'] = tfm.dfs['SEDIMENT']['lowsli']
+    grps = ['SEDIMENT']
+    def each_grp(self, grp, df, tfm):
+        df['TOP'] = df['uppsli']
+        df['BOTTOM'] = df['lowsli']
 
 # %% ../../nbs/handlers/helcom.ipynb #ef385c79
-class LookupDryWetPercentWeightCB(Callback):
+class LookupDryWetPercentWeightCB(PerGroupCB):
     "Lookup dry-wet ratio and format for MARIS."
-    def __call__(self, tfm: Transformer):
-        "Iterate through all DataFrames in the transformer object and apply the dry-wet ratio lookup."
-        for grp in tfm.dfs.keys():
-            if 'dw%' in tfm.dfs[grp].columns:
-                self._apply_dry_wet_ratio(tfm.dfs[grp])
-            if 'weight' in tfm.dfs[grp].columns and 'basis' in tfm.dfs[grp].columns:
-                self._correct_basis(tfm.dfs[grp])
-                self._apply_weight(tfm.dfs[grp])
+    def each_grp(self, grp, df, tfm):
+        if 'dw%' in df.columns: self._apply_dry_wet_ratio(df)
+        if 'weight' in df.columns and 'basis' in df.columns:
+            self._correct_basis(df)
+            self._apply_weight(df)
 
     def _apply_dry_wet_ratio(self, df: pd.DataFrame) -> None:
-        "Apply dry-wet ratio conversion and formatting to the given DataFrame."
-        df['PERCENTWT'] = df['dw%'] / 100  # Convert percentage to fraction
-        df.loc[df['PERCENTWT'] == 0, 'PERCENTWT'] = np.nan  # Convert 0% to nan
+        df['PERCENTWT'] = df['dw%'] / 100
+        df.loc[df['PERCENTWT'] == 0, 'PERCENTWT'] = np.nan
 
     def _correct_basis(self, df: pd.DataFrame) -> None:
-        "Correct BASIS values. Assuming F = Fresh weight, so F = W"
         df.loc[df['basis'] == 'F', 'basis'] = 'W'
 
     def _apply_weight(self, df: pd.DataFrame) -> None:
-        "Apply weight conversion and formatting to the given DataFrame."
         dry_condition = df['basis'] == 'D'
         wet_condition = df['basis'] == 'W'
-        
         df.loc[dry_condition, 'DRYWT'] = df['weight']
         df.loc[dry_condition & df['PERCENTWT'].notna(), 'WETWT'] = df['weight'] / df['PERCENTWT']
-        
         df.loc[wet_condition, 'WETWT'] = df['weight']
         df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['weight'] * df['PERCENTWT']
 
 # %% ../../nbs/handlers/helcom.ipynb #61afcc23
-class ParseCoordinates(Callback):
+class ParseCoordinatesCB(PerGroupCB):
     "Get geographical coordinates from columns expressed in degrees decimal format or from columns in degrees/minutes decimal format where degrees decimal format is missing or zero."
     def __init__(self, 
                  fn_convert_cor: Callable # Function that converts coordinates from degree-minute to decimal degree format
                  ):
-        self.fn_convert_cor = fn_convert_cor
+        fc.store_attr()
 
-    def __call__(self, tfm:Transformer):
-        for df in tfm.dfs.values():
-            self._format_coordinates(df)
+    def each_grp(self, grp, df, tfm): self._format_coordinates(df)
 
     def _format_coordinates(self, df:pd.DataFrame) -> None:
         coord_cols = self._get_coord_columns(df.columns)
-        
-        
         for coord in ['lat', 'lon']:
             decimal_col, minute_col = coord_cols[f'{coord}_d'], coord_cols[f'{coord}_m']
-            # Attempt to convert columns to numeric, coercing errors to NaN.
             df[decimal_col] = pd.to_numeric(df[decimal_col], errors='coerce')
             df[minute_col] = pd.to_numeric(df[minute_col], errors='coerce')
             condition = df[decimal_col].isna() | (df[decimal_col] == 0)
             df[coord.upper()] = np.where(condition,
                                  df[minute_col].apply(self._safe_convert),
                                  df[decimal_col])
-        
         df.dropna(subset=['LAT', 'LON'], inplace=True)
 
     def _get_coord_columns(self, columns) -> dict:
@@ -616,8 +562,7 @@ class ParseCoordinates(Callback):
         return matching_columns[0] if matching_columns else None
 
     def _safe_convert(self, value) -> str:
-        if pd.isna(value):
-            return value
+        if pd.isna(value): return value
         try:
             return self.fn_convert_cor(value)
         except Exception as e:
@@ -680,7 +625,7 @@ def encode(
                             AddTemperatureCB(),
                             RemapSedSliceTopBottomCB(),
                             LookupDryWetPercentWeightCB(),
-                            ParseCoordinates(ddmm_to_dd),
+                            ParseCoordinatesCB(ddmm_to_dd),
                             SanitizeLonLatCB(),
                             AddStationCB()
                             ])

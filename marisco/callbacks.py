@@ -7,7 +7,7 @@ Docs: https://franckalbinet.github.io/mariscoapi/callbacks.html.md"""
 # %% auto #0
 __all__ = ['Callback', 'PerGroupCB', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB',
            'AddSampleTypeIdColumnCB', 'SelectColumnsCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB',
-           'UniqueIndexCB', 'EncodeTimeCB', 'DecodeTimeCB']
+           'UniqueIndexCB', 'ParseTimeCB', 'EncodeTimeCB', 'DecodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb #5a293345
 #import copy
@@ -280,6 +280,13 @@ class UniqueIndexCB(PerGroupCB):
         
     def each_grp(self, grp, df, tfm):
         tfm.dfs[grp] = df.reset_index(drop=True).reset_index(names=[self.index_name])
+
+# %% ../nbs/api/callbacks.ipynb #c787de45
+class ParseTimeCB(PerGroupCB):
+    "Parse time column from ISO8601 string to datetime."
+    def __init__(self, time_col_name: str='TIME'): fc.store_attr()
+    def each_grp(self, grp, df, tfm):
+        df[self.time_col_name] = pd.to_datetime(df[self.time_col_name], format='ISO8601')
 
 # %% ../nbs/api/callbacks.ipynb #7f03e81c
 class EncodeTimeCB(PerGroupCB):

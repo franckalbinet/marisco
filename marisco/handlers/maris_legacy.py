@@ -4,7 +4,7 @@
 
 # %% auto #0
 __all__ = ['fname_in', 'dir_dest', 'cois_renaming_rules', 'dl_name_to_id', 'kw', 'DataLoader', 'get_zotero_key', 'get_fname',
-           'CastStationToStringCB', 'DropNAColumnsCB', 'SanitizeDetectionLimitCB', 'ParseTimeCB', 'get_attrs', 'encode']
+           'CastStationToStringCB', 'DropNAColumnsCB', 'SanitizeDetectionLimitCB', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #3a8d979f
 from tqdm import tqdm
@@ -16,7 +16,9 @@ from typing import Optional, List
 
 from marisco.callbacks import (
     Callback, 
+    PerGroupCB,
     Transformer, 
+    ParseTimeCB,
     SanitizeLonLatCB, 
     EncodeTimeCB, 
     RenameColumnsCB, 
@@ -120,28 +122,23 @@ cois_renaming_rules = {
 }
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #178e3892
-class CastStationToStringCB(Callback):
+class CastStationToStringCB(PerGroupCB):
     "Convert STATION column to string type, filling any missing values with empty string"
-    def __call__(self, tfm):
-        for k in tfm.dfs.keys():
-            if 'STATION' in tfm.dfs[k].columns:
-                tfm.dfs[k]['STATION'] = tfm.dfs[k]['STATION'].fillna('').astype('string')
+    def each_grp(self, grp, df, tfm):
+        if 'STATION' in df.columns:
+            df['STATION'] = df['STATION'].fillna('').astype('string')
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #819703e6
-class DropNAColumnsCB(Callback):
+class DropNAColumnsCB(PerGroupCB):
     "Drop variable containing only NaN or 'Not available' (id=0 in MARIS lookup tables)."
     def __init__(self, na_value=0): fc.store_attr()
-    def isMarisNA(self, col): 
-        return len(col.unique()) == 1 and col.iloc[0] == self.na_value
-    
+    def isMarisNA(self, col): return len(col.unique()) == 1 and col.iloc[0] == self.na_value
     def dropMarisNA(self, df):
         na_cols = [col for col in df.columns if self.isMarisNA(df[col])]
         return df.drop(labels=na_cols, axis=1)
-        
-    def __call__(self, tfm):
-        for k in tfm.dfs.keys():
-            tfm.dfs[k] = tfm.dfs[k].dropna(axis=1, how='all')
-            tfm.dfs[k] = self.dropMarisNA(tfm.dfs[k])
+    def each_grp(self, grp, df, tfm):
+        tfm.dfs[grp] = df.dropna(axis=1, how='all')
+        tfm.dfs[grp] = self.dropMarisNA(tfm.dfs[grp])
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #5f143484
 dl_name_to_id = lambda: get_lut(lut_path(), 
@@ -150,28 +147,11 @@ dl_name_to_id = lambda: get_lut(lut_path(),
                                 value='id')
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #c99e5640
-class SanitizeDetectionLimitCB(Callback):
+class SanitizeDetectionLimitCB(PerGroupCB):
     "Assign Detection Limit name to its id based on MARIS nomenclature."
-    def __init__(self,
-                 fn_lut=dl_name_to_id,
-                 dl_name='DL'):
-        fc.store_attr()
-
-    def __call__(self, tfm):
-        lut = self.fn_lut()
-        for k in tfm.dfs.keys():
-            tfm.dfs[k][self.dl_name] = tfm.dfs[k][self.dl_name].replace(lut)
-
-# %% ../../nbs/handlers/maris_legacy.ipynb #434da9d4
-class ParseTimeCB(Callback):
-    "Parse time column from MARIS dump."
-    def __init__(self,
-                 time_name='TIME'):
-        fc.store_attr()
-        
-    def __call__(self, tfm):
-        for k in tfm.dfs.keys():
-            tfm.dfs[k][self.time_name] = pd.to_datetime(tfm.dfs[k][self.time_name], format='ISO8601')
+    def __init__(self, fn_lut=dl_name_to_id, dl_name='DL'): fc.store_attr()
+    def each_grp(self, grp, df, tfm):
+        df[self.dl_name] = df[self.dl_name].replace(self.fn_lut())
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #f98fd736
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',

@@ -7,8 +7,8 @@
 | `nbs/api/callbacks.ipynb` | ✅ done |
 | `nbs/handlers/helcom.ipynb` | ✅ done |
 | `nbs/handlers/ospar.ipynb` | ✅ done |
-| `nbs/handlers/geotraces.ipynb` | 🔲 todo |
-| `nbs/handlers/maris_legacy.ipynb` | 🔲 todo |
+| `nbs/handlers/geotraces.ipynb` | ✅ done |
+| `nbs/handlers/maris_legacy.ipynb` | ✅ done |
 
 ---
 
@@ -100,6 +100,7 @@ their full `__call__` override — they legitimately need cross-group state.
 | `AddSampleTypeIdColumnCB` | migrated |
 | `SelectColumnsCB` | migrated |
 | `RenameColumnsCB` | migrated |
+| `ParseTimeCB` | added as shared callback (ISO8601 string → datetime) |
 | `EncodeTimeCB` | migrated |
 | `DecodeTimeCB` | migrated |
 | `UniqueIndexCB` | migrated |
@@ -231,6 +232,28 @@ Needs further design thought to align with the broader LUT closure pattern.
 
 ---
 
+### geotraces.ipynb — migrated ✅
+
+| Callback | Note |
+|---|---|
+| `AddSampleIDCB` | migrated |
+| `ParseTimeCB` | migrated — `time_col_name` moved from `__call__` arg to `__init__` param |
+
+Pre-dispatch callbacks (`SelectColsOfInterestCB`, `WideToLongCB`, `ExtractUnitCB`, `ExtractFilteringStatusCB`, `ExtractSamplingMethodCB`, `RenameNuclideCB`, `StandardizeUnitCB`, `RenameColumnCB`, `UnshiftLongitudeCB`) operate on `tfm.df` (single dataframe, before `DispatchToGroupCB`) — these remain as `Callback` by design.
+
+`DispatchToGroupCB` keeps its full `__call__` — it *produces* `tfm.dfs` from `tfm.df` (cross-group by design).
+
+### maris_legacy.ipynb — migrated ✅
+
+| Callback | Note |
+|---|---|
+| `CastStationToStringCB` | migrated — conditional `if 'STATION' in df.columns` moves into `each_grp` |
+| `DropNAColumnsCB` | migrated — `each_grp` writes back via `tfm.dfs[grp]` (returns new DataFrame) |
+| `SanitizeDetectionLimitCB` | migrated — `fn_lut()` called in `each_grp` (cheap static LUT) |
+| `ParseTimeCB` | **extracted to `callbacks.ipynb`** as shared callback; removed from both geotraces and maris_legacy; both handlers now import from `marisco.callbacks` |
+
+---
+
 ## What does NOT change
 
 Callbacks that require cross-group state or a fundamentally different dispatch
@@ -238,7 +261,7 @@ strategy keep their full `__call__`:
 
 - `CompareDfsAndTfmCB` — computes diffs *between* original and transformed dfs
 - `SplitSedimentValuesCB` — creates new groups by splitting one group
-- `GroupBySampleTypeCB` (geotraces) — *produces* `tfm.dfs` from `tfm.df`
+- `DispatchToGroupCB` (geotraces) — *produces* `tfm.dfs` from `tfm.df`
 - `RemapNuclideNameCB` (helcom/ospar) — calls `get_unique_across_dfs` first
 
 These are not special cases to be worked around — they are legitimately

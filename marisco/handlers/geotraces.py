@@ -10,7 +10,7 @@ __all__ = ['fname_in', 'fname_out', 'zotero_key', 'load_data', 'common_coi', 'nu
            'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/geotraces.ipynb #3a8d979f
-import fastcore.all as fc
+from fastcore.all import *
 import pandas as pd
 import numpy as np
 import re
@@ -53,32 +53,38 @@ zotero_key = '97UIMEXN'
 load_data = lambda fname: pd.read_csv(fname_in)
 
 # %% ../../nbs/handlers/geotraces.ipynb #8d3a7bba-39d7-4fc3-8f0e-fb83ff52dcc2
+# Metadata columns always kept as identifiers when reshaping wide → long
 common_coi = ['yyyy-mm-ddThh:mm:ss.sss', 'Longitude [degrees_east]',
               'Latitude [degrees_north]', 'Bot. Depth [m]', 'DEPTH [m]', 'BODC Bottle Number:INTEGER']
 
+# Regex patterns identifying radionuclide measurement columns
 nuclides_pattern = ['^TRITI', '^Th_228', '^Th_23[024]', '^Pa_231', 
                     '^U_236_[DT]', '^Be_', '^Cs_137', '^Pb_210', '^Po_210',
                     '^Ra_22[3468]', 'Np_237', '^Pu_239_[D]', '^Pu_240', '^Pu_239_Pu_240',
                     '^I_129', '^Ac_227']  
 
+# %% ../../nbs/handlers/geotraces.ipynb #fa7ae0ca
 class SelectColsOfInterestCB(Callback):
-    "Select columns of interest."
-    def __init__(self, common_coi, nuclides_pattern): fc.store_attr()
+    "Select columns of interest from the wide Geotraces dataframe."
+    def __init__(self,
+                 common_coi: list,       # Non-nuclide columns always kept as id_vars
+                 nuclides_pattern: list  # Regex patterns matching nuclide column names
+                 ): store_attr()
     def __call__(self, tfm):
         nuc_of_interest = [c for c in tfm.df.columns if 
                            any(re.match(pattern, c) for pattern in self.nuclides_pattern)]
-
         tfm.df = tfm.df[self.common_coi + nuc_of_interest]
 
 # %% ../../nbs/handlers/geotraces.ipynb #b060bb07-5565-4928-8b43-4abc5e64eb97
 class WideToLongCB(Callback):
-    """
-    Get Geotraces nuclide names as values not column names 
-    to extract contained information (unit, sampling method, ...).
-    """
-    def __init__(self, common_coi, nuclides_pattern, 
-                 var_name='NUCLIDE', value_name='VALUE'): 
-        fc.store_attr()
+    "Reshape wide nuclide columns to long format so unit, method, and filter status can be extracted from column names."
+    def __init__(self,
+                 common_coi: list,         # Non-nuclide columns kept as id_vars in melt
+                 nuclides_pattern: list,   # Regex patterns identifying nuclide columns
+                 var_name: str='NUCLIDE',  # Output column name for nuclide identifiers
+                 value_name: str='VALUE',  # Output column name for measurement values
+                 ): 
+        store_attr()
         
     def __call__(self, tfm):
         nuc_of_interest = [c for c in tfm.df.columns if 
@@ -89,11 +95,11 @@ class WideToLongCB(Callback):
 
 # %% ../../nbs/handlers/geotraces.ipynb #3e982489-7c69-4b6d-9930-8f786220ad5b
 class ExtractUnitCB(Callback):
-    """
-    Extract units from nuclide names.
-    """
-    def __init__(self, var_name='NUCLIDE'): 
-        fc.store_attr()
+    "Extract measurement unit from nuclide column names (e.g. 'Cs_137_D_CONC_BOTTLE [uBq/kg]' → 'uBq/kg')."
+    def __init__(self,
+                 var_name: str='NUCLIDE'  # Column containing nuclide names with embedded units in brackets
+                 ): 
+        store_attr()
         self.unit_col_name = 'UNIT'
 
     def extract_unit(self, s):
@@ -113,10 +119,12 @@ phase = {
 
 # %% ../../nbs/handlers/geotraces.ipynb #3ba72b3a-a013-4b5d-881a-9fd0a7e8b74c
 class ExtractFilteringStatusCB(Callback):
-    "Extract filtering status from nuclide names."
-    def __init__(self, phase, var_name='NUCLIDE'): 
-        fc.store_attr()
-        # self.filt_col_name = cdl_cfg()['vars']['suffixes']['filtered']['name']
+    "Extract filtering status and sample-type group from nuclide column names using phase code (e.g. _D_, _T_, _TP_)."
+    def __init__(self,
+                 phase: dict,              # Phase code → {FILT, group} mapping (e.g. {'D': {'FILT': 1, 'group': 'SEAWATER'}})
+                 var_name: str='NUCLIDE'   # Column containing nuclide names with embedded phase codes
+                 ): 
+        store_attr()
         self.filt_col_name = 'FILT'
 
     def extract_filt_status(self, s):
@@ -147,10 +155,10 @@ class ExtractSamplingMethodCB(Callback):
     "Extract sampling method from nuclide names."
     def __init__(self, 
                  smp_method:dict = smp_method, # Sampling method lookup table
-                 var_name='NUCLIDE', # Column name containing nuclide names
+                 var_name='NUCLIDE',            # Column name containing nuclide names
                  smp_method_col_name = 'SAMP_MET' # Column name for sampling method in output df
                  ): 
-        fc.store_attr()
+        store_attr()
 
     def extract_smp_method(self, s):
         match = re.search(r'_(' + '|'.join(self.smp_method.keys()) + ') ', s)
@@ -165,8 +173,11 @@ nuclides_name = {'TRITIUM': 'h3', 'Pu_239_Pu_240': 'pu239_240_tot'}
 # %% ../../nbs/handlers/geotraces.ipynb #06cc02db-47e0-4fe9-8586-d76bcb5c4615
 class RenameNuclideCB(Callback):
     "Remap nuclides name to MARIS standard."
-    def __init__(self, nuclides_name, var_name='NUCLIDE'): 
-        fc.store_attr()
+    def __init__(self,
+                 nuclides_name: dict,     # Provider-specific name overrides e.g. {'TRITIUM': 'h3'}
+                 var_name: str='NUCLIDE'  # Column containing nuclide names to standardize
+                 ): 
+        store_attr()
         self.patterns = ['_D', '_T', '_TP', '_LPT', '_SPT']
 
     def extract_nuclide_name(self, s):
@@ -193,11 +204,11 @@ units_lut = {
 class StandardizeUnitCB(Callback):
     "Remap unit to MARIS standard ones and apply conversion where needed."
     def __init__(self, 
-                 units_lut, 
-                 unit_col_name='UNIT',
-                 var_name='VALUE'): 
-        fc.store_attr()
-        # self.unit_col_name = cdl_cfg()['vars']['suffixes']['unit']['name']
+                 units_lut: dict,              # Unit string → {id, factor} conversion mapping
+                 unit_col_name: str='UNIT',    # Column containing unit strings to remap
+                 var_name: str='VALUE'         # Column containing measurement values to rescale
+                 ): 
+        store_attr()
         
     def __call__(self, tfm):
         # Convert/rescale values
@@ -221,25 +232,30 @@ renaming_rules = {
 # %% ../../nbs/handlers/geotraces.ipynb #5a1b1521-a4d4-4839-a2c1-444c31332ef2
 class RenameColumnCB(Callback):
     "Renaming variables to MARIS standard names."
-    def __init__(self, lut=renaming_rules): fc.store_attr()
+    def __init__(self,
+                 lut: dict=renaming_rules  # Provider column name → MARIS standard name mapping
+                 ): store_attr()
     def __call__(self, tfm):
-        # lut = self.renaming_rules()
         new_col_names = [self.lut[name] if name in self.lut else name for name in tfm.df.columns]
         tfm.df.columns = new_col_names
 
 # %% ../../nbs/handlers/geotraces.ipynb #ee266cb0-ad2f-4548-b68b-80d0f33ef403
 class UnshiftLongitudeCB(Callback):
-    "Longitudes are coded between 0 and 360 in Geotraces. We rescale it between -180 and 180 instead."
-    def __init__(self, lon_col_name='LON'): 
-        fc.store_attr()
+    "Shift longitudes from Geotraces [0, 360] convention to MARIS [-180, 180] by subtracting 180."
+    def __init__(self,
+                 lon_col_name: str='LON'  # Column containing longitudes in [0, 360] to shift
+                 ): 
+        store_attr()
     def __call__(self, tfm):
         tfm.df[self.lon_col_name] = tfm.df[self.lon_col_name] - 180
 
 # %% ../../nbs/handlers/geotraces.ipynb #347a0371-c6e4-4b7d-b1f8-8ffb00509e42
 class DispatchToGroupCB(Callback):
-    "Convert to a dictionary of dataframe with sample type (seawater,...) as keys."
-    def __init__(self, group_name='GROUP'): 
-        fc.store_attr()
+    "Split flat dataframe into per-group dict keyed by sample type (SEAWATER, SUSPENDED_MATTER, …)."
+    def __init__(self,
+                 group_name: str='GROUP'  # Column whose distinct values become the output dict keys
+                 ): 
+        store_attr()
         
     def __call__(self, tfm):
         tfm.dfs = dict(tuple(tfm.df.groupby(self.group_name)))
@@ -249,7 +265,11 @@ class DispatchToGroupCB(Callback):
 # %% ../../nbs/handlers/geotraces.ipynb #6da45d74
 class AddSampleIDCB(PerGroupCB):
     "Assign a sequential SMP_ID per sample-type group; cast SMP_ID_PROVIDER (BODC Bottle Number) to string for NetCDF VLEN compatibility."
-    def each_grp(self, grp, df, tfm):
+    def each_grp(self,
+                 grp: str,          # Group key e.g. 'SEAWATER', 'SUSPENDED_MATTER'
+                 df: pd.DataFrame,  # DataFrame for this group
+                 tfm,               # Parent Transformer
+                 ):
         df['SMP_ID'] = range(1, len(df) + 1)
         df['SMP_ID_PROVIDER'] = df['SMP_ID_PROVIDER'].astype(str)
 
@@ -270,7 +290,11 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Biological Classification > Plants > Macroalgae (Seaweeds)']
 
 # %% ../../nbs/handlers/geotraces.ipynb #ca5357b7
-def get_attrs(tfm, zotero_key, kw=kw):
+def get_attrs(
+        tfm, 
+        zotero_key, 
+        kw=kw
+        ):
     "Retrieve global attributes from Geotraces dataset."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -282,7 +306,11 @@ def get_attrs(tfm, zotero_key, kw=kw):
         ])()
 
 # %% ../../nbs/handlers/geotraces.ipynb #d591d3f2-8843-4dad-9514-d7e2d77af592
-def encode(fname_in, fname_out, **kwargs):
+def encode(
+        fname_in, 
+        fname_out, 
+        **kwargs
+        ):
     df = pd.read_csv(fname_in)
     tfm = Transformer(df, cbs=[
         SelectColsOfInterestCB(common_coi, nuclides_pattern),

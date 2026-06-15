@@ -37,7 +37,7 @@ Prefer scoped paths (`nbs/api`, `nbs/cli`) over full `nbs/` — handlers alone i
 
 ## Critical rule — nbdev
 
-**Never edit `.py` files in `marisco/`. They are auto-generated from notebooks.** All code lives in `nbs/`. After editing a notebook, run `nbdev_export` to regenerate modules.
+**Never edit `.py` files in `marisco/`. They are auto-generated from notebooks.** All code lives in `nbs/`. After editing a notebook, run `nbdev-export` to regenerate modules.
 
 Documentation follows the [`fastcore.docments`](https://fastcore.fast.ai/docments.html) convention: parameter documentation lives inline with the argument, not in a docstring body. nbdev picks these up automatically and renders them into the Quarto-based documentation site.
 

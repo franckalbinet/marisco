@@ -60,7 +60,7 @@ common_coi = ['yyyy-mm-ddThh:mm:ss.sss', 'Longitude [degrees_east]',
 # Regex patterns identifying radionuclide measurement columns
 nuclides_pattern = ['^TRITI', '^Th_228', '^Th_23[024]', '^Pa_231', 
                     '^U_236_[DT]', '^Be_', '^Cs_137', '^Pb_210', '^Po_210',
-                    '^Ra_22[3468]', 'Np_237', '^Pu_239_[D]', '^Pu_240', '^Pu_239_Pu_240',
+                    '^Ra_22[3468]', '^Np_237', '^Pu_239_[D]', '^Pu_240', '^Pu_239_Pu_240',
                     '^I_129', '^Ac_227']  
 
 # %% ../../nbs/handlers/geotraces.ipynb #fa7ae0ca
@@ -110,6 +110,7 @@ class ExtractUnitCB(Callback):
         tfm.df[self.unit_col_name] = tfm.df[self.var_name].apply(self.extract_unit)
 
 # %% ../../nbs/handlers/geotraces.ipynb #efb9477e-f593-4d15-b8b8-c073bd6bb590
+# Phase code embedded in column names → FILT status and sample type group
 phase = {
     'D': {'FILT': 1, 'group': 'SEAWATER'},
     'T': {'FILT': 2, 'group': 'SEAWATER'},
@@ -143,7 +144,7 @@ class ExtractFilteringStatusCB(Callback):
         tfm.df['GROUP'] = tfm.df[self.var_name].apply(self.extract_group)
 
 # %% ../../nbs/handlers/geotraces.ipynb #e7c79502-f09e-49c0-851b-cdb2eca82eac
-# To be validated
+# Sampling method code → MARIS method ID mapping (to be validated)
 smp_method = {
     'BOTTLE': 1,
     'FISH': 18,
@@ -168,6 +169,7 @@ class ExtractSamplingMethodCB(Callback):
         tfm.df[self.smp_method_col_name] = tfm.df[self.var_name].apply(self.extract_smp_method)
 
 # %% ../../nbs/handlers/geotraces.ipynb #8eb5c23c-8930-4100-b9bc-d536d2b8d3b6
+# Provider-specific nuclide name overrides for MARIS standardisation
 nuclides_name = {'TRITIUM': 'h3', 'Pu_239_Pu_240': 'pu239_240_tot'}
 
 # %% ../../nbs/handlers/geotraces.ipynb #06cc02db-47e0-4fe9-8586-d76bcb5c4615
@@ -192,6 +194,7 @@ class RenameNuclideCB(Callback):
         tfm.df[self.var_name] = tfm.df[self.var_name].apply(self.standardize_name)
 
 # %% ../../nbs/handlers/geotraces.ipynb #80145187-bb90-4428-9d31-77a82ec916b4
+# Geotraces unit → MARIS unit ID and conversion factor mapping
 units_lut = {
     'TU': {'id': 7, 'factor': 1},
     'uBq/kg': {'id': 3, 'factor': 1e-6},
@@ -220,6 +223,7 @@ class StandardizeUnitCB(Callback):
             {k: v['id'] for k, v in self.units_lut.items()})
 
 # %% ../../nbs/handlers/geotraces.ipynb #8896686b
+# Geotraces column name → MARIS standard name mapping
 renaming_rules = {
     'yyyy-mm-ddThh:mm:ss.sss': 'TIME',
     'Longitude [degrees_east]': 'LON',
@@ -274,6 +278,7 @@ class AddSampleIDCB(PerGroupCB):
         df['SMP_ID_PROVIDER'] = df['SMP_ID_PROVIDER'].astype(str)
 
 # %% ../../nbs/handlers/geotraces.ipynb #57f34e80
+# Lookup table: MARIS nc_name → nuclide_id
 lut_nuclides = lambda: get_lut(lut_path(), 'dbo_nuclide.xlsx', 
                                key='nc_name', value='nuclide_id', reverse=False)
 

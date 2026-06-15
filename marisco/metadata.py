@@ -9,7 +9,7 @@ __all__ = ['GlobAttrsFeeder', 'BboxCB', 'DepthRangeCB', 'TimeRangeCB', 'ZoteroIt
 
 # %% ../nbs/api/metadata.ipynb #b4934cd2
 import pandas as pd
-import fastcore.all as fc
+from fastcore.all import *
 from cftime import num2date
 from pyzotero import zotero, zotero_errors
 import json
@@ -30,7 +30,7 @@ class GlobAttrsFeeder:
                  cbs: List[Callback]=[], # Callbacks
                  logs: List[str]=[] # List of preprocessing steps taken
                  ): 
-        fc.store_attr()
+        store_attr()
         self.attrs = {}
         
     def callback(self):
@@ -55,10 +55,11 @@ class BboxCB(Callback):
 
 # %% ../nbs/api/metadata.ipynb #813cbfe2
 class DepthRangeCB(Callback):
-    "Compute depth values range"
+    "Compute minimum and maximum depth values"
     def __init__(self, 
-                 depth_col: str='SMP_DEPTH'): 
-        fc.store_attr()
+                 depth_col: str='SMP_DEPTH' # Column name for sampling depth values
+                ): 
+        store_attr()
     def __call__(self, obj):
         depths = pd.concat(obj.dfs).get(self.depth_col, default=pd.Series([]))
         if not depths.empty:
@@ -68,11 +69,12 @@ class DepthRangeCB(Callback):
 
 # %% ../nbs/api/metadata.ipynb #d12b933c
 class TimeRangeCB(Callback):
-    "Compute time values range"
+    "Compute time coverage start and end dates"
     def __init__(self, 
-                 time_col: str='TIME',
-                 fn_time_unit: Callable=get_time_units): 
-        fc.store_attr()
+                 time_col: str='TIME',         # Column name for time values
+                 fn_time_unit: Callable=get_time_units  # Function returning the NetCDF time unit string
+                ): 
+        store_attr()
         self.time_unit = fn_time_unit()
     
     def __call__(self, obj):
@@ -87,9 +89,10 @@ class TimeRangeCB(Callback):
 class ZoteroItem:
     "Retrieve Zotero metadata."
     def __init__(self, 
-                 item_id: str, 
-                 cfg: Dict[str, str]):
-        fc.store_attr()
+                 item_id: str, # Zotero item key to retrieve
+                 cfg: Dict[str, str] # Zotero config dict with keys 'lib_id' and 'api_key'
+                ):
+        store_attr()
         self.item = self.getItem(item_id)
     
     def exist(self): return self.item != None
@@ -98,7 +101,7 @@ class ZoteroItem:
         zot = zotero.Zotero(self.cfg['lib_id'], 'group', self.cfg['api_key'])
         try:
             return zot.item(item_id)
-        except zotero_errors.ResourceNotFound:
+        except zotero_errors.ResourceNotFoundError:
             print(f'Item {item_id} does not exist in Zotero library')
             return None
             
@@ -109,18 +112,18 @@ class ZoteroItem:
         return self.item['data']['abstractNote']
     
     def creator_name(self):
-        # creators = [f'{c["creatorType"]}: {c["name"]}' for c in self.item['data']['creators']]
-        # return '; '.join(creators)
         return json.dumps(self.item['data']['creators'])
             
     def __repr__(self):
         return json.dumps(self.item, indent=4) 
 
 # %% ../nbs/api/metadata.ipynb #1328e775
-# TBD: put it in callback module
 class ZoteroCB(Callback):
-    "Retrieve Zotero metadata."
-    def __init__(self, itemId, cfg): fc.store_attr()
+    "Populate global attributes from Zotero bibliographic metadata."
+    def __init__(self, 
+                 itemId,   # Zotero item key to retrieve
+                 cfg       # Full config dict; 'zotero' sub-key contains the Zotero credentials
+                ): store_attr()
     def __call__(self, obj):
         item = ZoteroItem(self.itemId, self.cfg['zotero'])
         if item.exist(): 
@@ -130,5 +133,9 @@ class ZoteroCB(Callback):
 
 # %% ../nbs/api/metadata.ipynb #daff6f7e
 class KeyValuePairCB(Callback):
-    def __init__(self, k, v): fc.store_attr()
+    "Add a single key-value pair as a NetCDF global attribute."
+    def __init__(self, 
+                 k, # NetCDF global attribute key name
+                 v  # NetCDF global attribute value
+                ): store_attr()
     def __call__(self, obj): obj.attrs[self.k] = self.v

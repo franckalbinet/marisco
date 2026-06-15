@@ -22,7 +22,7 @@
 
 - **TEPCO: magic unit ID in `ConvertToBqM3CB`** (`nbs/handlers/tepco.ipynb`): `UNIT = 1` is hardcoded with no explanation. Replace with a named constant (e.g. `UNIT_BQ_M3`) sourced from the LUT or `configs.py`.
 
-- **GEOTRACES: module-level `phase` dict** (`nbs/handlers/geotraces.ipynb`, ~line 150): the `phase` mapping (e.g. `{'D': {...}}`) is defined as module-level data mixed with code. Move to `configs.py` or load from an Excel LUT alongside the other lookup tables.
+- **GEOTRACES: module-level `phase` dict** (`nbs/handlers/geotraces.ipynb`, ~line 150): the `phase` mapping (e.g. `{'D': {...}}`) is defined as module-level data mixed with code. Move to `configs.py` or load from an Excel LUT alongside the other lookup tables. Add salinity, temperature, oxygen variables
 
 - **OSPAR: missing docstrings** (`nbs/handlers/ospar.ipynb`): `NormalizeUncCB`, `RemapDetectionLimitCB`, and `ConvertLonLatCB` have no docstrings — intent must be inferred from code. Add one-line docstrings describing the transformation (e.g. "Convert DDMM.mmm to decimal degrees").
 
@@ -65,6 +65,8 @@
 - **New handler: Casacuberta group / TITANICA** (`nbs/handlers/`): Nuria Casacuberta's group (ETH Zurich / Univ. Barcelona), world leaders in using long-lived radionuclides to trace ocean processes, are systematically publishing their datasets to the TITANICA Zenodo community (https://zenodo.org/communities/titanica). A dedicated handler (or family of handlers) is needed to ingest these datasets into MARIS. New datasets appear periodically so the process should support incremental updates.
 
 - **New handler: ARPANSA / Ocean Decade proof of concept** (`nbs/handlers/`): collaborative initiative with ARPANSA (Australia) under the UN Ocean Decade programme to automate data transfer to MARIS and use MARIS as the front end for a national/regional marine radioactivity information system. This is a proof of concept that could serve as a template for other national bodies.
+
+- Add cli tools for decoders (netcdf -> csv) also 
 
 ## Documentation
 

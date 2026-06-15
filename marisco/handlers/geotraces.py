@@ -235,7 +235,7 @@ renaming_rules = {
 
 # %% ../../nbs/handlers/geotraces.ipynb #5a1b1521-a4d4-4839-a2c1-444c31332ef2
 class RenameColumnCB(Callback):
-    "Renaming variables to MARIS standard names."
+    "Remap Geotraces-specific coordinate, depth, and sample-ID column names to MARIS standard nomenclature."
     def __init__(self,
                  lut: dict=renaming_rules  # Provider column name → MARIS standard name mapping
                  ): store_attr()
@@ -312,10 +312,11 @@ def get_attrs(
 
 # %% ../../nbs/handlers/geotraces.ipynb #d591d3f2-8843-4dad-9514-d7e2d77af592
 def encode(
-        fname_in, 
-        fname_out, 
-        **kwargs
+        fname_in:str,    # Path to the raw Geotraces input CSV (the IDP2021 discrete sample data)
+        fname_out:str,   # Destination path for the NetCDF4 output file
+        **kwargs         # Pass verbose=True for detailed NetCDFEncoder output
         ):
+    "Orchestrate the full Geotraces curation pipeline: load, transform, and encode to MARIS NetCDF4 format."
     df = pd.read_csv(fname_in)
     tfm = Transformer(df, cbs=[
         SelectColsOfInterestCB(common_coi, nuclides_pattern),
@@ -337,9 +338,44 @@ def encode(
     
     tfm()
     encoder = NetCDFEncoder(tfm.dfs, 
-                            # src_fname=nc_tpl_path,
                             dest_fname=fname_out,    
                             global_attrs=get_attrs(tfm, zotero_key=zotero_key, kw=kw),
                             verbose=kwargs.get('verbose', False)
                            )
     encoder.encode()
+
+
+# %% ../../nbs/handlers/geotraces.ipynb #d591d3f2-8843-4dad-9514-d7e2d77af592
+def encode(
+        fname_in:str,    # Path to the raw Geotraces input CSV (the IDP2021 discrete sample data)
+        fname_out:str,   # Destination path for the NetCDF4 output file
+        **kwargs         # Pass verbose=True for detailed NetCDFEncoder output
+        ):
+    "Orchestrate the full Geotraces curation pipeline: load, transform, and encode to MARIS NetCDF4 format."
+    df = pd.read_csv(fname_in)
+    tfm = Transformer(df, cbs=[
+        SelectColsOfInterestCB(common_coi, nuclides_pattern),
+        WideToLongCB(common_coi, nuclides_pattern),
+        ExtractUnitCB(),
+        ExtractFilteringStatusCB(phase),
+        ExtractSamplingMethodCB(smp_method),
+        RenameNuclideCB(nuclides_name),
+        StandardizeUnitCB(units_lut),
+        RenameColumnCB(renaming_rules),
+        UnshiftLongitudeCB(),
+        DispatchToGroupCB(),
+        AddSampleIDCB(),
+        ParseTimeCB(),
+        EncodeTimeCB(),
+        SanitizeLonLatCB(),
+        RemapCB(fn_lut=lut_nuclides, col_remap='NUCLIDE', col_src='NUCLIDE')
+        ])
+    
+    tfm()
+    encoder = NetCDFEncoder(tfm.dfs, 
+                            dest_fname=fname_out,    
+                            global_attrs=get_attrs(tfm, zotero_key=zotero_key, kw=kw),
+                            verbose=kwargs.get('verbose', False)
+                           )
+    encoder.encode()
+

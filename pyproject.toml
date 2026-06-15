@@ -26,7 +26,6 @@ dev = ['nbdev', 'ipykernel', 'twine', 'toolslm']
 
 
 [project.scripts]
-maris_init = "marisco.cli.init:main"
 maris_to_nc = "marisco.cli.to_nc:main"
 maris_db_to_nc = "marisco.cli.db_to_nc:main"
 maris_nc_to_csv = "marisco.cli.nc_to_csv:main"
@@ -36,6 +35,9 @@ version = {attr = "marisco.__version__"}
 
 [tool.setuptools.packages.find]
 include = ["marisco"]
+
+[tool.setuptools.package-data]
+marisco = ["files/lut/*.xlsx", "files/nc/*.nc"]
 
 [tool.nbdev]
 custom_sidebar = true

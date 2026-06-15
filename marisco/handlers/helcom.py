@@ -51,15 +51,10 @@ from marisco.metadata import (
 )
 
 from marisco.configs import (
-    nuc_lut_path, 
-    cfg, 
-    species_lut_path, 
-    sediments_lut_path, 
-    bodyparts_lut_path, 
-    detection_limit_lut_path, 
-    filtered_lut_path, 
+    NC_DTYPES,
+    lut_path,
+    lut_fname,
     get_lut, 
-    unit_lut_path,
     cache_path
 )
 
@@ -379,7 +374,7 @@ fixes_biota_tissues = {
 
 # %% ../../nbs/handlers/helcom.ipynb #4c42eb30
 lut_tissues = lambda: Remapper(provider_lut_df=read_csv('TISSUE.csv'),
-                               maris_lut_fn=bodyparts_lut_path,
+                               maris_lut_key='BODY_PART',
                                maris_col_id='bodypar_id',
                                maris_col_name='bodypar',
                                provider_col_to_match='TISSUE_DESCRIPTION',
@@ -388,7 +383,7 @@ lut_tissues = lambda: Remapper(provider_lut_df=read_csv('TISSUE.csv'),
                                ).generate_lookup_table(fixes=fixes_biota_tissues, as_df=False, overwrite=False)
 
 # %% ../../nbs/handlers/helcom.ipynb #cf290302
-lut_biogroup_from_biota = lambda: get_lut(src_dir=species_lut_path().parent, fname=species_lut_path().name, 
+lut_biogroup_from_biota = lambda: get_lut(src_dir=lut_path(), fname=NC_DTYPES['SPECIES']['fname'], 
                                key='species_id', value='biogroup_id')
 
 # %% ../../nbs/handlers/helcom.ipynb #4ea46125
@@ -592,7 +587,7 @@ def get_attrs(
         BboxCB(),
         DepthRangeCB(),
         TimeRangeCB(),
-        ZoteroCB(zotero_key, cfg=cfg()),
+        ZoteroCB(zotero_key),
         KeyValuePairCB('keywords', ', '.join(kw)),
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()

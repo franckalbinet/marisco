@@ -20,7 +20,6 @@ from typing import List, Dict, Callable, Any, Optional, Union
 from collections import defaultdict
 from marisco.configs import (
     get_lut, 
-    nuc_lut_path, 
     get_time_units,
     NC_GROUPS,
     SMP_TYPE_LUT,

@@ -48,11 +48,9 @@ from marisco.metadata import (
 )
 
 from marisco.configs import (
-    nuc_lut_path, 
-    cfg, 
-    species_lut_path, 
-    bodyparts_lut_path, 
-    detection_limit_lut_path, 
+    NC_DTYPES,
+    lut_path,
+    lut_fname,
     get_lut, 
     cache_path
 )
@@ -369,7 +367,7 @@ fixes_biota_tissues = {
 
 # %% ../../nbs/handlers/ospar.ipynb #38e2a17f
 lut_bodyparts = lambda: Remapper(provider_lut_df=get_unique_across_dfs(tfm.dfs, col_name='body_part_temp', as_df=True),
-                               maris_lut_fn=bodyparts_lut_path,
+                               maris_lut_key='BODY_PART',
                                maris_col_id='bodypar_id',
                                maris_col_name='bodypar',
                                provider_col_to_match='value',
@@ -378,7 +376,7 @@ lut_bodyparts = lambda: Remapper(provider_lut_df=get_unique_across_dfs(tfm.dfs, 
                                ).generate_lookup_table(fixes=fixes_biota_tissues, as_df=False, overwrite=False)
 
 # %% ../../nbs/handlers/ospar.ipynb #6c2ccab7
-lut_biogroup_from_biota = lambda: get_lut(src_dir=species_lut_path().parent, fname=species_lut_path().name, 
+lut_biogroup_from_biota = lambda: get_lut(src_dir=lut_path(), fname=NC_DTYPES['SPECIES']['fname'], 
                                key='species_id', value='biogroup_id')
 
 # %% ../../nbs/handlers/ospar.ipynb #a065b30a
@@ -443,7 +441,7 @@ def get_attrs(
         BboxCB(),
         DepthRangeCB(),
         TimeRangeCB(),
-        ZoteroCB(zotero_key, cfg=cfg()),
+        ZoteroCB(zotero_key),
         KeyValuePairCB('keywords', ', '.join(kw)),
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
         ])()

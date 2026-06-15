@@ -10,6 +10,7 @@ __all__ = ['TAXON_MAP', 'lut_taxon', 'or_mappings', 'ValidateEnumsCB', 'RemoveNo
 # %% ../nbs/api/netcdf2csv.ipynb #487ff36a
 from pathlib import Path
 # from netCDF4 import Dataset
+import os
 import pandas as pd
 import fastcore.all as fc
 from typing import Dict,Callable
@@ -20,10 +21,8 @@ from marisco.configs import (
     CSV_DTYPES,
     Enums,
     lut_path,
-    species_lut_path,
-    detection_limit_lut_path, # used for feedback. 
-    filtered_lut_path,
-    cfg
+    lut_fname,
+    ZOTERO_LIB_ID
 )
 
 from marisco.utils import (

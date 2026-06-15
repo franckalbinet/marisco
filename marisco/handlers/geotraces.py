@@ -205,7 +205,7 @@ units_lut = {
 
 # %% ../../nbs/handlers/geotraces.ipynb #070abb88-c987-4eec-b0dc-7b69a61c0093
 class StandardizeUnitCB(Callback):
-    "Remap unit to MARIS standard ones and apply conversion where needed."
+    "Remap Geotraces unit strings to MARIS unit IDs, rescaling measurement values by the appropriate conversion factor where units share a common MARIS unit ID (e.g. uBq/kg and mBq/kg both map to ID 3 but differ 1000x)."
     def __init__(self, 
                  units_lut: dict,              # Unit string → {id, factor} conversion mapping
                  unit_col_name: str='UNIT',    # Column containing unit strings to remap

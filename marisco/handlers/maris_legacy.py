@@ -38,7 +38,6 @@ from marisco.metadata import (
 from marisco.configs import (
     NC_GROUPS,
     lut_path,
-    cfg,
     nc_tpl_path,
     Enums, 
     get_lut

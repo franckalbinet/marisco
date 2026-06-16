@@ -138,7 +138,7 @@ def get_taxon_info_lut(maris_lut: str, key_names: dict = TAXON_MAP) -> dict:
     df = species[columns].rename(columns=key_names)
     return df.set_index('species_id').to_dict()
 
-lut_taxon = lambda: get_taxon_info_lut(maris_lut=species_lut_path(), key_names=TAXON_MAP)
+lut_taxon = lambda: get_taxon_info_lut(maris_lut=lut_fname('SPECIES'), key_names=TAXON_MAP)
 
 # %% ../nbs/api/netcdf2csv.ipynb #d0a0802f
 class AddTaxonInformationCB(Callback):
@@ -196,19 +196,18 @@ class AddTaxonInformationCB(Callback):
 # %% ../nbs/api/netcdf2csv.ipynb #334f6bf6
 class AddZoteroArchiveLocationCB(Callback):
     "Fetch and append 'Loc. in Archive' from Zotero to DataFrame."
-    def __init__(self, attrs: str, cfg: dict):
+    def __init__(self, attrs: str):
         fc.store_attr()
 
     def __call__(self, tfm):
-        
         zotero_key = self.attrs['id']
-        item = ZoteroItem(zotero_key, self.cfg['zotero'])
+        item = ZoteroItem(zotero_key, ZOTERO_LIB_ID, os.getenv('ZOTERO_API_KEY'))
         if item.exist():
             loc_in_archive = item.item['data']['archiveLocation'] 
             for grp, df in tfm.dfs.items():
                 df['REF_ID'] = int(loc_in_archive)
         else:
-            print(f"Warning: Zotero item {self.item_id} does not exist.")
+            print(f"Warning: Zotero item {zotero_key} does not exist.")
 
 # %% ../nbs/api/netcdf2csv.ipynb #246ee01d
 or_mappings={'DL':
@@ -338,7 +337,7 @@ def decode(
         ),
         DecodeTimeCB(),
         AddSampleTypeIdColumnCB(),
-        AddZoteroArchiveLocationCB(contents.global_attrs, cfg=cfg()),
+        AddZoteroArchiveLocationCB(contents.global_attrs),
         DataFormatConversionCB(
             dtypes=remap_dtypes,
             excluded_mappings = get_excluded_enums,

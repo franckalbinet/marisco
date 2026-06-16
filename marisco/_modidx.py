@@ -715,7 +715,6 @@ d = { 'settings': { 'branch': 'main',
                                'marisco.utils.ddmm_to_dd': ('api/utils.html#ddmm_to_dd', 'marisco/utils.py'),
                                'marisco.utils.get_bbox': ('api/utils.html#get_bbox', 'marisco/utils.py'),
                                'marisco.utils.get_unique_across_dfs': ('api/utils.html#get_unique_across_dfs', 'marisco/utils.py'),
-                               'marisco.utils.has_valid_varname': ('api/utils.html#has_valid_varname', 'marisco/utils.py'),
                                'marisco.utils.match_maris_lut': ('api/utils.html#match_maris_lut', 'marisco/utils.py'),
                                'marisco.utils.match_worms': ('api/utils.html#match_worms', 'marisco/utils.py'),
                                'marisco.utils.test_dfs': ('api/utils.html#test_dfs', 'marisco/utils.py')}}}

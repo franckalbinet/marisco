@@ -36,7 +36,7 @@ class ParseTimeCB(Callback):
 def get_attrs(tfm, zotero_key, kw) -> dict:
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(), DepthRangeCB(), TimeRangeCB(),
-        ZoteroCB(zotero_key, cfg=cfg()),
+        ZoteroCB(zotero_key),
         KeyValuePairCB('keywords', ', '.join(kw)),
         KeyValuePairCB('publisher_postprocess_logs', ', '.join(tfm.logs))
     ])()

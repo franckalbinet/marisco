@@ -34,12 +34,7 @@ from marisco.metadata import (
     KeyValuePairCB
 )
 
-from marisco.configs import (
-    AVOGADRO,
-    get_lut,
-    lut_path,
-    cfg
-)
+from ..configs import AVOGADRO, get_lut, lut_path
 
 from ..netcdf2csv import decode
 from ..encoders import NetCDFEncoder

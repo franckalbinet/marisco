@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file. The format 
 
 ---
 
+## [1.1.0] - 2026-06-16
+
+### Breaking changes
+- Removed `maris_init` CLI command and `~/.marisco/` setup directory — lookup tables and the NetCDF template are now bundled inside the package via `importlib.resources`; only `export ZOTERO_API_KEY=...` is required after `pip install`
+- Removed `cfg()` function (previously read `~/.marisco/configs.toml`)
+- Removed `base_path()` path helper
+- Removed all per-LUT path helpers (`nuc_lut_path()`, `species_lut_path()`, etc.) — replaced by `lut_fname(key)` using `NC_DTYPES` keys (e.g. `lut_fname('NUCLIDE')`)
+- `ZoteroCB` no longer accepts a `cfg` parameter — Zotero library ID (`ZOTERO_LIB_ID`) and API key (`ZOTERO_API_KEY` env var) are resolved internally
+- Cache directory moved from `~/.marisco/cache/` to `~/.cache/marisco/`
+
+### Refactoring
+- Merged `NC_VARS` and `CSV_VARS` into a single source-of-truth dict `NC_CSV`; both are still exported as derived views
+- Removed dead `nbs/api/inout.ipynb` (`write_toml`, `flatten_dict`, `read_toml` — no callers)
+- Completed post-refactoring verification across all notebooks: callbacks, metadata, encoders, decoders, all handlers, all CLI notebooks, and reference docs
+
+### Documentation
+- Updated `nbs/api/CLAUDE.md`, `nbs/handlers/CLAUDE.md`, and `nbs/reference/guide.ipynb` to reflect new setup and API
+
+---
+
 ## [1.0.11] - 2026-06-12
 
 ### Refactoring

@@ -34,10 +34,10 @@ Key exports:
 - `NC_GROUPS` — sample type group names → NetCDF4 group names
 - `NC_VARS` — MARIS variable names → NetCDF variable names
 - `NC_DTYPES` — all enumeration type definitions (NUCLIDE, UNIT, SPECIES, etc.)
-- `cfg()` — reads `~/.marisco/configs.toml`
+- `lut_fname(key)` — full path to a bundled LUT Excel file by `NC_DTYPES` key (e.g. `lut_fname('SPECIES')`)
+- `lut_path()` — path to the bundled LUT directory (`marisco/files/lut/`)
 - `get_lut(src_dir, fname, key, value)` — load a LUT Excel file → `{key: value}` dict
-- `*_lut_path()` — path helpers per LUT (e.g. `nuc_lut_path()`, `species_lut_path()`)
-- `cache_path()`, `base_path()` — helpers for `~/.marisco/`
+- `cache_path()` — path to `~/.cache/marisco/` (WoRMS lookups etc.)
 
 ## Metadata (`metadata.py`)
 
@@ -48,7 +48,7 @@ GlobAttrsFeeder(dfs, cbs=[
     BboxCB(),                           # geographical bounding box
     DepthRangeCB(),                     # min/max depth
     TimeRangeCB(),                      # time_coverage_start/end
-    ZoteroCB(zotero_key, cfg=cfg()),    # title, summary, creators from Zotero
+    ZoteroCB(zotero_key),               # title, summary, creators from Zotero
     KeyValuePairCB('keywords', '...'),  # arbitrary key-value pairs
 ])()
 ```
@@ -66,7 +66,7 @@ NetCDFEncoder(
 ).encode()
 ```
 
-Uses `~/.marisco/maris-template.nc` as the structural template. The template is generated from `nbs/api/files/cdl/maris.cdl` via `ncgen` — see `nbs/CLAUDE.md`.
+Uses the bundled `marisco/files/nc/maris-template.nc` as the structural template (resolved via `importlib.resources`). The template is generated from `nbs/api/files/cdl/maris.cdl` via `ncgen` — see `nbs/CLAUDE.md`.
 
 ## Decoding (`decoders.py`, `netcdf2csv.py`)
 

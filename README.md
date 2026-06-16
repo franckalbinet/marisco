@@ -47,9 +47,9 @@ ensuring they remain in sync.
 
 ### See It in Action
 
-For a concrete example of this approach, check out our [OSPAR dataset
-handler
-implementation](https://fr.anckalbi.net/marisco/handlers/ospar.html).
+For a concrete example of this approach, check out our [GEOTRACES
+dataset handler
+implementation](https://fr.anckalbi.net/marisco/handlers/geotraces.html).
 
 ### List of currently available handlers
 
@@ -81,9 +81,9 @@ pip install marisco
 
 ### Zotero API key
 
-Before initializing `marisco`, you need to set up your Zotero API key.
-`marisco` automatically retrieves bibliographic metadata for MARIS
-datasets from [Zotero](https://www.zotero.org/).
+You need to set up your Zotero API key. `marisco` automatically
+retrieves bibliographic metadata for MARIS datasets from
+[Zotero](https://www.zotero.org/).
 
 To do so, define the following environment variable containing the MARIS
 Zotero API key:
@@ -97,34 +97,11 @@ export ZOTERO_API_KEY=your_api_key_here
 > Please contact [MARIS Administrators](https://maris.iaea.org/home) to
 > get your API key.
 
-### Initialize marisco
-
-Once the API key is set, run the following command:
-
-``` console
-maris_init
-```
-
-This command:
-
-1.  creates a `.marisco/` directory containing various
-    configuration/configurable files in your `/home` directory;
-2.  creates a `configs.toml` file containing default but configurable
-    settings (default paths, …);
-3.  downloads several MARIS DB nomenclature/lookup tables into
-    `.marisco/lut/` directory;
-4.  downloads `maris-template.nc`, the MARIS NetCDF4 template.
-
 ## Getting started
 
 ### Command line utilities
 
 All commands accept a `-h` argument to get access to its documentation.
-
-#### `maris_init`
-
-Download configuration file, NetCDF MARIS template and required lookup
-tables (nomenclatures).
 
 #### `maris_to_nc`
 
@@ -226,16 +203,10 @@ For instance:
 
 ## Development
 
-As already explained the `maris_init` command will download the
-`maris-template.nc` file from [MARISCO GitHub
-repository](https://github.com/franckalbinet/marisco) from the following
-path: `nbs/api/files/nc/maris-template.nc` to your home directory under
-`.marisco/` folder.
-
-You have to know that the MARIS NetCDF template is generated from
+The MARIS NetCDF template is generated from
 `nbs/api/files/cdl/maris.cdl` Common Data Language (CDL) file as defined
 by [Unidata](https://docs.unidata.ucar.edu/). During development, to
-generate the MARIS NetCDF template `nbs/api/files/nc/maris-template.nc`:
+regenerate the MARIS NetCDF template `nbs/files/nc/maris-template.nc`:
 
 1.  install the
     [NetCDF-C](https://pjbartlein.github.io/REarthSysSci/install_netCDF.html)
@@ -244,7 +215,6 @@ generate the MARIS NetCDF template `nbs/api/files/nc/maris-template.nc`:
 
 ``` console
 ncgen -4 -o nbs/files/nc/maris-template.nc nbs/files/cdl/maris.cdl
-cp nbs/files/nc/maris-template.nc ~/.marisco/
 ```
 
 ### Developer documentation

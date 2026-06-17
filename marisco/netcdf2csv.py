@@ -40,7 +40,7 @@ from marisco.decoders import (
     NetCDFDecoder
     )
 from marisco.metadata import (
-    ZoteroItem
+    ZoteroClient
 )
 
 # %% ../nbs/api/netcdf2csv.ipynb #08c49973

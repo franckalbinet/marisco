@@ -1,4 +1,4 @@
-"""Utilities to populate NetCDF global attributes: spatial/temporal coverage, Zotero and INIS bibliographic metadata, and static key-value pairs.
+"""Callbacks to populate NetCDF global attributes.
 
 Docs: https://franckalbinet.github.io/mariscoapi/metadata.html.md"""
 
@@ -124,9 +124,16 @@ class ZoteroClient:
             ) -> str:       # Value for that key, or '' if item not loaded
         return self.item['data'][key] if self.item else ''
 
-            
-    def __repr__(self):
-        return json.dumps(self.item, indent=4) 
+    @property
+    def title(self) -> str: return self._get('title')
+
+    @property
+    def summary(self) -> str: return self._get('abstractNote')
+
+    @property
+    def creator_name(self) -> str: return json.dumps(self._get('creators'))
+
+    def __repr__(self): return json.dumps(self.item, indent=4)
 
 # %% ../nbs/api/metadata.ipynb #1328e775
 class ZoteroCB(Callback):
@@ -176,53 +183,43 @@ class INISClient:
         except Exception: self.item = None
 
     def exist(self) -> bool:
-        "Does the record exist? The API returns `{'status': 404, ...}` (not an HTTP 404) for missing IDs, so check for a top-level `id` key rather than relying on an exception."
+        "Does the record exist? The API returns {'status': 404, ...} (not an HTTP 404) for missing IDs, so check for a top-level 'id' key rather than relying on an exception."
         return self.item is not None and 'id' in self.item
 
-# %% ../nbs/api/metadata.ipynb #51a9f75f
-@patch(as_prop=True)
-def title(self:INISClient) -> str:
-    "Title of the INIS record, preferring English."
-    if not self.item: return ''
-    t = self.item.get('metadata', {}).get('title', '') or ''
-    if isinstance(t, str): return t
-    return t.get('en') or next((v for v in t.values() if v), '')
+    @property
+    def title(self) -> str:
+        if not self.item: return ''
+        t = self.item.get('metadata', {}).get('title', '') or ''
+        if isinstance(t, str): return t
+        return t.get('en') or next((v for v in t.values() if v), '')
 
-# %% ../nbs/api/metadata.ipynb #ac726902
-@patch(as_prop=True)
-def summary(self:INISClient) -> str:
-    "Abstract/summary of the INIS record, preferring English."
-    if not self.item: return ''
-    d = self.item.get('metadata', {}).get('description', '') or ''
-    if isinstance(d, str): return d
-    return d.get('en') or next((v for v in d.values() if v), '')
+    @property
+    def summary(self) -> str:
+        if not self.item: return ''
+        d = self.item.get('metadata', {}).get('description', '') or ''
+        if isinstance(d, str): return d
+        return d.get('en') or next((v for v in d.values() if v), '')
 
-# %% ../nbs/api/metadata.ipynb #eaf90667
-@patch(as_prop=True)
-def doi(self:INISClient) -> str:
-    "DOI string if available, checking pids first then metadata identifiers."
-    if not self.item: return ''
-    doi = self.item.get('pids', {}).get('doi', {})
-    if isinstance(doi, dict): doi = doi.get('identifier') or ''
-    if doi: return doi
-    for ident in self.item.get('metadata', {}).get('identifiers', []):
-        if ident.get('scheme') == 'doi': return ident.get('identifier', '')
-    return ''
+    @property
+    def doi(self) -> str:
+        if not self.item: return ''
+        doi = self.item.get('pids', {}).get('doi', {})
+        if isinstance(doi, dict): doi = doi.get('identifier') or ''
+        if doi: return doi
+        for ident in self.item.get('metadata', {}).get('identifiers', []):
+            if ident.get('scheme') == 'doi': return ident.get('identifier', '')
+        return ''
 
-# %% ../nbs/api/metadata.ipynb #c2162e7a
-@patch(as_prop=True)
-def creator_name(self:INISClient) -> str:
-    "JSON-encoded list of creators from the INIS record."
-    if not self.item: return ''
-    return json.dumps(self.item.get('metadata', {}).get('creators', []), ensure_ascii=True)
+    @property
+    def creator_name(self) -> str:
+        if not self.item: return ''
+        return json.dumps(self.item.get('metadata', {}).get('creators', []), ensure_ascii=True)
 
-# %% ../nbs/api/metadata.ipynb #907d6281
-@patch(as_prop=True)
-def url(self:INISClient) -> str:
-    "Best available HTML URL for the INIS record."
-    if not self.item: return ''
-    links = self.item.get('links', {})
-    return links.get('self_html') or links.get('latest_html') or links.get('self', '')
+    @property
+    def url(self) -> str:
+        if not self.item: return ''
+        links = self.item.get('links', {})
+        return links.get('self_html') or links.get('latest_html') or links.get('self', '')
 
 # %% ../nbs/api/metadata.ipynb #fd6f5646
 class InisCB(Callback):

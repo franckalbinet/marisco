@@ -6,8 +6,8 @@ Docs: https://franckalbinet.github.io/mariscoapi/configs.html.md"""
 
 # %% auto #0
 __all__ = ['AVOGADRO', 'NC_DIM', 'NC_CSV', 'NC_VARS', 'CSV_VARS', 'NC_GROUPS', 'SMP_TYPE_LUT', 'NC_DTYPES', 'CSV_DTYPES',
-           'ZOTERO_LIB_ID', 'NETCDF_TO_PYTHON_TYPE', 'lut_path', 'lut_fname', 'nc_tpl_path', 'cache_path',
-           'get_time_units', 'sanitize', 'try_int', 'get_lut', 'Enums']
+           'ZOTERO_LIB_ID', 'NC_GLOBAL_ATTRS', 'NETCDF_TO_PYTHON_TYPE', 'lut_path', 'lut_fname', 'nc_tpl_path',
+           'cache_path', 'get_time_units', 'sanitize', 'try_int', 'get_lut', 'Enums']
 
 # %% ../nbs/api/configs.ipynb #3f92bc7b
 from pathlib import Path
@@ -190,6 +190,20 @@ CSV_DTYPES = {
 
 # %% ../nbs/api/configs.ipynb #e5b80558
 ZOTERO_LIB_ID = '2432820'
+
+# %% ../nbs/api/configs.ipynb #0fece031
+NC_GLOBAL_ATTRS = {
+    'id', 'title', 'summary', 'keywords', 'history',
+    'keywords_vocabulary', 'keywords_vocabulary_url',
+    'record', 'featureType', 'cdm_data_type', 'Conventions',
+    'publisher_name', 'publisher_email', 'publisher_url', 'publisher_institution',
+    'creator_name', 'institution', 'metadata_link', 'creator_email', 'creator_url',
+    'references', 'license', 'comment',
+    'geospatial_lat_min', 'geospatial_lat_max', 'geospatial_lon_min', 'geospatial_lon_max',
+    'geospatial_vertical_min', 'geospatial_vertical_max', 'geospatial_bounds', 'geospatial_bounds_crs',
+    'time_coverage_start', 'time_coverage_end', 'local_time_zone',
+    'date_created', 'date_modified', 'publisher_postprocess_logs',
+}
 
 # %% ../nbs/api/configs.ipynb #09a81790
 def lut_path() -> Path:              # Path to LUTs directory

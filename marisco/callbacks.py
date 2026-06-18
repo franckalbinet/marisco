@@ -25,21 +25,31 @@ from .utils import Match
 class Callback(): 
     "Base class for callbacks."
     order = 0
+    def __init__(self): pass
 
 # %% ../nbs/api/callbacks.ipynb #0414ac1d
 class PerGroupCB(Callback):
     "Calls `each_grp` for each group in `tfm.dfs`; set `grps` to restrict to specific groups."
-    grps: list = None  # None → all groups; explicit list restricts to those groups only
+    grps: list = None
+
+    def __init__(self,
+                 grps: list=None  # Groups to process; None = all groups in `tfm.dfs`
+                 ):
+        if grps is not None: self.grps = grps
 
     def __call__(self, tfm):
         for grp in (self.grps or tfm.dfs):
             if grp in tfm.dfs: self.each_grp(grp, tfm.dfs[grp], tfm)
 
-    def each_grp(self,
-                 grp: str,          # Group key e.g. 'SEAWATER', 'BIOTA'
-                 df: pd.DataFrame,  # DataFrame for this group
-                 tfm,               # Parent Transformer
-                 ): raise NotImplementedError
+# %% ../nbs/api/callbacks.ipynb #92cf2c26
+@patch
+def each_grp(self:PerGroupCB,
+             grp: str,          # Group key e.g. `'SEAWATER'`, `'BIOTA'`
+             df: pd.DataFrame,  # DataFrame for this group
+             tfm,               # Parent `Transformer`
+             ):
+    "Override to implement per-group transformation logic."
+    raise NotImplementedError
 
 # %% ../nbs/api/callbacks.ipynb #61702d17
 def run_cbs(

@@ -1,4 +1,4 @@
-"""Various utilities to encode MARIS dataset as `NetCDF`, `csv`, ... formats.
+"""Handler-curated DataFrames → MARIS NetCDF
 
 Docs: https://franckalbinet.github.io/mariscoapi/encoders.html.md"""
 
@@ -13,28 +13,17 @@ from netCDF4 import Dataset
 import pandas as pd
 from typing import Dict, Callable
 import numpy as np
-from fastcore.basics import patch, store_attr
-import fastcore.all as fc
-#import os
-
-from marisco.configs import (
-    NC_DTYPES, 
-    NC_VARS, 
-    NC_DIM,
-    NC_GROUPS,
-    lut_path, 
-    Enums,
-    nc_tpl_path
-)
+from fastcore.all import *
+from .configs import NC_DTYPES, NC_VARS, NC_DIM, NC_GROUPS, lut_path, Enums, nc_tpl_path
 
 # %% ../nbs/api/encoders.ipynb #2e31b9dd
 class NetCDFEncoder:
-    "MARIS NetCDF encoder."
+    "MARIS NetCDF encoder: transforms handler-curated DataFrames into a self-contained NetCDF4 file."
     def __init__(self, 
-                 dfs: Dict[str, pd.DataFrame], # dict of Dataframes to encode with group name as key {'sediment': df_sed, ...}
+                 dfs: Dict[str, pd.DataFrame], # {NC_GROUPS key → DataFrame}, e.g. {'SEAWATER': df_sw, 'BIOTA': df_bio}
                  dest_fname: str, # Name of output file to produce
-                 global_attrs: Dict[str, str], # Global attributes
-                 fn_src_fname: Callable=nc_tpl_path, # Function returning file name and path to the MARIS CDL template
+                 global_attrs: Dict[str, str], # NetCDF global attributes (id, title, summary, keywords, ...)
+                 fn_src_fname: Callable=nc_tpl_path, # Callable returning path to the MARIS NetCDF template
                  verbose: bool=False, # Print currently written NetCDF group and variable names
                  ):
         store_attr()
@@ -42,114 +31,155 @@ class NetCDFEncoder:
         self.enum_dtypes = {}
         self.nc_to_cols = {v:k for k,v in NC_VARS.items()}
 
-
 # %% ../nbs/api/encoders.ipynb #7beed6e5
 @patch 
-def copy_global_attributes(self:NetCDFEncoder):
+def copy_global_attrs(self:NetCDFEncoder):
     "Update NetCDF template global attributes as specified by `global_attrs` argument."
     self.dest.setncatts(self.src.__dict__)
     for k, v in self.global_attrs.items(): self.dest.setncattr(k, v)
 
 # %% ../nbs/api/encoders.ipynb #a6909975
 @patch
-def copy_dimensions(self:NetCDFEncoder, grp_dest):
-    "Copy dimensions to root and all groups from template."
+def copy_dims(
+    self:NetCDFEncoder,
+    grp_dest,  # Destination NetCDF group
+    ):
+    "Copy dimensions from template into a group."
     src_dim = self.src.groups[grp_dest.name].dimensions
     for name, dim in src_dim.items():
         grp_dest.createDimension(name, (len(dim) if not dim.isunlimited() else None))
 
 # %% ../nbs/api/encoders.ipynb #6e24da73
 @patch
-def process_groups(self:NetCDFEncoder):
+def process_grps(self:NetCDFEncoder):
+    "Iterate all groups in `dfs` and encode each one."
     for grp_name, df in self.dfs.items():
-        self.process_group(NC_GROUPS[grp_name], df)
+        self.process_grp(NC_GROUPS[grp_name], df)
 
 # %% ../nbs/api/encoders.ipynb #4e308b46
 @patch
-def process_group(self:NetCDFEncoder, grp_name, df):
+def process_grp(
+    self:NetCDFEncoder,
+    grp_name:str,  # NC_GROUPS key, e.g. `'SEAWATER'`
+    df:pd.DataFrame,  # Measurements for this group
+    ):
+    "Create a destination group, copy dimensions, then create and populate variables from the DataFrame."
     grp_dest = self.dest.createGroup(grp_name)
-    self.copy_dimensions(grp_dest)
-    self.copy_variables(grp_name, df, grp_dest)
+    self.copy_dims(grp_dest)
+    self.copy_vars(grp_name, df, grp_dest)
 
 # %% ../nbs/api/encoders.ipynb #c49969ab
 @patch
-def copy_variables(self:NetCDFEncoder, grp_name, df, grp_dest):
+def copy_vars(
+    self:NetCDFEncoder,
+    grp_name:str,  # NC_GROUPS key
+    df:pd.DataFrame,  # Measurements for this group
+    grp_dest,  # Destination NetCDF group
+    ):
+    "Copy variables from template into group, filling from df."
     cols = [NC_VARS[col] for col in df.columns if col in NC_VARS]
     for var_name, var_src in self.src.groups[grp_name].variables.items():
-        if var_name in cols: 
-            self.copy_variable(var_name, var_src, df, grp_dest)
+        if var_name in cols: self.copy_var(var_name, var_src, df, grp_dest)
 
 # %% ../nbs/api/encoders.ipynb #40561907
 @patch
-def copy_variable(self:NetCDFEncoder, var_name, var_src, df, grp_dest):
+def copy_var(
+    self:NetCDFEncoder,
+    var_name:str,  # NetCDF variable name
+    var_src,  # Source template variable
+    df:pd.DataFrame,  # DataFrame with the data
+    grp_dest,  # Destination NetCDF group
+    ):
+    "Copy a single variable: create, populate, copy attrs."
     dtype_name = var_src.datatype.name
-    if self.verbose: 
+    if self.verbose:
         print(80*'-')
         print(f'Group: {grp_dest.name}, Variable: {var_name}')
-    self._create_and_copy_variable(var_name, var_src, df, grp_dest, dtype_name)
-    self.copy_variable_attributes(var_name, var_src, grp_dest)
-
-# %% ../nbs/api/encoders.ipynb #93792604
-@patch
-def _create_and_copy_variable(self:NetCDFEncoder, var_name:str, var_src, df, grp_dest, dtype_name:str):
-    "Create and populate a NetCDF variable with data from the dataframe"
-    variable_type = self._get_variable_type(dtype_name, var_src)
-    self._create_netcdf_variable(grp_dest, var_name, variable_type)
-    self._populate_variable_data(grp_dest, var_name, variable_type, df)
+    variable_type = self.var_type(dtype_name, var_src)
+    self.create_var(grp_dest, var_name, variable_type)
+    self.fill_var(grp_dest, var_name, variable_type, df)
+    self.copy_var_attrs(var_name, var_src, grp_dest)
 
 # %% ../nbs/api/encoders.ipynb #7ca20973
 @patch
-def _get_variable_type(self:NetCDFEncoder, dtype_name:str, var_src):
-    "Determine the appropriate variable type for NetCDF creation"
+def var_type(
+    self:NetCDFEncoder,
+    dtype_name:str,  # Datatype name from template
+    var_src,  # Source template variable
+    ):
+    "Pick enum type if available, else template datatype."
     if var_src.dtype == str: return str
     return self.enum_dtypes.get(dtype_name, var_src.datatype)
 
 # %% ../nbs/api/encoders.ipynb #1f638ff9
 @patch
-def _create_netcdf_variable(self:NetCDFEncoder, grp_dest, var_name:str, variable_type):
-    "Create a NetCDF variable with appropriate compression settings"
-    compression_kwargs = {'compression': None} if variable_type == str else {'compression': 'zlib', 'complevel': 9}
-    grp_dest.createVariable(var_name, variable_type, (NC_DIM,), **compression_kwargs)
+def create_var(
+    self:NetCDFEncoder,
+    grp_dest,  # Destination NetCDF group
+    var_name:str,  # NetCDF variable name
+    variable_type,  # NetCDF type (enum, str, or float)
+    ):
+    "Create a NetCDF variable with zlib compression."
+    use_comp = variable_type == str
+    grp_dest.createVariable(var_name, variable_type, (NC_DIM,),
+                            **({'compression': None} if use_comp else {'compression': 'zlib', 'complevel': 9}))
 
 # %% ../nbs/api/encoders.ipynb #6e43737f
 @patch
-def _populate_variable_data(self:NetCDFEncoder, grp_dest, var_name:str, variable_type, df):
-    "Populate the NetCDF variable with data from the dataframe"
+def fill_var(
+    self:NetCDFEncoder,
+    grp_dest,  # Destination NetCDF group
+    var_name:str,  # NetCDF variable name
+    variable_type,  # NetCDF type (enum, str, or float)
+    df:pd.DataFrame,  # DataFrame with the data
+    ):
+    "Populate a NetCDF variable from a DataFrame column."
     values = df[self.nc_to_cols[var_name]].values
-    is_enum_type = hasattr(variable_type, '__class__') and 'EnumType' in str(type(variable_type))
-    if is_enum_type: values = self.sanitize_if_enum_and_nan(values) 
+    is_enum = hasattr(variable_type, '__class__') and 'EnumType' in str(type(variable_type))
+    if is_enum: values = self.fillna_enum(values)
     if variable_type == str:
-        for i, v in enumerate(values): grp_dest[var_name][i] = v
+        for i,v in enumerate(values): grp_dest[var_name][i] = v
     else:
         grp_dest[var_name][:] = values
 
 # %% ../nbs/api/encoders.ipynb #c3042eed
 @patch
-def sanitize_if_enum_and_nan(self:NetCDFEncoder, values, fill_value=-1):
-    try:
-        values = values.astype(float)
-    except (ValueError, TypeError):
-        values = np.array(values, dtype=float)
+def fillna_enum(
+    self:NetCDFEncoder,
+    values,  # Array of values, possibly with NaN
+    fill_value:int=-1,  # Sentinel for missing enum values
+    ):
+    "Replace NaN in enum-typed columns with a fill value."
+    try: values = values.astype(float)
+    except (ValueError, TypeError): values = np.array(values, dtype=float)
     values[np.isnan(values)] = fill_value
     return values.astype(np.int64)
 
+
 # %% ../nbs/api/encoders.ipynb #6068704d
 @patch
-def copy_variable_attributes(self:NetCDFEncoder, var_name, var_src, grp_dest):
+def copy_var_attrs(
+    self:NetCDFEncoder,
+    var_name:str,  # NetCDF variable name
+    var_src,  # Source template variable
+    grp_dest,  # Destination NetCDF group
+    ):
+    "Copy attributes from template variable to destination."
     grp_dest[var_name].setncatts(var_src.__dict__)
 
 # %% ../nbs/api/encoders.ipynb #6b7c5992
-@patch
-def retrieve_all_cols(self:NetCDFEncoder, 
-                      dtypes=NC_DTYPES
-                      ):
-    "Retrieve all unique columns from the dict of dataframes." 
-    return list(set(col for df in self.dfs.values() for col in df.columns if col in dtypes.keys()))
+@patch(as_prop=True)
+def all_cols(self:NetCDFEncoder):
+    "All unique NC columns present across all groups."
+    return list(set(col for df in self.dfs.values() for col in df.columns if col in NC_DTYPES))
+
 
 # %% ../nbs/api/encoders.ipynb #724453b7
 @patch
 def create_enums(self:NetCDFEncoder):
-    cols = self.retrieve_all_cols()
+    "Create NetCDF enum types for all columns referenced in the data."
+
+    cols = self.all_cols
     enums = Enums(lut_src_dir=lut_path())
     for col in cols:
         name = NC_DTYPES[col]['name']
@@ -162,6 +192,6 @@ def create_enums(self:NetCDFEncoder):
 def encode(self:NetCDFEncoder):
     "Encode MARIS NetCDF based on template and dataframes."
     with Dataset(self.src_fname, format='NETCDF4') as self.src, Dataset(self.dest_fname, 'w', format='NETCDF4') as self.dest:
-        self.copy_global_attributes()
+        self.copy_global_attrs()
         self.create_enums()
-        self.process_groups()
+        self.process_grps()

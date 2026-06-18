@@ -1,4 +1,4 @@
-"""Callback used in handlers
+"""Callbacks used by handlers to transform raw provider dataframes through an ordered pipeline of transformations.
 
 Docs: https://franckalbinet.github.io/mariscoapi/callbacks.html.md"""
 
@@ -6,27 +6,19 @@ Docs: https://franckalbinet.github.io/mariscoapi/callbacks.html.md"""
 
 # %% auto #0
 __all__ = ['Callback', 'PerGroupCB', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB',
-           'AddSampleTypeIdColumnCB', 'SelectColumnsCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB',
-           'UniqueIndexCB', 'ParseTimeCB', 'EncodeTimeCB', 'DecodeTimeCB']
+           'AddSampleTypeIdColumnCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB', 'UniqueIndexCB',
+           'ParseTimeCB', 'EncodeTimeCB', 'DecodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb #5a293345
-#import copy
-import fastcore.all as fc
+import copy
+from fastcore.all import *
 from operator import attrgetter
 from cftime import date2num ,num2date
 import numpy as np
 import pandas as pd
 from typing import List, Dict, Callable, Any, Optional, Union
 from collections import defaultdict
-from marisco.configs import (
-    get_lut, 
-    get_time_units,
-    NC_GROUPS,
-    SMP_TYPE_LUT,
-    #cfg, 
-    # cdl_cfg
-)
-
+from .configs import get_lut, get_time_units, NC_GROUPS, SMP_TYPE_LUT
 from .utils import Match
 
 # %% ../nbs/api/callbacks.ipynb #4e58c73c
@@ -68,7 +60,7 @@ class Transformer():
                  custom_maps: Dict = None,
                  inplace: bool=False # Whether to modify the dataframe(s) in place
                  ): 
-        fc.store_attr()
+        store_attr()
         self.is_single_df = isinstance(data, pd.DataFrame)
         self.df, self.dfs = self._prepare_data(data, inplace)
         self.logs = []
@@ -102,7 +94,7 @@ class SanitizeLonLatCB(PerGroupCB):
                  lat_col: str='LAT', # Latitude column name
                  verbose: bool=False # Whether to print the number of invalid longitude & latitude values
                  ):
-        fc.store_attr()
+        store_attr()
 
     def each_grp(self, grp, df, tfm):
         df[self.lon_col] = df[self.lon_col].apply(lambda x: float(str(x).replace(',', '.')))
@@ -117,7 +109,7 @@ class SanitizeLonLatCB(PerGroupCB):
 
 # %% ../nbs/api/callbacks.ipynb #8c905654
 class RemapCB(Callback):
-    "Generic MARIS remapping callback."
+    "Remap source values to MARIS standard identifiers using a lookup table."
     def __init__(self, 
                  fn_lut: Callable, # Function that returns the lookup table dictionary
                  col_remap: str, # Name of the column to remap
@@ -126,10 +118,9 @@ class RemapCB(Callback):
                  default_value: Any = 0, # Default value for unmatched entries
                  verbose: bool=False # Whether to print the number of unmatched entries
                 ):
-        fc.store_attr()
+        store_attr()
         self.lut = None
         if isinstance(dest_grps, str): self.dest_grps = [dest_grps]
-        # Format the documentation string based on the type and content of dest_grps
         if isinstance(self.dest_grps, list):
             if len(self.dest_grps) > 1:
                 grp_str = ', '.join(self.dest_grps[:-1]) + ' and ' + self.dest_grps[-1]
@@ -137,16 +128,12 @@ class RemapCB(Callback):
                 grp_str = self.dest_grps[0]
         else:
             grp_str = self.dest_grps
-                
         self.__doc__ = f"Remap values from '{col_src}' to '{col_remap}' for groups: {grp_str}."
 
     def __call__(self, tfm):
         self.lut = self.fn_lut()
         for grp in self.dest_grps:
-            if grp in tfm.dfs:
-                self._remap_group(tfm.dfs[grp])
-            else:
-                print(f"Group {grp} not found in the dataframes.")
+            if grp in tfm.dfs: self._remap_group(tfm.dfs[grp])
 
     def _remap_group(self, df: pd.DataFrame):
         df[self.col_remap] = df[self.col_src].apply(self._remap_value)
@@ -170,7 +157,7 @@ class LowerStripNameCB(PerGroupCB):
                  col_dst: str=None, # Destination column name
                  fn_transform: Callable=lambda x: x.lower().strip() # Transformation function
                  ):
-        fc.store_attr()
+        store_attr()
         self.__doc__ = f"Convert '{col_src}' column values to lowercase, strip spaces, and store in '{col_dst}' column."
         if not col_dst: self.col_dst = col_src
         
@@ -182,34 +169,25 @@ class LowerStripNameCB(PerGroupCB):
 
 # %% ../nbs/api/callbacks.ipynb #949d6471
 class AddSampleTypeIdColumnCB(PerGroupCB):
+    "Add a column with the sample type as defined in the CDL."
     def __init__(self, 
                  lut: dict=SMP_TYPE_LUT, # Lookup table for sample type
                  col_name: str='SAMPLE_TYPE' # Column name to store the sample type id
                  ): 
-        "Add a column with the sample type as defined in the CDL."
-        fc.store_attr()
+        store_attr()
         
     def each_grp(self, grp, df, tfm): df[self.col_name] = self.lut[grp]
 
-# %% ../nbs/api/callbacks.ipynb #efe41950
-class SelectColumnsCB(PerGroupCB):
-    "Select columns of interest."
-    def __init__(self, 
-                 cois: dict # Columns of interest
-                 ): 
-        fc.store_attr()
-        
-    def each_grp(self, grp, df, tfm): tfm.dfs[grp] = df.loc[:, self.cois.keys()]
-
 # %% ../nbs/api/callbacks.ipynb #9da3e703
 class RenameColumnsCB(PerGroupCB):
-    "Renaming variables to MARIS standard names."
+    "Rename variables to MARIS standard names, keeping only renamed columns."
     def __init__(self,
-                 renaming_rules: dict # Renaming rules
+                 renaming_rules: dict # Renaming rules {old_name: new_name}
                  ): 
-        fc.store_attr()
+        store_attr()
         
-    def each_grp(self, grp, df, tfm): df.rename(columns=self.renaming_rules, inplace=True)
+    def each_grp(self, grp, df, tfm): tfm.dfs[grp] = df[self.renaming_rules.keys()].rename(columns=self.renaming_rules)
+
 
 # %% ../nbs/api/callbacks.ipynb #1ea2cc64
 class RemoveAllNAValuesCB(Callback):
@@ -218,7 +196,7 @@ class RemoveAllNAValuesCB(Callback):
                  cols_to_check: Union[Dict[str, list], list],  # Dict or list of columns to check
                  how: str='all'  # How to handle NA values 'all' or 'any'
                 ):
-        fc.store_attr()
+        store_attr()
 
     def __call__(self, tfm):
         # Convert list to dict if cols_to_check is a list
@@ -234,11 +212,11 @@ class RemoveAllNAValuesCB(Callback):
 
 # %% ../nbs/api/callbacks.ipynb #8cf07327
 class CompareDfsAndTfmCB(Callback):
-    "Create a dataframe of removed data and track changes in row counts due to transformations."
+    "Create a dataframe of removed data and track changes in row counts due to transformations."  # TODO: refactor - too long
     def __init__(self, 
                  dfs: Dict[str, pd.DataFrame]  # Original dataframes
                  ): 
-        fc.store_attr()
+        store_attr()
         
     def __call__(self, tfm: Transformer) -> None:
         self._initialize_tfm_attributes(tfm)
@@ -275,7 +253,7 @@ class CompareDfsAndTfmCB(Callback):
 # %% ../nbs/api/callbacks.ipynb #3653a68d
 class UniqueIndexCB(PerGroupCB):
     "Set unique index for each group."
-    def __init__(self, index_name='ID'): fc.store_attr()
+    def __init__(self, index_name='ID'): store_attr()
         
     def each_grp(self, grp, df, tfm):
         tfm.dfs[grp] = df.reset_index(drop=True).reset_index(names=[self.index_name])
@@ -283,7 +261,7 @@ class UniqueIndexCB(PerGroupCB):
 # %% ../nbs/api/callbacks.ipynb #c787de45
 class ParseTimeCB(PerGroupCB):
     "Parse time column from ISO8601 string to datetime."
-    def __init__(self, time_col_name: str='TIME'): fc.store_attr()
+    def __init__(self, time_col_name: str='TIME'): store_attr()
     def each_grp(self, grp, df, tfm):
         df[self.time_col_name] = pd.to_datetime(df[self.time_col_name], format='ISO8601')
 
@@ -294,7 +272,7 @@ class EncodeTimeCB(PerGroupCB):
                  col_time: str='TIME',
                  fn_units: Callable=get_time_units # Function returning the time units
                  ): 
-        fc.store_attr()
+        store_attr()
         self.units = fn_units()
 
     def each_grp(self, grp, df, tfm):
@@ -310,7 +288,7 @@ class DecodeTimeCB(PerGroupCB):
                  col_time: str='TIME',
                  fn_units: Callable=get_time_units # Function returning the time units
                  ): 
-        fc.store_attr()
+        store_attr()
         self.units = fn_units()
 
     def each_grp(self, grp, df, tfm):

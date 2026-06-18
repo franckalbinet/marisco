@@ -22,7 +22,7 @@ from marisco.callbacks import (
     SanitizeLonLatCB, 
     EncodeTimeCB, 
     RenameColumnsCB, 
-    SelectColumnsCB,
+    #SelectColumnsCB,
     UniqueIndexCB
 )
 
@@ -193,7 +193,6 @@ def encode(
         dfs = dataloader(ref_id=ref_id)
         print(get_fname(dfs))
         tfm = Transformer(dfs, cbs=[
-            SelectColumnsCB(cois_renaming_rules),
             RenameColumnsCB(cois_renaming_rules),
             CastStationToStringCB(),
             DropNAColumnsCB(),

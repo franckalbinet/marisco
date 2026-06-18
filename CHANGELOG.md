@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.3.0] - 2026-06-18
+
+### Changed
+- `NetCDFEncoder` methods renamed for consistency and brevity: `copy_global_attributes` → `copy_global_attrs`, `copy_dimensions` → `copy_dims`, `process_groups` → `process_grps`, `process_group` → `process_grp`, `copy_variables` → `copy_vars`, `copy_variable` → `copy_var`, `copy_variable_attributes` → `copy_var_attrs`, `_get_variable_type` → `var_type`, `_create_netcdf_variable` → `create_var`, `_populate_variable_data` → `fill_var`, `sanitize_if_enum_and_nan` → `fillna_enum`
+- `retrieve_all_cols(dtypes=NC_DTYPES)` replaced by `all_cols` read-only property
+- All `NetCDFEncoder` methods now carry docstrings and inline parameter docs (fastcore.docments style)
+- Module docstring updated to reflect its role: handler-curated DataFrames → MARIS NetCDF
+
+### Removed
+- `_create_and_copy_variable` internal helper (logic inlined into `copy_var`)
+
 ## [1.2.1] - 2026-06-18
 
 ### Changed

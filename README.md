@@ -18,10 +18,10 @@ data analysis software.
 
 ## Core Concept: Handlers
 
-`marisco` is built around the concept of `handlers` - specialized
-modules designed to convert MARIS datasets into NetCDF format. Each
-handler is tailored to a specific data provider and implemented as a
-dedicated Jupyter notebook.
+`marisco` is built around the concept of `handlers`, specialized modules
+designed to convert MARIS datasets into NetCDF format. Each handler is
+tailored to a specific data provider and implemented as a dedicated
+Jupyter notebook.
 
 ### Literate Programming Approach
 
@@ -194,10 +194,10 @@ For instance:
 
 ## Documentation
 
-- [MARIS Data Guide](reference/guide.ipynb) — overview of sample types,
+- [MARIS Data Guide](reference/guide.ipynb): overview of sample types,
   measurement fields, nomenclature, curation pipeline, and available
   datasets; aimed at data providers and data users
-- [Field Definitions](reference/field-definition.ipynb) — complete
+- [Field Definitions](reference/field-definition.ipynb): complete
   field-by-field reference with MARISCO column names, NetCDF variable
   names, CSV variable names, types, and lookup tables
 

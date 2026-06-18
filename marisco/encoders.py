@@ -171,19 +171,18 @@ def copy_var_attrs(
 @patch(as_prop=True)
 def all_cols(self:NetCDFEncoder):
     "All unique NC columns present across all groups."
-    return list(set(col for df in self.dfs.values() for col in df.columns if col in NC_DTYPES))
+    return list(set(col for df in self.dfs.values() for col in df.columns if col in NC_VARS))
 
 
 # %% ../nbs/api/encoders.ipynb #724453b7
 @patch
 def create_enums(self:NetCDFEncoder):
     "Create NetCDF enum types for all columns referenced in the data."
-
-    cols = self.all_cols
+    cols = [col for col in self.all_cols if col in NC_DTYPES]
     enums = Enums(lut_src_dir=lut_path())
     for col in cols:
-        name = NC_DTYPES[col]['name']
-        if self.verbose: print(f'Creating enum for {name} with values {enums.types[col]}.')
+        name = NC_DTYPES[col]["name"]
+        if self.verbose: print(f"Creating enum for {name} with values {enums.types[col]}.")
         dtype = self.dest.createEnumType(np.int64, name, enums.types[col])
         self.enum_dtypes[name] = dtype
 

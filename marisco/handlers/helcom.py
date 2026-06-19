@@ -21,14 +21,14 @@ from typing import List, Dict, Callable, Tuple, Any
 import re
 import time
 
-from marisco.utils import (
-    Remapper, 
-    ddmm_to_dd,
-    Match, 
-    get_unique_across_dfs,
-    ExtractNetcdfContents,
-    NA
+from ..configs import NA
+from marisco.match import (
+    Remapper,
+    Match,
+    uniq_across_dfs, lut_from,
 )
+from ..geo import ddmm_to_dd
+from ..utils import ExtractNetcdfContents
 
 from marisco.callbacks import (
     Callback, 
@@ -163,7 +163,7 @@ class RemapNuclideNameCB(PerGroupCB):
         fc.store_attr()
 
     def __call__(self, tfm):
-        df_uniques = get_unique_across_dfs(tfm.dfs, col_name=self.col_name, as_df=True)
+        df_uniques = lut_from(tfm.dfs, self.col_name)
         self.lut = {k: v.matched_id for k, v in self.fn_lut(df_uniques).items()}
         super().__call__(tfm)
 

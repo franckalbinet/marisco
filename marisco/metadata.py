@@ -23,7 +23,7 @@ import subprocess
 
 import json
 from typing import Dict, List, Callable
-from .utils import get_bbox 
+from .geo import get_bbox 
 from .configs import get_time_units, ZOTERO_LIB_ID, NC_GLOBAL_ATTRS
 from .callbacks import run_cbs, Callback
 

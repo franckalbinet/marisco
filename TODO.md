@@ -68,6 +68,14 @@
 
 - Add cli tools for decoders (netcdf -> csv) also 
 
+- Universal unique id
+```
+import hashlib
+combined_str = "32.123_-180.435_2022-01-01T00:00:00.000"
+hash_object = hashlib.sha256(combined_str.encode())
+unique_id = hash_object.hexdigest(); unique_id
+```
+
 ## Documentation
 
 - **Handler-writing guide** (`nbs/handlers/`): no documented vocabulary of available callbacks and their contracts. A concise guide (or extended `CLAUDE.md`) is needed both for contributors and to enable AI-assisted handler authoring.

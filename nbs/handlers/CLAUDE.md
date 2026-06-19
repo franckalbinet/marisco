@@ -100,7 +100,7 @@ Examine the provider's own nomenclature. Typically this means loading a distinct
 
 ```python
 # e.g. all unique nuclide names across all sample-type DataFrames
-get_unique_across_dfs(dfs, col_name='NUCLIDE', as_df=True)
+lut_from(dfs, 'NUCLIDE')
 ```
 
 Also inspect the target MARIS LUT to understand what names and IDs are available:

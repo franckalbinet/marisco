@@ -20,10 +20,10 @@ from pathlib import Path
 import time
 from rich import print
 
-from marisco.utils import (
-    Remapper, 
-    get_unique_across_dfs,
-    NA
+from ..configs import NA
+from marisco.match import (
+    Remapper,
+    uniq_across_dfs, lut_from,
 )
 
 from marisco.callbacks import (
@@ -304,7 +304,7 @@ fixes_biota_species = {
 }
 
 # %% ../../nbs/handlers/ospar.ipynb #3764bf4c
-lut_biota = lambda: Remapper(provider_lut_df=get_unique_across_dfs(dfs, col_name='species', as_df=True),
+lut_biota = lambda: Remapper(provider_lut_df=lut_from(dfs, 'species'),
                              maris_lut_fn=species_lut_path,
                              maris_col_id='species_id',
                              maris_col_name='species',

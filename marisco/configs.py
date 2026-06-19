@@ -13,7 +13,7 @@ __all__ = ['AVOGADRO', 'NA', 'NC_DIM', 'NC_CSV', 'NC_VARS', 'CSV_VARS', 'NC_GROU
 from pathlib import Path
 import os
 import re
-from typing import Any, Dict
+from typing import Any, Dict, Union
 import pandas as pd
 from fastcore.all import *
 from netCDF4 import Dataset
@@ -275,16 +275,29 @@ def try_int(x:Any         # Value to attempt integer conversion on
         return x
 
 # %% ../nbs/api/configs.ipynb #0d172382
+# too long for our coding standard - NEED REFACTORING
 def get_lut(
-    src_dir: str, # Directory containing lookup tables
-    fname: str, # Excel file lookup table name
-    key: str, # Excel file column name to be used as dict keys 
-    value: str, # Excel file column name to be used as dict values 
+    key_or_fname: str, # NC_DTYPES key (e.g. 'NUCLIDE') or Excel filename
+    key: Optional[str]=None, # Column for dict keys; inferred from NC_DTYPES if applicable
+    value: Optional[str]=None, # Column for dict values; inferred from NC_DTYPES if applicable
+    src_dir: Optional[str]=None, # Directory containing lookup tables (default: lut_path())
     do_sanitize: bool=True, # Sanitization required?
     reverse: bool=False, # Reverse lookup table (value, key)
-    check_duplicates: bool=False # Check for duplicates in lookup table
-    ) -> Dict[str, int]: # MARIS lookup table (key, value)
-    "Convert MARIS db lookup table excel file to dictionary `{'name': id, ...}` or `{id: name, ...}` if `reverse` is True."
+    check_duplicates: bool=False, # Check for duplicates in lookup table
+    as_df: bool=False # Return DataFrame instead of dict (for fuzzy_merge etc.)
+    ) -> Union[Dict[str, int], pd.DataFrame]: # MARIS lookup table (key, value) or (key, value) DataFrame
+    "Convert MARIS db lookup table excel file to dictionary or DataFrame."
+    if src_dir is None: src_dir = lut_path()
+    
+    # Resolve from NC_DTYPES if the first arg is a known key
+    if key_or_fname in NC_DTYPES:
+        cfg = NC_DTYPES[key_or_fname]
+        fname = cfg['fname']
+        if key is None: key = cfg['key']
+        if value is None: value = cfg['value']
+    else:
+        fname = key_or_fname
+    
     fname = Path(src_dir) / fname
     df = pd.read_excel(fname, usecols=[key, value]).dropna(subset=value)
     
@@ -293,6 +306,8 @@ def get_lut(
         if duplicates: print(f"Warning: {fname.name}: found duplicate keys: {duplicates}")
         
     df[value] = df[value].astype('int')
+    if as_df: return df
+    
     df = df.set_index(key)
     lut = df[value].to_dict()
     if do_sanitize: lut = {sanitize(k): v for k, v in lut.items()}
@@ -314,9 +329,8 @@ class Enums():
 def lookup(self: Enums) -> Dict[str, Dict[str, int]]:
     "Load all enumeration types defined in `NC_DTYPES` as `{name: id}` dictionaries, available via `self.types[var_name]`."
     types = {}
-    for var_name, dtype in self.dtypes.items():
-        _, fname, key, value = dtype.values()
-        lut = get_lut(self.lut_src_dir, fname, key=key, value=value)
+    for var_name in self.dtypes:
+        lut = get_lut(var_name, src_dir=self.lut_src_dir)
         types[var_name] = lut
     return types
 

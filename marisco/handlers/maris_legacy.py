@@ -140,10 +140,7 @@ class DropNAColumnsCB(PerGroupCB):
         tfm.dfs[grp] = self.dropMarisNA(tfm.dfs[grp])
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #5f143484
-dl_name_to_id = lambda: get_lut(lut_path(), 
-                                'dbo_detectlimit.xlsx', 
-                                key='name', 
-                                value='id')
+dl_name_to_id = lambda: get_lut('dbo_detectlimit.xlsx', key='name', value='id')
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #c99e5640
 class SanitizeDetectionLimitCB(PerGroupCB):

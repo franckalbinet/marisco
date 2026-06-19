@@ -6,58 +6,26 @@
 __all__ = ['src_dir', 'fname_out', 'zotero_key', 'default_smp_types', 'fixes_nuclide_names', 'lut_nuclides', 'coi_sediment',
            'coi_val', 'coi_units_unc', 'lut_units', 'coi_dl', 'fixes_biota_species', 'lut_biota', 'fixes_biota_tissues',
            'lut_tissues', 'lut_biogroup_from_biota', 'fixes_sediments', 'sed_replace_lut', 'lut_sediments',
-           'lut_filtered', 'kw', 'read_csv', 'load_data', 'RemapNuclideNameCB', 'ParseTimeCB', 'SplitSedimentValuesCB',
-           'SanitizeValueCB', 'unc_rel2stan', 'NormalizeUncCB', 'RemapUnitCB', 'RemapDetectionLimitCB',
-           'RemapSedimentCB', 'RemapFiltCB', 'AddSampleIDCB', 'AddDepthCB', 'AddSalinityCB', 'AddStationCB',
-           'AddTemperatureCB', 'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'ParseCoordinatesCB',
-           'get_attrs', 'encode']
+           'lut_filtered', 'kw', 'load_data', 'ParseTimeCB', 'SplitSedimentValuesCB', 'SanitizeValueCB', 'unc_rel2stan',
+           'NormalizeUncCB', 'RemapUnitCB', 'RemapDetectionLimitCB', 'RemapSedimentCB', 'RemapFiltCB', 'AddSampleIDCB',
+           'AddDepthCB', 'AddSalinityCB', 'AddStationCB', 'AddTemperatureCB', 'RemapSedSliceTopBottomCB',
+           'LookupDryWetPercentWeightCB', 'ParseCoordinatesCB', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb #3a8d979f
-import pandas as pd 
+from fastcore.all import *
+import pandas as pd
 import numpy as np
-import fastcore.all as fc 
-from pathlib import Path 
-from typing import List, Dict, Callable, Tuple, Any 
 import re
-import time
 
-from ..configs import NA
-from marisco.match import (
-    Remapper,
-    Match,
-    uniq_across_dfs, lut_from,
-)
+from ..configs import NA, NC_DTYPES, get_lut, lut_path, cache_path
+from ..match import uniq_across_dfs, lut_from, fuzzy_merge, fix_lut, Lut
 from ..geo import ddmm_to_dd
 from ..utils import ExtractNetcdfContents
-
-from marisco.callbacks import (
-    Callback, 
-    PerGroupCB,
-    Transformer, 
-    EncodeTimeCB, 
-    LowerStripNameCB, 
-    SanitizeLonLatCB, 
-    CompareDfsAndTfmCB, 
-    RemapCB
-)
-
-from marisco.metadata import (
-    GlobAttrsFeeder, 
-    BboxCB, 
-    DepthRangeCB, 
-    TimeRangeCB, 
-    ZoteroCB, 
-    KeyValuePairCB
-)
-
-from marisco.configs import (
-    NC_DTYPES,
-    lut_path,
-    lut_fname,
-    get_lut, 
-    cache_path
-)
-
+from ..callbacks import (
+    Callback, PerGroupCB, Transformer,
+    EncodeTimeCB, LowerStripNameCB, SanitizeLonLatCB,
+    CompareDfsAndTfmCB, RemapCB)
+from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder
 from ..netcdf2csv import decode
 
@@ -76,53 +44,15 @@ default_smp_types = {
     'SED': 'SEDIMENT'
 }
 
-# %% ../../nbs/handlers/helcom.ipynb #b840f3f3
-def read_csv(file_name, dir=src_dir):
-    file_path = f'{dir}/{file_name}'
-    return pd.read_csv(file_path)
-
 # %% ../../nbs/handlers/helcom.ipynb #93f0655f
-def load_data(src_url: str, 
-              smp_types: dict = default_smp_types, 
-              use_cache: bool = False,
-              save_to_cache: bool = False,
-              verbose: bool = False) -> Dict[str, pd.DataFrame]:
-    "Load HELCOM data and return the data in a dictionary of dataframes with the dictionary key as the sample type."
-
-    def load_and_merge(file_prefix: str) -> pd.DataFrame:
-                
-        dir = cache_path() if use_cache else src_url
-        file_smp_path = f'{dir}/{file_prefix}01.csv'
-        file_meas_path = f'{dir}/{file_prefix}02.csv'
-
-        if use_cache:
-            if not Path(file_smp_path).exists():
-                print(f'{file_smp_path} not found.')            
-            if not Path(file_meas_path).exists():
-                print(f'{file_meas_path} not found.')
-        
-        if verbose:
-            start_time = time.time()
-        df_meas = read_csv(f'{file_prefix}02.csv', dir)
-        df_smp = read_csv(f'{file_prefix}01.csv', dir)
-        
-        df_meas.columns = df_meas.columns.str.lower()
-        df_smp.columns = df_smp.columns.str.lower()
-        
-        merged_df = pd.merge(df_meas, df_smp, on='key', how='left')
-        
-        if verbose:
-            print(f"Downloaded data for {file_prefix}01.csv and {file_prefix}02.csv in {time.time() - start_time:.2f} seconds.")
-            
-        if save_to_cache:
-            dir = cache_path()
-            df_smp.to_csv(f'{dir}/{file_prefix}01.csv', index=False)
-            df_meas.to_csv(f'{dir}/{file_prefix}02.csv', index=False)
-            if verbose:
-                print(f"Saved downloaded data to cache at {dir}/{file_prefix}01.csv and {dir}/{file_prefix}02.csv")
-
-        return merged_df
-    return {smp_type: load_and_merge(file_prefix) for file_prefix, smp_type in smp_types.items()}
+def load_data(fname_in):
+    "Load HELCOM data; returns dict of DataFrames keyed by sample type."
+    res = {}
+    for prefix,smp_type in default_smp_types.items():
+        smp = pd.read_csv(f'{fname_in}/{prefix}01.csv').rename(str.lower, axis='columns')
+        meas = pd.read_csv(f'{fname_in}/{prefix}02.csv').rename(str.lower, axis='columns')
+        res[smp_type] = smp.merge(meas, on='key')
+    return res
 
 # %% ../../nbs/handlers/helcom.ipynb #60cf885b
 fixes_nuclide_names = {
@@ -143,32 +73,8 @@ fixes_nuclide_names = {
     }
 
 # %% ../../nbs/handlers/helcom.ipynb #9a189ef9
-# Create a lookup table for nuclide names
-lut_nuclides = lambda df: Remapper(provider_lut_df=df,
-                                   maris_lut_fn=nuc_lut_path,
-                                   maris_col_id='nuclide_id',
-                                   maris_col_name='nc_name',
-                                   provider_col_to_match='value',
-                                   provider_col_key='value',
-                                   fname_cache='nuclides_helcom.pkl').generate_lookup_table(fixes=fixes_nuclide_names, 
-                                                                                            as_df=False, overwrite=False)
-
-# %% ../../nbs/handlers/helcom.ipynb #03d47237
-class RemapNuclideNameCB(PerGroupCB):
-    "Remap data provider nuclide names to standardized MARIS nuclide names."
-    def __init__(self, 
-                 fn_lut: Callable, # Function that returns the lookup table dictionary
-                 col_name: str # Column name to remap
-                ):
-        fc.store_attr()
-
-    def __call__(self, tfm):
-        df_uniques = lut_from(tfm.dfs, self.col_name)
-        self.lut = {k: v.matched_id for k, v in self.fn_lut(df_uniques).items()}
-        super().__call__(tfm)
-
-    def each_grp(self, grp, df, tfm):
-        df['NUCLIDE'] = df[self.col_name].replace(self.lut)
+# Resolved nuclide lookup table (provider → MARIS nuclide_id)
+lut_nuclides = Lut(fixed, key_col='value', val_col=nuc_cfg['value'])
 
 # %% ../../nbs/handlers/helcom.ipynb #ae547a0c
 class ParseTimeCB(PerGroupCB):
@@ -383,8 +289,7 @@ lut_tissues = lambda: Remapper(provider_lut_df=read_csv('TISSUE.csv'),
                                ).generate_lookup_table(fixes=fixes_biota_tissues, as_df=False, overwrite=False)
 
 # %% ../../nbs/handlers/helcom.ipynb #cf290302
-lut_biogroup_from_biota = lambda: get_lut(src_dir=lut_path(), fname=NC_DTYPES['SPECIES']['fname'], 
-                               key='species_id', value='biogroup_id')
+lut_biogroup_from_biota = lambda: get_lut('SPECIES', key='species_id', value='biogroup_id')
 
 # %% ../../nbs/handlers/helcom.ipynb #4ea46125
 fixes_sediments = {
@@ -601,7 +506,7 @@ def encode(
     dfs = load_data(src_dir)
     tfm = Transformer(dfs, cbs=[
                             LowerStripNameCB(col_src='nuclide', col_dst='NUCLIDE'),
-                            RemapNuclideNameCB(lut_nuclides, col_name='NUCLIDE'),
+                            RemapCB(lut=lut_nuclides, col_remap='NUCLIDE', col_src='NUCLIDE'),
                             ParseTimeCB(),
                             EncodeTimeCB(),
                             SplitSedimentValuesCB(coi_sediment),

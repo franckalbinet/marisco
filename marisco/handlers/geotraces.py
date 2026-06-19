@@ -274,8 +274,7 @@ class AddSampleIDCB(PerGroupCB):
 
 # %% ../../nbs/handlers/geotraces.ipynb #57f34e80
 # Lookup table: MARIS nc_name → nuclide_id
-lut_nuclides = lambda: get_lut(lut_path(), 'dbo_nuclide.xlsx', 
-                               key='nc_name', value='nuclide_id', reverse=False)
+lut_nuclides = lambda: get_lut('NUCLIDE', reverse=False)
 
 # %% ../../nbs/handlers/geotraces.ipynb #f98fd736
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',

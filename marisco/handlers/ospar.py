@@ -376,8 +376,7 @@ lut_bodyparts = lambda: Remapper(provider_lut_df=get_unique_across_dfs(tfm.dfs, 
                                ).generate_lookup_table(fixes=fixes_biota_tissues, as_df=False, overwrite=False)
 
 # %% ../../nbs/handlers/ospar.ipynb #6c2ccab7
-lut_biogroup_from_biota = lambda: get_lut(src_dir=lut_path(), fname=NC_DTYPES['SPECIES']['fname'], 
-                               key='species_id', value='biogroup_id')
+lut_biogroup_from_biota = lambda: get_lut('SPECIES', key='species_id', value='biogroup_id')
 
 # %% ../../nbs/handlers/ospar.ipynb #a065b30a
 class AddSampleIdCB(PerGroupCB):

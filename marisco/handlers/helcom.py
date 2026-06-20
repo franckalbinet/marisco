@@ -6,7 +6,7 @@
 __all__ = ['src_dir', 'fname_out', 'zotero_key', 'default_smp_types', 'fixes_nuclide_names', 'lut_nuclides', 'coi_sediment',
            'coi_val', 'coi_units_unc', 'lut_units', 'coi_dl', 'fixes_biota_species', 'lut_biota', 'fixes_biota_tissues',
            'lut_tissues', 'lut_biogroup_from_biota', 'fixes_sediments', 'sed_replace_lut', 'lut_sediments',
-           'lut_filtered', 'kw', 'load_data', 'ParseTimeCB', 'SplitSedimentValuesCB', 'SanitizeValueCB', 'unc_rel2stan',
+           'lut_filtered', 'kw', 'load_data', 'ParseTimeCB', 'MeltSedimentValuesCB', 'SanitizeValueCB', 'unc_rel2stan',
            'NormalizeUncCB', 'RemapUnitCB', 'RemapDetectionLimitCB', 'RemapSedimentCB', 'RemapFiltCB', 'AddSampleIDCB',
            'AddDepthCB', 'AddSalinityCB', 'AddStationCB', 'AddTemperatureCB', 'RemapSedSliceTopBottomCB',
            'LookupDryWetPercentWeightCB', 'ParseCoordinatesCB', 'get_attrs', 'encode']
@@ -74,89 +74,51 @@ fixes_nuclide_names = {
 
 # %% ../../nbs/handlers/helcom.ipynb #9a189ef9
 # Resolved nuclide lookup table (provider → MARIS nuclide_id)
-lut_nuclides = Lut(fixed, key_col='value', val_col=nuc_cfg['value'])
+lut_nuclides = Lut(fixed, key_col='value', val_col='nuclide_id')
 
-# %% ../../nbs/handlers/helcom.ipynb #ae547a0c
+# %% ../../nbs/handlers/helcom.ipynb #1a682a3e
 class ParseTimeCB(PerGroupCB):
-    "Standardize time format across all dataframes."
-    def each_grp(self, grp, df, tfm): self._process_dates(df)
+    "Parse HELCOM DATE (MM/DD/YY HH:MM:SS) with fallback to YEAR/MONTH/DAY."
+    def each_grp(self, grp, df, tfm):
+        df['TIME'] = pd.to_datetime(df['date'], format='%m/%d/%y %H:%M:%S', errors='coerce')
+        for c in ['day','month']: df.loc[df[c]==0,c] = 1
+        m = df['TIME'].isna()
+        df.loc[m,'TIME'] = pd.to_datetime(df.loc[m, ['year','month','day']], errors='coerce')
 
-    def _process_dates(self, df: pd.DataFrame) -> None:
-        df['TIME'] = self._parse_date(df)
-        self._handle_missing_dates(df)
-        self._fill_missing_time(df)
-
-    def _parse_date(self, df: pd.DataFrame) -> pd.Series:
-        return pd.to_datetime(df['date'], format='%m/%d/%y %H:%M:%S', errors='coerce')
-
-    def _handle_missing_dates(self, df: pd.DataFrame):
-        df.loc[df["day"] == 0, "day"] = 1
-        df.loc[df["month"] == 0, "month"] = 1
-        missing_day_month = (df["day"].isna()) & (df["month"].isna()) & (df["year"].notna())
-        df.loc[missing_day_month, ["day", "month"]] = 1
-
-    def _fill_missing_time(self, df: pd.DataFrame) -> None:
-        missing_time = df['TIME'].isna()
-        df.loc[missing_time, 'TIME'] = pd.to_datetime(
-            df.loc[missing_time, ['year', 'month', 'day']], 
-            format='%Y%m%d', 
-            errors='coerce'
-        )
 
 # %% ../../nbs/handlers/helcom.ipynb #5df02329
+# Column mappings per sediment measurement type: MARIS-standard column name → raw HELCOM column name
 coi_sediment = {
     'kg_type': {
-        'VALUE': 'value_bq/kg',
-        'UNC': 'error%_kg',
-        'DL': '< value_bq/kg',
-        'UNIT': 3,  # Unit ID for Bq/kg
+        'VALUE': 'value_bq/kg',  # Activity concentration per unit mass
+        'UNC': 'error%_kg',      # Relative uncertainty (percent)
+        'DL': '< value_bq/kg',   # Detection limit flag/level
+        'UNIT': 3,               # Unit ID for Bq/kg
     },
     'm2_type': {
-        'VALUE': 'value_bq/m²',
-        'UNC': 'error%_m²',
-        'DL': '< value_bq/m²',
-        'UNIT': 2,  # Unit ID for Bq/m²
+        'VALUE': 'value_bq/m²',  # Activity per unit area
+        'UNC': 'error%_m²',      # Relative uncertainty (percent)
+        'DL': '< value_bq/m²',   # Detection limit flag/level
+        'UNIT': 2,               # Unit ID for Bq/m²
     }
 }
 
-# %% ../../nbs/handlers/helcom.ipynb #13fb2292
-class SplitSedimentValuesCB(Callback):
-    "Separate sediment entries into distinct rows for Bq/kg and Bq/m² measurements."
-    def __init__(self, 
-                 coi: Dict[str, Dict[str, Any]] # Columns of interest with value, uncertainty, DL columns and units
-                ):
-        fc.store_attr()
-        
-    def __call__(self, tfm: Transformer):
-        if 'SEDIMENT' not in tfm.dfs:
-            return
-            
-        df = tfm.dfs['SEDIMENT']
-        dfs_to_concat = []
-        
-        # For each measurement type (kg and m2)
-        for measure_type, cols in self.coi.items():
-            # If any of value/uncertainty/DL exists, keep the row
-            has_data = (
-                df[cols['VALUE']].notna() | 
-                df[cols['UNC']].notna() | 
-                df[cols['DL']].notna()
-            )
-            
-            if has_data.any():
-                df_measure = df[has_data].copy()
-                
-                # Copy columns to standardized names
-                df_measure['_VALUE'] = df_measure[cols['VALUE']]
-                df_measure['_UNC'] = df_measure[cols['UNC']]
-                df_measure['_DL'] = df_measure[cols['DL']]
-                df_measure['_UNIT'] = cols['UNIT']
-                
-                dfs_to_concat.append(df_measure)
-        
-        # Combine all measurement type dataframes
-        if dfs_to_concat:
-            tfm.dfs['SEDIMENT'] = pd.concat(dfs_to_concat, ignore_index=True)
+# %% ../../nbs/handlers/helcom.ipynb #83480f98
+class MeltSedimentValuesCB(PerGroupCB):
+    "Melt HELCOM dual-value sediment rows into separate rows per measurement type (Bq/kg, Bq/m²)."
+    grps = ['SEDIMENT']
+    def __init__(self, coi:dict  # Column-of-interest mapping, keyed by unit variant (kg, m²)
+            ): store_attr()
+
+    def each_grp(self, grp, df, tfm):
+        parts = []
+        for cols in self.coi.values():
+            sel = df[[cols[v] for v in ['VALUE','UNC','DL']]].notna().any(axis=1)
+            if not sel.any(): continue
+            parts.append(df[sel].rename(columns={
+                cols['VALUE']:'_VALUE', cols['UNC']:'_UNC',
+                cols['DL']:'_DL'}).assign(_UNIT=cols['UNIT']))
+        if parts: tfm.dfs[grp] = pd.concat(parts, ignore_index=True)
 
 # %% ../../nbs/handlers/helcom.ipynb #8580f592
 coi_val = {'SEAWATER' : {'VALUE': 'value_bq/m³'},

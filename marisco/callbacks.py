@@ -16,7 +16,6 @@ from typing import List, Dict, Callable, Any, Optional, Union
 from collections import defaultdict
 from .configs import get_lut, get_time_units, NC_GROUPS, SMP_TYPE_LUT
 
-
 # %% auto #0
 __all__ = ['Callback', 'PerGroupCB', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB',
            'AddSampleTypeIdColumnCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB', 'UniqueIndexCB',
@@ -122,23 +121,56 @@ class SanitizeLonLatCB(PerGroupCB):
 class RemapCB(PerGroupCB):
     "Remap source values to MARIS standard identifiers using a lookup table."
     def __init__(self,
-                 lut: dict|'Lut',       # Lookup: dict or Lut instance (from MIFA pipeline)
-                 col_remap: str,        # Destination column to create
-                 col_src: str,          # Source column with provider values
-                 default_val: int=0,    # Value assigned to unmapped source values
-                 grps: list[str]=None,  # Groups to process (None = all)
+                 lut: dict|Callable,  # Lookup: dict, or callable(dfs)->dict
+                 col_remap: str,            # Destination column to create
+                 col_src: str,              # Source column with provider values
+                 default_val: int=0,        # Value assigned to unmapped source values
+                 grps: list[str]=None,      # Groups to process (None = all)
                 ):
-        self.lut = lut if isinstance(lut, dict) else dict(zip(lut.merged[lut.key_col], lut.merged[lut.val_col]))
-        self.col_remap,self.col_src,self.default_val = col_remap,col_src,default_val
-        self.grps = grps
+        store_attr()
         grp_str = ', '.join(str(g) for g in grps) if grps else 'all'
         self.__doc__ = f"Remap values from '{col_src}' to '{col_remap}' for groups: {grp_str}."
 
+    def _resolve_lut(self, tfm):
+        "Resolve the LUT: if a callable, call it with tfm's dfs to produce a dict."
+        spec = self.lut
+        if callable(spec):
+            dfs = tfm.dfs if not tfm.is_single_df else {'_': tfm.df}
+            spec = spec(dfs)
+        return spec
+
+    def each_grp(self, grp, df, tfm):
+        lut = self._resolve_lut(tfm)
+        df[self.col_remap] = df[self.col_src].map(lut).fillna(self.default_val).astype(int)
+
+class RemapCB(PerGroupCB):
+    "Remap source values to MARIS standard identifiers using a lookup table."
+    def __init__(self,
+                 lut: dict|Callable,  # Lookup: dict, or callable(dfs)->dict
+                 col_remap: str,            # Destination column to create
+                 col_src: str,              # Source column with provider values
+                 default_val: int=0,        # Value assigned to unmapped source values
+                 grps: list[str]=None,      # Groups to process (None = all)
+                ):
+        store_attr()
+        grp_str = ', '.join(str(g) for g in grps) if grps else 'all'
+        self.__doc__ = f"Remap values from '{col_src}' to '{col_remap}' for groups: {grp_str}."
+
+    def _resolve_lut(self, tfm):
+        "Resolve the LUT: if a callable, call it with tfm's dfs to produce a dict."
+        spec = self.lut
+        if callable(spec):
+            dfs = tfm.dfs if not tfm.is_single_df else {'_': tfm.df}
+            spec = spec(dfs)
+        return spec
+
+    def __call__(self, tfm):
+        self._resolved_lut = self._resolve_lut(tfm)
+        super().__call__(tfm)
+
     def each_grp(self, grp, df, tfm):
         df[self.col_remap] = (df[self.col_src]
-            .apply(lambda x: x.strip() if isinstance(x, str) else x)
-            .map(self.lut).fillna(self.default_val).astype(int))
-
+            .map(self._resolved_lut).fillna(self.default_val).astype(int))
 
 # %% ../nbs/api/callbacks.ipynb #bd1917a0
 class LowerStripNameCB(PerGroupCB):

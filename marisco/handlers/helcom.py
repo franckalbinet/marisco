@@ -252,7 +252,10 @@ sed_replace_lut = {56: -99, 73: -99}
 class CleanSedimentCodesCB(PerGroupCB):
     "Replace invalid HELCOM SEDI codes with -99 sentinel before nomenclature lookup."
     grps = ['SEDIMENT']
-    def __init__(self, replace_lut): store_attr()
+    def __init__(self, 
+                 replace_lut # sediment helcom -> maris lookup table
+                 ): 
+           store_attr()
     def each_grp(self, grp, df, tfm):
         df['sedi'] = df['sedi'].replace(self.replace_lut).fillna(-99)
 

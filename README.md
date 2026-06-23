@@ -5,192 +5,103 @@
 
 The [IAEA **M**arine **R**adioactivity **I**nformation **S**ystem
 (MARIS)](https://maris.iaea.org) provides open access to radioactivity
-measurements in marine environments. Developed by the [IAEA Marine
-Environmental
+measurements in marine environments — seawater, biota, sediment, and
+suspended matter — collected by national laboratories, monitoring
+programmes, and research institutions worldwide. Developed by the [IAEA
+Marine Environmental
 Laboratories](https://www.iaea.org/about/organizational-structure/department-of-nuclear-sciences-and-applications/division-of-iaea-environment-laboratories)
-in Monaco, MARIS offers data on seawater, biota, sediment, and suspended
-matter.
+in Monaco, MARIS is the authoritative international reference for marine
+radioactivity data.
 
-This Python package includes command-line tools to convert MARIS
-datasets into [`NetCDF`](https://www.unidata.ucar.edu/software/netcdf/)
-or `.csv` formats, enhancing compatibility with various scientific and
-data analysis software.
+`marisco` is being developed as the data processing foundation of MARIS:
+a Python package that converts provider datasets into standardised
+[NetCDF4](https://www.unidata.ucar.edu/software/netcdf/) and CSV formats
+for ingestion into the MARIS database.
 
-## Core Concept: Handlers
+## Transparency by design
 
-`marisco` is built around the concept of `handlers`, specialized modules
-designed to convert MARIS datasets into NetCDF format. Each handler is
-tailored to a specific data provider and implemented as a dedicated
-Jupyter notebook.
+Each dataset is processed by a dedicated *handler* — a Jupyter notebook
+that documents every curation decision alongside the code that
+implements it. Unit conversions, nuclide nomenclature mapping,
+coordinate standardisation, outlier flags: every choice is visible,
+traceable, and auditable.
 
-### Literate Programming Approach
+Handlers are shared with data providers as a working document. If a
+conversion looks wrong, a mapping is missing, or terminology differs
+from your internal standards, the notebook is where we discuss and
+resolve it — not buried in email threads or internal comments.
 
-We’ve adopted a Literate Programming approach, which means:
+For a concrete example, see the [GEOTRACES
+handler](https://fr.anckalbi.net/marisco/handlers/geotraces.html).
 
-1.  **Documentation**: Each handler serves as comprehensive
-    documentation.
-2.  **Code Reference**: The notebooks contain the actual implementation
-    code.
-3.  **Communication Tool**: They facilitate discussions with data
-    providers about discrepancies or inconsistencies.
+## Available handlers
 
-### Powered by nbdev
+| Handler | Description | Data source | Status |
+|----|----|----|----|
+| [HELCOM](https://fr.anckalbi.net/marisco/handlers/helcom.html) | Baltic Sea marine environment monitoring | [HELCOM](https://helcom.fi/about-us) | ✅ Active |
+| [GEOTRACES](https://fr.anckalbi.net/marisco/handlers/geotraces.html) | BODC GEOTRACES oceanographic radionuclide data | [GEOTRACES IDP2021](https://www.geotraces.org/geotraces-intermediate-data-product-2021/) | ✅ Active |
+| [MARIS Legacy](https://fr.anckalbi.net/marisco/handlers/maris_legacy.html) | Historical MARIS datasets from the master database | — | ⚠️ Migrating |
+| [OSPAR](https://fr.anckalbi.net/marisco/handlers/ospar.html) | NE Atlantic marine environment datasets | [ODIMS OSPAR](https://odims.ospar.org/en/) | ⚠️ Migrating |
+| [TEPCO](https://fr.anckalbi.net/marisco/handlers/tepco.html) | TEPCO Fukushima Daiichi monitoring data | [TEPCO Monitoring](https://radioactivity.nsr.go.jp/ja/list/349/list-1.html) | ⚠️ Migrating |
 
-To achieve this, we leverage [nbdev](https://nbdev.fast.ai), a powerful
-tool that allows us to:
-
-1.  Write code within Jupyter notebooks
-2.  Automatically export relevant parts as dedicated Python modules
-
-This approach bridges the gap between documentation and implementation,
-ensuring they remain in sync.
-
-### See It in Action
-
-For a concrete example of this approach, check out our [GEOTRACES
-dataset handler
-implementation](https://fr.anckalbi.net/marisco/handlers/geotraces.html).
-
-### List of currently available handlers
-
-MARISCO includes a suite of specialized data handlers designed to:
-
-- Convert provider-specific data formats into standardized MARIS NetCDF
-  files
-- Ensure data quality and consistency across providers
-- Facilitate integration with the MARIS marine radioactivity database
-- Support automated data processing workflows
-
-The following handlers are currently implemented:
-
-| Handler | Description | Link to Data Source |
-|----|----|----|
-| [MARIS Legacy](https://fr.anckalbi.net/marisco/handlers/maris_legacy.html) | All legacy MARIS datasets from the MARIS Master Database | \- |
-| [HELCOM](https://fr.anckalbi.net/marisco/handlers/helcom.html) | HELCOM marine environment protection datasets | [HELCOM](https://helcom.fi/about-us) |
-| [OSPAR](https://fr.anckalbi.net/marisco/handlers/ospar.html) | OSPAR marine environment datasets | [ODIMS OSPAR](https://odims.ospar.org/en/) |
-| [TEPCO](https://fr.anckalbi.net/marisco/handlers/tepco.html) | TEPCO Fukushima monitoring data | [TEPCO Monitoring](https://radioactivity.nsr.go.jp/ja/list/349/list-1.html) |
-| [GEOTRACES](https://fr.anckalbi.net/marisco/handlers/geotraces.html) | BODC GEOTRACES oceanographic data | [GEOTRACES IDP2021](https://www.geotraces.org/geotraces-intermediate-data-product-2021/) |
+*Migrating: handler is functional but being updated to the current
+matching API.*
 
 ## Install
-
-Now, to install `marisco` simply run
 
 ``` console
 pip install marisco
 ```
 
-### Zotero API key
+Two environment variables may be required depending on the dataset:
 
-You need to set up your Zotero API key. `marisco` automatically
-retrieves bibliographic metadata for MARIS datasets from
-[Zotero](https://www.zotero.org/).
+- **`ZOTERO_API_KEY`** — used to fetch bibliographic metadata from the
+  [MARIS Zotero
+  library](https://www.zotero.org/groups/2432820/maris/library). Contact
+  [MARIS Administrators](https://maris.iaea.org/home) to obtain your
+  key:
 
-To do so, define the following environment variable containing the MARIS
-Zotero API key:
+  ``` console
+  export ZOTERO_API_KEY=your_api_key_here
+  ```
 
-``` console
-export ZOTERO_API_KEY=your_api_key_here
-```
+- **INIS** — bibliographic metadata is being progressively migrated from
+  Zotero to the [IAEA INIS
+  database](https://www.iaea.org/resources/databases/inis). The
+  [`INISClient`](https://franckalbinet.github.io/marisco/api/metadata.html#inisclient)
+  fetches records via [curl](https://curl.se/), which must be installed
+  separately. In the near term both systems coexist; INIS will supersede
+  Zotero as the migration completes.
 
-> [!IMPORTANT]
->
-> Please contact [MARIS Administrators](https://maris.iaea.org/home) to
-> get your API key.
-
-## Getting started
+## Quick start
 
 ### Command line utilities
 
-All commands accept a `-h` argument to get access to its documentation.
+All commands accept `-h` for full documentation.
 
-#### `maris_to_nc`
+**Convert a provider dataset to MARIS NetCDF4:**
 
-Convert `helcom`, `geotraces`, `tepco` or `ospar` marine radioactivity
-datasets to MARIS NetCDF4 format.
+``` console
+maris_to_nc ospar 191-OSPAR-2024.nc
+```
 
-    usage: maris_to_nc [-h] [--src SRC] ds dest
+**Convert the MARIS legacy database dump to NetCDF4:**
 
-    positional arguments:
-      ds          Name of the dataset to encode as NetCDF4
-      dest        Output path for NetCDF file
+``` console
+maris_db_to_nc "~/data/maris/dump.txt" ~/output
+# or a subset:
+maris_db_to_nc "~/data/maris/dump.txt" ~/output --ref_ids="16,30"
+```
 
-    options:
-      -h, --help  show this help message and exit
-      --src SRC   Optional input data path only required for the 'GEOTRACES' dataset
+**Convert a NetCDF4 file to MARIS-format CSV (for database import):**
 
-For instance: `maris_to_nc ospar 191-OSPAR-2024.nc`
+``` console
+maris_nc_to_csv ~/output/191-OSPAR-2024.nc ~/output/191-OSPAR-2024
+```
 
-#### `maris_db_to_nc`
-
-The MARIS Master Database integrates two types of datasets:
-
-- Historical datasets retrieved from published scientific papers
-- Ongoing monitoring data from international programs like `HELCOM`,
-  `OSPAR`, `TEPCO`, and `GEOTRACES`
-
-This command-line utility converts MARIS datasets from their legacy
-format to NetCDF4, making them more accessible for modern data analysis
-workflows. Users can either convert the entire database or specify
-particular datasets by their reference IDs for selective conversion.
-
-    usage: maris_db_to_nc [-h] [--ref_ids REF_IDS] src dest
-
-    Convert MARIS legacy database to NetCDF4 format. If ref_ids is provided as comma-separated values, only encodes those subsets.
-
-    positional arguments:
-      src                Path to MARIS database dump as `.txt` file
-      dest               Output path for NetCDF file(s)
-
-    options:
-      -h, --help         show this help message and exit
-      --ref_ids REF_IDS  Optional comma-separated reference IDs (e.g., "123,456,789") (default: )
-
-For instance:
-
-- `maris_db_to_nc "~/pro/data/maris/2024-11-20 MARIS_QA_shapetype_id=1.txt" ~/pro/tmp/output`  
-- or
-  `maris_db_to_nc "~/pro/data/maris/2024-11-20 MARIS_QA_shapetype_id=1.txt" ~/pro/tmp/output --ref_ids="16,30"`
-  for a subset of the MARIS Master Database.
-
-#### `maris_nc_to_csv`
-
-This utility converts NetCDF files to CSV files that conform to the
-MARIS Standard format, originally designed for OpenRefine workflows.
-
-Although MARISCO has now superseded OpenRefine in the data preparation
-pipeline, the MARIS master database continues to require CSV inputs in
-this legacy format. This command-line utility, built with the MARISCO
-library, handles the conversion process.
-
-    usage: maris_nc_to_csv [-h] src dest
-
-    Converts NetCDF files into CSV files that follow the MARIS Standard format.
-
-    positional arguments:
-      src         Input path and filename for NetCDF file
-      dest        Output path and filename (without extension) for CSV file
-
-    options:
-      -h, --help  show this help message and exit
-
-For instance:
-`maris_nc_to_csv ~/pro/tmp/output/191-OSPAR-2024.nc ~/pro/tmp/output/191-OSPAR-2024`
-
-> [!TIP]
->
-> ### Note
->
-> When specifying the destination path (e.g.,
-> `~/pro/tmp/output/191-OSPAR-2024`), the utility automatically appends
-> the MARIS sample type to the filename. For example:
->
-> - `191-OSPAR-2024_BIOTA.csv` for biological samples
->
-> While this specific example produces only a BIOTA file, the utility
-> can generate multiple files (one per sample type) depending on the
-> content of the source dataset. This reflects the NetCDF4 file
-> structure, where each MARIS sample type is stored as a separate group
-> within the file.
+The CSV utility appends the sample type automatically
+(e.g. `191-OSPAR-2024_BIOTA.csv`), and may generate multiple files — one
+per sample type present in the source dataset.
 
 ## Documentation
 
@@ -227,35 +138,18 @@ Detailed specifications and reference material:
 
 ## Development
 
-The MARIS NetCDF template is generated from
-`nbs/api/files/cdl/maris.cdl` Common Data Language (CDL) file as defined
-by [Unidata](https://docs.unidata.ucar.edu/). During development, to
-regenerate the MARIS NetCDF template `nbs/files/nc/maris-template.nc`:
-
-1.  install the
-    [NetCDF-C](https://pjbartlein.github.io/REarthSysSci/install_netCDF.html)
-    utilities
-2.  once in `Marisco` home directory, run:
+The MARIS NetCDF template is generated from `nbs/files/cdl/maris.cdl`.
+To regenerate it locally, install
+[NetCDF-C](https://pjbartlein.github.io/REarthSysSci/install_netCDF.html)
+and run:
 
 ``` console
 ncgen -4 -o nbs/files/nc/maris-template.nc nbs/files/cdl/maris.cdl
 ```
 
-### Developer documentation
-
-In-depth guidance for contributors is captured in the project’s CRAFT
-file (at the repository root) and optional CRAFTs under the `CRAFTs/`
-folder. These are auto-loaded by SolveitAI when working with this
-codebase and cover:
-
-- **Project overview, architecture and setup** (root CRAFT)
-- **Coding style and abbreviations** (`CRAFTs/coding-style-abbr.ipynb`):
-  naming conventions, abbreviations, and fastai/fastcore idioms used in
-  this codebase
-- **Handler documentation guide** (`CRAFTs/handler-doc-style.ipynb`):
-  documentation style and template for handlers
-- **Software design principles** (`CRAFTs/sicp-design-memento.ipynb`):
-  high-level architecture, abstraction layers, and system design
+Contributor guidance — architecture, coding conventions, handler
+documentation style — is in the `CRAFTs/` notebooks at the repository
+root.
 
 ## Acknowledgements
 

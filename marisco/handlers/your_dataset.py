@@ -14,7 +14,9 @@ fname_out = '...'      # default output filename
 zotero_key = 'XXXXXXXX'  # 8 character Zotero record key
 
 # %% ../../nbs/how-to/writing-a-handler.ipynb #wrh-009
-def load_data(fname_in):
+def load_data(
+        fname_in # Path to raw data provider's data
+        ):
     "Load provider data; returns dict of DataFrames keyed by sample type."
     res = {}
     # Read each sample type group from the provider's files and store it
@@ -33,13 +35,20 @@ nuclide_lut = make_lut('NUCLIDE', fixes=fixes_nuclide_names)
 # %% ../../nbs/how-to/writing-a-handler.ipynb #wrh-014
 class SanitizeNuclideNamesCB(PerGroupCB):
     "Lowercase and strip whitespace from provider nuclide names."
-    def __init__(self, col_src, col_dst):
+    def __init__(self, 
+                 col_src, # Source column name e.g. 'Nuclide'
+                 col_dst # Destination column name
+                 ):
         store_attr()
     def each_grp(self, grp, df, tfm):
         df[self.col_dst] = df[self.col_src].str.lower().str.strip()
 
 # %% ../../nbs/how-to/writing-a-handler.ipynb #wrh-018
-def get_attrs(tfm, zotero_key, **kw):
+def get_attrs(
+        tfm, # Transformer object
+        zotero_key, # Zotero dataset record key
+        kw:list=['oceanography', 'Earth Science > Oceans > ...']
+        ):
     "Build NetCDF global attributes for the dataset."
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
@@ -49,13 +58,24 @@ def get_attrs(tfm, zotero_key, **kw):
     ])()
 
 # %% ../../nbs/how-to/writing-a-handler.ipynb #wrh-020
-def encode(fname_out, **kwargs):
+def encode(
+        fname_out: str, # Output file name
+        **kwargs
+        ) -> None:
     "Encode provider data into MARIS standard NetCDF4 file."
     dfs = load_data(src_dir)
-    tfm = Transformer(dfs, cbs=[...])
+    tfm = Transformer(dfs, cbs=[
+        SanitizeNuclideNamesCB(col_src='nuclide', col_dst='NUCLIDE'),
+        RemapCB(lut=nuclide_lut, col_remap='NUCLIDE', col_src='NUCLIDE'),
+        EncodeTimeCB(col_src='date'),
+        SanitizeLonLatCB(),
+        # ... add remaining callbacks in pipeline order
+    ])
     tfm()
-    NetCDFEncoder(
+    encoder = NetCDFEncoder(
         tfm.dfs,
         dest_fname=fname_out,
-        global_attrs=get_attrs(tfm, zotero_key, **kwargs)
-    ).encode()
+        global_attrs=get_attrs(tfm, zotero_key, **kwargs),
+        verbose=kwargs.get('verbose', False),
+    )
+    encoder.encode()

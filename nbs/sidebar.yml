@@ -1,12 +1,22 @@
 website:
   sidebar:
+    collapse-level: 1
     contents:
       - index.ipynb
+      - section: "How-to"
+        contents:
+          - how-to/writing-a-handler.ipynb
+          - how-to/reconcile-nomenclature.ipynb
+      - section: "Data Reference"
+        contents:
+          - reference/guide.ipynb
+          - reference/field-definition.ipynb
+          - reference/sample-id-coverage.ipynb
       - section: "Handlers"
         contents:
+          - handlers/geotraces.ipynb
           - handlers/helcom.ipynb
           - handlers/ospar.ipynb          
-          - handlers/geotraces.ipynb
           - handlers/maris_legacy.ipynb
           - handlers/tepco.ipynb
       - section: API
@@ -20,12 +30,4 @@ website:
           - api/geo.ipynb
           - api/utils.ipynb
           - api/netcdf2csv.ipynb
-      - section: "How-to guides"
-        contents:
-          - how-to/reconcile-nomenclature.ipynb
-          - how-to/writing-a-handler.ipynb
-      - section: "Data Reference"
-        contents:
-          - reference/guide.ipynb
-          - reference/field-definition.ipynb
-          - reference/sample-id-coverage.ipynb
+      

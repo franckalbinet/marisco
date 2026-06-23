@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.4.0] - 2026-06-23
+
+  ### Added
+  - `fuzzy_merge`: brute-force Levenshtein (or custom) matching between provider and MARIS reference
+  DataFrames
+  - `fix_lut`: apply expert overrides on top of fuzzy matches, with a stderr warning for unknown
+  targets
+  - `lut_from` / `uniq_across_dfs`: build source LUTs from unique column values across group
+  DataFrames
+  - `make_lut` / `make_lut_from`: lazy factory functions that defer the full match-and-fix pipeline
+  until runtime; integrate directly with `RemapCB`
+
+  ### Changed
+  - HELCOM handler fully refactored to the new matching API (`make_lut`, `make_lut_from`, `RemapCB`)
+  - OSPAR, TEPCO, and MARIS Legacy handlers temporarily muted (`#| eval: false`) pending migration
+  to the new API
+
+  ### Removed
+  - `Remapper` class: replaced by the `fuzzy_merge` / `fix_lut` / `make_lut` / `make_lut_from`
+  workflow
+
 ## [1.3.0] - 2026-06-18
 
 ### Changed

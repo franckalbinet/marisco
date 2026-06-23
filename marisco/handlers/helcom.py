@@ -46,7 +46,9 @@ default_smp_types = {
 }
 
 # %% ../../nbs/handlers/helcom.ipynb #93f0655f
-def load_data(fname_in):
+def load_data(
+        fname_in # Path to raw HELCOM csv dataset
+        ):
     "Load HELCOM data; returns dict of DataFrames keyed by sample type."
     res = {}
     for prefix,smp_type in default_smp_types.items():

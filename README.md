@@ -194,12 +194,36 @@ For instance:
 
 ## Documentation
 
+Documentation is organised into two groups:
+
+### How-to guides
+
+Practical walkthroughs for common tasks:
+
+- [Writing a new handler](how-to/writing-a-handler.ipynb): step-by-step
+  guide to adding a new data provider to the marisco pipeline
+- [Nomenclature reconciliation](how-to/reconcile-nomenclature.ipynb):
+  repeatable procedure for mapping provider names (nuclides, species,
+  units, …) to MARIS standard identifiers
+
+### Reference
+
+Detailed specifications and reference material:
+
 - [MARIS Data Guide](reference/guide.ipynb): overview of sample types,
   measurement fields, nomenclature, curation pipeline, and available
   datasets; aimed at data providers and data users
 - [Field Definitions](reference/field-definition.ipynb): complete
   field-by-field reference with MARISCO column names, NetCDF variable
   names, CSV variable names, types, and lookup tables
+- [Data Curation Rules](reference/data-curation-rules.ipynb): rules
+  applied during data curation across all handlers
+- [Enum Rules](reference/enum_rules.ipynb): enumeration value handling
+  rules
+- [Sample ID Coverage](reference/sample-id-coverage.ipynb): coverage
+  analysis of sample identifiers
+- [Sample Uniqueness](reference/sample-uniqueness.ipynb): sample
+  uniqueness constraints and validation
 
 ## Development
 
@@ -219,12 +243,22 @@ ncgen -4 -o nbs/files/nc/maris-template.nc nbs/files/cdl/maris.cdl
 
 ### Developer documentation
 
-In-depth guidance for contributors is captured in a hierarchy of
-`CLAUDE.md` files co-located with the code they describe:
+In-depth guidance for contributors is captured in the project’s CRAFT
+file (at the repository root) and optional CRAFTs under the `CRAFTs/`
+folder. These are auto-loaded by SolveitAI when working with this
+codebase and cover:
 
-| File | Covers |
-|----|----|
-| [`CLAUDE.md`](https://github.com/franckalbinet/marisco/blob/main/CLAUDE.md) | Project overview, architecture, setup |
-| [`nbs/CLAUDE.md`](https://github.com/franckalbinet/marisco/blob/main/nbs/CLAUDE.md) | nbdev workflow — edit/export cycle, template regeneration |
-| [`nbs/api/CLAUDE.md`](https://github.com/franckalbinet/marisco/blob/main/nbs/api/CLAUDE.md) | Core abstractions: Callback/Transformer, Remapper, configs, encoders |
-| [`nbs/handlers/CLAUDE.md`](https://github.com/franckalbinet/marisco/blob/main/nbs/handlers/CLAUDE.md) | Handler pattern, column naming, data curation rules, IMFA remapping |
+- **Project overview, architecture and setup** (root CRAFT)
+- **Coding style and abbreviations** (`CRAFTs/coding-style-abbr.ipynb`):
+  naming conventions, abbreviations, and fastai/fastcore idioms used in
+  this codebase
+- **Handler documentation guide** (`CRAFTs/handler-doc-style.ipynb`):
+  documentation style and template for handlers
+- **Software design principles** (`CRAFTs/sicp-design-memento.ipynb`):
+  high-level architecture, abstraction layers, and system design
+
+## Acknowledgements
+
+Development of this package was supported by the
+[Solveit](https://solve.it.com) platform, an interactive development
+environment for dialog-driven software engineering.

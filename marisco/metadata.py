@@ -238,7 +238,7 @@ class InisCB(Callback):
             if item.doi: obj.attrs['references'] = item.doi
             if item.url: obj.attrs['metadata_link'] = item.url
 
-# %% ../nbs/api/metadata.ipynb #3fbd040a
+# %% ../nbs/api/metadata.ipynb #89965ed7
 # Zenodo metadata callback helpers
 DEFAULT_ZENODO_RECORDS_URL = "https://zenodo.org/api/records"
 DEFAULT_ZENODO_TIMEOUT = 10.0
@@ -255,7 +255,7 @@ class _ZenodoTransportError(_ZenodoMetadataError):
     "Raised when Zenodo transport fails before a valid payload is received."
     pass
 
-# %% ../nbs/api/metadata.ipynb #5fd23cbc
+# %% ../nbs/api/metadata.ipynb #c35726a2
 def _zenodo_curl_json(url:str,
                       timeout:float=DEFAULT_ZENODO_TIMEOUT # Request timeout in seconds
                      ) -> dict: # Raw Zenodo record payload
@@ -288,6 +288,7 @@ def _zenodo_curl_json(url:str,
     except json.JSONDecodeError as exc:
         raise _ZenodoMetadataError('Zenodo metadata retrieval failed: invalid JSON payload') from exc
 
+# %% ../nbs/api/metadata.ipynb #2efa79db
 def _zenodo_fetch_record(
     record_id:str, # Zenodo record identifier
     record_base_url:str=DEFAULT_ZENODO_RECORDS_URL, # API base URL
@@ -306,7 +307,7 @@ def _zenodo_fetch_record(
     except json.JSONDecodeError as exc:
         raise _ZenodoMetadataError('Zenodo metadata retrieval failed: invalid JSON payload') from exc
 
-# %% ../nbs/api/metadata.ipynb #f145c717
+# %% ../nbs/api/metadata.ipynb #ce0c4cb3
 def _zenodo_as_dict(value): return value if isinstance(value, dict) else {}
 def _zenodo_as_list(value): return value if isinstance(value, list) else []
 def _zenodo_pick_text(value):
@@ -316,6 +317,7 @@ def _zenodo_pick_text(value):
         return next((v for v in value.values() if isinstance(v, str) and v), '')
     return '' if value is None else str(value)
 
+# %% ../nbs/api/metadata.ipynb #318ff28a
 def _zenodo_metadata(item:dict # Raw Zenodo record payload
                     ) -> dict: # Normalized metadata block
     "Return the normalized Zenodo metadata block."
@@ -338,7 +340,7 @@ def _zenodo_url(item:dict # Raw Zenodo record payload
             or _zenodo_pick_text(links.get('latest_html'))
             or _zenodo_pick_text(item.get('doi_url')))
 
-# %% ../nbs/api/metadata.ipynb #170dbe01
+# %% ../nbs/api/metadata.ipynb #07210baa
 class ZenodoItem:
     "Retrieve Zenodo metadata from the single-record API."
     def __init__(self,
@@ -381,7 +383,7 @@ class ZenodoItem:
 
     def __repr__(self): return json.dumps(self.item, indent=4)
 
-# %% ../nbs/api/metadata.ipynb #8524a9ab
+# %% ../nbs/api/metadata.ipynb #e2f25796
 class ZenodoCB(Callback):
     "Populate global attributes from Zenodo metadata."
     def __init__(self,

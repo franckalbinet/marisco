@@ -4,12 +4,13 @@
 
 # %% auto #0
 __all__ = ['src_dir', 'fname_out', 'zotero_key', 'default_smp_types', 'fixes_nuclide_names', 'nuclide_lut', 'coi_sediment',
-           'coi_val', 'lut_units', 'coi_dl', 'provider_lut_species', 'provider_lut_tissues', 'fixes_species',
-           'species_lut', 'fixes_biota_tissues', 'lut_tissues', 'lut_biogroup', 'provider_lut_sed', 'fixes_sediments',
-           'sed_replace_lut', 'sediment_lut', 'lut_filtered', 'kw', 'load_data', 'ParseTimeCB', 'MeltSedimentValuesCB',
-           'SanitizeValueCB', 'RemapUnitCB', 'RemapDetectionLimitCB', 'CleanSedimentCodesCB', 'RemapFiltCB',
-           'AddSampleIDCB', 'AddDepthCB', 'AddSalinityCB', 'AddStationCB', 'AddTemperatureCB',
-           'RemapSedSliceTopBottomCB', 'LookupDryWetPercentWeightCB', 'ParseCoordinatesCB', 'get_attrs', 'encode']
+           'coi_val', 'lut_units', 'coi_dl', 'provider_lut_species', 'fixes_species', 'species_lut',
+           'provider_lut_tissues', 'fixes_biota_tissues', 'lut_tissues', 'lut_biogroup', 'provider_lut_sed',
+           'fixes_sediments', 'sed_replace_lut', 'sediment_lut', 'lut_filtered', 'basis_fix', 'kw', 'load_data',
+           'ParseTimeCB', 'MeltSedimentValuesCB', 'SanitizeValueCB', 'RemapUnitCB', 'RemapDetectionLimitCB',
+           'CleanSedimentCodesCB', 'AddSampleIDCB', 'AddDepthCB', 'AddSalinityCB', 'AddStationCB', 'AddTemperatureCB',
+           'RemapSedSliceTopBottomCB', 'CleanBasisCB', 'PercentWeightCB', 'WeightCB', 'ParseCoordinatesCB', 'get_attrs',
+           'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb #3a8d979f
 from fastcore.all import *
@@ -196,10 +197,6 @@ class RemapDetectionLimitCB(PerGroupCB):
 provider_lut_species = pd.read_csv(f'{src_dir}/RUBIN_NAME.csv')
 print(provider_lut_species.head())
 
-# %% ../../nbs/handlers/helcom.ipynb #a918ce5b
-provider_lut_tissues = pd.read_csv(f'{src_dir}/TISSUE.csv')
-print(provider_lut_tissues.head())
-
 # %% ../../nbs/handlers/helcom.ipynb #159de1b1
 fixes_species = {
     'LAMINARIA SACCHARINA': 'Saccharina latissima',
@@ -210,6 +207,10 @@ fixes_species = {
 
 # %% ../../nbs/handlers/helcom.ipynb #192e3fb3
 species_lut = make_lut_from(provider_lut_species, 'RUBIN', 'SCIENTIFIC NAME', 'SPECIES', fixes=fixes_species)
+
+# %% ../../nbs/handlers/helcom.ipynb #da4a51ed
+provider_lut_tissues = pd.read_csv(f'{src_dir}/TISSUE.csv')
+print(provider_lut_tissues.head())
 
 # %% ../../nbs/handlers/helcom.ipynb #c6e2b06f-5eb1-4708-8087-75c836f08112
 fixes_biota_tissues = {
@@ -263,51 +264,38 @@ lut_filtered = {
     'F': 1 # Yes
 }
 
-# %% ../../nbs/handlers/helcom.ipynb #e8f58336
-class RemapFiltCB(PerGroupCB):
-    "Lookup filt value in dataframe using the lookup table."
-    def __init__(self,
-                 lut_filtered: dict=lut_filtered, # Dictionary mapping filt codes to their corresponding names
-                ):
-        fc.store_attr()
-
-    def each_grp(self, grp, df, tfm):
-        if 'filt' in df.columns: df['FILT'] = df['filt'].map(lambda x: self.lut_filtered.get(x, 0))
-
 # %% ../../nbs/handlers/helcom.ipynb #b030cb94
 class AddSampleIDCB(PerGroupCB):
-    "Generate a SMP_ID from the KEY values in the HELCOM dataset."
+    "Assign internal sequential SMP_ID and preserve provider KEY as SMP_ID_PROVIDER."
     def each_grp(self, grp, df, tfm):
         df['SMP_ID'] = range(1, len(df) + 1)
         df['SMP_ID_PROVIDER'] = df['key'].astype(str)
 
 # %% ../../nbs/handlers/helcom.ipynb #28f14b73
 class AddDepthCB(PerGroupCB):
-    "Ensure depth values are floats and add 'SMP_DEPTH' and 'TOT_DEPTH' columns."
+    "Rename HELCOM sdepth/tdepth columns to MARIS-standard SMP_DEPTH/TOT_DEPTH and cast as float."
     def each_grp(self, grp, df, tfm):
         if 'sdepth' in df.columns: df['SMP_DEPTH'] = df['sdepth'].astype(float)
         if 'tdepth' in df.columns: df['TOT_DEPTH'] = df['tdepth'].astype(float)
 
-# %% ../../nbs/handlers/helcom.ipynb #1faa14fb
+# %% ../../nbs/handlers/helcom.ipynb #666d97c9
 class AddSalinityCB(PerGroupCB):
-    "Add salinity to all DataFrames."
-    def __init__(self, salinity_col: str = 'salin'): fc.store_attr()
-
+    "Add salinity (SAL) from HELCOM salin column where present."
     def each_grp(self, grp, df, tfm):
-        if self.salinity_col in df.columns: df['SAL'] = df[self.salinity_col].astype(float)
+        if 'salin' in df.columns: df['SAL'] = df['salin'].astype(float)
 
-# %% ../../nbs/handlers/helcom.ipynb #55ea4c29
+# %% ../../nbs/handlers/helcom.ipynb #498f0460
 class AddStationCB(PerGroupCB):
     "Add station to all DataFrames."
     def each_grp(self, grp, df, tfm): df['STATION'] = df['station'].fillna('').astype(str)
 
 # %% ../../nbs/handlers/helcom.ipynb #047afa7e
 class AddTemperatureCB(PerGroupCB):
-    "Add temperature to all DataFrames."
-    def __init__(self, temperature_col: str = 'ttemp'): fc.store_attr()
+    "Add temperature (TEMP) from HELCOM ttemp column."
+    grps = ['SEAWATER']
+    def each_grp(self, grp, df, tfm): 
+        df['TEMP'] = df['ttemp'].astype(float)
 
-    def each_grp(self, grp, df, tfm):
-        if self.temperature_col in df.columns: df['TEMP'] = df[self.temperature_col].astype(float)
 
 # %% ../../nbs/handlers/helcom.ipynb #cf398df9
 class RemapSedSliceTopBottomCB(PerGroupCB):
@@ -317,72 +305,60 @@ class RemapSedSliceTopBottomCB(PerGroupCB):
         df['TOP'] = df['uppsli']
         df['BOTTOM'] = df['lowsli']
 
-# %% ../../nbs/handlers/helcom.ipynb #ef385c79
-class LookupDryWetPercentWeightCB(PerGroupCB):
-    "Lookup dry-wet ratio and format for MARIS."
-    def each_grp(self, grp, df, tfm):
-        if 'dw%' in df.columns: self._apply_dry_wet_ratio(df)
-        if 'weight' in df.columns and 'basis' in df.columns:
-            self._correct_basis(df)
-            self._apply_weight(df)
+# %% ../../nbs/handlers/helcom.ipynb #1dbe78b7
+basis_fix = {'F': 'W'}
 
-    def _apply_dry_wet_ratio(self, df: pd.DataFrame) -> None:
+# %% ../../nbs/handlers/helcom.ipynb #c52a2ae0
+class CleanBasisCB(PerGroupCB):
+    "Map basis F to W (BIOTA)."
+    grps = ['BIOTA']
+    def each_grp(self, grp, df, tfm):
+        df['basis'] = df['basis'].replace(basis_fix)
+
+# %% ../../nbs/handlers/helcom.ipynb #daab6923
+class PercentWeightCB(PerGroupCB):
+    "Compute PERCENTWT = dw% / 100 (SEDIMENT)."
+    grps = ['SEDIMENT']
+    def each_grp(self, grp, df, tfm):
         df['PERCENTWT'] = df['dw%'] / 100
         df.loc[df['PERCENTWT'] == 0, 'PERCENTWT'] = np.nan
 
-    def _correct_basis(self, df: pd.DataFrame) -> None:
-        df.loc[df['basis'] == 'F', 'basis'] = 'W'
+# %% ../../nbs/handlers/helcom.ipynb #6a9ffff7
+class WeightCB(PerGroupCB):
+    "Compute DRYWT / WETWT from weight + basis (BIOTA)."
+    grps = ['BIOTA']
+    def each_grp(self, grp, df, tfm):
+        df['PERCENTWT'] = df['dw%'] / 100
+        df.loc[df['PERCENTWT'] == 0, 'PERCENTWT'] = np.nan
+        for cond, col in [(df['basis'] == 'D', 'DRYWT'), (df['basis'] == 'W', 'WETWT')]:
+            df.loc[cond, col] = df['weight']
+        has = df['PERCENTWT'].notna()
+        df.loc[(df['basis'] == 'D') & has, 'WETWT'] = df['weight'] / df['PERCENTWT']
+        df.loc[(df['basis'] == 'W') & has, 'DRYWT'] = df['weight'] * df['PERCENTWT']
 
-    def _apply_weight(self, df: pd.DataFrame) -> None:
-        dry_condition = df['basis'] == 'D'
-        wet_condition = df['basis'] == 'W'
-        df.loc[dry_condition, 'DRYWT'] = df['weight']
-        df.loc[dry_condition & df['PERCENTWT'].notna(), 'WETWT'] = df['weight'] / df['PERCENTWT']
-        df.loc[wet_condition, 'WETWT'] = df['weight']
-        df.loc[wet_condition & df['PERCENTWT'].notna(), 'DRYWT'] = df['weight'] * df['PERCENTWT']
-
-# %% ../../nbs/handlers/helcom.ipynb #61afcc23
+# %% ../../nbs/handlers/helcom.ipynb #623f9222
 class ParseCoordinatesCB(PerGroupCB):
-    "Get geographical coordinates from columns expressed in degrees decimal format or from columns in degrees/minutes decimal format where degrees decimal format is missing or zero."
-    def __init__(self, 
-                 fn_convert_cor: Callable # Function that converts coordinates from degree-minute to decimal degree format
-                 ):
-        fc.store_attr()
+    "Parse lat/lon from decimal-degree or degree-minute columns, preferring decimal."
+    def __init__(self, fn_convert_cor):
+        store_attr()
 
-    def each_grp(self, grp, df, tfm): self._format_coordinates(df)
+   
+    def each_grp(self, grp, df, tfm):
+        cols = df.columns
+        lat_d = next(c for c in cols if 'lat' in c.lower() and 'dddddd' in c.lower())
+        lat_m = next(c for c in cols if 'lat' in c.lower() and 'ddmmmm' in c.lower())
+        lon_d = next(c for c in cols if 'lon' in c.lower() and 'dddddd' in c.lower())
+        lon_m = next(c for c in cols if 'lon' in c.lower() and 'ddmmmm' in c.lower())
 
-    def _format_coordinates(self, df:pd.DataFrame) -> None:
-        coord_cols = self._get_coord_columns(df.columns)
-        for coord in ['lat', 'lon']:
-            decimal_col, minute_col = coord_cols[f'{coord}_d'], coord_cols[f'{coord}_m']
-            df[decimal_col] = pd.to_numeric(df[decimal_col], errors='coerce')
-            df[minute_col] = pd.to_numeric(df[minute_col], errors='coerce')
-            condition = df[decimal_col].isna() | (df[decimal_col] == 0)
-            df[coord.upper()] = np.where(condition,
-                                 df[minute_col].apply(self._safe_convert),
-                                 df[decimal_col])
-        df.dropna(subset=['LAT', 'LON'], inplace=True)
+        for dec_c, min_c, name in [(lon_d, lon_m, 'LON'), (lat_d, lat_m, 'LAT')]:
+            dec = pd.to_numeric(df[dec_c], errors='coerce')
+            minute = pd.to_numeric(df[min_c], errors='coerce')
+            df[name] = dec
+            mask = (dec.isna() | (dec == 0)) & minute.notna()
+            df.loc[mask, name] = minute[mask].apply(self.fn_convert_cor)
 
-    def _get_coord_columns(self, columns) -> dict:
-        return {
-            'lon_d': self._find_coord_column(columns, 'lon', 'dddddd'),
-            'lat_d': self._find_coord_column(columns, 'lat', 'dddddd'),
-            'lon_m': self._find_coord_column(columns, 'lon', 'ddmmmm'),
-            'lat_m': self._find_coord_column(columns, 'lat', 'ddmmmm')
-        }
+        tfm.dfs[grp] = df[(df['LAT'].notna()) & (df['LON'].notna()) & (df['LAT'] != 0) & (df['LON'] != 0)]
 
-    def _find_coord_column(self, columns, coord_type, coord_format) -> str:
-        pattern = re.compile(f'{coord_type}.*{coord_format}', re.IGNORECASE)
-        matching_columns = [col for col in columns if pattern.search(col)]
-        return matching_columns[0] if matching_columns else None
-
-    def _safe_convert(self, value) -> str:
-        if pd.isna(value): return value
-        try:
-            return self.fn_convert_cor(value)
-        except Exception as e:
-            print(f"Error converting value {value}: {e}")
-            return value
 
 # %% ../../nbs/handlers/helcom.ipynb #8c293bb1
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
@@ -421,25 +397,28 @@ def encode(
     dfs = load_data(src_dir)
     tfm = Transformer(dfs, cbs=[
                             LowerStripNameCB(col_src='nuclide', col_dst='NUCLIDE'),
-                            RemapCB(lut=lut_nuclides, col_remap='NUCLIDE', col_src='NUCLIDE'),
+                            RemapCB(lut=nuclide_lut, col_remap='NUCLIDE', col_src='NUCLIDE'),
                             ParseTimeCB(),
                             EncodeTimeCB(),
-                            SplitSedimentValuesCB(coi_sediment),
-                            SanitizeValueCB(coi_val),       
+                            MeltSedimentValuesCB(coi_sediment),
+                            SanitizeValueCB(coi_val),
                             NormalizeUncCB(),
                             RemapUnitCB(),
-                            RemapDetectionLimitCB(coi_dl),                           
-                            RemapCB(fn_lut=lut_biota, col_remap='SPECIES', col_src='rubin', dest_grps='BIOTA'),
-                            RemapCB(fn_lut=lut_tissues, col_remap='BODY_PART', col_src='tissue', dest_grps='BIOTA'),
-                            RemapCB(fn_lut=lut_biogroup_from_biota, col_remap='BIO_GROUP', col_src='SPECIES', dest_grps='BIOTA'),
-                            RemapSedimentCB(fn_lut=lut_sediments, replace_lut=sed_replace_lut),
-                            RemapFiltCB(lut_filtered),
+                            RemapDetectionLimitCB(coi_dl),
+                            RemapCB(lut=species_lut, col_remap='SPECIES', col_src='rubin', grps=['BIOTA']),
+                            RemapCB(lut=lut_tissues, col_remap='BODY_PART', col_src='tissue', grps=['BIOTA']),
+                            RemapCB(lut=lut_biogroup, col_remap='BIO_GROUP', col_src='SPECIES', grps=['BIOTA']),
+                            CleanSedimentCodesCB(replace_lut=sed_replace_lut),
+                            RemapCB(lut=sediment_lut, col_remap='SED_TYPE', col_src='sedi', grps=['SEDIMENT']),
+                            RemapCB(lut=lut_filtered, col_remap='FILT', col_src='filt', grps=['SEAWATER']),
                             AddSampleIDCB(),
                             AddDepthCB(),
                             AddSalinityCB(),
                             AddTemperatureCB(),
                             RemapSedSliceTopBottomCB(),
-                            LookupDryWetPercentWeightCB(),
+                            CleanBasisCB(),
+                            PercentWeightCB(),
+                            WeightCB(),
                             ParseCoordinatesCB(ddmm_to_dd),
                             SanitizeLonLatCB(),
                             AddStationCB()

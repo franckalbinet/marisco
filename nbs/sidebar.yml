@@ -22,7 +22,7 @@ website:
           - api/netcdf2csv.ipynb
       - section: "How-to guides"
         contents:
-          - how-to/mifa-pattern.ipynb
+          - how-to/reconcile-nomenclature.ipynb
           - how-to/writing-a-handler.ipynb
       - section: "Data Reference"
         contents:

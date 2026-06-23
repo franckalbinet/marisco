@@ -292,15 +292,16 @@ class ParseTimeCB(PerGroupCB):
 class EncodeTimeCB(PerGroupCB):
     "Encode time as seconds since epoch."    
     def __init__(self, 
-                 col_time: str='TIME',
-                 fn_units: Callable=get_time_units # Function returning the time units
+                   col_time: str='TIME',  # Time column name
+                   verbose: bool=False,  # Print warning about missing time values
+                   fn_units: Callable=get_time_units # Function returning the time units
                  ): 
         store_attr()
         self.units = fn_units()
 
-    def each_grp(self, grp, df, tfm):
+    def each_grp(self, grp: str, df: pd.DataFrame, tfm):
         n_missing = df[self.col_time].isna().sum()
-        if n_missing: print(f"Warning: {n_missing} missing time value(s) in {grp}")
+        if self.verbose and n_missing: print(f"Warning: {n_missing} missing time value(s) in {grp}")
         tfm.dfs[grp] = df[df[self.col_time].notna()]
         tfm.dfs[grp][self.col_time] = tfm.dfs[grp][self.col_time].apply(lambda x: date2num(x, units=self.units))
 

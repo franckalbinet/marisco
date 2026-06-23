@@ -5,8 +5,8 @@
 
 The [IAEA **M**arine **R**adioactivity **I**nformation **S**ystem
 (MARIS)](https://maris.iaea.org) provides open access to radioactivity
-measurements in marine environments — seawater, biota, sediment, and
-suspended matter — collected by national laboratories, monitoring
+measurements in marine environments (seawater, biota, sediment, and
+suspended matter) collected by national laboratories, monitoring
 programmes, and research institutions worldwide. Developed by the [IAEA
 Marine Environmental
 Laboratories](https://www.iaea.org/about/organizational-structure/department-of-nuclear-sciences-and-applications/division-of-iaea-environment-laboratories)
@@ -20,7 +20,7 @@ for ingestion into the MARIS database.
 
 ## Transparency by design
 
-Each dataset is processed by a dedicated *handler* — a Jupyter notebook
+Each dataset is processed by a dedicated *handler*, a Jupyter notebook
 that documents every curation decision alongside the code that
 implements it. Unit conversions, nuclide nomenclature mapping,
 coordinate standardisation, outlier flags: every choice is visible,
@@ -29,7 +29,7 @@ traceable, and auditable.
 Handlers are shared with data providers as a working document. If a
 conversion looks wrong, a mapping is missing, or terminology differs
 from your internal standards, the notebook is where we discuss and
-resolve it — not buried in email threads or internal comments.
+resolve it; not buried in email threads or internal comments.
 
 For a concrete example, see the [GEOTRACES
 handler](https://fr.anckalbi.net/marisco/handlers/geotraces.html).
@@ -55,7 +55,7 @@ pip install marisco
 
 Two environment variables may be required depending on the dataset:
 
-- **`ZOTERO_API_KEY`** — used to fetch bibliographic metadata from the
+- **`ZOTERO_API_KEY`**: used to fetch bibliographic metadata from the
   [MARIS Zotero
   library](https://www.zotero.org/groups/2432820/maris/library). Contact
   [MARIS Administrators](https://maris.iaea.org/home) to obtain your
@@ -65,7 +65,7 @@ Two environment variables may be required depending on the dataset:
   export ZOTERO_API_KEY=your_api_key_here
   ```
 
-- **INIS** — bibliographic metadata is being progressively migrated from
+- **INIS**: bibliographic metadata is being progressively migrated from
   Zotero to the [IAEA INIS
   database](https://www.iaea.org/resources/databases/inis). The
   [`INISClient`](https://franckalbinet.github.io/marisco/api/metadata.html#inisclient)

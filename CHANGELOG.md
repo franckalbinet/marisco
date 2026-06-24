@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.1] - 2026-06-24
+
+### Changed
+- Improved "Write a new handler" how-to: getting-started guidance and column naming conventions
+- Fixed missing/mistyped nbdev directives
+- Removed leftover code and stale documentation
+- General README and how-to refinements
+
 ## [1.4.0] - 2026-06-23
 
   ### Added

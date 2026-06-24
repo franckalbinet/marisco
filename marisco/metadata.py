@@ -56,8 +56,8 @@ class GlobAttrsFeeder:
 class BboxCB(Callback):
     "Compute dataset geographical bounding box"
     def __call__(self, obj):
-        bbox = get_bbox(pd.concat(obj.dfs))     
-        lon_min, lon_max, lat_min, lat_max = [str(bound) for bound in bbox.bounds]
+        bbox = get_bbox(pd.concat(obj.dfs))
+        lon_min, lat_min, lon_max, lat_max = [str(bound) for bound in bbox.bounds]
         obj.attrs.update({
             'geospatial_lat_min': lat_min, 
             'geospatial_lat_max': lat_max,
@@ -81,7 +81,7 @@ class DepthRangeCB(Callback):
 
 # %% ../nbs/api/metadata.ipynb #d12b933c
 class TimeRangeCB(Callback):
-    "Compute time coverage start and end dates"
+    "Decode the min/max of the NetCDF-encoded TIME column into ISO date strings for global attributes"
     def __init__(self, 
                  time_col: str='TIME',         # Column name for time values
                  fn_time_unit: Callable=get_time_units  # Function returning the NetCDF time unit string

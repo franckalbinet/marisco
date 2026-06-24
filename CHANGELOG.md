@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.4.2] - 2026-06-24
+
+### Fixed
+- `BboxCB`: correct Shapely `bounds` unpacking order (`lon_min, lat_min, lon_max, lat_max`); previously `lat_min`/`lon_max` were swapped, producing wrong bounding-box attributes in generated NetCDF files (reported by @tabascojijii in PR #42)
+
 ## [1.4.1] - 2026-06-24
 
 ### Changed

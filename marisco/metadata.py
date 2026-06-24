@@ -57,7 +57,7 @@ class BboxCB(Callback):
     "Compute dataset geographical bounding box"
     def __call__(self, obj):
         bbox = get_bbox(pd.concat(obj.dfs))     
-        lon_min, lon_max, lat_min, lat_max = [str(bound) for bound in bbox.bounds]
+        lon_min, lat_min, lon_max, lat_max = [str(bound) for bound in bbox.bounds]
         obj.attrs.update({
             'geospatial_lat_min': lat_min, 
             'geospatial_lat_max': lat_max,

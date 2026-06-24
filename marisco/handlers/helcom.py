@@ -4,13 +4,13 @@
 
 # %% auto #0
 __all__ = ['src_dir', 'fname_out', 'zotero_key', 'default_smp_types', 'fixes_nuclide_names', 'nuclide_lut', 'coi_sediment',
-           'coi_val', 'lut_units', 'coi_dl', 'provider_lut_species', 'fixes_species', 'species_lut',
+           'coi_val', 'coi_units_unc', 'lut_units', 'coi_dl', 'provider_lut_species', 'fixes_species', 'species_lut',
            'provider_lut_tissues', 'fixes_biota_tissues', 'lut_tissues', 'lut_biogroup', 'provider_lut_sed',
            'fixes_sediments', 'sed_replace_lut', 'sediment_lut', 'lut_filtered', 'basis_fix', 'kw', 'load_data',
-           'ParseTimeCB', 'MeltSedimentValuesCB', 'SanitizeValueCB', 'RemapUnitCB', 'RemapDetectionLimitCB',
-           'CleanSedimentCodesCB', 'AddSampleIDCB', 'AddDepthCB', 'AddSalinityCB', 'AddStationCB', 'AddTemperatureCB',
-           'RemapSedSliceTopBottomCB', 'CleanBasisCB', 'PercentWeightCB', 'WeightCB', 'ParseCoordinatesCB', 'get_attrs',
-           'encode']
+           'ParseTimeCB', 'MeltSedimentValuesCB', 'SanitizeValueCB', 'NormalizeUncCB', 'RemapUnitCB',
+           'RemapDetectionLimitCB', 'CleanSedimentCodesCB', 'AddSampleIDCB', 'AddDepthCB', 'AddSalinityCB',
+           'AddStationCB', 'AddTemperatureCB', 'RemapSedSliceTopBottomCB', 'CleanBasisCB', 'PercentWeightCB',
+           'WeightCB', 'ParseCoordinatesCB', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb #3a8d979f
 from fastcore.all import *
@@ -140,6 +140,26 @@ class SanitizeValueCB(PerGroupCB):
         value_col = self.coi[grp]['VALUE']
         tfm.dfs[grp] = df.dropna(subset=[value_col])
         tfm.dfs[grp]['VALUE'] = tfm.dfs[grp][value_col]
+
+# %% ../../nbs/handlers/helcom.ipynb #c31d06a6
+coi_units_unc = {
+    'SEAWATER': ('VALUE', 'error%_m³'),
+    'BIOTA':    ('VALUE', 'error%'),
+    'SEDIMENT': ('VALUE', '_UNC'),
+}
+
+# %% ../../nbs/handlers/helcom.ipynb #9b18c837
+class NormalizeUncCB(PerGroupCB):
+    "Convert relative uncertainty (percent) to absolute (standard) uncertainty per group."
+    def __init__(self,
+                 coi: dict=coi_units_unc,  # {group: (meas_col, unc_col)}
+                ):
+        store_attr()
+
+    def each_grp(self, grp, df, tfm):
+        if grp not in self.coi: return
+        meas_col, unc_col = self.coi[grp]
+        df['UNC'] = df[unc_col] * df[meas_col] / 100
 
 # %% ../../nbs/handlers/helcom.ipynb #ac61a993
 lut_units = {

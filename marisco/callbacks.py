@@ -18,8 +18,8 @@ from .configs import get_lut, get_time_units, NC_GROUPS, SMP_TYPE_LUT
 
 # %% auto #0
 __all__ = ['Callback', 'PerGroupCB', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB',
-           'AddSampleTypeIdColumnCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'CompareDfsAndTfmCB', 'UniqueIndexCB',
-           'ParseTimeCB', 'EncodeTimeCB', 'DecodeTimeCB']
+           'AddSampleTypeIdColumnCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'MeltWideNuclidesCB', 'AddSampleIDCB',
+           'CompareDfsAndTfmCB', 'UniqueIndexCB', 'ParseTimeCB', 'EncodeTimeCB', 'DecodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb #4e58c73c
 class Callback(): 
@@ -207,6 +207,44 @@ class RemoveAllNAValuesCB(Callback):
                 how=self.how,
                 inplace=True
             )
+
+# %% ../nbs/api/callbacks.ipynb #d7982397
+class MeltWideNuclidesCB(Callback):
+    "Reshape wide nuclide columns to long format using a named-dict spec."
+    def __init__(self,
+                 spec: list,           # List of dicts with keys: val, unc, nuclide, unit, lab
+                 grp:  str='SEAWATER', # Group in tfm.dfs to reshape
+                 ):
+        store_attr()
+
+    def __call__(self, tfm):
+        if self.grp not in tfm.dfs: return
+        df = tfm.dfs[self.grp]
+        frames = []
+        for s in self.spec:
+            sub = df.dropna(subset=[s['val']]).copy()
+            sub['NUCLIDE'] = s['nuclide']
+            sub['VALUE']   = sub[s['val']]
+            sub['UNC']     = sub[s['unc']]
+            sub['UNIT']    = s['unit']
+            sub['LAB']     = s['lab']
+            frames.append(sub)
+        if frames:
+            tfm.dfs[self.grp] = pd.concat(frames, ignore_index=True)
+
+# %% ../nbs/api/callbacks.ipynb #7bb09e18
+class AddSampleIDCB(PerGroupCB):
+    "Assign 1-based sequential SMP_ID; optionally cast a provider ID column to str for NetCDF VLEN compatibility."
+    def __init__(self,
+                 col_provider: str=None,  # Provider ID column to cast to str; None = skip
+                 ):
+        store_attr()
+
+    def each_grp(self, grp, df, tfm):
+        tfm.dfs[grp] = df.reset_index(drop=True)
+        tfm.dfs[grp]['SMP_ID'] = tfm.dfs[grp].index + 1
+        if self.col_provider and self.col_provider in tfm.dfs[grp].columns:
+            tfm.dfs[grp][self.col_provider] = tfm.dfs[grp][self.col_provider].astype(str)
 
 # %% ../nbs/api/callbacks.ipynb #8cf07327
 class CompareDfsAndTfmCB(Callback):

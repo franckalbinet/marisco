@@ -40,7 +40,7 @@ handler](https://fr.anckalbi.net/marisco/handlers/geotraces.html).
 |----|----|----|----|
 | [HELCOM](https://fr.anckalbi.net/marisco/handlers/helcom.html) | Baltic Sea marine environment monitoring | [HELCOM](https://helcom.fi/about-us) | ✅ Active |
 | [GEOTRACES](https://fr.anckalbi.net/marisco/handlers/geotraces.html) | BODC GEOTRACES oceanographic radionuclide data | [GEOTRACES IDP2021](https://www.geotraces.org/geotraces-intermediate-data-product-2021/) | ✅ Active |
-| [MARIS Legacy](https://fr.anckalbi.net/marisco/handlers/maris_legacy.html) | Historical MARIS datasets from the master database | — | ⚠️ Migrating |
+| [MARIS Legacy](https://fr.anckalbi.net/marisco/handlers/maris_legacy.html) | Historical MARIS datasets from the master database | — | ✅ Active |
 | [OSPAR](https://fr.anckalbi.net/marisco/handlers/ospar.html) | NE Atlantic marine environment datasets | [ODIMS OSPAR](https://odims.ospar.org/en/) | ⚠️ Migrating |
 | [TEPCO](https://fr.anckalbi.net/marisco/handlers/tepco.html) | TEPCO Fukushima Daiichi monitoring data | [TEPCO Monitoring](https://radioactivity.nsr.go.jp/ja/list/349/list-1.html) | ⚠️ Migrating |
 

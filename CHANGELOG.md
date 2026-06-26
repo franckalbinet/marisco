@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.3] - 2026-06-26
+
+### Added
+- `DataLoader`: loads the MARIS global dump CSV, filters by `ref_id`, and returns one DataFrame per sample type (`BIOTA`, `SEAWATER`, `SEDIMENT`, `SUSPENDED_MATTER`)
+- `CastStationToStringCB`: coerces the `STATION` column to VLEN string and fills missing values with empty string
+- `DropNAColumnsCB`: removes columns that are entirely `NaN` or all-zero (MARIS "Not Available" sentinel)
+- `AddSampleIDCB`: casts `SMP_ID` to `int` and `SMP_ID_PROVIDER` to variable-length string
+
+### Changed
+- `maris_legacy` handler fully migrated to the current callback API (`RenameColumnsCB`, `RemapCB`, `PerGroupCB`, `SanitizeLonLatCB`, `ParseTimeCB`, `EncodeTimeCB`)
+- Handler notebook restructured as a step-by-step documentation guide (column selection → type casting → NA dropping → DL remapping → time encoding → coordinate sanitization → NetCDF encoding)
+- MARIS Legacy handler status updated to ✅ Active in README
+
 ## [1.4.2] - 2026-06-24
 
 ### Fixed

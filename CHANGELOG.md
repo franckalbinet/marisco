@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0] - 2026-06-29
+
+### Added
+- `jois` handler: ingests four years (2021–2024) of JOIS seawater radionuclide measurements (I-129, U-236, U-238, U-236/U-238) from the Beaufort Sea (CCGS Louis St. Laurent expeditions)
+  - `load_data`: fetches ZIP archives from Zenodo, normalises column names, applies scale factors, and concatenates all years into a single `SEAWATER` DataFrame
+  - `norm_cols` / `extract_scales` / `apply_scales`: scale-factor helpers handling inconsistent `( x 10^N)` suffixes across years
+  - `RenameNucColsCB`: aligns `U238_ppb` and `U236_U238` column names to `{Nuclide}_{Unit}` pattern before melting
+  - `RenameColsCB`: maps provider CTD columns to MARIS standard names (`LAT`, `LON`, `SMP_DEPTH`, `TEMP`, `SAL`, etc.)
+  - `ParseDateTimeCB`: combines separate `Date` and `Time` columns into a single `TIME` column
+  - `MeltJOISCB`: reshapes wide nuclide columns to long format with `NUCLIDE`, `UNIT`, `VALUE`, `UNC`
+  - `ConvertU238CB`: converts U-238 from ppb to atoms/kg using Avogadro's number and U-238 molar mass
+  - `encode`: full pipeline entry point writing standardised data to NetCDF4
+
 ## [1.4.3] - 2026-06-26
 
 ### Added

@@ -244,7 +244,7 @@ class AddSampleIDCB(PerGroupCB):
         tfm.dfs[grp] = df.reset_index(drop=True)
         tfm.dfs[grp]['SMP_ID'] = tfm.dfs[grp].index + 1
         if self.col_provider and self.col_provider in tfm.dfs[grp].columns:
-            tfm.dfs[grp][self.col_provider] = tfm.dfs[grp][self.col_provider].astype(str)
+            tfm.dfs[grp][self.col_provider] = tfm.dfs[grp][self.col_provider].astype(str).astype(object)
 
 # %% ../nbs/api/callbacks.ipynb #8cf07327
 class CompareDfsAndTfmCB(Callback):

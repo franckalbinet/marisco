@@ -200,10 +200,12 @@ class AddZoteroArchiveLocationCB(Callback):
         fc.store_attr()
 
     def __call__(self, tfm):
-        zotero_key = self.attrs['id']
-        item = ZoteroItem(zotero_key, ZOTERO_LIB_ID, os.getenv('ZOTERO_API_KEY'))
+        zotero_key = self.attrs.get('id')
+        if zotero_key is None:
+            return
+        item = ZoteroClient(zotero_key, ZOTERO_LIB_ID, os.getenv('ZOTERO_API_KEY'))
         if item.exist():
-            loc_in_archive = item.item['data']['archiveLocation'] 
+            loc_in_archive = item.item['data']['archiveLocation']
             for grp, df in tfm.dfs.items():
                 df['REF_ID'] = int(loc_in_archive)
         else:

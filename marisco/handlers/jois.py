@@ -18,6 +18,7 @@ from ..callbacks import (PerGroupCB, Callback, Transformer, EncodeTimeCB,
                                 SanitizeLonLatCB, RemapCB, AddSampleIDCB)
 from ..metadata import GlobAttrsFeeder, ZoteroCB, BboxCB, DepthRangeCB, TimeRangeCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder
+from ..netcdf2csv import decode
 
 # %% ../../nbs/handlers/jois.ipynb #585e1b91
 RECORDS = {

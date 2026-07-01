@@ -420,6 +420,7 @@ def encode(
     ) -> None:
     "Encode data to NetCDF."
     dfs = load_data(src_dir)
+    dfs = {k: v.sample(10, random_state=42) for k, v in dfs.items()}
     tfm = Transformer(dfs, cbs=[
                             LowerStripNameCB(col_src='nuclide', col_dst='NUCLIDE'),
                             RemapCB(lut=nuclide_lut, col_remap='NUCLIDE', col_src='NUCLIDE'),

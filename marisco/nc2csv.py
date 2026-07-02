@@ -13,7 +13,6 @@ from pathlib import Path
 from netCDF4 import Dataset
 import pandas as pd
 from .configs import CSV_VARS, CSV_DTYPES, get_lut, get_time_units, lut_fname, lut_path, SMP_TYPE_LUT, NC_VARS
-from .utils import ExtractNetcdfContents
 from cftime import num2date
 
 # %% ../nbs/api/nc2csv.ipynb #c20e593d
@@ -138,7 +137,8 @@ def to_csv(
     ref_id:int=None        # Reference ID to add as REF_ID column
 ):
     "Convert MARIS standard NetCDF file to import-ready CSV files."
-    decode_time(read_nc_groups(fname_in))
+    dfs = keep_csv_cols(read_nc_grps(fname_in))
+    decode_time(dfs)
     add_sample_type(dfs)
     add_ref_id(dfs, ref_id)
     add_taxon_info(dfs)

@@ -21,14 +21,13 @@ import re
 from ..configs import NA, NC_DTYPES, get_lut, lut_path, cache_path
 from ..match import uniq_across_dfs, lut_from, fuzzy_merge, fix_lut, make_lut, make_lut_from
 from ..geo import ddmm_to_dd
-from ..utils import ExtractNetcdfContents
 from ..callbacks import (
     Callback, PerGroupCB, Transformer,
     EncodeTimeCB, LowerStripNameCB, SanitizeLonLatCB,
     CompareDfsAndTfmCB, RemapCB)
 from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder
-from ..netcdf2csv import decode
+from ..nc2csv import to_csv
 
 import warnings
 warnings.filterwarnings('ignore')

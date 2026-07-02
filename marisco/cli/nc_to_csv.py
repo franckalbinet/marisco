@@ -6,7 +6,7 @@ __all__ = ['main']
 # %% ../../nbs/cli/nc_to_csv.ipynb #3f92bc7b
 from fastcore.script import *
 from pathlib import Path
-from ..netcdf2csv import decode
+#from marisco.netcdf2csv import decode
 
 # %% ../../nbs/cli/nc_to_csv.ipynb #d618aa0d
 @call_parse
@@ -16,4 +16,4 @@ def main(
 ) -> None:
     "Converts NetCDF files into CSV files that follow the MARIS Standard format."
     print(f'Decoding: {Path(src).name} ...')
-    decode(fname_in=src, dest_out=dest, verbose=True)
+    #decode(fname_in=src, dest_out=dest, verbose=True)

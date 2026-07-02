@@ -1,0 +1,2845 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Field Definitions – marisco</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-2593923cf60a9aa2fc04e718582542c7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="Field Definitions – marisco">
+<meta property="og:description" content="MARIS companion package and tutorials">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="Field Definitions – marisco">
+<meta name="twitter:description" content="MARIS companion package and tutorials">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/franckalbinet/marisco"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/guide.html">Data Reference</a></li><li class="breadcrumb-item"><a href="../reference/field-definition.html">Field Definitions</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARISCO</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">How-to</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/writing-a-handler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Write a new handler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/reconcile-nomenclature.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reconcile nomenclatures</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Data Reference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Data Guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/field-definition.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Field Definitions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/sample-id-coverage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sample ID Coverage</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/geotraces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geotraces</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/maris_legacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Legacy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/jois.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint Ocean Ice Study</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/ospar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OSPAR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/tepco.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TEPCO</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/encoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Encoders</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/geo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc2csv.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NetCDF to CSV</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#summary-table" id="toc-summary-table" class="nav-link active" data-scroll-target="#summary-table">Summary table</a></li>
+  <li><a href="#field-descriptions" id="toc-field-descriptions" class="nav-link" data-scroll-target="#field-descriptions">Field descriptions</a></li>
+  <li><a href="#sample-quality" id="toc-sample-quality" class="nav-link" data-scroll-target="#sample-quality">Sample Quality</a></li>
+  <li><a href="#sample-type" id="toc-sample-type" class="nav-link" data-scroll-target="#sample-type">Sample Type</a></li>
+  <li><a href="#laboratory" id="toc-laboratory" class="nav-link" data-scroll-target="#laboratory">Laboratory</a></li>
+  <li><a href="#latitude" id="toc-latitude" class="nav-link" data-scroll-target="#latitude">Latitude</a></li>
+  <li><a href="#longitude" id="toc-longitude" class="nav-link" data-scroll-target="#longitude">Longitude</a></li>
+  <li><a href="#station" id="toc-station" class="nav-link" data-scroll-target="#station">Station</a></li>
+  <li><a href="#sample-id" id="toc-sample-id" class="nav-link" data-scroll-target="#sample-id">Sample ID</a></li>
+  <li><a href="#profile-id" id="toc-profile-id" class="nav-link" data-scroll-target="#profile-id">Profile ID</a></li>
+  <li><a href="#transect-id" id="toc-transect-id" class="nav-link" data-scroll-target="#transect-id">Transect ID</a></li>
+  <li><a href="#sampling-depth" id="toc-sampling-depth" class="nav-link" data-scroll-target="#sampling-depth">Sampling Depth</a></li>
+  <li><a href="#total-depth" id="toc-total-depth" class="nav-link" data-scroll-target="#total-depth">Total Depth</a></li>
+  <li><a href="#begin-period" id="toc-begin-period" class="nav-link" data-scroll-target="#begin-period">Begin Period</a></li>
+  <li><a href="#end-period" id="toc-end-period" class="nav-link" data-scroll-target="#end-period">End Period</a></li>
+  <li><a href="#nuclide" id="toc-nuclide" class="nav-link" data-scroll-target="#nuclide">Nuclide</a></li>
+  <li><a href="#detection-limit" id="toc-detection-limit" class="nav-link" data-scroll-target="#detection-limit">Detection Limit</a></li>
+  <li><a href="#activity" id="toc-activity" class="nav-link" data-scroll-target="#activity">Activity</a></li>
+  <li><a href="#uncertainty" id="toc-uncertainty" class="nav-link" data-scroll-target="#uncertainty">Uncertainty</a></li>
+  <li><a href="#unit" id="toc-unit" class="nav-link" data-scroll-target="#unit">Unit</a></li>
+  <li><a href="#variable-type" id="toc-variable-type" class="nav-link" data-scroll-target="#variable-type">Variable Type</a></li>
+  <li><a href="#frequency" id="toc-frequency" class="nav-link" data-scroll-target="#frequency">Frequency</a></li>
+  <li><a href="#range-low-detection" id="toc-range-low-detection" class="nav-link" data-scroll-target="#range-low-detection">Range Low Detection</a></li>
+  <li><a href="#range-low" id="toc-range-low" class="nav-link" data-scroll-target="#range-low">Range Low</a></li>
+  <li><a href="#range-upper" id="toc-range-upper" class="nav-link" data-scroll-target="#range-upper">Range Upper</a></li>
+  <li><a href="#species-biota" id="toc-species-biota" class="nav-link" data-scroll-target="#species-biota">Species (BIOTA)</a></li>
+  <li><a href="#biological-group-biota" id="toc-biological-group-biota" class="nav-link" data-scroll-target="#biological-group-biota">Biological Group (BIOTA)</a></li>
+  <li><a href="#taxon-name-biota" id="toc-taxon-name-biota" class="nav-link" data-scroll-target="#taxon-name-biota">Taxon Name (BIOTA)</a></li>
+  <li><a href="#taxon-reported-name-biota" id="toc-taxon-reported-name-biota" class="nav-link" data-scroll-target="#taxon-reported-name-biota">Taxon Reported Name (BIOTA)</a></li>
+  <li><a href="#common-name-biota" id="toc-common-name-biota" class="nav-link" data-scroll-target="#common-name-biota">Common Name (BIOTA)</a></li>
+  <li><a href="#taxon-rank-biota" id="toc-taxon-rank-biota" class="nav-link" data-scroll-target="#taxon-rank-biota">Taxon Rank (BIOTA)</a></li>
+  <li><a href="#taxon-database-biota" id="toc-taxon-database-biota" class="nav-link" data-scroll-target="#taxon-database-biota">Taxon Database (BIOTA)</a></li>
+  <li><a href="#taxon-database-id-biota" id="toc-taxon-database-id-biota" class="nav-link" data-scroll-target="#taxon-database-id-biota">Taxon Database ID (BIOTA)</a></li>
+  <li><a href="#taxon-database-url-biota" id="toc-taxon-database-url-biota" class="nav-link" data-scroll-target="#taxon-database-url-biota">Taxon Database URL (BIOTA)</a></li>
+  <li><a href="#body-part-biota" id="toc-body-part-biota" class="nav-link" data-scroll-target="#body-part-biota">Body Part (BIOTA)</a></li>
+  <li><a href="#slice-up-top-sediment" id="toc-slice-up-top-sediment" class="nav-link" data-scroll-target="#slice-up-top-sediment">Slice Up / Top (SEDIMENT)</a></li>
+  <li><a href="#slice-down-bottom-sediment" id="toc-slice-down-bottom-sediment" class="nav-link" data-scroll-target="#slice-down-bottom-sediment">Slice Down / Bottom (SEDIMENT)</a></li>
+  <li><a href="#sediment-type-sediment" id="toc-sediment-type-sediment" class="nav-link" data-scroll-target="#sediment-type-sediment">Sediment Type (SEDIMENT)</a></li>
+  <li><a href="#sediment-reported-name-sediment" id="toc-sediment-reported-name-sediment" class="nav-link" data-scroll-target="#sediment-reported-name-sediment">Sediment Reported Name (SEDIMENT)</a></li>
+  <li><a href="#volume" id="toc-volume" class="nav-link" data-scroll-target="#volume">Volume</a></li>
+  <li><a href="#salinity-seawater" id="toc-salinity-seawater" class="nav-link" data-scroll-target="#salinity-seawater">Salinity (SEAWATER)</a></li>
+  <li><a href="#temperature-seawater" id="toc-temperature-seawater" class="nav-link" data-scroll-target="#temperature-seawater">Temperature (SEAWATER)</a></li>
+  <li><a href="#filtered-seawater" id="toc-filtered-seawater" class="nav-link" data-scroll-target="#filtered-seawater">Filtered (SEAWATER)</a></li>
+  <li><a href="#filter-pore-size-seawater" id="toc-filter-pore-size-seawater" class="nav-link" data-scroll-target="#filter-pore-size-seawater">Filter Pore Size (SEAWATER)</a></li>
+  <li><a href="#acidified" id="toc-acidified" class="nav-link" data-scroll-target="#acidified">Acidified</a></li>
+  <li><a href="#oxygen-seawater" id="toc-oxygen-seawater" class="nav-link" data-scroll-target="#oxygen-seawater">Oxygen (SEAWATER)</a></li>
+  <li><a href="#sample-area-sediment" id="toc-sample-area-sediment" class="nav-link" data-scroll-target="#sample-area-sediment">Sample Area (SEDIMENT)</a></li>
+  <li><a href="#dry-weight-biota" id="toc-dry-weight-biota" class="nav-link" data-scroll-target="#dry-weight-biota">Dry Weight (BIOTA)</a></li>
+  <li><a href="#wet-weight-biota" id="toc-wet-weight-biota" class="nav-link" data-scroll-target="#wet-weight-biota">Wet Weight (BIOTA)</a></li>
+  <li><a href="#percent-weight-biota" id="toc-percent-weight-biota" class="nav-link" data-scroll-target="#percent-weight-biota">Percent Weight (BIOTA)</a></li>
+  <li><a href="#sampling-method" id="toc-sampling-method" class="nav-link" data-scroll-target="#sampling-method">Sampling Method</a></li>
+  <li><a href="#drying-method" id="toc-drying-method" class="nav-link" data-scroll-target="#drying-method">Drying Method</a></li>
+  <li><a href="#preparation-method" id="toc-preparation-method" class="nav-link" data-scroll-target="#preparation-method">Preparation Method</a></li>
+  <li><a href="#counting-method" id="toc-counting-method" class="nav-link" data-scroll-target="#counting-method">Counting Method</a></li>
+  <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference</a></li>
+  <li><a href="#reference-note" id="toc-reference-note" class="nav-link" data-scroll-target="#reference-note">Reference Note</a></li>
+  <li><a href="#sample-note" id="toc-sample-note" class="nav-link" data-scroll-target="#sample-note">Sample Note</a></li>
+  <li><a href="#measurement-note" id="toc-measurement-note" class="nav-link" data-scroll-target="#measurement-note">Measurement Note</a></li>
+  <li><a href="#good-for-export" id="toc-good-for-export" class="nav-link" data-scroll-target="#good-for-export">Good for Export</a></li>
+  <li><a href="#area" id="toc-area" class="nav-link" data-scroll-target="#area">Area</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/guide.html">Data Reference</a></li><li class="breadcrumb-item"><a href="../reference/field-definition.html">Field Definitions</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Field Definitions</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>MARIS data is distributed as <strong>NetCDF4</strong> files (primary format) and <strong>CSV</strong> files for database import. This reference lists all standard field definitions with their NetCDF variable names and CSV variable names. Fields marked <code>—</code> are not present in that format.</p>
+<p>The <strong>MARISCO column</strong> is the uppercase internal name used within the marisco curation pipeline.</p>
+<section id="summary-table" class="level2">
+<h2 class="anchored" data-anchor-id="summary-table">Summary table</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>MARISCO column</th>
+<th>NetCDF variable</th>
+<th>CSV variable</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sample quality</td>
+<td>—</td>
+<td>—</td>
+<td><code>sampquality</code></td>
+</tr>
+<tr class="even">
+<td>Sample type</td>
+<td><code>SAMPLE_TYPE</code></td>
+<td><em>(group name)</em></td>
+<td><code>samptype_id</code></td>
+</tr>
+<tr class="odd">
+<td>Laboratory</td>
+<td><code>LAB</code></td>
+<td><code>lab</code></td>
+<td><code>lab_id</code></td>
+</tr>
+<tr class="even">
+<td>Latitude</td>
+<td><code>LAT</code></td>
+<td><code>lat</code></td>
+<td><code>latitude</code></td>
+</tr>
+<tr class="odd">
+<td>Longitude</td>
+<td><code>LON</code></td>
+<td><code>lon</code></td>
+<td><code>longitude</code></td>
+</tr>
+<tr class="even">
+<td>Station</td>
+<td><code>STATION</code></td>
+<td><code>station</code></td>
+<td><code>station</code></td>
+</tr>
+<tr class="odd">
+<td>Sample ID</td>
+<td><code>SMP_ID</code></td>
+<td><code>smp_id</code></td>
+<td><code>samplabcode</code></td>
+</tr>
+<tr class="even">
+<td>Profile ID</td>
+<td><code>PROFILE_ID</code></td>
+<td>—</td>
+<td><code>profile_id</code></td>
+</tr>
+<tr class="odd">
+<td>Transect ID</td>
+<td>—</td>
+<td>—</td>
+<td><code>transect_id</code></td>
+</tr>
+<tr class="even">
+<td>Sampling depth</td>
+<td><code>SMP_DEPTH</code></td>
+<td><code>smp_depth</code></td>
+<td><code>sampdepth</code></td>
+</tr>
+<tr class="odd">
+<td>Total depth</td>
+<td><code>TOT_DEPTH</code></td>
+<td><code>tot_depth</code></td>
+<td><code>totdepth</code></td>
+</tr>
+<tr class="even">
+<td>Begin period</td>
+<td><code>TIME</code></td>
+<td><code>time</code></td>
+<td><code>begperiod</code></td>
+</tr>
+<tr class="odd">
+<td>End period</td>
+<td>—</td>
+<td>—</td>
+<td><code>endperiod</code></td>
+</tr>
+<tr class="even">
+<td>Nuclide</td>
+<td><code>NUCLIDE</code></td>
+<td><code>nuclide</code></td>
+<td><code>nuclide_id</code></td>
+</tr>
+<tr class="odd">
+<td>Detection limit</td>
+<td><code>DL</code></td>
+<td><code>dl</code></td>
+<td><code>detection</code></td>
+</tr>
+<tr class="even">
+<td>Activity</td>
+<td><code>VALUE</code></td>
+<td><code>value</code></td>
+<td><code>activity</code></td>
+</tr>
+<tr class="odd">
+<td>Uncertainty</td>
+<td><code>UNC</code></td>
+<td><code>unc</code></td>
+<td><code>uncertaint</code></td>
+</tr>
+<tr class="even">
+<td>Unit</td>
+<td><code>UNIT</code></td>
+<td><code>unit</code></td>
+<td><code>unit_id</code></td>
+</tr>
+<tr class="odd">
+<td>Variable type</td>
+<td>—</td>
+<td>—</td>
+<td><code>vartype</code></td>
+</tr>
+<tr class="even">
+<td>Frequency</td>
+<td>—</td>
+<td>—</td>
+<td><code>freq</code></td>
+</tr>
+<tr class="odd">
+<td>Range low detection</td>
+<td>—</td>
+<td>—</td>
+<td><code>rl_detection</code></td>
+</tr>
+<tr class="even">
+<td>Range low</td>
+<td>—</td>
+<td>—</td>
+<td><code>rangelow</code></td>
+</tr>
+<tr class="odd">
+<td>Range upper</td>
+<td>—</td>
+<td>—</td>
+<td><code>rangeupp</code></td>
+</tr>
+<tr class="even">
+<td>Species</td>
+<td><code>SPECIES</code></td>
+<td><code>species</code></td>
+<td><code>species_id</code></td>
+</tr>
+<tr class="odd">
+<td>Biological group</td>
+<td><code>BIO_GROUP</code></td>
+<td><code>bio_group</code></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Taxon name</td>
+<td><code>TAXONNAME</code></td>
+<td>—</td>
+<td><code>Taxonname</code></td>
+</tr>
+<tr class="odd">
+<td>Taxon reported name</td>
+<td><code>TAXONREPNAME</code></td>
+<td>—</td>
+<td><code>TaxonRepName</code></td>
+</tr>
+<tr class="even">
+<td>Common name</td>
+<td>—</td>
+<td>—</td>
+<td><code>Commonname</code></td>
+</tr>
+<tr class="odd">
+<td>Taxon rank</td>
+<td><code>TAXONRANK</code></td>
+<td>—</td>
+<td><code>Taxonrank</code></td>
+</tr>
+<tr class="even">
+<td>Taxon database</td>
+<td><code>TAXONDB</code></td>
+<td>—</td>
+<td><code>TaxonDB</code></td>
+</tr>
+<tr class="odd">
+<td>Taxon database ID</td>
+<td><code>TAXONDBID</code></td>
+<td>—</td>
+<td><code>TaxonDBID</code></td>
+</tr>
+<tr class="even">
+<td>Taxon database URL</td>
+<td><code>TAXONDBURL</code></td>
+<td>—</td>
+<td><code>TaxonDBURL</code></td>
+</tr>
+<tr class="odd">
+<td>Body part</td>
+<td><code>BODY_PART</code></td>
+<td><code>body_part</code></td>
+<td><code>bodypar_id</code></td>
+</tr>
+<tr class="even">
+<td>Slice up (top)</td>
+<td><code>TOP</code></td>
+<td><code>top</code></td>
+<td><code>sliceup</code></td>
+</tr>
+<tr class="odd">
+<td>Slice down (bottom)</td>
+<td><code>BOTTOM</code></td>
+<td><code>bottom</code></td>
+<td><code>slicedown</code></td>
+</tr>
+<tr class="even">
+<td>Sediment type</td>
+<td><code>SED_TYPE</code></td>
+<td><code>sed_type</code></td>
+<td><code>sedtype_id</code></td>
+</tr>
+<tr class="odd">
+<td>Sediment reported name</td>
+<td>—</td>
+<td>—</td>
+<td><code>SedRepName</code></td>
+</tr>
+<tr class="even">
+<td>Volume</td>
+<td>—</td>
+<td>—</td>
+<td><code>volume</code></td>
+</tr>
+<tr class="odd">
+<td>Salinity</td>
+<td><code>SALINITY</code></td>
+<td><code>salinity</code></td>
+<td><code>salinity</code></td>
+</tr>
+<tr class="even">
+<td>Temperature</td>
+<td><code>TEMP</code></td>
+<td><code>temperature</code></td>
+<td><code>temperatur</code></td>
+</tr>
+<tr class="odd">
+<td>Filtered</td>
+<td><code>FILT</code></td>
+<td><code>filt</code></td>
+<td><code>filtered</code></td>
+</tr>
+<tr class="even">
+<td>Filter pore size</td>
+<td>—</td>
+<td>—</td>
+<td><code>filtpore</code></td>
+</tr>
+<tr class="odd">
+<td>Acidified</td>
+<td>—</td>
+<td>—</td>
+<td><code>acid</code></td>
+</tr>
+<tr class="even">
+<td>Oxygen</td>
+<td>—</td>
+<td>—</td>
+<td><code>oxygen</code></td>
+</tr>
+<tr class="odd">
+<td>Sample area</td>
+<td>—</td>
+<td>—</td>
+<td><code>samparea</code></td>
+</tr>
+<tr class="even">
+<td>Dry weight</td>
+<td><code>DRYWT</code></td>
+<td><code>drywt</code></td>
+<td><code>drywt</code></td>
+</tr>
+<tr class="odd">
+<td>Wet weight</td>
+<td><code>WETWT</code></td>
+<td><code>wetwt</code></td>
+<td><code>wetwt</code></td>
+</tr>
+<tr class="even">
+<td>Percent weight</td>
+<td><code>PERCENTWT</code></td>
+<td>—</td>
+<td><code>percentwt</code></td>
+</tr>
+<tr class="odd">
+<td>Sampling method</td>
+<td><code>SAMP_MET</code></td>
+<td><code>samp_met</code></td>
+<td><code>sampmet_id</code></td>
+</tr>
+<tr class="even">
+<td>Drying method</td>
+<td>—</td>
+<td>—</td>
+<td><code>drymet_id</code></td>
+</tr>
+<tr class="odd">
+<td>Preparation method</td>
+<td><code>PREP_MET</code></td>
+<td><code>prep_met</code></td>
+<td><code>prepmet_id</code></td>
+</tr>
+<tr class="even">
+<td>Counting method</td>
+<td><code>COUNT_MET</code></td>
+<td><code>count_met</code></td>
+<td><code>counmet_id</code></td>
+</tr>
+<tr class="odd">
+<td>Reference</td>
+<td><code>REF_ID</code></td>
+<td>—</td>
+<td><code>ref_id</code></td>
+</tr>
+<tr class="even">
+<td>Reference note</td>
+<td>—</td>
+<td>—</td>
+<td><code>refnote</code></td>
+</tr>
+<tr class="odd">
+<td>Sample note</td>
+<td>—</td>
+<td>—</td>
+<td><code>sampnote</code></td>
+</tr>
+<tr class="even">
+<td>Measurement note</td>
+<td>—</td>
+<td>—</td>
+<td><code>measurenote</code></td>
+</tr>
+<tr class="odd">
+<td>Good for export</td>
+<td>—</td>
+<td>—</td>
+<td><code>gfe</code></td>
+</tr>
+<tr class="even">
+<td>Area</td>
+<td><code>AREA</code></td>
+<td><code>area</code></td>
+<td><code>area</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="field-descriptions" class="level2">
+<h2 class="anchored" data-anchor-id="field-descriptions">Field descriptions</h2>
+</section>
+<section id="sample-quality" class="level2">
+<h2 class="anchored" data-anchor-id="sample-quality">Sample Quality</h2>
+<p>Indicates the quality assessment of the sample. Common values: G (Good), C (Caution), F (Fail).</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>sampquality</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sample-type" class="level2">
+<h2 class="anchored" data-anchor-id="sample-type">Sample Type</h2>
+<p>Classifies the sample into one of four MARIS groups. In NetCDF4, sample type is encoded as the group name rather than a column variable. In CSV format it is an integer: 1 = SEAWATER, 2 = BIOTA, 3 = SEDIMENT, 4 = SUSPENDED.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><em>(group name)</em></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>string</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>samptype_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="laboratory" class="level2">
+<h2 class="anchored" data-anchor-id="laboratory">Laboratory</h2>
+<p>Identifies the laboratory that processed and measured the sample.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_lab.xlsx">dbo_lab.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>lab</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>lab_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="latitude" class="level2">
+<h2 class="anchored" data-anchor-id="latitude">Latitude</h2>
+<p>Decimal degrees, −90 to 90.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>lat</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>latitude</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="longitude" class="level2">
+<h2 class="anchored" data-anchor-id="longitude">Longitude</h2>
+<p>Decimal degrees, −180 to 180.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>lon</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>longitude</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="station" class="level2">
+<h2 class="anchored" data-anchor-id="station">Station</h2>
+<p>Name of the station where the sample was collected, as reported by the provider.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>station</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>string</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>station</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sample-id" class="level2">
+<h2 class="anchored" data-anchor-id="sample-id">Sample ID</h2>
+<p>The data provider’s sample identifier. Stored verbatim when provided; a sequential integer is generated when absent.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>smp_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>uint64</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>samplabcode</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="profile-id" class="level2">
+<h2 class="anchored" data-anchor-id="profile-id">Profile ID</h2>
+<p>An identifier for linking samples that form part of a vertical sequence (profile). Provided as-is by the data provider.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>profile_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="transect-id" class="level2">
+<h2 class="anchored" data-anchor-id="transect-id">Transect ID</h2>
+<p>An identifier for linking samples that form part of a horizontal sequence (transect). Provided as-is by the data provider.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>transect_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sampling-depth" class="level2">
+<h2 class="anchored" data-anchor-id="sampling-depth">Sampling Depth</h2>
+<p>Depth below the water surface at which the sample was taken, in metres. 0 = surface sample; −1 = depth not available.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>smp_depth</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>sampdepth</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="total-depth" class="level2">
+<h2 class="anchored" data-anchor-id="total-depth">Total Depth</h2>
+<p>Total water column depth at the sampling location, in metres.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>tot_depth</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>totdepth</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="begin-period" class="level2">
+<h2 class="anchored" data-anchor-id="begin-period">Begin Period</h2>
+<p>Date when sample collection began. If only a year is known, the date is set to 1 January of that year; if year and month are known, it is set to the 1st of that month.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>time</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>int64 (seconds since 1970-01-01 00:00:00 UTC)</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>begperiod</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>datetime string (yyyy-mm-dd hh:mm:ss)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="end-period" class="level2">
+<h2 class="anchored" data-anchor-id="end-period">End Period</h2>
+<p>Date when sample collection ended. Same date convention as Begin Period.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>endperiod</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>datetime string (yyyy-mm-dd hh:mm:ss)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="nuclide" class="level2">
+<h2 class="anchored" data-anchor-id="nuclide">Nuclide</h2>
+<p>Identifies the measured radionuclide via a MARIS standard ID.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_nuclide.xlsx">dbo_nuclide.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>nuclide</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>nuclide_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="detection-limit" class="level2">
+<h2 class="anchored" data-anchor-id="detection-limit">Detection Limit</h2>
+<p>Describes the status of the associated Activity value:</p>
+<ul>
+<li><code>1</code> (<code>=</code>) — measured value; an uncertainty should accompany it</li>
+<li><code>2</code> (<code>&lt;</code>) — below detection limit; Activity holds the MDA or ISO 11929 detection limit</li>
+<li><code>3</code> (<code>ND</code>) — not detected; no activity value and no MDA reported</li>
+<li><code>4</code> (<code>DE</code>) — derived; Activity is an aggregation (mean, sum, etc.) of multiple samples</li>
+</ul>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_detectlimit.xlsx">dbo_detectlimit.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>dl</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>detection</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="activity" class="level2">
+<h2 class="anchored" data-anchor-id="activity">Activity</h2>
+<p>The measured activity or MDA for the nuclide. See Detection Limit for interpretation of this value.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>value</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>activity</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="uncertainty" class="level2">
+<h2 class="anchored" data-anchor-id="uncertainty">Uncertainty</h2>
+<p>1σ (k=1) measurement uncertainty, expressed in the same unit as Activity.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>unc</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>uncertaint</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="unit" class="level2">
+<h2 class="anchored" data-anchor-id="unit">Unit</h2>
+<p>Unit of measurement for Activity and Uncertainty. MARIS stores seawater activities in Bq m⁻³ — values reported by providers in Bq L⁻¹ are converted (×1000).</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_unit.xlsx">dbo_unit.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>unit</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>unit_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="variable-type" class="level2">
+<h2 class="anchored" data-anchor-id="variable-type">Variable Type</h2>
+<p>Type of aggregation applied when Activity is not a single measurement. Common codes: AM (arithmetic mean), GM (geometric mean), MED (median), MAX, MIN.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>vartype</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="frequency" class="level2">
+<h2 class="anchored" data-anchor-id="frequency">Frequency</h2>
+<p>Regularity of sampling or measurement (e.g.&nbsp;daily, weekly, monthly).</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>freq</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="range-low-detection" class="level2">
+<h2 class="anchored" data-anchor-id="range-low-detection">Range Low Detection</h2>
+<p>Detection limit status of the Range Low value (same codes as Detection Limit). Used when Activity is an aggregated value.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_detectlimit.xlsx">dbo_detectlimit.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>rl_detection</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="range-low" class="level2">
+<h2 class="anchored" data-anchor-id="range-low">Range Low</h2>
+<p>Minimum activity within an aggregated dataset, expressed in the unit given by Unit.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>rangelow</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="range-upper" class="level2">
+<h2 class="anchored" data-anchor-id="range-upper">Range Upper</h2>
+<p>Maximum activity within an aggregated dataset, expressed in the unit given by Unit.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>rangeupp</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="species-biota" class="level2">
+<h2 class="anchored" data-anchor-id="species-biota">Species (BIOTA)</h2>
+<p>Identifies the sampled species via a MARIS standard ID. When only a biological group is known (e.g.&nbsp;‘Fish’), the coarsest matching species entry in the LUT is used.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_species.xlsx">dbo_species.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>species</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>species_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="biological-group-biota" class="level2">
+<h2 class="anchored" data-anchor-id="biological-group-biota">Biological Group (BIOTA)</h2>
+<p>Grouping of related species (e.g.&nbsp;crustaceans, molluscs, fish). Always derived from the <code>biogroup_id</code> column in <code>dbo_species.xlsx</code> — never assigned independently.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>Derived from <a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_species.xlsx">dbo_species.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>bio_group</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="taxon-name-biota" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-name-biota">Taxon Name (BIOTA)</h2>
+<p>Scientific name of the taxon, as defined in <code>dbo_species.xlsx</code>.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>See <code>dbo_species.xlsx</code></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>Taxonname</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="taxon-reported-name-biota" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-reported-name-biota">Taxon Reported Name (BIOTA)</h2>
+<p>Taxon name as reported by the data provider (may differ from the accepted scientific name).</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>TaxonRepName</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="common-name-biota" class="level2">
+<h2 class="anchored" data-anchor-id="common-name-biota">Common Name (BIOTA)</h2>
+<p>Common (vernacular) name of the species or organism.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>Commonname</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="taxon-rank-biota" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-rank-biota">Taxon Rank (BIOTA)</h2>
+<p>Rank of the taxon in the biological classification system (e.g.&nbsp;species, genus, family), as defined in <code>dbo_species.xlsx</code>.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>See <code>dbo_species.xlsx</code></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>Taxonrank</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="taxon-database-biota" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-database-biota">Taxon Database (BIOTA)</h2>
+<p>Name of the external taxonomy database where this taxon is registered (e.g.&nbsp;WoRMS, ITIS).</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>See <code>dbo_species.xlsx</code></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>TaxonDB</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="taxon-database-id-biota" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-database-id-biota">Taxon Database ID (BIOTA)</h2>
+<p>Identifier for this taxon in the external taxonomy database.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>See <code>dbo_species.xlsx</code></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>TaxonDBID</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="taxon-database-url-biota" class="level2">
+<h2 class="anchored" data-anchor-id="taxon-database-url-biota">Taxon Database URL (BIOTA)</h2>
+<p>URL of the taxon record in the external taxonomy database.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>See <code>dbo_species.xlsx</code></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>TaxonDBURL</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="body-part-biota" class="level2">
+<h2 class="anchored" data-anchor-id="body-part-biota">Body Part (BIOTA)</h2>
+<p>Identifies the specific body part from which the sample was taken (e.g.&nbsp;flesh, whole animal, liver).</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_bodypar.xlsx">dbo_bodypar.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>body_part</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>bodypar_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="slice-up-top-sediment" class="level2">
+<h2 class="anchored" data-anchor-id="slice-up-top-sediment">Slice Up / Top (SEDIMENT)</h2>
+<p>Top of the sediment core interval relative to the water–sediment interface, in cm.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>top</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>sliceup</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="slice-down-bottom-sediment" class="level2">
+<h2 class="anchored" data-anchor-id="slice-down-bottom-sediment">Slice Down / Bottom (SEDIMENT)</h2>
+<p>Bottom of the sediment core interval relative to the water–sediment interface, in cm.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>bottom</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>slicedown</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sediment-type-sediment" class="level2">
+<h2 class="anchored" data-anchor-id="sediment-type-sediment">Sediment Type (SEDIMENT)</h2>
+<p>Classification of sediment according to the Udden–Wentworth scale.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_sedtype.xlsx">dbo_sedtype.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>sed_type</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>sedtype_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sediment-reported-name-sediment" class="level2">
+<h2 class="anchored" data-anchor-id="sediment-reported-name-sediment">Sediment Reported Name (SEDIMENT)</h2>
+<p>Sediment name as reported by the data provider; stored verbatim.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>SedRepName</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="volume" class="level2">
+<h2 class="anchored" data-anchor-id="volume">Volume</h2>
+<p>Volume of the sample, in litres.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>volume</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="salinity-seawater" class="level2">
+<h2 class="anchored" data-anchor-id="salinity-seawater">Salinity (SEAWATER)</h2>
+<p>Salinity in practical salinity units (PSU). If the provider reports absolute salinity (g/kg), convert to PSU using <a href="https://www.teos-10.org/">TEOS-10 guidelines</a>.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>salinity</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>salinity</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="temperature-seawater" class="level2">
+<h2 class="anchored" data-anchor-id="temperature-seawater">Temperature (SEAWATER)</h2>
+<p>Water temperature at the time of sampling, in °C.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>temperature</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>temperatur</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="filtered-seawater" class="level2">
+<h2 class="anchored" data-anchor-id="filtered-seawater">Filtered (SEAWATER)</h2>
+<p>Indicates whether the sample was filtered before measurement. In NetCDF4, stored as an integer: 1 = filtered (dissolved fraction), 2 = unfiltered (total).</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>filt</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer (1 = filtered, 2 = unfiltered)</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>filtered</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string (Y = filtered, N = unfiltered, NA = not applicable)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="filter-pore-size-seawater" class="level2">
+<h2 class="anchored" data-anchor-id="filter-pore-size-seawater">Filter Pore Size (SEAWATER)</h2>
+<p>Pore size of the filter used, in µm.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>filtpore</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="acidified" class="level2">
+<h2 class="anchored" data-anchor-id="acidified">Acidified</h2>
+<p>Indicates whether the sample was acidified prior to analysis.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>acid</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string (A = acidified, NA = not acidified)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="oxygen-seawater" class="level2">
+<h2 class="anchored" data-anchor-id="oxygen-seawater">Oxygen (SEAWATER)</h2>
+<p>Dissolved oxygen concentration of the sample.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>oxygen</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sample-area-sediment" class="level2">
+<h2 class="anchored" data-anchor-id="sample-area-sediment">Sample Area (SEDIMENT)</h2>
+<p>Surface area of the sediment sample, in cm².</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>samparea</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="dry-weight-biota" class="level2">
+<h2 class="anchored" data-anchor-id="dry-weight-biota">Dry Weight (BIOTA)</h2>
+<p>Dry weight of the sample, in grams.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>drywt</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>drywt</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="wet-weight-biota" class="level2">
+<h2 class="anchored" data-anchor-id="wet-weight-biota">Wet Weight (BIOTA)</h2>
+<p>Wet weight of the sample, in grams.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>wetwt</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>wetwt</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="percent-weight-biota" class="level2">
+<h2 class="anchored" data-anchor-id="percent-weight-biota">Percent Weight (BIOTA)</h2>
+<p>Dry-to-wet weight ratio, expressed as a percentage: (dry weight / wet weight) × 100. Value must be between 0 and 100.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>percentwt</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>float</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sampling-method" class="level2">
+<h2 class="anchored" data-anchor-id="sampling-method">Sampling Method</h2>
+<p>Method used to collect the sample.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_sampmet.xlsx">dbo_sampmet.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>samp_met</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>sampmet_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="drying-method" class="level2">
+<h2 class="anchored" data-anchor-id="drying-method">Drying Method</h2>
+<p>Method used to dry the sample prior to analysis.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_sampmet.xlsx">dbo_sampmet.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>drymet_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="preparation-method" class="level2">
+<h2 class="anchored" data-anchor-id="preparation-method">Preparation Method</h2>
+<p>Method used to prepare the sample for radioactivity measurement.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_prepmet.xlsx">dbo_prepmet.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>prep_met</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>prepmet_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="counting-method" class="level2">
+<h2 class="anchored" data-anchor-id="counting-method">Counting Method</h2>
+<p>Analytical method used to measure radioactivity (e.g.&nbsp;gamma spectrometry, alpha spectrometry, LSC).</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_counmet.xlsx">dbo_counmet.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>count_met</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>counmet_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference" class="level2">
+<h2 class="anchored" data-anchor-id="reference">Reference</h2>
+<p>Identifies the source dataset or publication from which this record originates.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>dbo_ref.xlsx (internal; not publicly distributed)</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>ref_id</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reference-note" class="level2">
+<h2 class="anchored" data-anchor-id="reference-note">Reference Note</h2>
+<p>Additional notes about the source reference.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>refnote</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sample-note" class="level2">
+<h2 class="anchored" data-anchor-id="sample-note">Sample Note</h2>
+<p>Additional notes about the sample.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>sampnote</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="measurement-note" class="level2">
+<h2 class="anchored" data-anchor-id="measurement-note">Measurement Note</h2>
+<p>Additional notes about the measurement process.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>measurenote</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="good-for-export" class="level2">
+<h2 class="anchored" data-anchor-id="good-for-export">Good for Export</h2>
+<p>Flag indicating whether the record is suitable for export from the MARIS database.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>gfe</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="area" class="level2">
+<h2 class="anchored" data-anchor-id="area">Area</h2>
+<p>Named geographic region where the sample was collected.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><strong>Lookup table</strong></td>
+<td><a href="https://github.com/franckalbinet/marisco/blob/main/nbs/files/lut/dbo_area.xlsx">dbo_area.xlsx</a></td>
+</tr>
+<tr class="even">
+<td><strong>NetCDF variable</strong></td>
+<td><code>area</code></td>
+</tr>
+<tr class="odd">
+<td><strong>NetCDF type</strong></td>
+<td>integer</td>
+</tr>
+<tr class="even">
+<td><strong>CSV variable</strong></td>
+<td><code>area</code></td>
+</tr>
+<tr class="odd">
+<td><strong>CSV type</strong></td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>lutcb-refactoring – marisco</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-2593923cf60a9aa2fc04e718582542c7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="marisco">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="marisco">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/franckalbinet/marisco"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARISCO</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">How-to</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/writing-a-handler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Write a new handler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/reconcile-nomenclature.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reconcile nomenclatures</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Data Reference</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Data Guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/field-definition.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Field Definitions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/sample-id-coverage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sample ID Coverage</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/geotraces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geotraces</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/maris_legacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Legacy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/jois.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint Ocean Ice Study</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/ospar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OSPAR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/tepco.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TEPCO</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/encoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Encoders</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/geo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc2csv.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NetCDF to CSV</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#lutcb-refactoring-architecture-design-record" id="toc-lutcb-refactoring-architecture-design-record" class="nav-link active" data-scroll-target="#lutcb-refactoring-architecture-design-record">LutCB Refactoring: Architecture &amp; Design Record</a>
+  <ul>
+  <li><a href="#the-problem" id="toc-the-problem" class="nav-link" data-scroll-target="#the-problem">1. The problem</a></li>
+  <li><a href="#root-cause" id="toc-root-cause" class="nav-link" data-scroll-target="#root-cause">2. Root cause</a></li>
+  <li><a href="#the-architectural-insight-callbacks-are-already-recipes" id="toc-the-architectural-insight-callbacks-are-already-recipes" class="nav-link" data-scroll-target="#the-architectural-insight-callbacks-are-already-recipes">3. The architectural insight: callbacks are already recipes</a></li>
+  <li><a href="#the-solution-lutcb" id="toc-the-solution-lutcb" class="nav-link" data-scroll-target="#the-solution-lutcb">4. The solution: <code>LutCB</code></a>
+  <ul>
+  <li><a href="#what-it-is" id="toc-what-it-is" class="nav-link" data-scroll-target="#what-it-is">What it is</a></li>
+  <li><a href="#why-the-name" id="toc-why-the-name" class="nav-link" data-scroll-target="#why-the-name">Why the name</a></li>
+  <li><a href="#nc_dtypes-already-has-the-column-metadata" id="toc-nc_dtypes-already-has-the-column-metadata" class="nav-link" data-scroll-target="#nc_dtypes-already-has-the-column-metadata">NC_DTYPES already has the column metadata</a></li>
+  <li><a href="#where-it-lives" id="toc-where-it-lives" class="nav-link" data-scroll-target="#where-it-lives">Where it lives</a></li>
+  <li><a href="#proposed-implementation" id="toc-proposed-implementation" class="nav-link" data-scroll-target="#proposed-implementation">Proposed implementation</a></li>
+  <li><a href="#two-provider-cases" id="toc-two-provider-cases" class="nav-link" data-scroll-target="#two-provider-cases">Two provider cases</a></li>
+  </ul></li>
+  <li><a href="#changes-required-in-remapcb" id="toc-changes-required-in-remapcb" class="nav-link" data-scroll-target="#changes-required-in-remapcb">5. Changes required in <code>RemapCB</code></a></li>
+  <li><a href="#the-mifa-dual-role-in-handler-notebooks" id="toc-the-mifa-dual-role-in-handler-notebooks" class="nav-link" data-scroll-target="#the-mifa-dual-role-in-handler-notebooks">6. The MIFA dual role in handler notebooks</a>
+  <ul>
+  <li><a href="#closed-box-production-exported-cells" id="toc-closed-box-production-exported-cells" class="nav-link" data-scroll-target="#closed-box-production-exported-cells">Closed box — production (exported cells)</a></li>
+  <li><a href="#open-box-maintenance-interface-eval-false-cells" id="toc-open-box-maintenance-interface-eval-false-cells" class="nav-link" data-scroll-target="#open-box-maintenance-interface-eval-false-cells">Open box — maintenance interface (<code>#| eval: false</code> cells)</a></li>
+  <li><a href="#the-cache-mechanism" id="toc-the-cache-mechanism" class="nav-link" data-scroll-target="#the-cache-mechanism">The cache mechanism</a></li>
+  </ul></li>
+  <li><a href="#what-stays-the-same-in-handler-notebooks" id="toc-what-stays-the-same-in-handler-notebooks" class="nav-link" data-scroll-target="#what-stays-the-same-in-handler-notebooks">7. What stays the same in handler notebooks</a></li>
+  <li><a href="#files-to-change" id="toc-files-to-change" class="nav-link" data-scroll-target="#files-to-change">8. Files to change</a></li>
+  <li><a href="#design-principles-applied" id="toc-design-principles-applied" class="nav-link" data-scroll-target="#design-principles-applied">9. Design principles applied</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><h1 class="title display-7"></h1></header><div class="quarto-title-block"><div class="quarto-title-tools-only"><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+
+
+
+
+<section id="lutcb-refactoring-architecture-design-record" class="level1">
+<h1>LutCB Refactoring: Architecture &amp; Design Record</h1>
+<blockquote class="blockquote">
+<p>Reference document for the planned refactoring of nomenclature reconciliation across all handlers. Captures the diagnosis, design decisions, and rationale from the design session. Use as the base when implementing.</p>
+</blockquote>
+<hr>
+<section id="the-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem">1. The problem</h2>
+<p>Every handler that uses the new MIFA pattern currently exports a broken line:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| exports</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> Lut(fixed, key_col<span class="op">=</span><span class="st">'value'</span>, val_col<span class="op">=</span><span class="st">'nuclide_id'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This fails <code>nbdev-prepare</code> (both notebook test execution and module import) because <code>fixed</code> is not in scope. The dependency chain is:</p>
+<pre><code>lut_nuclides  →  fixed  →  merged  →  dfs  (runtime data, #| eval: false)</code></pre>
+<p><code>fixed = fix_lut(merged, ...)</code> has no <code>#| export</code> directive so it is absent from the generated <code>.py</code> module. <code>merged</code> was computed in a <code>#| eval: false</code> cell so it is also absent during notebook test execution.</p>
+<p>The generated <code>marisco/handlers/helcom.py</code> therefore contains:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fixes_nuclide_names <span class="op">=</span> { ... }          <span class="co"># OK — exported, pure dict literal</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> Lut(fixed, ...)         <span class="co"># NameError: 'fixed' not defined</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Importing the module fails. Running <code>nbdev-prepare</code> fails.</p>
+<hr>
+</section>
+<section id="root-cause" class="level2">
+<h2 class="anchored" data-anchor-id="root-cause">2. Root cause</h2>
+<p>The MIFA “Apply” step (<code>lut_nuclides = Lut(fixed, ...)</code>) is exported as a <strong>module-level eager computation</strong>, but it depends on runtime data. The two requirements are incompatible.</p>
+<p>The old OSPAR / TEPCO handlers avoided this by making <code>lut_nuclides</code> a <strong>lazy lambda</strong>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OSPAR (old Remapper-based pattern) — lazy, fine</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> <span class="kw">lambda</span> df: Remapper(...).generate_lookup_table(...)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># GEOTRACES — lazy, fine (MARIS ref only, no provider data needed)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> <span class="kw">lambda</span>: get_lut(<span class="st">'NUCLIDE'</span>, reverse<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The new MIFA pattern broke laziness by switching to an eager <code>Lut</code> instance.</p>
+<hr>
+</section>
+<section id="the-architectural-insight-callbacks-are-already-recipes" class="level2">
+<h2 class="anchored" data-anchor-id="the-architectural-insight-callbacks-are-already-recipes">3. The architectural insight: callbacks are already recipes</h2>
+<p>Every <code>Callback</code> in the marisco system is a <strong>recipe</strong> in the Wickham/tidymodels sense:</p>
+<ul>
+<li>Configured at construction time with no data</li>
+<li>Applied to data when <code>Transformer</code> runs (<code>tfm()</code>)</li>
+<li>Composed into a pipeline via <code>cbs=[...]</code></li>
+</ul>
+<pre><code>Callback.__init__(config)   →  the recipe specification
+Transformer(dfs, cbs=[...]) →  the composed recipe
+tfm()                       →  bake() — apply recipe to data
+encode()                    →  the top-level orchestrator</code></pre>
+<p>This means <code>lut_nuclides</code> as currently designed (an eager <code>Lut</code> instance resolved at module load time) <strong>breaks the recipe pattern</strong>. Everything else in the system is lazy; the LUT builder should be too.</p>
+<p><code>LutCB</code> (see §4) restores consistency: it is a sub-callback, configured upfront, resolved lazily when <code>RemapCB</code> runs.</p>
+<hr>
+</section>
+<section id="the-solution-lutcb" class="level2">
+<h2 class="anchored" data-anchor-id="the-solution-lutcb">4. The solution: <code>LutCB</code></h2>
+<section id="what-it-is" class="level3">
+<h3 class="anchored" data-anchor-id="what-it-is">What it is</h3>
+<p><code>LutCB</code> is a lazy callback that:</p>
+<ul>
+<li><strong>Closes over</strong> its configuration at construction time (<code>lut_key</code>, <code>fixes</code>, <code>cache_fname</code>, <code>src_col</code>) — no data needed</li>
+<li><strong>Produces a <code>Lut</code></strong> when called with data (<code>dfs</code> or an explicit provider DataFrame)</li>
+<li><strong>Caches <code>merged</code></strong> to disk on first run; subsequent calls load from cache</li>
+<li>Is passed directly to <code>RemapCB</code> as the <code>lut</code> parameter</li>
+</ul>
+</section>
+<section id="why-the-name" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-name">Why the name</h3>
+<p>The existing vocabulary (<code>Lut</code>, <code>RemapCB</code>, <code>-CB</code> suffix) makes <code>LutCB</code> the natural name. <code>RemapCB</code> takes a <code>lut</code> — that <code>lut</code> is now either an eager <code>Lut</code> instance or a lazy <code>LutCB</code>. One new concept, zero new vocabulary.</p>
+</section>
+<section id="nc_dtypes-already-has-the-column-metadata" class="level3">
+<h3 class="anchored" data-anchor-id="nc_dtypes-already-has-the-column-metadata">NC_DTYPES already has the column metadata</h3>
+<p><code>NC_DTYPES</code> in <code>configs.ipynb</code> already stores <code>key</code> and <code>value</code> column names for every MARIS LUT type:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>NC_DTYPES <span class="op">=</span> {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'NUCLIDE'</span>: {<span class="st">'fname'</span>: <span class="st">'dbo_nuclide.xlsx'</span>, <span class="st">'key'</span>: <span class="st">'nc_name'</span>,  <span class="st">'value'</span>: <span class="st">'nuclide_id'</span>},</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SPECIES'</span>: {<span class="st">'fname'</span>: <span class="st">'dbo_species.xlsx'</span>,  <span class="st">'key'</span>: <span class="st">'species'</span>,  <span class="st">'value'</span>: <span class="st">'species_id'</span>},</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'BODY_PART'</span>: {...},</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>LutCB</code> takes the key string and resolves column names from <code>NC_DTYPES</code> internally. The handler author states <em>what</em> they want (<code>'NUCLIDE'</code>), not <em>how</em> to look it up. This reduces the param count from 6+ to 3 for the common case.</p>
+</section>
+<section id="where-it-lives" class="level3">
+<h3 class="anchored" data-anchor-id="where-it-lives">Where it lives</h3>
+<p><code>LutCB</code> belongs in <code>nbs/api/match.ipynb</code> — it composes the existing MIFA primitives (<code>lut_from</code>, <code>fuzzy_merge</code>, <code>fix_lut</code>, <code>Lut</code>) into the full Apply step.</p>
+</section>
+<section id="proposed-implementation" class="level3">
+<h3 class="anchored" data-anchor-id="proposed-implementation">Proposed implementation</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| export</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LutCB:</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Lazy MIFA Apply step: configured upfront, builds Lut from data on demand."</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                 lut_key:<span class="bu">str</span>,           <span class="co"># NC_DTYPES key ('NUCLIDE', 'SPECIES', ...)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                 fixes:<span class="bu">dict</span><span class="op">=</span>{},         <span class="co"># Expert overrides (MIFA Fix step result)</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                 cache_fname:<span class="bu">str</span><span class="op">=</span><span class="va">None</span>,  <span class="co"># Pickle filename under cache_path()</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                 src_col:<span class="bu">str</span><span class="op">=</span><span class="st">'value'</span>,   <span class="co"># Provider column to match (lut_from convention)</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                ):</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        store_attr()</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        cfg <span class="op">=</span> NC_DTYPES[lut_key]</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.maris_ref      <span class="op">=</span> get_lut(lut_key, as_df<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.maris_name_col <span class="op">=</span> cfg[<span class="st">'key'</span>]    <span class="co"># e.g. 'nc_name' for NUCLIDE</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.maris_id_col   <span class="op">=</span> cfg[<span class="st">'value'</span>]  <span class="co"># e.g. 'nuclide_id'</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>                 src,                       <span class="co"># dfs dict (Case 2) or provider DataFrame (Case 1)</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>                 col:<span class="bu">str</span><span class="op">=</span><span class="va">None</span>,              <span class="co"># Column to extract when src is a dfs dict</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>                 overwrite_cache:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>                ) <span class="op">-&gt;</span> Lut:</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Build Lut: infer or use provider LUT, fuzzy-match, apply fixes, cache merged."</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        provider_lut <span class="op">=</span> lut_from(src, col) <span class="cf">if</span> <span class="bu">isinstance</span>(src, <span class="bu">dict</span>) <span class="cf">else</span> src</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>        path <span class="op">=</span> cache_path() <span class="op">/</span> <span class="va">self</span>.cache_fname <span class="cf">if</span> <span class="va">self</span>.cache_fname <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> path <span class="kw">and</span> path.exists() <span class="kw">and</span> <span class="kw">not</span> overwrite_cache:</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>            merged <span class="op">=</span> pd.read_pickle(path)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>            merged <span class="op">=</span> fuzzy_merge(provider_lut, <span class="va">self</span>.maris_ref,</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>                                 left_on<span class="op">=</span><span class="va">self</span>.src_col, right_on<span class="op">=</span><span class="va">self</span>.maris_name_col)</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> path: merged.to_pickle(path)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>        fixed <span class="op">=</span> fix_lut(merged, <span class="va">self</span>.fixes, <span class="va">self</span>.maris_ref,</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>                        left_on<span class="op">=</span><span class="va">self</span>.src_col, right_on<span class="op">=</span><span class="va">self</span>.maris_name_col,</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>                        id_col<span class="op">=</span><span class="va">self</span>.maris_id_col)</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Lut(fixed, key_col<span class="op">=</span><span class="va">self</span>.src_col, val_col<span class="op">=</span><span class="va">self</span>.maris_id_col)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="two-provider-cases" class="level3">
+<h3 class="anchored" data-anchor-id="two-provider-cases">Two provider cases</h3>
+<p><code>LutCB.__call__</code> handles both MIFA usage patterns:</p>
+<p><strong>Case 1 — provider supplies an explicit nomenclature table</strong> (e.g.&nbsp;HELCOM RUBIN_NAME.csv). Pass the DataFrame directly; set <code>src_col</code> at init to name the matching column:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>lut_species <span class="op">=</span> LutCB(<span class="st">'SPECIES'</span>, fixes<span class="op">=</span>fixes_species,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                     cache_fname<span class="op">=</span><span class="st">'species_helcom.pkl'</span>, src_col<span class="op">=</span><span class="st">'SCIENTIFIC NAME'</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># call site:</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>lut <span class="op">=</span> lut_species(provider_df)   <span class="co"># provider_df has 'SCIENTIFIC NAME' column</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Case 2 — infer unique values from the data</strong> (e.g.&nbsp;nuclide names scattered across all group DataFrames). Pass the full <code>dfs</code> dict and the column name:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> LutCB(<span class="st">'NUCLIDE'</span>, fixes<span class="op">=</span>fixes_nuclide_names, cache_fname<span class="op">=</span><span class="st">'nuclides_helcom.pkl'</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># call site:</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>lut <span class="op">=</span> lut_nuclides(dfs, col<span class="op">=</span><span class="st">'NUCLIDE'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="changes-required-in-remapcb" class="level2">
+<h2 class="anchored" data-anchor-id="changes-required-in-remapcb">5. Changes required in <code>RemapCB</code></h2>
+<p><code>RemapCB</code> currently resolves <code>lut</code> eagerly at <code>__init__</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="va">self</span>.lut <span class="op">=</span> lut <span class="cf">if</span> <span class="bu">isinstance</span>(lut, <span class="bu">dict</span>) <span class="cf">else</span> <span class="bu">dict</span>(<span class="bu">zip</span>(lut.merged[lut.key_col], lut.merged[lut.val_col]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>It needs to accept a <code>LutCB</code> and resolve it lazily — using <code>tfm.dfs</code> (available via the <code>tfm</code> argument already passed to <code>each_grp</code>) and reusing <code>self.col_src</code> as the <code>col</code> argument:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RemapCB(PerGroupCB):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                 lut: <span class="bu">dict</span><span class="op">|</span>Lut<span class="op">|</span>LutCB,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                 col_remap: <span class="bu">str</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                 col_src: <span class="bu">str</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                 default_val: <span class="bu">int</span><span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                 grps: <span class="bu">list</span>[<span class="bu">str</span>]<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                ):</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        store_attr()</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._lut_dict <span class="op">=</span> <span class="va">None</span>  <span class="co"># deferred if LutCB</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _resolve(<span class="va">self</span>, tfm):</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>._lut_dict <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>: <span class="cf">return</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        lut <span class="op">=</span> <span class="va">self</span>.lut(tfm.dfs, col<span class="op">=</span><span class="va">self</span>.col_src) <span class="cf">if</span> <span class="bu">isinstance</span>(<span class="va">self</span>.lut, LutCB) <span class="cf">else</span> <span class="va">self</span>.lut</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._lut_dict <span class="op">=</span> lut <span class="cf">if</span> <span class="bu">isinstance</span>(lut, <span class="bu">dict</span>) <span class="cf">else</span> <span class="bu">dict</span>(<span class="bu">zip</span>(lut.merged[lut.key_col], lut.merged[lut.val_col]))</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> each_grp(<span class="va">self</span>, grp, df, tfm):</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._resolve(tfm)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        df[<span class="va">self</span>.col_remap] <span class="op">=</span> (df[<span class="va">self</span>.col_src]</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>            .<span class="bu">apply</span>(<span class="kw">lambda</span> x: x.strip() <span class="cf">if</span> <span class="bu">isinstance</span>(x, <span class="bu">str</span>) <span class="cf">else</span> x)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>            .<span class="bu">map</span>(<span class="va">self</span>._lut_dict).fillna(<span class="va">self</span>.default_val).astype(<span class="bu">int</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Key point: <code>self.col_src</code> (already on <code>RemapCB</code>) is reused as <code>col</code> when calling <code>LutCB</code>. No new parameter needed — the two concepts were always the same column.</p>
+<hr>
+</section>
+<section id="the-mifa-dual-role-in-handler-notebooks" class="level2">
+<h2 class="anchored" data-anchor-id="the-mifa-dual-role-in-handler-notebooks">6. The MIFA dual role in handler notebooks</h2>
+<p>The MIFA cells in a handler notebook serve two completely different purposes that <code>nbdev</code> makes structurally explicit:</p>
+<section id="closed-box-production-exported-cells" class="level3">
+<h3 class="anchored" data-anchor-id="closed-box-production-exported-cells">Closed box — production (exported cells)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| exports</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>fixes_nuclide_names <span class="op">=</span> {          <span class="co"># the persisted human expertise</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'cs134137'</span>: <span class="st">'cs134_137_tot'</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'k-40'</span>: <span class="st">'k40'</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#| exports</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> LutCB(<span class="st">'NUCLIDE'</span>, fixes<span class="op">=</span>fixes_nuclide_names, cache_fname<span class="op">=</span><span class="st">'nuclides_helcom.pkl'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>These two cells are the entire production artifact. <code>lut_nuclides</code> is a lazy callback ready to be passed to <code>RemapCB</code>. <code>fixes_nuclide_names</code> is the durable record of every expert decision.</p>
+</section>
+<section id="open-box-maintenance-interface-eval-false-cells" class="level3">
+<h3 class="anchored" data-anchor-id="open-box-maintenance-interface-eval-false-cells">Open box — maintenance interface (<code>#| eval: false</code> cells)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1 — Match (slow, needs data, human reviews output)</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>provider_lut <span class="op">=</span> lut_from(dfs, <span class="st">'NUCLIDE'</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>maris_ref <span class="op">=</span> get_lut(<span class="st">'NUCLIDE'</span>, as_df<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fuzzy_merge(provider_lut, maris_ref, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'nc_name'</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>merged.query(<span class="st">'score &gt; 0'</span>)    <span class="co"># Step 2 — Inspect: review borderline matches</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3 — Fix: update fixes_nuclide_names above, then verify:</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>fixed <span class="op">=</span> fix_lut(merged, fixes_nuclide_names, maris_ref,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'nc_name'</span>, id_col<span class="op">=</span><span class="st">'nuclide_id'</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>fixed[fixed[<span class="st">'score'</span>] <span class="op">&gt;</span> <span class="dv">0</span>]    <span class="co"># should be empty</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4 — Apply: verify the LutCB produces correct results</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>lut <span class="op">=</span> lut_nuclides(dfs, col<span class="op">=</span><span class="st">'NUCLIDE'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The <code>#| eval: false</code> boundary is the <strong>maintenance hatch</strong> — cells you open when data changes and new/unexpected nomenclature appears. Run them interactively, inspect borderline matches, update <code>fixes_nuclide_names</code>, and on the next <code>encode()</code> call <code>LutCB</code> regenerates the cache from the updated fixes.</p>
+</section>
+<section id="the-cache-mechanism" class="level3">
+<h3 class="anchored" data-anchor-id="the-cache-mechanism">The cache mechanism</h3>
+<ul>
+<li><strong>Normal production run</strong>: <code>LutCB</code> loads <code>merged</code> from the pickle cache — fast, no fuzzy matching, no data needed</li>
+<li><strong>Data changes / new nomenclature</strong>: Run MIFA cells interactively, update <code>fixes_nuclide_names</code>, call <code>lut_nuclides(dfs, col='NUCLIDE', overwrite_cache=True)</code> to regenerate</li>
+<li><strong>Cache does not exist yet</strong>: <code>LutCB.__call__</code> computes <code>merged</code> via <code>fuzzy_merge</code> and saves it; subsequent calls are fast</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="what-stays-the-same-in-handler-notebooks" class="level2">
+<h2 class="anchored" data-anchor-id="what-stays-the-same-in-handler-notebooks">7. What stays the same in handler notebooks</h2>
+<ul>
+<li><code>fixes_xxx_names</code> dicts — still exported, still the primary artifact of the MIFA Fix step</li>
+<li>MIFA <code>#| eval: false</code> cells — still present, still the human-in-the-loop interface</li>
+<li><code>encode()</code> function — largely unchanged; <code>lut_nuclides(dfs, col='NUCLIDE')</code> is called once before constructing <code>Transformer</code>, or <code>RemapCB</code> resolves it transparently if <code>RemapCB</code> is extended (see §5)</li>
+</ul>
+<hr>
+</section>
+<section id="files-to-change" class="level2">
+<h2 class="anchored" data-anchor-id="files-to-change">8. Files to change</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>nbs/api/match.ipynb</code></td>
+<td>Add <code>LutCB</code> class (export)</td>
+</tr>
+<tr class="even">
+<td><code>nbs/api/callbacks.ipynb</code></td>
+<td>Extend <code>RemapCB</code> to accept and lazily resolve <code>LutCB</code></td>
+</tr>
+<tr class="odd">
+<td><code>nbs/handlers/helcom.ipynb</code></td>
+<td>Replace exported <code>lut_nuclides = Lut(fixed, ...)</code> with <code>LutCB(...)</code></td>
+</tr>
+<tr class="even">
+<td><code>nbs/handlers/ospar.ipynb</code></td>
+<td>Migrate from <code>Remapper</code> lambda to <code>LutCB</code></td>
+</tr>
+<tr class="odd">
+<td><code>nbs/handlers/geotraces.ipynb</code></td>
+<td>Migrate (simple case: <code>LutCB</code> with no fixes needed)</td>
+</tr>
+<tr class="even">
+<td><code>nbs/handlers/tepco.ipynb</code></td>
+<td>Migrate</td>
+</tr>
+<tr class="odd">
+<td><code>nbs/handlers/maris_legacy.ipynb</code></td>
+<td>Migrate</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="design-principles-applied" class="level2">
+<h2 class="anchored" data-anchor-id="design-principles-applied">9. Design principles applied</h2>
+<p><strong>SICP λ3 — Closure as object</strong>: <code>LutCB.__init__</code> captures the configuration as its defining environment. <code>__call__</code> is the single operation exposed. The class <em>is</em> a closure over <code>fixes</code>, <code>maris_ref</code>, <code>cache_fname</code>.</p>
+<p><strong>SICP λ4 — Wishful thinking</strong>: The exported cell reads as a declaration — “nuclide lookup is MIFA over NUCLIDE with these fixes and this cache” — before any data exists. Implementation details are hidden.</p>
+<p><strong>fastai/Howard — abstract when the pattern recurs</strong>: <code>LutCB</code> is justified because the same pattern appears in every handler. One class, learned once, used everywhere.</p>
+<p><strong>fastai/Howard — name the data, not the machinery</strong>: <code>lut_nuclides</code> is the meaningful name in the handler notebook. <code>LutCB</code> is the class. The name on the instance carries the semantic weight.</p>
+<p><strong>nbdev structural discipline</strong>: <code>#| eval: false</code> is not just a performance annotation — it is the architectural boundary between the production pipeline (exported) and the maintenance interface (interactive only).</p>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># LutCB Refactoring: Architecture &amp; Design Record</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Reference document for the planned refactoring of nomenclature reconciliation</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; across all handlers. Captures the diagnosis, design decisions, and rationale</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; from the design session. Use as the base when implementing.</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">## 1. The problem</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>Every handler that uses the new MIFA pattern currently exports a broken line:</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co">#| exports</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> Lut(fixed, key_col<span class="op">=</span><span class="st">'value'</span>, val_col<span class="op">=</span><span class="st">'nuclide_id'</span>)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>This fails <span class="in">`nbdev-prepare`</span> (both notebook test execution and module import) because</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="in">`fixed`</span> is not in scope. The dependency chain is:</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="in">lut_nuclides  →  fixed  →  merged  →  dfs  (runtime data, #| eval: false)</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="in">`fixed = fix_lut(merged, ...)`</span> has no <span class="in">`#| export`</span> directive so it is absent from</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>the generated <span class="in">`.py`</span> module. <span class="in">`merged`</span> was computed in a <span class="in">`#| eval: false`</span> cell so it</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>is also absent during notebook test execution.</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>The generated <span class="in">`marisco/handlers/helcom.py`</span> therefore contains:</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>fixes_nuclide_names <span class="op">=</span> { ... }          <span class="co"># OK — exported, pure dict literal</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> Lut(fixed, ...)         <span class="co"># NameError: 'fixed' not defined</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>Importing the module fails. Running <span class="in">`nbdev-prepare`</span> fails.</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2. Root cause</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>The MIFA "Apply" step (<span class="in">`lut_nuclides = Lut(fixed, ...)`</span>) is exported as a</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>**module-level eager computation**, but it depends on runtime data. The two</span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>requirements are incompatible.</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>The old OSPAR / TEPCO handlers avoided this by making <span class="in">`lut_nuclides`</span> a **lazy</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>lambda**:</span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a><span class="co"># OSPAR (old Remapper-based pattern) — lazy, fine</span></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> <span class="kw">lambda</span> df: Remapper(...).generate_lookup_table(...)</span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="co"># GEOTRACES — lazy, fine (MARIS ref only, no provider data needed)</span></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> <span class="kw">lambda</span>: get_lut(<span class="st">'NUCLIDE'</span>, reverse<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>The new MIFA pattern broke laziness by switching to an eager <span class="in">`Lut`</span> instance.</span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## 3. The architectural insight: callbacks are already recipes</span></span>
+<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a>Every <span class="in">`Callback`</span> in the marisco system is a **recipe** in the Wickham/tidymodels</span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a>sense:</span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Configured at construction time with no data</span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Applied to data when <span class="in">`Transformer`</span> runs (<span class="in">`tfm()`</span>)</span>
+<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Composed into a pipeline via <span class="in">`cbs=[...]`</span></span>
+<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a><span class="in">Callback.__init__(config)   →  the recipe specification</span></span>
+<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a><span class="in">Transformer(dfs, cbs=[...]) →  the composed recipe</span></span>
+<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a><span class="in">tfm()                       →  bake() — apply recipe to data</span></span>
+<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a><span class="in">encode()                    →  the top-level orchestrator</span></span>
+<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a>This means <span class="in">`lut_nuclides`</span> as currently designed (an eager <span class="in">`Lut`</span> instance resolved</span>
+<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a>at module load time) **breaks the recipe pattern**. Everything else in the system</span>
+<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a>is lazy; the LUT builder should be too.</span>
+<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a><span class="in">`LutCB`</span> (see §4) restores consistency: it is a sub-callback, configured upfront,</span>
+<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a>resolved lazily when <span class="in">`RemapCB`</span> runs.</span>
+<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a><span class="fu">## 4. The solution: `LutCB`</span></span>
+<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a><span class="fu">### What it is</span></span>
+<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a><span class="in">`LutCB`</span> is a lazy callback that:</span>
+<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Closes over** its configuration at construction time (<span class="in">`lut_key`</span>, <span class="in">`fixes`</span>,</span>
+<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a>  <span class="in">`cache_fname`</span>, <span class="in">`src_col`</span>) — no data needed</span>
+<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Produces a `Lut`** when called with data (<span class="in">`dfs`</span> or an explicit provider</span>
+<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a>  DataFrame)</span>
+<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Caches `merged`** to disk on first run; subsequent calls load from cache</span>
+<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Is passed directly to <span class="in">`RemapCB`</span> as the <span class="in">`lut`</span> parameter</span>
+<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a><span class="fu">### Why the name</span></span>
+<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a>The existing vocabulary (<span class="in">`Lut`</span>, <span class="in">`RemapCB`</span>, <span class="in">`-CB`</span> suffix) makes <span class="in">`LutCB`</span> the</span>
+<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a>natural name. <span class="in">`RemapCB`</span> takes a <span class="in">`lut`</span> — that <span class="in">`lut`</span> is now either an eager <span class="in">`Lut`</span></span>
+<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a>instance or a lazy <span class="in">`LutCB`</span>. One new concept, zero new vocabulary.</span>
+<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a><span class="fu">### NC_DTYPES already has the column metadata</span></span>
+<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a><span class="in">`NC_DTYPES`</span> in <span class="in">`configs.ipynb`</span> already stores <span class="in">`key`</span> and <span class="in">`value`</span> column names for</span>
+<span id="cb14-108"><a href="#cb14-108" aria-hidden="true" tabindex="-1"></a>every MARIS LUT type:</span>
+<span id="cb14-109"><a href="#cb14-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a>NC_DTYPES <span class="op">=</span> {</span>
+<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a>    <span class="st">'NUCLIDE'</span>: {<span class="st">'fname'</span>: <span class="st">'dbo_nuclide.xlsx'</span>, <span class="st">'key'</span>: <span class="st">'nc_name'</span>,  <span class="st">'value'</span>: <span class="st">'nuclide_id'</span>},</span>
+<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SPECIES'</span>: {<span class="st">'fname'</span>: <span class="st">'dbo_species.xlsx'</span>,  <span class="st">'key'</span>: <span class="st">'species'</span>,  <span class="st">'value'</span>: <span class="st">'species_id'</span>},</span>
+<span id="cb14-114"><a href="#cb14-114" aria-hidden="true" tabindex="-1"></a>    <span class="st">'BODY_PART'</span>: {...},</span>
+<span id="cb14-115"><a href="#cb14-115" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-117"><a href="#cb14-117" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-119"><a href="#cb14-119" aria-hidden="true" tabindex="-1"></a><span class="in">`LutCB`</span> takes the key string and resolves column names from <span class="in">`NC_DTYPES`</span> internally.</span>
+<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a>The handler author states *what* they want (`'NUCLIDE'`), not *how* to look it up.</span>
+<span id="cb14-121"><a href="#cb14-121" aria-hidden="true" tabindex="-1"></a>This reduces the param count from 6+ to 3 for the common case.</span>
+<span id="cb14-122"><a href="#cb14-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-123"><a href="#cb14-123" aria-hidden="true" tabindex="-1"></a><span class="fu">### Where it lives</span></span>
+<span id="cb14-124"><a href="#cb14-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-125"><a href="#cb14-125" aria-hidden="true" tabindex="-1"></a><span class="in">`LutCB`</span> belongs in <span class="in">`nbs/api/match.ipynb`</span> — it composes the existing MIFA</span>
+<span id="cb14-126"><a href="#cb14-126" aria-hidden="true" tabindex="-1"></a>primitives (<span class="in">`lut_from`</span>, <span class="in">`fuzzy_merge`</span>, <span class="in">`fix_lut`</span>, <span class="in">`Lut`</span>) into the full Apply step.</span>
+<span id="cb14-127"><a href="#cb14-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-128"><a href="#cb14-128" aria-hidden="true" tabindex="-1"></a><span class="fu">### Proposed implementation</span></span>
+<span id="cb14-129"><a href="#cb14-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a><span class="co">#| export</span></span>
+<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LutCB:</span>
+<span id="cb14-133"><a href="#cb14-133" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Lazy MIFA Apply step: configured upfront, builds Lut from data on demand."</span></span>
+<span id="cb14-134"><a href="#cb14-134" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,</span>
+<span id="cb14-135"><a href="#cb14-135" aria-hidden="true" tabindex="-1"></a>                 lut_key:<span class="bu">str</span>,           <span class="co"># NC_DTYPES key ('NUCLIDE', 'SPECIES', ...)</span></span>
+<span id="cb14-136"><a href="#cb14-136" aria-hidden="true" tabindex="-1"></a>                 fixes:<span class="bu">dict</span><span class="op">=</span>{},         <span class="co"># Expert overrides (MIFA Fix step result)</span></span>
+<span id="cb14-137"><a href="#cb14-137" aria-hidden="true" tabindex="-1"></a>                 cache_fname:<span class="bu">str</span><span class="op">=</span><span class="va">None</span>,  <span class="co"># Pickle filename under cache_path()</span></span>
+<span id="cb14-138"><a href="#cb14-138" aria-hidden="true" tabindex="-1"></a>                 src_col:<span class="bu">str</span><span class="op">=</span><span class="st">'value'</span>,   <span class="co"># Provider column to match (lut_from convention)</span></span>
+<span id="cb14-139"><a href="#cb14-139" aria-hidden="true" tabindex="-1"></a>                ):</span>
+<span id="cb14-140"><a href="#cb14-140" aria-hidden="true" tabindex="-1"></a>        store_attr()</span>
+<span id="cb14-141"><a href="#cb14-141" aria-hidden="true" tabindex="-1"></a>        cfg <span class="op">=</span> NC_DTYPES[lut_key]</span>
+<span id="cb14-142"><a href="#cb14-142" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.maris_ref      <span class="op">=</span> get_lut(lut_key, as_df<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-143"><a href="#cb14-143" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.maris_name_col <span class="op">=</span> cfg[<span class="st">'key'</span>]    <span class="co"># e.g. 'nc_name' for NUCLIDE</span></span>
+<span id="cb14-144"><a href="#cb14-144" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.maris_id_col   <span class="op">=</span> cfg[<span class="st">'value'</span>]  <span class="co"># e.g. 'nuclide_id'</span></span>
+<span id="cb14-145"><a href="#cb14-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-146"><a href="#cb14-146" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>,</span>
+<span id="cb14-147"><a href="#cb14-147" aria-hidden="true" tabindex="-1"></a>                 src,                       <span class="co"># dfs dict (Case 2) or provider DataFrame (Case 1)</span></span>
+<span id="cb14-148"><a href="#cb14-148" aria-hidden="true" tabindex="-1"></a>                 col:<span class="bu">str</span><span class="op">=</span><span class="va">None</span>,              <span class="co"># Column to extract when src is a dfs dict</span></span>
+<span id="cb14-149"><a href="#cb14-149" aria-hidden="true" tabindex="-1"></a>                 overwrite_cache:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb14-150"><a href="#cb14-150" aria-hidden="true" tabindex="-1"></a>                ) <span class="op">-&gt;</span> Lut:</span>
+<span id="cb14-151"><a href="#cb14-151" aria-hidden="true" tabindex="-1"></a>        <span class="co">"Build Lut: infer or use provider LUT, fuzzy-match, apply fixes, cache merged."</span></span>
+<span id="cb14-152"><a href="#cb14-152" aria-hidden="true" tabindex="-1"></a>        provider_lut <span class="op">=</span> lut_from(src, col) <span class="cf">if</span> <span class="bu">isinstance</span>(src, <span class="bu">dict</span>) <span class="cf">else</span> src</span>
+<span id="cb14-153"><a href="#cb14-153" aria-hidden="true" tabindex="-1"></a>        path <span class="op">=</span> cache_path() <span class="op">/</span> <span class="va">self</span>.cache_fname <span class="cf">if</span> <span class="va">self</span>.cache_fname <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb14-154"><a href="#cb14-154" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> path <span class="kw">and</span> path.exists() <span class="kw">and</span> <span class="kw">not</span> overwrite_cache:</span>
+<span id="cb14-155"><a href="#cb14-155" aria-hidden="true" tabindex="-1"></a>            merged <span class="op">=</span> pd.read_pickle(path)</span>
+<span id="cb14-156"><a href="#cb14-156" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb14-157"><a href="#cb14-157" aria-hidden="true" tabindex="-1"></a>            merged <span class="op">=</span> fuzzy_merge(provider_lut, <span class="va">self</span>.maris_ref,</span>
+<span id="cb14-158"><a href="#cb14-158" aria-hidden="true" tabindex="-1"></a>                                 left_on<span class="op">=</span><span class="va">self</span>.src_col, right_on<span class="op">=</span><span class="va">self</span>.maris_name_col)</span>
+<span id="cb14-159"><a href="#cb14-159" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> path: merged.to_pickle(path)</span>
+<span id="cb14-160"><a href="#cb14-160" aria-hidden="true" tabindex="-1"></a>        fixed <span class="op">=</span> fix_lut(merged, <span class="va">self</span>.fixes, <span class="va">self</span>.maris_ref,</span>
+<span id="cb14-161"><a href="#cb14-161" aria-hidden="true" tabindex="-1"></a>                        left_on<span class="op">=</span><span class="va">self</span>.src_col, right_on<span class="op">=</span><span class="va">self</span>.maris_name_col,</span>
+<span id="cb14-162"><a href="#cb14-162" aria-hidden="true" tabindex="-1"></a>                        id_col<span class="op">=</span><span class="va">self</span>.maris_id_col)</span>
+<span id="cb14-163"><a href="#cb14-163" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Lut(fixed, key_col<span class="op">=</span><span class="va">self</span>.src_col, val_col<span class="op">=</span><span class="va">self</span>.maris_id_col)</span>
+<span id="cb14-164"><a href="#cb14-164" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-165"><a href="#cb14-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-166"><a href="#cb14-166" aria-hidden="true" tabindex="-1"></a><span class="fu">### Two provider cases</span></span>
+<span id="cb14-167"><a href="#cb14-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-168"><a href="#cb14-168" aria-hidden="true" tabindex="-1"></a><span class="in">`LutCB.__call__`</span> handles both MIFA usage patterns:</span>
+<span id="cb14-169"><a href="#cb14-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-170"><a href="#cb14-170" aria-hidden="true" tabindex="-1"></a>**Case 1 — provider supplies an explicit nomenclature table** (e.g. HELCOM</span>
+<span id="cb14-171"><a href="#cb14-171" aria-hidden="true" tabindex="-1"></a>RUBIN_NAME.csv). Pass the DataFrame directly; set <span class="in">`src_col`</span> at init to name the</span>
+<span id="cb14-172"><a href="#cb14-172" aria-hidden="true" tabindex="-1"></a>matching column:</span>
+<span id="cb14-173"><a href="#cb14-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-174"><a href="#cb14-174" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb14-175"><a href="#cb14-175" aria-hidden="true" tabindex="-1"></a>lut_species <span class="op">=</span> LutCB(<span class="st">'SPECIES'</span>, fixes<span class="op">=</span>fixes_species,</span>
+<span id="cb14-176"><a href="#cb14-176" aria-hidden="true" tabindex="-1"></a>                     cache_fname<span class="op">=</span><span class="st">'species_helcom.pkl'</span>, src_col<span class="op">=</span><span class="st">'SCIENTIFIC NAME'</span>)</span>
+<span id="cb14-177"><a href="#cb14-177" aria-hidden="true" tabindex="-1"></a><span class="co"># call site:</span></span>
+<span id="cb14-178"><a href="#cb14-178" aria-hidden="true" tabindex="-1"></a>lut <span class="op">=</span> lut_species(provider_df)   <span class="co"># provider_df has 'SCIENTIFIC NAME' column</span></span>
+<span id="cb14-179"><a href="#cb14-179" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-180"><a href="#cb14-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-181"><a href="#cb14-181" aria-hidden="true" tabindex="-1"></a>**Case 2 — infer unique values from the data** (e.g. nuclide names scattered</span>
+<span id="cb14-182"><a href="#cb14-182" aria-hidden="true" tabindex="-1"></a>across all group DataFrames). Pass the full <span class="in">`dfs`</span> dict and the column name:</span>
+<span id="cb14-183"><a href="#cb14-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-184"><a href="#cb14-184" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb14-185"><a href="#cb14-185" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> LutCB(<span class="st">'NUCLIDE'</span>, fixes<span class="op">=</span>fixes_nuclide_names, cache_fname<span class="op">=</span><span class="st">'nuclides_helcom.pkl'</span>)</span>
+<span id="cb14-186"><a href="#cb14-186" aria-hidden="true" tabindex="-1"></a><span class="co"># call site:</span></span>
+<span id="cb14-187"><a href="#cb14-187" aria-hidden="true" tabindex="-1"></a>lut <span class="op">=</span> lut_nuclides(dfs, col<span class="op">=</span><span class="st">'NUCLIDE'</span>)</span>
+<span id="cb14-188"><a href="#cb14-188" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-189"><a href="#cb14-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-190"><a href="#cb14-190" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb14-191"><a href="#cb14-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-192"><a href="#cb14-192" aria-hidden="true" tabindex="-1"></a><span class="fu">## 5. Changes required in `RemapCB`</span></span>
+<span id="cb14-193"><a href="#cb14-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-194"><a href="#cb14-194" aria-hidden="true" tabindex="-1"></a><span class="in">`RemapCB`</span> currently resolves <span class="in">`lut`</span> eagerly at <span class="in">`__init__`</span>:</span>
+<span id="cb14-195"><a href="#cb14-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-196"><a href="#cb14-196" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb14-197"><a href="#cb14-197" aria-hidden="true" tabindex="-1"></a><span class="va">self</span>.lut <span class="op">=</span> lut <span class="cf">if</span> <span class="bu">isinstance</span>(lut, <span class="bu">dict</span>) <span class="cf">else</span> <span class="bu">dict</span>(<span class="bu">zip</span>(lut.merged[lut.key_col], lut.merged[lut.val_col]))</span>
+<span id="cb14-198"><a href="#cb14-198" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-199"><a href="#cb14-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-200"><a href="#cb14-200" aria-hidden="true" tabindex="-1"></a>It needs to accept a <span class="in">`LutCB`</span> and resolve it lazily — using <span class="in">`tfm.dfs`</span> (available</span>
+<span id="cb14-201"><a href="#cb14-201" aria-hidden="true" tabindex="-1"></a>via the <span class="in">`tfm`</span> argument already passed to <span class="in">`each_grp`</span>) and reusing <span class="in">`self.col_src`</span></span>
+<span id="cb14-202"><a href="#cb14-202" aria-hidden="true" tabindex="-1"></a>as the <span class="in">`col`</span> argument:</span>
+<span id="cb14-203"><a href="#cb14-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-204"><a href="#cb14-204" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb14-205"><a href="#cb14-205" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RemapCB(PerGroupCB):</span>
+<span id="cb14-206"><a href="#cb14-206" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,</span>
+<span id="cb14-207"><a href="#cb14-207" aria-hidden="true" tabindex="-1"></a>                 lut: <span class="bu">dict</span><span class="op">|</span>Lut<span class="op">|</span>LutCB,</span>
+<span id="cb14-208"><a href="#cb14-208" aria-hidden="true" tabindex="-1"></a>                 col_remap: <span class="bu">str</span>,</span>
+<span id="cb14-209"><a href="#cb14-209" aria-hidden="true" tabindex="-1"></a>                 col_src: <span class="bu">str</span>,</span>
+<span id="cb14-210"><a href="#cb14-210" aria-hidden="true" tabindex="-1"></a>                 default_val: <span class="bu">int</span><span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb14-211"><a href="#cb14-211" aria-hidden="true" tabindex="-1"></a>                 grps: <span class="bu">list</span>[<span class="bu">str</span>]<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb14-212"><a href="#cb14-212" aria-hidden="true" tabindex="-1"></a>                ):</span>
+<span id="cb14-213"><a href="#cb14-213" aria-hidden="true" tabindex="-1"></a>        store_attr()</span>
+<span id="cb14-214"><a href="#cb14-214" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._lut_dict <span class="op">=</span> <span class="va">None</span>  <span class="co"># deferred if LutCB</span></span>
+<span id="cb14-215"><a href="#cb14-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-216"><a href="#cb14-216" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _resolve(<span class="va">self</span>, tfm):</span>
+<span id="cb14-217"><a href="#cb14-217" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>._lut_dict <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>: <span class="cf">return</span></span>
+<span id="cb14-218"><a href="#cb14-218" aria-hidden="true" tabindex="-1"></a>        lut <span class="op">=</span> <span class="va">self</span>.lut(tfm.dfs, col<span class="op">=</span><span class="va">self</span>.col_src) <span class="cf">if</span> <span class="bu">isinstance</span>(<span class="va">self</span>.lut, LutCB) <span class="cf">else</span> <span class="va">self</span>.lut</span>
+<span id="cb14-219"><a href="#cb14-219" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._lut_dict <span class="op">=</span> lut <span class="cf">if</span> <span class="bu">isinstance</span>(lut, <span class="bu">dict</span>) <span class="cf">else</span> <span class="bu">dict</span>(<span class="bu">zip</span>(lut.merged[lut.key_col], lut.merged[lut.val_col]))</span>
+<span id="cb14-220"><a href="#cb14-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-221"><a href="#cb14-221" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> each_grp(<span class="va">self</span>, grp, df, tfm):</span>
+<span id="cb14-222"><a href="#cb14-222" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._resolve(tfm)</span>
+<span id="cb14-223"><a href="#cb14-223" aria-hidden="true" tabindex="-1"></a>        df[<span class="va">self</span>.col_remap] <span class="op">=</span> (df[<span class="va">self</span>.col_src]</span>
+<span id="cb14-224"><a href="#cb14-224" aria-hidden="true" tabindex="-1"></a>            .<span class="bu">apply</span>(<span class="kw">lambda</span> x: x.strip() <span class="cf">if</span> <span class="bu">isinstance</span>(x, <span class="bu">str</span>) <span class="cf">else</span> x)</span>
+<span id="cb14-225"><a href="#cb14-225" aria-hidden="true" tabindex="-1"></a>            .<span class="bu">map</span>(<span class="va">self</span>._lut_dict).fillna(<span class="va">self</span>.default_val).astype(<span class="bu">int</span>))</span>
+<span id="cb14-226"><a href="#cb14-226" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-227"><a href="#cb14-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-228"><a href="#cb14-228" aria-hidden="true" tabindex="-1"></a>Key point: <span class="in">`self.col_src`</span> (already on <span class="in">`RemapCB`</span>) is reused as <span class="in">`col`</span> when calling</span>
+<span id="cb14-229"><a href="#cb14-229" aria-hidden="true" tabindex="-1"></a><span class="in">`LutCB`</span>. No new parameter needed — the two concepts were always the same column.</span>
+<span id="cb14-230"><a href="#cb14-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-231"><a href="#cb14-231" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb14-232"><a href="#cb14-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-233"><a href="#cb14-233" aria-hidden="true" tabindex="-1"></a><span class="fu">## 6. The MIFA dual role in handler notebooks</span></span>
+<span id="cb14-234"><a href="#cb14-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-235"><a href="#cb14-235" aria-hidden="true" tabindex="-1"></a>The MIFA cells in a handler notebook serve two completely different purposes that</span>
+<span id="cb14-236"><a href="#cb14-236" aria-hidden="true" tabindex="-1"></a><span class="in">`nbdev`</span> makes structurally explicit:</span>
+<span id="cb14-237"><a href="#cb14-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-238"><a href="#cb14-238" aria-hidden="true" tabindex="-1"></a><span class="fu">### Closed box — production (exported cells)</span></span>
+<span id="cb14-239"><a href="#cb14-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-240"><a href="#cb14-240" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb14-241"><a href="#cb14-241" aria-hidden="true" tabindex="-1"></a><span class="co">#| exports</span></span>
+<span id="cb14-242"><a href="#cb14-242" aria-hidden="true" tabindex="-1"></a>fixes_nuclide_names <span class="op">=</span> {          <span class="co"># the persisted human expertise</span></span>
+<span id="cb14-243"><a href="#cb14-243" aria-hidden="true" tabindex="-1"></a>    <span class="st">'cs134137'</span>: <span class="st">'cs134_137_tot'</span>,</span>
+<span id="cb14-244"><a href="#cb14-244" aria-hidden="true" tabindex="-1"></a>    <span class="st">'k-40'</span>: <span class="st">'k40'</span>,</span>
+<span id="cb14-245"><a href="#cb14-245" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb14-246"><a href="#cb14-246" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-247"><a href="#cb14-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-248"><a href="#cb14-248" aria-hidden="true" tabindex="-1"></a><span class="co">#| exports</span></span>
+<span id="cb14-249"><a href="#cb14-249" aria-hidden="true" tabindex="-1"></a>lut_nuclides <span class="op">=</span> LutCB(<span class="st">'NUCLIDE'</span>, fixes<span class="op">=</span>fixes_nuclide_names, cache_fname<span class="op">=</span><span class="st">'nuclides_helcom.pkl'</span>)</span>
+<span id="cb14-250"><a href="#cb14-250" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-251"><a href="#cb14-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-252"><a href="#cb14-252" aria-hidden="true" tabindex="-1"></a>These two cells are the entire production artifact. <span class="in">`lut_nuclides`</span> is a lazy</span>
+<span id="cb14-253"><a href="#cb14-253" aria-hidden="true" tabindex="-1"></a>callback ready to be passed to <span class="in">`RemapCB`</span>. <span class="in">`fixes_nuclide_names`</span> is the durable</span>
+<span id="cb14-254"><a href="#cb14-254" aria-hidden="true" tabindex="-1"></a>record of every expert decision.</span>
+<span id="cb14-255"><a href="#cb14-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-256"><a href="#cb14-256" aria-hidden="true" tabindex="-1"></a><span class="fu">### Open box — maintenance interface (`#| eval: false` cells)</span></span>
+<span id="cb14-257"><a href="#cb14-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-258"><a href="#cb14-258" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb14-259"><a href="#cb14-259" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb14-260"><a href="#cb14-260" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1 — Match (slow, needs data, human reviews output)</span></span>
+<span id="cb14-261"><a href="#cb14-261" aria-hidden="true" tabindex="-1"></a>provider_lut <span class="op">=</span> lut_from(dfs, <span class="st">'NUCLIDE'</span>)</span>
+<span id="cb14-262"><a href="#cb14-262" aria-hidden="true" tabindex="-1"></a>maris_ref <span class="op">=</span> get_lut(<span class="st">'NUCLIDE'</span>, as_df<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-263"><a href="#cb14-263" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fuzzy_merge(provider_lut, maris_ref, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'nc_name'</span>)</span>
+<span id="cb14-264"><a href="#cb14-264" aria-hidden="true" tabindex="-1"></a>merged.query(<span class="st">'score &gt; 0'</span>)    <span class="co"># Step 2 — Inspect: review borderline matches</span></span>
+<span id="cb14-265"><a href="#cb14-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-266"><a href="#cb14-266" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3 — Fix: update fixes_nuclide_names above, then verify:</span></span>
+<span id="cb14-267"><a href="#cb14-267" aria-hidden="true" tabindex="-1"></a>fixed <span class="op">=</span> fix_lut(merged, fixes_nuclide_names, maris_ref,</span>
+<span id="cb14-268"><a href="#cb14-268" aria-hidden="true" tabindex="-1"></a>                left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'nc_name'</span>, id_col<span class="op">=</span><span class="st">'nuclide_id'</span>)</span>
+<span id="cb14-269"><a href="#cb14-269" aria-hidden="true" tabindex="-1"></a>fixed[fixed[<span class="st">'score'</span>] <span class="op">&gt;</span> <span class="dv">0</span>]    <span class="co"># should be empty</span></span>
+<span id="cb14-270"><a href="#cb14-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-271"><a href="#cb14-271" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4 — Apply: verify the LutCB produces correct results</span></span>
+<span id="cb14-272"><a href="#cb14-272" aria-hidden="true" tabindex="-1"></a>lut <span class="op">=</span> lut_nuclides(dfs, col<span class="op">=</span><span class="st">'NUCLIDE'</span>)</span>
+<span id="cb14-273"><a href="#cb14-273" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-274"><a href="#cb14-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-275"><a href="#cb14-275" aria-hidden="true" tabindex="-1"></a>The <span class="in">`#| eval: false`</span> boundary is the **maintenance hatch** — cells you open when</span>
+<span id="cb14-276"><a href="#cb14-276" aria-hidden="true" tabindex="-1"></a>data changes and new/unexpected nomenclature appears. Run them interactively,</span>
+<span id="cb14-277"><a href="#cb14-277" aria-hidden="true" tabindex="-1"></a>inspect borderline matches, update <span class="in">`fixes_nuclide_names`</span>, and on the next</span>
+<span id="cb14-278"><a href="#cb14-278" aria-hidden="true" tabindex="-1"></a><span class="in">`encode()`</span> call <span class="in">`LutCB`</span> regenerates the cache from the updated fixes.</span>
+<span id="cb14-279"><a href="#cb14-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-280"><a href="#cb14-280" aria-hidden="true" tabindex="-1"></a><span class="fu">### The cache mechanism</span></span>
+<span id="cb14-281"><a href="#cb14-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-282"><a href="#cb14-282" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Normal production run**: <span class="in">`LutCB`</span> loads <span class="in">`merged`</span> from the pickle cache — fast,</span>
+<span id="cb14-283"><a href="#cb14-283" aria-hidden="true" tabindex="-1"></a>  no fuzzy matching, no data needed</span>
+<span id="cb14-284"><a href="#cb14-284" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Data changes / new nomenclature**: Run MIFA cells interactively, update</span>
+<span id="cb14-285"><a href="#cb14-285" aria-hidden="true" tabindex="-1"></a>  <span class="in">`fixes_nuclide_names`</span>, call <span class="in">`lut_nuclides(dfs, col='NUCLIDE', overwrite_cache=True)`</span></span>
+<span id="cb14-286"><a href="#cb14-286" aria-hidden="true" tabindex="-1"></a>  to regenerate</span>
+<span id="cb14-287"><a href="#cb14-287" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Cache does not exist yet**: <span class="in">`LutCB.__call__`</span> computes <span class="in">`merged`</span> via <span class="in">`fuzzy_merge`</span></span>
+<span id="cb14-288"><a href="#cb14-288" aria-hidden="true" tabindex="-1"></a>  and saves it; subsequent calls are fast</span>
+<span id="cb14-289"><a href="#cb14-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-290"><a href="#cb14-290" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb14-291"><a href="#cb14-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-292"><a href="#cb14-292" aria-hidden="true" tabindex="-1"></a><span class="fu">## 7. What stays the same in handler notebooks</span></span>
+<span id="cb14-293"><a href="#cb14-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-294"><a href="#cb14-294" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`fixes_xxx_names`</span> dicts — still exported, still the primary artifact of the MIFA</span>
+<span id="cb14-295"><a href="#cb14-295" aria-hidden="true" tabindex="-1"></a>  Fix step</span>
+<span id="cb14-296"><a href="#cb14-296" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>MIFA <span class="in">`#| eval: false`</span> cells — still present, still the human-in-the-loop</span>
+<span id="cb14-297"><a href="#cb14-297" aria-hidden="true" tabindex="-1"></a>  interface</span>
+<span id="cb14-298"><a href="#cb14-298" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`encode()`</span> function — largely unchanged; <span class="in">`lut_nuclides(dfs, col='NUCLIDE')`</span> is</span>
+<span id="cb14-299"><a href="#cb14-299" aria-hidden="true" tabindex="-1"></a>  called once before constructing <span class="in">`Transformer`</span>, or <span class="in">`RemapCB`</span> resolves it</span>
+<span id="cb14-300"><a href="#cb14-300" aria-hidden="true" tabindex="-1"></a>  transparently if <span class="in">`RemapCB`</span> is extended (see §5)</span>
+<span id="cb14-301"><a href="#cb14-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-302"><a href="#cb14-302" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb14-303"><a href="#cb14-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-304"><a href="#cb14-304" aria-hidden="true" tabindex="-1"></a><span class="fu">## 8. Files to change</span></span>
+<span id="cb14-305"><a href="#cb14-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-306"><a href="#cb14-306" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> File <span class="pp">|</span> Change <span class="pp">|</span></span>
+<span id="cb14-307"><a href="#cb14-307" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb14-308"><a href="#cb14-308" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/api/match.ipynb`</span> <span class="pp">|</span> Add <span class="in">`LutCB`</span> class (export) <span class="pp">|</span></span>
+<span id="cb14-309"><a href="#cb14-309" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/api/callbacks.ipynb`</span> <span class="pp">|</span> Extend <span class="in">`RemapCB`</span> to accept and lazily resolve <span class="in">`LutCB`</span> <span class="pp">|</span></span>
+<span id="cb14-310"><a href="#cb14-310" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/handlers/helcom.ipynb`</span> <span class="pp">|</span> Replace exported <span class="in">`lut_nuclides = Lut(fixed, ...)`</span> with <span class="in">`LutCB(...)`</span> <span class="pp">|</span></span>
+<span id="cb14-311"><a href="#cb14-311" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/handlers/ospar.ipynb`</span> <span class="pp">|</span> Migrate from <span class="in">`Remapper`</span> lambda to <span class="in">`LutCB`</span> <span class="pp">|</span></span>
+<span id="cb14-312"><a href="#cb14-312" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/handlers/geotraces.ipynb`</span> <span class="pp">|</span> Migrate (simple case: <span class="in">`LutCB`</span> with no fixes needed) <span class="pp">|</span></span>
+<span id="cb14-313"><a href="#cb14-313" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/handlers/tepco.ipynb`</span> <span class="pp">|</span> Migrate <span class="pp">|</span></span>
+<span id="cb14-314"><a href="#cb14-314" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/handlers/maris_legacy.ipynb`</span> <span class="pp">|</span> Migrate <span class="pp">|</span></span>
+<span id="cb14-315"><a href="#cb14-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-316"><a href="#cb14-316" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb14-317"><a href="#cb14-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-318"><a href="#cb14-318" aria-hidden="true" tabindex="-1"></a><span class="fu">## 9. Design principles applied</span></span>
+<span id="cb14-319"><a href="#cb14-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-320"><a href="#cb14-320" aria-hidden="true" tabindex="-1"></a>**SICP λ3 — Closure as object**: <span class="in">`LutCB.__init__`</span> captures the configuration as</span>
+<span id="cb14-321"><a href="#cb14-321" aria-hidden="true" tabindex="-1"></a>its defining environment. <span class="in">`__call__`</span> is the single operation exposed. The class</span>
+<span id="cb14-322"><a href="#cb14-322" aria-hidden="true" tabindex="-1"></a>*is* a closure over <span class="in">`fixes`</span>, <span class="in">`maris_ref`</span>, <span class="in">`cache_fname`</span>.</span>
+<span id="cb14-323"><a href="#cb14-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-324"><a href="#cb14-324" aria-hidden="true" tabindex="-1"></a>**SICP λ4 — Wishful thinking**: The exported cell reads as a declaration —</span>
+<span id="cb14-325"><a href="#cb14-325" aria-hidden="true" tabindex="-1"></a>"nuclide lookup is MIFA over NUCLIDE with these fixes and this cache" — before</span>
+<span id="cb14-326"><a href="#cb14-326" aria-hidden="true" tabindex="-1"></a>any data exists. Implementation details are hidden.</span>
+<span id="cb14-327"><a href="#cb14-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-328"><a href="#cb14-328" aria-hidden="true" tabindex="-1"></a>**fastai/Howard — abstract when the pattern recurs**: <span class="in">`LutCB`</span> is justified because</span>
+<span id="cb14-329"><a href="#cb14-329" aria-hidden="true" tabindex="-1"></a>the same pattern appears in every handler. One class, learned once, used</span>
+<span id="cb14-330"><a href="#cb14-330" aria-hidden="true" tabindex="-1"></a>everywhere.</span>
+<span id="cb14-331"><a href="#cb14-331" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-332"><a href="#cb14-332" aria-hidden="true" tabindex="-1"></a>**fastai/Howard — name the data, not the machinery**: <span class="in">`lut_nuclides`</span> is the</span>
+<span id="cb14-333"><a href="#cb14-333" aria-hidden="true" tabindex="-1"></a>meaningful name in the handler notebook. <span class="in">`LutCB`</span> is the class. The name on the</span>
+<span id="cb14-334"><a href="#cb14-334" aria-hidden="true" tabindex="-1"></a>instance carries the semantic weight.</span>
+<span id="cb14-335"><a href="#cb14-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-336"><a href="#cb14-336" aria-hidden="true" tabindex="-1"></a>**nbdev structural discipline**: <span class="in">`#| eval: false`</span> is not just a performance</span>
+<span id="cb14-337"><a href="#cb14-337" aria-hidden="true" tabindex="-1"></a>annotation — it is the architectural boundary between the production pipeline</span>
+<span id="cb14-338"><a href="#cb14-338" aria-hidden="true" tabindex="-1"></a>(exported) and the maintenance interface (interactive only).</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

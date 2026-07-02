@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Nomenclature reconciliation: fuzzy matching, lookup tables, and external API resolution.">
+
+<title>Match – marisco</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-2593923cf60a9aa2fc04e718582542c7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="Match – marisco">
+<meta property="og:description" content="Nomenclature reconciliation: fuzzy matching, lookup tables, and external API resolution.">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="Match – marisco">
+<meta name="twitter:description" content="Nomenclature reconciliation: fuzzy matching, lookup tables, and external API resolution.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/franckalbinet/marisco"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/callbacks.html">API</a></li><li class="breadcrumb-item"><a href="../api/match.html">Match</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARISCO</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">How-to</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/writing-a-handler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Write a new handler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/reconcile-nomenclature.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reconcile nomenclatures</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Data Reference</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Data Guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/field-definition.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Field Definitions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/sample-id-coverage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sample ID Coverage</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/geotraces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geotraces</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/maris_legacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Legacy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/jois.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint Ocean Ice Study</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/ospar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OSPAR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/tepco.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TEPCO</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/encoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Encoders</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/match.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/geo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc2csv.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NetCDF to CSV</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#uniq_across_dfs" id="toc-uniq_across_dfs" class="nav-link active" data-scroll-target="#uniq_across_dfs">uniq_across_dfs</a></li>
+  <li><a href="#lut_from" id="toc-lut_from" class="nav-link" data-scroll-target="#lut_from">lut_from</a></li>
+  <li><a href="#mapping-provider-codes-to-maris" id="toc-mapping-provider-codes-to-maris" class="nav-link" data-scroll-target="#mapping-provider-codes-to-maris">Mapping provider codes to MARIS</a>
+  <ul>
+  <li><a href="#fuzzy_merge" id="toc-fuzzy_merge" class="nav-link" data-scroll-target="#fuzzy_merge">fuzzy_merge</a></li>
+  <li><a href="#fix_lut" id="toc-fix_lut" class="nav-link" data-scroll-target="#fix_lut">fix_lut</a></li>
+  <li><a href="#usage-examples" id="toc-usage-examples" class="nav-link" data-scroll-target="#usage-examples">Usage examples</a>
+  <ul>
+  <li><a href="#case-1-provider-has-explicit-nomenclature-like-helcom-rubin_name.csv" id="toc-case-1-provider-has-explicit-nomenclature-like-helcom-rubin_name.csv" class="nav-link" data-scroll-target="#case-1-provider-has-explicit-nomenclature-like-helcom-rubin_name.csv">Case 1: Provider has explicit nomenclature (like HELCOM RUBIN_NAME.csv)</a></li>
+  <li><a href="#case-2-provider-without-explicit-nomenclature" id="toc-case-2-provider-without-explicit-nomenclature" class="nav-link" data-scroll-target="#case-2-provider-without-explicit-nomenclature">Case 2: Provider without explicit nomenclature</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#assembling-the-mappings" id="toc-assembling-the-mappings" class="nav-link" data-scroll-target="#assembling-the-mappings">Assembling the mappings</a>
+  <ul>
+  <li><a href="#make_lut_from" id="toc-make_lut_from" class="nav-link" data-scroll-target="#make_lut_from">make_lut_from</a></li>
+  <li><a href="#make_lut" id="toc-make_lut" class="nav-link" data-scroll-target="#make_lut">make_lut</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/callbacks.html">API</a></li><li class="breadcrumb-item"><a href="../api/match.html">Match</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Match</h1>
+</div>
+
+<div>
+  <div class="description">
+    Nomenclature reconciliation: fuzzy matching, lookup tables, and external API resolution.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/match.py#L25" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="uniq_across_dfs" class="level3">
+<h3 class="anchored" data-anchor-id="uniq_across_dfs">uniq_across_dfs</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> uniq_across_dfs(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    dfs:Dict, <span class="co"># Dict of group DataFrames</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    col:<span class="bu">str</span>, <span class="co"># Column to extract unique values from</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="bu">list</span>: <span class="co"># Unique values across all group DataFrames</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Unique column values across all group DataFrames.</em></p>
+<p>For instance:</p>
+<div id="94f182d3" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> {<span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>       <span class="st">'BIOTA'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>       <span class="st">'SEDIMENT'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>]})}</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">set</span>(uniq_across_dfs(dfs, <span class="st">'NUCLIDE'</span>)), {<span class="st">'cs134'</span>, <span class="st">'cs137'</span>, <span class="st">'cs134_137_tot'</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>What if the column name is not in one of the dataframe?</p>
+<div id="ceebdeaf" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> {<span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>       <span class="st">'BIOTA'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>       <span class="st">'SEDIMENT'</span>: pd.DataFrame({<span class="st">'NONUCLIDE'</span>: [<span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>, <span class="st">'cs134_137_tot'</span>]})}</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">set</span>(uniq_across_dfs(dfs, <span class="st">'NUCLIDE'</span>)), {<span class="st">'cs134'</span>, <span class="st">'cs137'</span>, <span class="st">'cs134_137_tot'</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>When a data provider doesn’t supply its own nomenclature, we can derive one from the data itself. <a href="https://franckalbinet.github.io/marisco/api/match.html#lut_from"><code>lut_from</code></a> wraps <a href="https://franckalbinet.github.io/marisco/api/match.html#uniq_across_dfs"><code>uniq_across_dfs</code></a> in the format that <code>Remapper</code> expects.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/match.py#L32" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="lut_from" class="level3">
+<h3 class="anchored" data-anchor-id="lut_from">lut_from</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lut_from(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    dfs:Dict, <span class="co"># Dict of group DataFrames</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    col:<span class="bu">str</span>, <span class="co"># Column to extract unique values from</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    incl_nchars:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Include n_chars column?</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>DataFrame: <span class="co"># Source lookup table</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Build a source lookup table from unique values across all DataFrames.</em></p>
+<div id="d1f0ec8f" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lut_from example</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df_lut <span class="op">=</span> lut_from(dfs, <span class="st">'NUCLIDE'</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">list</span>(df_lut[<span class="st">'value'</span>]), <span class="bu">sorted</span>([<span class="st">'cs134'</span>, <span class="st">'cs137'</span>, <span class="st">'cs134_137_tot'</span>]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="67dea1a4" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lut_from with incl_nchars</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df_lut <span class="op">=</span> lut_from(dfs, <span class="st">'NUCLIDE'</span>, incl_nchars<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">list</span>(df_lut[<span class="st">'n_chars'</span>]), [<span class="dv">5</span>, <span class="dv">13</span>, <span class="dv">5</span>])</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># single group</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> {<span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs137'</span>]})}</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>test_eq(uniq_across_dfs(single, <span class="st">'NUCLIDE'</span>), [<span class="st">'cs137'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="mapping-provider-codes-to-maris" class="level2">
+<h2 class="anchored" data-anchor-id="mapping-provider-codes-to-maris">Mapping provider codes to MARIS</h2>
+<p>A semi-automated workflow for reconciling provider nomenclature against MARIS reference lookups.</p>
+<p>This workflow is designed for the reality that mapping provider codes to MARIS is inherently imperfect. The computer can handle the bulk work with brute-force matching, but reliably getting the last mile right requires a domain expert in the loop.</p>
+<p>The idea is:</p>
+<ol type="1">
+<li><strong>Get familiar with the provider’s codes</strong>: inspect the raw data and list the unique terms that need mapping.</li>
+<li><strong>Try an automatic mapping</strong>: let the computer do fuzzy matching between provider codes and MARIS references.</li>
+<li><strong>Fix what it got wrong</strong>: apply expert overrides for cases the fuzzy match could not resolve correctly.</li>
+<li><strong>Check the result</strong>: verify the final mapping before using it in the pipeline.</li>
+</ol>
+<p>Handler authors should follow this pattern whenever they need to align provider nomenclature (species names, nuclide codes, units, etc.) to MARIS identifiers. The functions below give you the building blocks; steps 1 and 4 are manual review steps.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/match.py#L44" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="fuzzy_merge" class="level3">
+<h3 class="anchored" data-anchor-id="fuzzy_merge">fuzzy_merge</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fuzzy_merge(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    left:DataFrame, <span class="co"># Left DataFrame (provider codes)</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    right:DataFrame, <span class="co"># Right DataFrame (MARIS references)</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    left_on:<span class="bu">str</span><span class="op">=</span><span class="st">'value'</span>, <span class="co"># Column in `left` to match on</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    right_on:<span class="bu">str</span><span class="op">=</span><span class="st">'name'</span>, <span class="co"># Column in `right` to match on</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    dist_fn:Callable<span class="op">=</span>levenshtein_distance, <span class="co"># Distance/similarity function</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    lowercase:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Normalise strings to lowercase before comparing?</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>DataFrame: <span class="co"># Left rows augmented with best right match + score</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>For each row in left, find closest row in right by dist_fn.</em></p>
+<p>Test <a href="https://franckalbinet.github.io/marisco/api/match.html#fuzzy_merge"><code>fuzzy_merge</code></a> exact matches, near-matches, and custom distance functions:</p>
+<div id="103e5c33" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fuzzy_merge: exact matches get score 0</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> pd.DataFrame({<span class="st">'value'</span>: [<span class="st">'cs137'</span>, <span class="st">'k40'</span>]})</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>right <span class="op">=</span> pd.DataFrame({<span class="st">'name'</span>: [<span class="st">'cs137'</span>, <span class="st">'k40'</span>, <span class="st">'sr90'</span>], <span class="st">'maris_id'</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]})</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fuzzy_merge(left, right, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">list</span>(merged[<span class="st">'score'</span>]), [<span class="dv">0</span>, <span class="dv">0</span>])</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">list</span>(merged[<span class="st">'maris_id'</span>]), [<span class="dv">1</span>, <span class="dv">2</span>])</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># fuzzy_merge: near-matches get a non-zero score</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> pd.DataFrame({<span class="st">'value'</span>: [<span class="st">'cs-137'</span>, <span class="st">'cs134_137'</span>]})</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fuzzy_merge(left, right, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 'cs-137' → 'cs137' (dist 1), 'cs134_137' → 'cs137' (dist 5)</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>test_eq(merged.loc[merged[<span class="st">'value'</span>] <span class="op">==</span> <span class="st">'cs-137'</span>, <span class="st">'score'</span>].iloc[<span class="dv">0</span>], <span class="dv">1</span>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>test_eq(merged.loc[merged[<span class="st">'value'</span>] <span class="op">==</span> <span class="st">'cs134_137'</span>, <span class="st">'score'</span>].iloc[<span class="dv">0</span>], <span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="e2e70437" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fuzzy_merge: custom distance function</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> pd.DataFrame({<span class="st">'value'</span>: [<span class="st">'cs137'</span>, <span class="st">'k40'</span>]})</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>merged_jw <span class="op">=</span> fuzzy_merge(left, right, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                         dist_fn<span class="op">=</span><span class="kw">lambda</span> a, b: <span class="dv">1</span> <span class="op">-</span> jaro_winkler_similarity(a, b))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">list</span>(merged_jw[<span class="st">'maris_id'</span>]), [<span class="dv">1</span>, <span class="dv">2</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="613cba86" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lowercase=True: case difference ignored</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> pd.DataFrame({<span class="st">'value'</span>: [<span class="st">'Cs137'</span>]})</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>right <span class="op">=</span> pd.DataFrame({<span class="st">'name'</span>: [<span class="st">'cs137'</span>], <span class="st">'maris_id'</span>: [<span class="dv">1</span>]})</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fuzzy_merge(left, right, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>, lowercase<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>test_eq(merged.loc[<span class="dv">0</span>, <span class="st">'score'</span>], <span class="fl">0.0</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>test_eq(merged.loc[<span class="dv">0</span>, <span class="st">'maris_id'</span>], <span class="dv">1</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># lowercase=False: case difference counts as distance 1</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>merged2 <span class="op">=</span> fuzzy_merge(left, right, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>, lowercase<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>test_eq(merged2.loc[<span class="dv">0</span>, <span class="st">'score'</span>], <span class="dv">1</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>test_eq(merged2.loc[<span class="dv">0</span>, <span class="st">'maris_id'</span>], <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>For more details on jellyfish distance/similarity functions, see the <a href="https://www.jpt.sh/projects/jellyfish/functions/">official documentation</a>.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/match.py#L66" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="fix_lut" class="level3">
+<h3 class="anchored" data-anchor-id="fix_lut">fix_lut</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fix_lut(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    merged:DataFrame, overrides:<span class="bu">dict</span>, maris:DataFrame, left_on:<span class="bu">str</span>, right_on:<span class="bu">str</span>, id_col:<span class="bu">str</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>DataFrame:</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Replace matched entries with expert overrides by name.</em></p>
+<p><a href="https://franckalbinet.github.io/marisco/api/match.html#fix_lut"><code>fix_lut</code></a> replaces fuzzy-matched entries with expert overrides and resets their score to 0:</p>
+<div id="1e61092d" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fix_lut: override a fuzzy match with the correct MARIS name</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>maris <span class="op">=</span> pd.DataFrame({<span class="st">'name'</span>: [<span class="st">'cs137'</span>, <span class="st">'k40'</span>, <span class="st">'cs134_137_tot'</span>], <span class="st">'maris_id'</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">33</span>]})</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> pd.DataFrame({<span class="st">'value'</span>: [<span class="st">'cs134_137'</span>]})</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fuzzy_merge(left, maris, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># cs134_137 matched to cs137 (score 4) — wrong!</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>test_eq(merged[<span class="st">'maris_id'</span>].iloc[<span class="dv">0</span>], <span class="dv">1</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>test_eq(merged[<span class="st">'score'</span>].iloc[<span class="dv">0</span>], <span class="dv">4</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(merged)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       value   name  maris_id  score
+0  cs134_137  cs137         1      4</code></pre>
+</div>
+</div>
+<div id="503d7859" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix it with an expert override</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>overrides <span class="op">=</span> {<span class="st">'cs134_137'</span>: <span class="st">'cs134_137_tot'</span>}</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>fixed <span class="op">=</span> fix_lut(merged, overrides, maris,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>, id_col<span class="op">=</span><span class="st">'maris_id'</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>test_eq(fixed[<span class="st">'maris_id'</span>].iloc[<span class="dv">0</span>], <span class="dv">33</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>test_eq(fixed[<span class="st">'score'</span>].iloc[<span class="dv">0</span>], <span class="dv">0</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(fixed)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       value           name  maris_id  score
+0  cs134_137  cs134_137_tot        33      0</code></pre>
+</div>
+</div>
+<div id="00fb8144" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Empty overrides: no changes</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>fixed2 <span class="op">=</span> fix_lut(merged, {}, maris,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                 left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>, id_col<span class="op">=</span><span class="st">'maris_id'</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>test_eq(fixed2[<span class="st">'maris_id'</span>].iloc[<span class="dv">0</span>], <span class="dv">1</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>test_eq(fixed2[<span class="st">'score'</span>].iloc[<span class="dv">0</span>], <span class="dv">4</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(fixed)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       value           name  maris_id  score
+0  cs134_137  cs134_137_tot        33      0</code></pre>
+</div>
+</div>
+<div id="7275bf95" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> io</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> contextlib</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="91c356e4" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fix_lut: unknown target in overrides prints warning and skips</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>left2 <span class="op">=</span> pd.DataFrame({<span class="st">'value'</span>: [<span class="st">'cs137'</span>, <span class="st">'k40'</span>]})</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>merged2 <span class="op">=</span> fuzzy_merge(left2, maris, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 'nonexistent' is not in the maris table</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>overrides2 <span class="op">=</span> {<span class="st">'cs137'</span>: <span class="st">'nonexistent'</span>}</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>stderr <span class="op">=</span> io.StringIO()</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> contextlib.redirect_stderr(stderr):</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    fixed2 <span class="op">=</span> fix_lut(merged2, overrides2, maris,</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>                     left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>, id_col<span class="op">=</span><span class="st">'maris_id'</span>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Warning was printed</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="st">"Warning: 'nonexistent' not found"</span> <span class="kw">in</span> stderr.getvalue()</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="co"># cs137 was not changed (still points to maris_id 1)</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>test_eq(fixed2.loc[fixed2[<span class="st">'value'</span>] <span class="op">==</span> <span class="st">'cs137'</span>, <span class="st">'maris_id'</span>].iloc[<span class="dv">0</span>], <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="usage-examples" class="level3">
+<h3 class="anchored" data-anchor-id="usage-examples">Usage examples</h3>
+<section id="case-1-provider-has-explicit-nomenclature-like-helcom-rubin_name.csv" class="level4">
+<h4 class="anchored" data-anchor-id="case-1-provider-has-explicit-nomenclature-like-helcom-rubin_name.csv">Case 1: Provider has explicit nomenclature (like HELCOM RUBIN_NAME.csv)</h4>
+<div id="447503f4" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>provider_df <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'RUBIN'</span>: [<span class="st">'GADU MOR'</span>, <span class="st">'FUCU VES'</span>, <span class="st">'MYTI EDU'</span>],</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SCIENTIFIC NAME'</span>: [<span class="st">'GADUS MORHUA'</span>, <span class="st">'FUCUS VESICULOSUS'</span>, <span class="st">'MYTILUS EDULIS'</span>],</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>maris_species <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'species_id'</span>: [<span class="dv">11</span>, <span class="dv">22</span>, <span class="dv">33</span>],</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'species_name'</span>: [<span class="st">'Gadus morhua'</span>, <span class="st">'Fucus vesiculosus'</span>, <span class="st">'Mytilus edulis'</span>],</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>overwrite_cache <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> cache_path() <span class="op">/</span> <span class="st">'species_helcom.pkl'</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> path.exists() <span class="kw">and</span> <span class="kw">not</span> overwrite_cache:</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    merged <span class="op">=</span> pd.read_pickle(path)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    merged <span class="op">=</span> fuzzy_merge(provider_df, maris_species,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>                         left_on<span class="op">=</span><span class="st">'SCIENTIFIC NAME'</span>, right_on<span class="op">=</span><span class="st">'species_name'</span>)</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    merged.to_pickle(path)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>merged.query(<span class="st">'score &gt; 0'</span>)  <span class="co"># inspect non-exact matches</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fix_lut(merged, {}, maris_species,</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>                 left_on<span class="op">=</span><span class="st">'SCIENTIFIC NAME'</span>, right_on<span class="op">=</span><span class="st">'species_name'</span>, id_col<span class="op">=</span><span class="st">'species_id'</span>)</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>lut <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(merged[<span class="st">'SCIENTIFIC NAME'</span>], merged[<span class="st">'species_id'</span>]))</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(lut[<span class="st">'GADUS MORHUA'</span>])  <span class="co"># 11</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>11</code></pre>
+</div>
+</div>
+</section>
+<section id="case-2-provider-without-explicit-nomenclature" class="level4">
+<h4 class="anchored" data-anchor-id="case-2-provider-without-explicit-nomenclature">Case 2: Provider without explicit nomenclature</h4>
+<p>Here the provider does not supply a nomenclature lookup table. We infer the unique values directly from the data using <a href="https://franckalbinet.github.io/marisco/api/match.html#lut_from"><code>lut_from</code></a>, then follow the same matching workflow.</p>
+<div id="881d6fbf" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Case 2 — Provider without explicit nomenclature (use lut_from to infer from data)</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>provider_data <span class="op">=</span> {</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134'</span>, <span class="st">'cs137'</span>, <span class="st">'k40'</span>]}),</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'BIOTA'</span>:    pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'k40'</span>, <span class="st">'sr90'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect: build a LUT from the data itself</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>provider_lut <span class="op">=</span> lut_from(provider_data, <span class="st">'NUCLIDE'</span>)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>maris_nuclides <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'maris_id'</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">33</span>],</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'name'</span>: [<span class="st">'cs137'</span>, <span class="st">'k40'</span>, <span class="st">'sr90'</span>, <span class="st">'cs134_137_tot'</span>],</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Match: brute-force fuzzy matching</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fuzzy_merge(provider_lut, maris_nuclides, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>)</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Uncomment to inspect borderline matches: merged.query('score &gt; 0')</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix: override anything the fuzzy match got wrong</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>overrides <span class="op">=</span> {<span class="st">'cs134_137_tot'</span>: <span class="st">'cs134_137_tot'</span>}</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>fixed <span class="op">=</span> fix_lut(merged, overrides, maris_nuclides,</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>                left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>, id_col<span class="op">=</span><span class="st">'maris_id'</span>)</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply: use as a plain dict</span></span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>lut <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(fixed[<span class="st">'value'</span>], fixed[<span class="st">'maris_id'</span>]))</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>test_eq(lut[<span class="st">'cs137'</span>], <span class="dv">1</span>)</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>test_eq(lut[<span class="st">'cs134_137_tot'</span>], <span class="dv">33</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+</section>
+<section id="assembling-the-mappings" class="level2">
+<h2 class="anchored" data-anchor-id="assembling-the-mappings">Assembling the mappings</h2>
+<p>When you need to defer the entire mapping pipeline (for example, because the runtime data (<code>dfs</code>) isn’t available at module load time) the functions below wrap the pipeline into a single lazy callable.</p>
+<p><strong><a href="https://franckalbinet.github.io/marisco/api/match.html#make_lut_from"><code>make_lut_from</code></a></strong> is the general builder. You provide a callable (or a static DataFrame), and it returns a function that, given the full <code>dfs</code> dict, runs the matching and fixing pipeline and returns a <code>dict</code>.</p>
+<p><strong><a href="https://franckalbinet.github.io/marisco/api/match.html#make_lut"><code>make_lut</code></a></strong> is a convenience wrapper for the common case (Case 2) where the provider has no explicit nomenclature table. It infers unique values from the data using <a href="https://franckalbinet.github.io/marisco/api/match.html#lut_from"><code>lut_from</code></a>, then follows the same matching and fixing pipeline.</p>
+<p>This pattern lets handler notebooks export the <em>configuration</em> (fixes, cache tag, key) without eagerly computing against data that may not exist yet.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/match.py#L86" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="make_lut_from" class="level3">
+<h3 class="anchored" data-anchor-id="make_lut_from">make_lut_from</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_lut_from(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    mk_prov, <span class="co"># Callable(dict-&gt;DataFrame) or static provider DataFrame</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    key_col:<span class="bu">str</span>, <span class="co"># Column name for the Lut key (source value to look up)</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    match_col:<span class="bu">str</span>, <span class="co"># Column in provider LUT to fuzzy-match against MARIS ref</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    lut_key:<span class="bu">str</span>, <span class="co"># NC_DTYPES key for the MARIS ref LUT to reconcile against, e.g. 'NUCLIDE' or 'SPECIES'</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    fixes:<span class="bu">dict</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Expert overrides: {source_value: maris_name}</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    cache_tag:<span class="bu">str</span><span class="op">=</span><span class="va">None</span>, <span class="co"># If set, cache `merged` as `{cache_tag}.pkl` under cache_path()</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>Callable: <span class="co"># Function dict-&gt;dict: takes dfs, returns lookup dict</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Factory: returns a callable that builds a lookup dict from provider data at call time.</em></p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/match.py#L106" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="make_lut" class="level3">
+<h3 class="anchored" data-anchor-id="make_lut">make_lut</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_lut(</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    lut_key:<span class="bu">str</span>, <span class="co"># NC_DTYPES key for the MARIS ref. LUT to reconcile against, e.g. 'NUCLIDE' or 'SPECIES'</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    fixes:<span class="bu">dict</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Expert overrides: {source_value: maris_name}</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    cache_tag:<span class="bu">str</span><span class="op">=</span><span class="va">None</span>, <span class="co"># If set, cache `merged` as `{cache_tag}.pkl`</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>Callable: <span class="co"># Function dict-&gt;dict: takes dfs, returns lookup dict</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Convenience: derives provider LUT from dfs dict via lut_from, then wraps in make_lut_from.</em></p>
+<div id="5105a7ca" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Flavor A — minimal example, no fixes, no cache</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>nuclide_lut <span class="op">=</span> make_lut(<span class="st">'NUCLIDE'</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use with some test data</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>test_dfs <span class="op">=</span> {</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134'</span>, <span class="st">'k40'</span>]}),</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'BIOTA'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'k40'</span>, <span class="st">'sr90'</span>, <span class="st">'cs134_137'</span>]}),</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>lut <span class="op">=</span> nuclide_lut(test_dfs)</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co"># cs137 maps to maris_id 33 (from the database LUT)</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>test_eq(lut[<span class="st">'cs137'</span>], <span class="dv">33</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="500a72fd" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Flavor A — with fixes derived from what's in the notebook</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>fixes_nuclide_names <span class="op">=</span> {<span class="st">'cs134_137'</span>: <span class="st">'cs134_137_tot'</span>}</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>nuclide_lut <span class="op">=</span> make_lut(<span class="st">'NUCLIDE'</span>, fixes<span class="op">=</span>fixes_nuclide_names)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>lut <span class="op">=</span> nuclide_lut(test_dfs)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># The fix ensures 'cs134_137' resolves correctly</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>test_eq(lut[<span class="st">'cs134_137'</span>], <span class="dv">76</span>) <span class="co"># maris_id for cs134_137_tot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="083937bb" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>maris <span class="op">=</span> get_lut(<span class="st">'NUCLIDE'</span>, as_df<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>maris.head(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="2a221c9a" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Flavor B — explicit provider LUT (e.g. from a nomenclature file)</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>provider_species <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'code'</span>: [<span class="st">'GADU MOR'</span>, <span class="st">'MYTI EDU'</span>],</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'sci_name'</span>: [<span class="st">'Gadus morhua'</span>, <span class="st">'Mytilus edulis'</span>],</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>species_lut <span class="op">=</span> make_lut_from(<span class="kw">lambda</span> _: provider_species,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>                            key_col<span class="op">=</span><span class="st">'code'</span>, match_col<span class="op">=</span><span class="st">'sci_name'</span>,</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>                            lut_key<span class="op">=</span><span class="st">'SPECIES'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="d20fcc01" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># GADU MOR maps to species_id 99 (from the database LUT)</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>test_eq(species_lut(<span class="va">None</span>)[<span class="st">'GADU MOR'</span>], <span class="dv">99</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="77ace08a" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Flavor B — with fix overrides</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>species_lut <span class="op">=</span> make_lut_from(<span class="kw">lambda</span> _: provider_species,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                            key_col<span class="op">=</span><span class="st">'code'</span>, match_col<span class="op">=</span><span class="st">'sci_name'</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                            lut_key<span class="op">=</span><span class="st">'SPECIES'</span>, fixes<span class="op">=</span>{<span class="st">'GADU MOR'</span>: <span class="st">'Gadus morhua'</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="79cd0141" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Same result: fix confirms what fuzzy matching already got right</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>test_eq(species_lut(<span class="va">None</span>)[<span class="st">'GADU MOR'</span>], <span class="dv">99</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

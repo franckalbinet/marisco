@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Aligning provider nomenclature with MARIS">
+
+<title>Reconcile nomenclatures – marisco</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-2593923cf60a9aa2fc04e718582542c7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="Reconcile nomenclatures – marisco">
+<meta property="og:description" content="Aligning provider nomenclature with MARIS">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="Reconcile nomenclatures – marisco">
+<meta name="twitter:description" content="Aligning provider nomenclature with MARIS">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/franckalbinet/marisco"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../how-to/writing-a-handler.html">How-to</a></li><li class="breadcrumb-item"><a href="../how-to/reconcile-nomenclature.html">Reconcile nomenclatures</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARISCO</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">How-to</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/writing-a-handler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Write a new handler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/reconcile-nomenclature.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Reconcile nomenclatures</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Data Reference</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Data Guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/field-definition.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Field Definitions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/sample-id-coverage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sample ID Coverage</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/geotraces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geotraces</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/maris_legacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Legacy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/jois.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint Ocean Ice Study</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/ospar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OSPAR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/tepco.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TEPCO</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/encoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Encoders</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/geo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc2csv.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NetCDF to CSV</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#how-it-works" id="toc-how-it-works" class="nav-link active" data-scroll-target="#how-it-works">How it works</a>
+  <ul>
+  <li><a href="#try-to-map-automatically" id="toc-try-to-map-automatically" class="nav-link" data-scroll-target="#try-to-map-automatically">Try to map automatically</a></li>
+  <li><a href="#fix-what-it-got-wrong" id="toc-fix-what-it-got-wrong" class="nav-link" data-scroll-target="#fix-what-it-got-wrong">Fix what it got wrong</a></li>
+  <li><a href="#check-the-result" id="toc-check-the-result" class="nav-link" data-scroll-target="#check-the-result">Check the result</a></li>
+  </ul></li>
+  <li><a href="#common-scenarios" id="toc-common-scenarios" class="nav-link" data-scroll-target="#common-scenarios">Common scenarios</a>
+  <ul>
+  <li><a href="#when-the-match-is-correct-but-the-score-is-not-zero" id="toc-when-the-match-is-correct-but-the-score-is-not-zero" class="nav-link" data-scroll-target="#when-the-match-is-correct-but-the-score-is-not-zero">When the match is correct but the score is not zero</a></li>
+  <li><a href="#when-the-provider-supplies-a-lookup-table" id="toc-when-the-provider-supplies-a-lookup-table" class="nav-link" data-scroll-target="#when-the-provider-supplies-a-lookup-table">When the provider supplies a lookup table</a></li>
+  <li><a href="#when-the-provider-does-not-supply-a-lookup-table" id="toc-when-the-provider-does-not-supply-a-lookup-table" class="nav-link" data-scroll-target="#when-the-provider-does-not-supply-a-lookup-table">When the provider does not supply a lookup table</a></li>
+  </ul></li>
+  <li><a href="#using-the-result-in-a-transformer" id="toc-using-the-result-in-a-transformer" class="nav-link" data-scroll-target="#using-the-result-in-a-transformer">Using the result in a Transformer</a>
+  <ul>
+  <li><a href="#self-contained-reconciliation-example" id="toc-self-contained-reconciliation-example" class="nav-link" data-scroll-target="#self-contained-reconciliation-example">Self-contained reconciliation example</a></li>
+  <li><a href="#using-make_lut-as-a-shortcut" id="toc-using-make_lut-as-a-shortcut" class="nav-link" data-scroll-target="#using-make_lut-as-a-shortcut">Using <code>make_lut</code> as a shortcut</a></li>
+  <li><a href="#running-the-transformer-end-to-end" id="toc-running-the-transformer-end-to-end" class="nav-link" data-scroll-target="#running-the-transformer-end-to-end">Running the Transformer end-to-end</a></li>
+  <li><a href="#using-a-plain-dict-as-a-lut" id="toc-using-a-plain-dict-as-a-lut" class="nav-link" data-scroll-target="#using-a-plain-dict-as-a-lut">Using a plain dict as a lut</a></li>
+  </ul></li>
+  <li><a href="#recording-decisions-in-the-handler-notebook" id="toc-recording-decisions-in-the-handler-notebook" class="nav-link" data-scroll-target="#recording-decisions-in-the-handler-notebook">Recording decisions in the handler notebook</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../how-to/writing-a-handler.html">How-to</a></li><li class="breadcrumb-item"><a href="../how-to/reconcile-nomenclature.html">Reconcile nomenclatures</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Reconcile nomenclatures</h1>
+</div>
+
+<div>
+  <div class="description">
+    Aligning provider nomenclature with MARIS
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p><strong>Why this needs a human in the loop?</strong></p>
+<p>Matching provider codes to MARIS identifiers sounds like a string comparison problem, but in practice it is a data curation problem.</p>
+<p>There are many reasons the automatic matching can fail:</p>
+<ul>
+<li>Spelling variations and typos in the source data</li>
+<li>Inconsistent use of hyphens, spaces, or underscores (<code>Cs-137</code>, <code>cs137</code>, <code>CS 137</code>)</li>
+<li>Composite or derived values that do not exist as a single MARIS reference (<code>cs134_137_tot</code>, <code>pu239+240</code>)</li>
+<li>Provider-specific codes with no direct MARIS equivalent</li>
+<li>Scientific names that have been updated (synonyms, reclassifications)</li>
+<li>Units written in different notations (<code>Bq/m3</code> vs <code>Bq.m-3</code>)</li>
+</ul>
+<p>No fuzzy-matching algorithm can resolve these on its own. The distance score can flag the borderline cases, but deciding the correct mapping requires domain expertise.</p>
+<p>An LLM could take a first pass, but it would need the same careful human review afterwards. And some nomenclatures are large: the MARIS species reference has over 1500 entries and gets updated over time. Running an LLM on that scale for every handler would be disproportionate, especially when fuzzy matching handles the bulk cases well and the remaining ambiguous cases still need a domain expert to evaluate them anyway.</p>
+<p>Our experience has shown that the most reliable approach is: let the computer do brute-force fuzzy matching on the bulk cases, then bring a domain expert into the loop for the ambiguous ones.</p>
+<section id="how-it-works" class="level2">
+<h2 class="anchored" data-anchor-id="how-it-works">How it works</h2>
+<p>The reconciliation workflow breaks down into four steps, each with a clear outcome:</p>
+<ul>
+<li><p><strong>Try an automatic mapping</strong>: Let the computer do brute-force fuzzy matching between provider values and MARIS references. The distance score tells you how far apart two strings are. A score of 0 means an exact match. The higher the score, the more the strings differ. This score is your signal for which cases need human attention.</p></li>
+<li><p><strong>Fix what it got wrong</strong>: Apply expert overrides for every case the fuzzy match could not resolve correctly. This is where domain knowledge enters.</p></li>
+<li><p><strong>Check the result</strong>: Verify the final mapping before using it in the pipeline.</p></li>
+<li><p><strong>Use the mapping in a Transformer</strong>: Package the resolved lookup table and pass it into a callback.</p></li>
+</ul>
+<p><strong>Let’s see it in action.</strong></p>
+<p>First try to <a href="https://www.jpt.sh/projects/jellyfish">“fuzzy” match</a> data provider and maris nomenclature:</p>
+<section id="try-to-map-automatically" class="level3">
+<h3 class="anchored" data-anchor-id="try-to-map-automatically">Try to map automatically</h3>
+<div id="mifa-005" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Real-world HELCOM-style nuclide values (compound codes, typos, hyphen variants)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.match <span class="im">import</span> fuzzy_merge</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>provider_lut <span class="op">=</span> pd.DataFrame({<span class="st">'value'</span>: [<span class="st">'cs134137'</span>, <span class="st">'cm243244'</span>, <span class="st">'pu239240'</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">'pu238240'</span>, <span class="st">'cs143'</span>, <span class="st">'cs145'</span>, <span class="st">'cs144'</span>, <span class="st">'k-40'</span>]})</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>maris_ref <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'maris_id'</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">99</span>, <span class="dv">33</span>],</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'name'</span>: [<span class="st">'cs134'</span>, <span class="st">'cs137'</span>, <span class="st">'cm244'</span>, <span class="st">'pu239'</span>, <span class="st">'pu240'</span>, <span class="st">'cs134_137_tot'</span>, <span class="st">'k40'</span>],</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fuzzy_merge(provider_lut, maris_ref, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect non-exact matches (score &gt; 0)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(merged[merged[<span class="st">'score'</span>] <span class="op">&gt;</span> <span class="dv">0</span>][[<span class="st">'value'</span>, <span class="st">'name'</span>, <span class="st">'maris_id'</span>, <span class="st">'score'</span>]])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      value   name  maris_id  score
+0  cs134137  cs134         1      3
+1  cm243244  cm244         3      3
+2  pu239240  pu239         4      3
+3  pu238240  pu240         5      3
+4     cs143  cs134         1      2
+5     cs145  cs134         1      2
+6     cs144  cs134         1      1
+7      k-40    k40        33      1</code></pre>
+</div>
+</div>
+</section>
+<section id="fix-what-it-got-wrong" class="level3">
+<h3 class="anchored" data-anchor-id="fix-what-it-got-wrong">Fix what it got wrong</h3>
+<p>Apply expert overrides for every case the fuzzy match got wrong. You write a dictionary that maps each problematic provider value to the correct MARIS name. The <a href="https://franckalbinet.github.io/marisco/api/match.html#fix_lut"><code>fix_lut</code></a> function applies these overrides and resets the score to 0 for the fixed entries, so you can verify that no issues remain.</p>
+<p>There are two kinds of problems you will encounter:</p>
+<ul>
+<li><p><strong>False matches</strong>: The algorithm picked a MARIS name, but it is the wrong one. For example, <code>cs134_137_tot</code> was matched to <code>k40</code> because of some accidental string similarity. These need an override telling the system the correct target.</p></li>
+<li><p><strong>Missing matches</strong>: The provider uses a value that does not exist in the MARIS reference at all. For example, <code>cs134</code> and <code>cs144</code> are not standard MARIS nuclide names. You need to research what they actually represent and map them to the closest MARIS equivalent.</p></li>
+</ul>
+<div id="mifa-007" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.match <span class="im">import</span> fix_lut</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Expert overrides: provider value -&gt; correct MARIS name</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>overrides <span class="op">=</span> {</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'cs134_137_tot'</span>: <span class="st">'cs134_137_tot'</span>,  <span class="co"># correct match exists</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'cs144'</span>: <span class="st">'cs137'</span>,                   <span class="co"># typo for cs137</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'cs134'</span>: <span class="st">'cs134_137_tot'</span>,           <span class="co"># combined measurement</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>fixed <span class="op">=</span> fix_lut(merged, overrides, maris_ref,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>, id_col<span class="op">=</span><span class="st">'maris_id'</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(fixed[fixed[<span class="st">'score'</span>] <span class="op">&gt;</span> <span class="dv">0</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      value  maris_id   name  score
+0  cs134137         1  cs134      3
+1  cm243244         3  cm244      3
+2  pu239240         4  pu239      3
+3  pu238240         5  pu240      3
+4     cs143         1  cs134      2
+5     cs145         1  cs134      2
+7      k-40        33    k40      1</code></pre>
+</div>
+</div>
+</section>
+<section id="check-the-result" class="level3">
+<h3 class="anchored" data-anchor-id="check-the-result">Check the result</h3>
+<p>If all entries now have a score of 0, the lookup table is complete and ready for use.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(fixed[fixed[<span class="st">'score'</span>] <span class="op">&gt;</span> <span class="dv">0</span>]) <span class="op">==</span> <span class="dv">0</span>, <span class="st">"Unresolved matches remain"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="common-scenarios" class="level2">
+<h2 class="anchored" data-anchor-id="common-scenarios">Common scenarios</h2>
+<section id="when-the-match-is-correct-but-the-score-is-not-zero" class="level3">
+<h3 class="anchored" data-anchor-id="when-the-match-is-correct-but-the-score-is-not-zero">When the match is correct but the score is not zero</h3>
+<p>A non-zero score does not always mean something is wrong. The algorithm scores every pair by string distance, and sometimes a valid mapping produces a small positive score. For example, the HELCOM RUBIN code <code>ENCHINODERMATA CIM</code> fuzzy-matches to the MARIS species <code>Echinodermata</code> with a non-zero score, because the provider uses a more specific category name than the MARIS reference entry. The match is semantically correct, so you leave it as is and move on.</p>
+<p>The boundary of concern is not “score is zero” but “score is low enough to be clearly the same thing.” If the best match is clearly the right one even with a non-zero score, no override is needed. You only need to override when the fuzzy match picked the wrong MARIS entry, or when you decide a value must map to a specific target that the algorithm did not rank first.</p>
+</section>
+<section id="when-the-provider-supplies-a-lookup-table" class="level3">
+<h3 class="anchored" data-anchor-id="when-the-provider-supplies-a-lookup-table">When the provider supplies a lookup table</h3>
+<p>Some providers include a separate file that maps their codes to scientific names. For example, HELCOM ships a <code>RUBIN_NAME.csv</code> that maps RUBIN species codes to their full scientific names. In this case you load that file directly and run the workflow on it.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>provider_df <span class="op">=</span> pd.read_csv(<span class="ss">f'</span><span class="sc">{</span>src_dir<span class="sc">}</span><span class="ss">/RUBIN_NAME.csv'</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>maris_ref <span class="op">=</span> get_lut(<span class="st">'SPECIES'</span>, as_df<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fuzzy_merge(provider_df, maris_ref,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                     left_on<span class="op">=</span><span class="st">'SCIENTIFIC NAME'</span>, right_on<span class="op">=</span><span class="st">'species'</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>merged[merged.score <span class="op">&gt;</span> <span class="dv">0</span>].sort_values(<span class="st">'score'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Review the borderline matches, write your overrides, and fix:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fixes <span class="op">=</span> {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'LAMINARIA SACCHARINA'</span>: <span class="st">'Saccharina latissima'</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'CARDIUM EDULE'</span>: <span class="st">'Cerastoderma edule'</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>fixed <span class="op">=</span> fix_lut(merged, fixes, maris_ref,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                left_on<span class="op">=</span><span class="st">'SCIENTIFIC NAME'</span>, right_on<span class="op">=</span><span class="st">'species'</span>, id_col<span class="op">=</span><span class="st">'species_id'</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(fixed[fixed[<span class="st">'score'</span>] <span class="op">&gt;</span> <span class="dv">0</span>]) <span class="op">==</span> <span class="dv">0</span>, <span class="st">"Unresolved matches remain"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Package the result into a callable the Transformer can use:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>species_lut <span class="op">=</span> make_lut_from(provider_df, <span class="st">'RUBIN'</span>, <span class="st">'SCIENTIFIC NAME'</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                            <span class="st">'SPECIES'</span>, fixes<span class="op">=</span>fixes)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="when-the-provider-does-not-supply-a-lookup-table" class="level3">
+<h3 class="anchored" data-anchor-id="when-the-provider-does-not-supply-a-lookup-table">When the provider does not supply a lookup table</h3>
+<p>Many providers only share measurement data without a mapping table. In this case you derive the unique values directly from the data columns using <a href="https://franckalbinet.github.io/marisco/api/match.html#lut_from"><code>lut_from</code></a>, which collects all unique entries across every sample group (<code>SEAWATER</code>, <code>BIOTA</code>, <code>SEDIMENT</code>) into a single DataFrame.</p>
+<p>Once you have this derived lookup table, the workflow proceeds exactly as above: try an automatic match against the MARIS reference, inspect the borderline scores, fix with overrides, and check the result.</p>
+<p>Once the assertion passes, wrap it into a Transformer-ready callable with:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>nuclide_lut <span class="op">=</span> make_lut(<span class="st">'NUCLIDE'</span>, fixes<span class="op">=</span>fixes)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="1745b402" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.match <span class="im">import</span> lut_from, fuzzy_merge, fix_lut, make_lut</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Derive unique values from the data itself</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>provider_data <span class="op">=</span> {</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134'</span>, <span class="st">'cs137'</span>, <span class="st">'k40'</span>]}),</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'BIOTA'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'k40'</span>, <span class="st">'sr90'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>provider_lut <span class="op">=</span> lut_from(provider_data, <span class="st">'NUCLIDE'</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>maris_ref <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'maris_id'</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">33</span>],</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'name'</span>: [<span class="st">'cs137'</span>, <span class="st">'k40'</span>, <span class="st">'sr90'</span>, <span class="st">'cs134_137_tot'</span>],</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fuzzy_merge(provider_lut, maris_ref, left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>fixes <span class="op">=</span> {<span class="st">'cs134_137_tot'</span>: <span class="st">'cs134_137_tot'</span>, <span class="st">'cs134'</span>: <span class="st">'cs134_137_tot'</span>}</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>fixed <span class="op">=</span> fix_lut(merged, fixes, maris_ref,</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>                left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'name'</span>, id_col<span class="op">=</span><span class="st">'maris_id'</span>)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(fixed[fixed[<span class="st">'score'</span>] <span class="op">&gt;</span> <span class="dv">0</span>]) <span class="op">==</span> <span class="dv">0</span>, <span class="st">"Unresolved matches remain"</span> </span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>nuclide_lut <span class="op">=</span> make_lut(<span class="st">'NUCLIDE'</span>, fixes<span class="op">=</span>fixes)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="using-the-result-in-a-transformer" class="level2">
+<h2 class="anchored" data-anchor-id="using-the-result-in-a-transformer">Using the result in a Transformer</h2>
+<p>The lookup table (whether built by <a href="https://franckalbinet.github.io/marisco/api/match.html#make_lut"><code>make_lut</code></a>, <a href="https://franckalbinet.github.io/marisco/api/match.html#make_lut_from"><code>make_lut_from</code></a>, or a plain dict) goes into a <a href="https://franckalbinet.github.io/marisco/api/callbacks.html#remapcb"><code>RemapCB</code></a> callback that the <a href="https://franckalbinet.github.io/marisco/api/callbacks.html#transformer"><code>Transformer</code></a> applies during encoding.</p>
+<section id="self-contained-reconciliation-example" class="level3">
+<h3 class="anchored" data-anchor-id="self-contained-reconciliation-example">Self-contained reconciliation example</h3>
+<p>This example creates a mock provider LUT, fuzzy-matches it against the MARIS NUCLIDE reference (loaded with <a href="https://franckalbinet.github.io/marisco/api/configs.html#get_lut"><code>get_lut</code></a>), applies expert overrides, and packages the result into a <a href="https://franckalbinet.github.io/marisco/api/callbacks.html#remapcb"><code>RemapCB</code></a> callback. This is the most explicit workflow, mapping directly to what you would do for a new provider.</p>
+<div id="39b95822" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.configs <span class="im">import</span> get_lut</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.match <span class="im">import</span> fuzzy_merge, fix_lut, make_lut_from</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.callbacks <span class="im">import</span> RemapCB</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Mock provider values</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>provider_lut <span class="op">=</span> pd.DataFrame({<span class="st">'value'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134'</span>, <span class="st">'k-40'</span>, <span class="st">'sr90'</span>, <span class="st">'cs144'</span>, <span class="st">'cs134_137_tot'</span>]})</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>maris_ref <span class="op">=</span> get_lut(<span class="st">'NUCLIDE'</span>, as_df<span class="op">=</span><span class="va">True</span>)  <span class="co"># columns: nuclide_id, nc_name</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> fuzzy_merge(provider_lut, maris_ref,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                     left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'nc_name'</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Non-zero scores ==="</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(merged[merged.score <span class="op">&gt;</span> <span class="dv">0</span>][[<span class="st">'value'</span>, <span class="st">'nc_name'</span>, <span class="st">'score'</span>]].to_string(index<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>fixes <span class="op">=</span> {<span class="st">'cs134'</span>: <span class="st">'cs134_137_tot'</span>, <span class="st">'cs144'</span>: <span class="st">'cs137'</span>, <span class="st">'k-40'</span>: <span class="st">'k40'</span>}</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>fixed <span class="op">=</span> fix_lut(merged, fixes, maris_ref,</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>                left_on<span class="op">=</span><span class="st">'value'</span>, right_on<span class="op">=</span><span class="st">'nc_name'</span>, id_col<span class="op">=</span><span class="st">'nuclide_id'</span>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(fixed[fixed.score <span class="op">&gt;</span> <span class="dv">0</span>]) <span class="op">==</span> <span class="dv">0</span>, <span class="st">"Unresolved matches remain"</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== All resolved ==="</span>)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Package for Transformer callback</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>nuclide_lut <span class="op">=</span> make_lut_from(provider_lut, <span class="st">'value'</span>, <span class="st">'value'</span>, <span class="st">'NUCLIDE'</span>, fixes<span class="op">=</span>fixes)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>cb <span class="op">=</span> RemapCB(lut<span class="op">=</span>nuclide_lut, col_remap<span class="op">=</span><span class="st">'NUCLIDE'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Callback ready: </span><span class="sc">{</span>cb<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== Non-zero scores ===
+value nc_name  score
+ k-40     k40      1
+cs144   cs134      1
+
+=== All resolved ===
+Callback ready: &lt;marisco.callbacks.RemapCB object&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="using-make_lut-as-a-shortcut" class="level3">
+<h3 class="anchored" data-anchor-id="using-make_lut-as-a-shortcut">Using <a href="https://franckalbinet.github.io/marisco/api/match.html#make_lut"><code>make_lut</code></a> as a shortcut</h3>
+<p>When the provider only delivers measurement data without a separate lookup table, <a href="https://franckalbinet.github.io/marisco/api/match.html#make_lut"><code>make_lut</code></a> handles the entire workflow in one call: it derives unique values from the data, fuzzy-matches against the MARIS reference, applies your overrides, and returns a ready-to-use callable.</p>
+<div id="cbb53c15" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.configs <span class="im">import</span> get_lut</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.match <span class="im">import</span> make_lut</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.callbacks <span class="im">import</span> RemapCB</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># What the provider actually delivers: measurement data in each group</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> {</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134'</span>, <span class="st">'k-40'</span>, <span class="st">'sr90'</span>]}),</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'BIOTA'</span>:    pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs144'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Derive unique values across all groups</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>maris_ref <span class="op">=</span> get_lut(<span class="st">'NUCLIDE'</span>, as_df<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>fixes <span class="op">=</span> {<span class="st">'cs134'</span>: <span class="st">'cs134_137_tot'</span>, <span class="st">'cs144'</span>: <span class="st">'cs137'</span>, <span class="st">'k-40'</span>: <span class="st">'k40'</span>}</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co"># make_lut does the derive + fuzzy-match + fix in one call</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>nuclide_lut <span class="op">=</span> make_lut(<span class="st">'NUCLIDE'</span>, fixes<span class="op">=</span>fixes)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Use in Transformer</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>cb <span class="op">=</span> RemapCB(lut<span class="op">=</span>nuclide_lut, col_remap<span class="op">=</span><span class="st">'NUCLIDE'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="running-the-transformer-end-to-end" class="level3">
+<h3 class="anchored" data-anchor-id="running-the-transformer-end-to-end">Running the Transformer end-to-end</h3>
+<p>Once the lut is built, you feed it into a <a href="https://franckalbinet.github.io/marisco/api/callbacks.html#transformer"><code>Transformer</code></a> along with your data. The <a href="https://franckalbinet.github.io/marisco/api/callbacks.html#remapcb"><code>RemapCB</code></a> callback remaps every value in the specified column to its MARIS identifier during encoding. The output shows the remapped numeric ids.</p>
+<div id="fe667f8d" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.match <span class="im">import</span> make_lut</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.callbacks <span class="im">import</span> RemapCB, Transformer</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Complete end-to-end: build lut, run Transformer, inspect result</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> {</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs134'</span>, <span class="st">'k-40'</span>, <span class="st">'sr90'</span>]}),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'BIOTA'</span>:    pd.DataFrame({<span class="st">'NUCLIDE'</span>: [<span class="st">'cs137'</span>, <span class="st">'cs144'</span>, <span class="st">'cs134_137_tot'</span>]}),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>fixes <span class="op">=</span> {<span class="st">'cs134'</span>: <span class="st">'cs134_137_tot'</span>, <span class="st">'cs144'</span>: <span class="st">'cs137'</span>, <span class="st">'k-40'</span>: <span class="st">'k40'</span>}</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>nuclide_lut <span class="op">=</span> make_lut(<span class="st">'NUCLIDE'</span>, fixes<span class="op">=</span>fixes)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>cb <span class="op">=</span> RemapCB(lut<span class="op">=</span>nuclide_lut, col_remap<span class="op">=</span><span class="st">'NUCLIDE'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[cb])</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> tfm()</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result[<span class="st">'SEAWATER'</span>][<span class="st">'NUCLIDE'</span>].unique())</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result[<span class="st">'BIOTA'</span>][<span class="st">'NUCLIDE'</span>].unique())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[33 76  4 12]
+[33 76]</code></pre>
+</div>
+</div>
+</section>
+<section id="using-a-plain-dict-as-a-lut" class="level3">
+<h3 class="anchored" data-anchor-id="using-a-plain-dict-as-a-lut">Using a plain dict as a lut</h3>
+<p>For simple mappings where the provider values already match MARIS codes exactly, you can pass a plain Python dict directly as the lut. No fuzzy matching or overrides needed.</p>
+<div id="6c2f49ff" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> marisco.callbacks <span class="im">import</span> RemapCB, Transformer</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plain dict for trivial mappings</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>filter_lut <span class="op">=</span> {<span class="st">'N'</span>: <span class="dv">2</span>, <span class="st">'n'</span>: <span class="dv">2</span>, <span class="st">'F'</span>: <span class="dv">1</span>}</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> {</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'FILTERING'</span>: [<span class="st">'N'</span>, <span class="st">'F'</span>, <span class="st">'n'</span>, <span class="st">'Y'</span>]}),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>cb <span class="op">=</span> RemapCB(lut<span class="op">=</span>filter_lut, col_remap<span class="op">=</span><span class="st">'FILTERING'</span>, col_src<span class="op">=</span><span class="st">'FILTERING'</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[cb])</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> tfm()</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result[<span class="st">'SEAWATER'</span>][<span class="st">'FILTERING'</span>].unique())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[2 1 0]</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="recording-decisions-in-the-handler-notebook" class="level2">
+<h2 class="anchored" data-anchor-id="recording-decisions-in-the-handler-notebook">Recording decisions in the handler notebook</h2>
+<p>Each handler should document the overrides dictionary and any data-quality issues discovered during inspection. The HELCOM handler shows this pattern with <code>FEEDBACK TO DATA PROVIDER</code> callout boxes.</p>
+<p>For instance, the following markdown cell:</p>
+<pre><code>:::{.callout-important}
+## FEEDBACK TO DATA PROVIDER
+
+Some `rubin` codes in the HELCOM Biota dataset do not appear in the `RUBIN_NAME.csv` lookup table. This includes entries with trailing spaces (`FUCU VES `, `GADU MOR  `) and apparently missing codes (`FUCU SPP`, `FURC LUMB`, `STUC PECT`). Trailing spaces should be trimmed at source, and any valid RUBIN codes missing from the lookup table should be added.
+:::</code></pre>
+<p>would be rendered as:</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>FEEDBACK TO DATA PROVIDER
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Some <code>rubin</code> codes in the HELCOM Biota dataset do not appear in the <code>RUBIN_NAME.csv</code> lookup table. This includes entries with trailing spaces (<code>FUCU VES</code>, <code>GADU MOR</code>) and apparently missing codes (<code>FUCU SPP</code>, <code>FURC LUMB</code>, <code>STUC PECT</code>). Trailing spaces should be trimmed at source, and any valid RUBIN codes missing from the lookup table should be added.</p>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Joint Ocean Ice Study – marisco</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-2593923cf60a9aa2fc04e718582542c7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="Joint Ocean Ice Study – marisco">
+<meta property="og:description" content="MARIS companion package and tutorials">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="Joint Ocean Ice Study – marisco">
+<meta name="twitter:description" content="MARIS companion package and tutorials">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/franckalbinet/marisco"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../handlers/geotraces.html">Handlers</a></li><li class="breadcrumb-item"><a href="../handlers/jois.html">Joint Ocean Ice Study</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARISCO</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">How-to</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/writing-a-handler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Write a new handler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/reconcile-nomenclature.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reconcile nomenclatures</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Data Reference</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Data Guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/field-definition.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Field Definitions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/sample-id-coverage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sample ID Coverage</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/geotraces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geotraces</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/maris_legacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Legacy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/jois.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Joint Ocean Ice Study</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/ospar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OSPAR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/tepco.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TEPCO</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/encoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Encoders</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/geo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc2csv.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NetCDF to CSV</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#raw-data-format" id="toc-raw-data-format" class="nav-link active" data-scroll-target="#raw-data-format">Raw data format</a>
+  <ul>
+  <li><a href="#norm_cols" id="toc-norm_cols" class="nav-link" data-scroll-target="#norm_cols">norm_cols</a></li>
+  <li><a href="#extract_scales" id="toc-extract_scales" class="nav-link" data-scroll-target="#extract_scales">extract_scales</a></li>
+  <li><a href="#apply_scales" id="toc-apply_scales" class="nav-link" data-scroll-target="#apply_scales">apply_scales</a></li>
+  <li><a href="#load_data" id="toc-load_data" class="nav-link" data-scroll-target="#load_data">load_data</a></li>
+  </ul></li>
+  <li><a href="#rename-and-standardise-columns" id="toc-rename-and-standardise-columns" class="nav-link" data-scroll-target="#rename-and-standardise-columns">Rename and standardise columns</a>
+  <ul>
+  <li><a href="#renamenuccolscb" id="toc-renamenuccolscb" class="nav-link" data-scroll-target="#renamenuccolscb">RenameNucColsCB</a></li>
+  <li><a href="#align-nuclide-column-names" id="toc-align-nuclide-column-names" class="nav-link" data-scroll-target="#align-nuclide-column-names">Align nuclide column names</a></li>
+  <li><a href="#renamecolscb" id="toc-renamecolscb" class="nav-link" data-scroll-target="#renamecolscb">RenameColsCB</a></li>
+  <li><a href="#parsedatetimecb" id="toc-parsedatetimecb" class="nav-link" data-scroll-target="#parsedatetimecb">ParseDateTimeCB</a></li>
+  </ul></li>
+  <li><a href="#reshape-wide-to-long" id="toc-reshape-wide-to-long" class="nav-link" data-scroll-target="#reshape-wide-to-long">Reshape wide to long</a>
+  <ul>
+  <li><a href="#meltjoiscb" id="toc-meltjoiscb" class="nav-link" data-scroll-target="#meltjoiscb">MeltJOISCB</a></li>
+  </ul></li>
+  <li><a href="#convert-u-238-units" id="toc-convert-u-238-units" class="nav-link" data-scroll-target="#convert-u-238-units">Convert U-238 units</a>
+  <ul>
+  <li><a href="#convertu238cb" id="toc-convertu238cb" class="nav-link" data-scroll-target="#convertu238cb">ConvertU238CB</a></li>
+  </ul></li>
+  <li><a href="#remap-nomenclatures-to-maris-identifiers" id="toc-remap-nomenclatures-to-maris-identifiers" class="nav-link" data-scroll-target="#remap-nomenclatures-to-maris-identifiers">Remap nomenclatures to MARIS identifiers</a></li>
+  <li><a href="#standardise-final-columns" id="toc-standardise-final-columns" class="nav-link" data-scroll-target="#standardise-final-columns">Standardise final columns</a></li>
+  <li><a href="#netcdf-encoder" id="toc-netcdf-encoder" class="nav-link" data-scroll-target="#netcdf-encoder">NetCDF encoder</a>
+  <ul>
+  <li><a href="#get_attrs" id="toc-get_attrs" class="nav-link" data-scroll-target="#get_attrs">get_attrs</a></li>
+  <li><a href="#encode" id="toc-encode" class="nav-link" data-scroll-target="#encode">encode</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../handlers/geotraces.html">Handlers</a></li><li class="breadcrumb-item"><a href="../handlers/jois.html">Joint Ocean Ice Study</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Joint Ocean Ice Study</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The JOIS datasets comprise four years (2021-2024) of seawater radionuclide measurements from the Beaufort Sea, collected as part of the Joint Ocean Ice Study (JOIS) expeditions aboard the CCGS Louis St.&nbsp;Laurent. Samples were analysed at ETH Zurich / LIP (Nuria Casacuberta’s group). The raw data are published as <a href="https://zenodo.org/communities/titanica/records?q=&amp;l=list&amp;p=1&amp;s=10&amp;sort=newest">Zenodo archives</a>, each containing a single Excel file with CTD (conductivity, temperature, depth) metadata and activity concentrations in wide format.</p>
+<p>Nuclide coverage varies by year:</p>
+<div style="width: fit-content; font-size: 0.85em; margin: 0 auto;">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Year</th>
+<th style="text-align: center;">I-129</th>
+<th style="text-align: center;">U-236</th>
+<th style="text-align: center;">U-238</th>
+<th style="text-align: center;">U-236/U-238</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2021</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td>2022</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+</tr>
+<tr class="odd">
+<td>2023</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+</tr>
+<tr class="even">
+<td>2024</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The column layout is similar enough across years that the same pipeline handles all of them, with a few normalisation steps to absorb the differences.</p>
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<div id="585e1b91" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>RECORDS <span class="op">=</span> {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2021</span>: {<span class="st">'url'</span>: <span class="st">'https://zenodo.org/records/18880401/files/annabel-payne/BGOS-JOIS-2021-v1.0.1.zip?download=1'</span>},</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2022</span>: {<span class="st">'url'</span>: <span class="st">'https://zenodo.org/records/18880777/files/annabel-payne/BGOS-JOIS-2022-v1.0.1.zip?download=1'</span>},</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2023</span>: {<span class="st">'url'</span>: <span class="st">'https://zenodo.org/records/18880591/files/annabel-payne/BGOS-JOIS-2023-v1.0.zip?download=1'</span>},</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2024</span>: {<span class="st">'url'</span>: <span class="st">'https://zenodo.org/records/18880497/files/annabel-payne/BGOS-JOIS-2024-v1.0.1.zip?download=1'</span>},</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>fname_out <span class="op">=</span> <span class="st">'JOIS_Beaufort_Sea.nc'</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>src_dir   <span class="op">=</span> <span class="va">None</span>  <span class="co"># remote-only, no local files</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<section id="raw-data-format" class="level2">
+<h2 class="anchored" data-anchor-id="raw-data-format">Raw data format</h2>
+<p>All four JOIS ZIP archives contain a single Excel sheet with CTD metadata columns and activity concentrations in wide format: each nuclide-unit pair gets its own column (e.g.&nbsp;<code>I129_at_kg</code>, <code>I129_at_l</code>), and each value column has a matching <code>unc_</code> column for uncertainty. Value columns carry <code>( x 10^N)</code> suffixes in some years indicating an unscaled value. The 2021 ZIP has a stray <code>( x 10^6)</code> column header that should read <code>Cruise</code>.</p>
+<p><a href="https://franckalbinet.github.io/marisco/handlers/helcom.html#load_data"><code>load_data</code></a> handles all four years by: - Normalising column names (stripping scale-factor suffixes) - Extracting and applying scale factors to unscaled values - Detecting the 2023 U-236 <code>at_kg</code> columns that are missing their suffix but are in the same scale as their <code>at_l</code> counterparts - Concatenating all years into a single DataFrame</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>FEEDBACK TO DATA PROVIDER
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>( x 10^N)</code> suffix in column headers signals that the stored values are <strong>unscaled</strong> and must be multiplied by 10^N to obtain the true value (atoms/kg or atoms/l depending on the column). This convention is applied inconsistently across years and columns:</p>
+<ul>
+<li><strong>I-129</strong>: The 2021-2022 files use <code>I129_at_kg ( x 10^7)</code>, where values are unscaled raw numbers (suffix present). The 2023-2024 files use <code>I129_at_kg</code> with the scale already applied and no suffix. The same physical quantity therefore requires different handling per year.</li>
+<li><strong>U-236 in 2023</strong>: <code>U236_at_l</code> correctly carries <code>( x 10^6)</code> (values unscaled), but <code>U236_at_kg</code> is missing its suffix even though its values are also unscaled; this is confirmed by the expected seawater density ratio (~1025 kg/m³ between at/kg and at/l).</li>
+</ul>
+<p>The provider should clarify the intended convention and ideally publish all values with scales pre-applied, removing the need for per-year suffix parsing.</p>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/handlers/jois.py#L34" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="norm_cols" class="level3">
+<h3 class="anchored" data-anchor-id="norm_cols">norm_cols</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> norm_cols(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    cols, <span class="co"># Column names to normalise</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="bu">list</span>:</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Normalise column names: strip scale-factor suffixes like ( x 10^7) or (x 10^6).</em></p>
+<div id="6de86d84" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>test_eq(norm_cols([<span class="st">'I129_at_kg ( x 10^7)'</span>, <span class="st">'U236_at_l'</span>]),</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>        [<span class="st">'I129_at_kg'</span>, <span class="st">'U236_at_l'</span>])</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>test_eq(norm_cols([<span class="st">'Stn'</span>, <span class="st">'Depth_m'</span>]), [<span class="st">'Stn'</span>, <span class="st">'Depth_m'</span>])</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"norm_cols: no-change case and suffix-stripping case pass. ✓"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>norm_cols: no-change case and suffix-stripping case pass. ✓</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/handlers/jois.py#L40" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="extract_scales" class="level3">
+<h3 class="anchored" data-anchor-id="extract_scales">extract_scales</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_scales(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    cols, <span class="co"># Column names to scan for scale-factor suffixes</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="bu">dict</span>:</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Return {col: factor} for columns with <code>( x 10^N)</code> suffix in original names, excluding empty-string results.</em></p>
+<div id="4b912f1f" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>scales <span class="op">=</span> extract_scales([<span class="st">'I129_at_kg ( x 10^7)'</span>, <span class="st">'U236_at_l(x10^6)'</span>, <span class="st">'Stn'</span>])</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>test_eq(scales, {<span class="st">'I129_at_kg'</span>: <span class="dv">10_000_000</span>, <span class="st">'U236_at_l'</span>: <span class="dv">1_000_000</span>})</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"extract_scales: two scales extracted, no spurious matches. ✓"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>extract_scales: two scales extracted, no spurious matches. ✓</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/handlers/jois.py#L48" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="apply_scales" class="level3">
+<h3 class="anchored" data-anchor-id="apply_scales">apply_scales</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_scales(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    df, <span class="co"># DataFrame to modify in place</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    scales, <span class="co"># {col: factor} of scale factors to apply</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>DataFrame:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Multiply columns in df by their scale factor.</em></p>
+<div id="4699ae1c" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'I129_at_kg'</span>: [<span class="fl">1.0</span>, <span class="fl">2.0</span>], <span class="st">'Stn'</span>: [<span class="st">'A'</span>, <span class="st">'B'</span>]})</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>scales <span class="op">=</span> {<span class="st">'I129_at_kg'</span>: <span class="dv">10_000_000</span>}</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> apply_scales(df, scales)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>test_eq(result[<span class="st">'I129_at_kg'</span>].tolist(), [<span class="fl">10_000_000.0</span>, <span class="fl">20_000_000.0</span>])</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>test_eq(result[<span class="st">'Stn'</span>].tolist(), [<span class="st">'A'</span>, <span class="st">'B'</span>])</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"apply_scales: value columns scaled, non-value columns unchanged. ✓"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>apply_scales: value columns scaled, non-value columns unchanged. ✓</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/handlers/helcom.py#L48" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="load_data" class="level3">
+<h3 class="anchored" data-anchor-id="load_data">load_data</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_data(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    recs:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional dict of year-&gt;record; defaults to all RECORDS</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="bu">dict</span>:</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Fetch all JOIS records from Zenodo, align column names, apply scale factors, and return a single <code>SEAWATER</code> DataFrame.</em></p>
+<div id="1ae163f7" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> load_data()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="6d765b86" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dfs[<span class="st">'SEAWATER'</span>].describe(include<span class="op">=</span><span class="st">'number'</span>).T[[<span class="st">'count'</span>, <span class="st">'mean'</span>, <span class="st">'min'</span>, <span class="st">'max'</span>]])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   count          mean          min           max
+sample_number      441.0  6.377082e+02    25.000000  1.209000e+03
+Latitude_degN      441.0  7.469298e+01    70.539500  7.969150e+01
+Longitude_degE     441.0 -1.452820e+02  -153.320167 -1.229452e+02
+Pressure_dbar      441.0  7.458816e+02     4.223000  3.817376e+03
+Depth_m            441.0  7.350311e+02     4.179505  3.743998e+03
+Temperature_degC   441.0 -1.417129e-01    -1.586100  5.142400e+00
+Conservative_Temp  441.0 -1.736566e-01    -1.579121  5.199772e+00
+Potential_Temp     441.0 -1.787647e-01    -1.586842  5.142001e+00
+Salinity_psu       441.0  3.343552e+01    24.756100  3.495950e+01
+Absolute_Salinity  441.0  3.359702e+01    24.874988  3.512872e+01
+Sigma0             441.0  2.685045e+01    19.866195  2.810244e+01
+Insitu_Density     441.0  1.026899e+00     1.019916  1.028151e+00
+I129_at_kg         441.0  1.097553e+09     0.000000  6.033279e+09
+unc_I129_at_kg     441.0  4.149385e+07     0.000000  2.503235e+08
+unc_129_pct        440.0  9.664254e+00     0.000021  1.232857e+03
+I129_at_l          441.0  1.128016e+09     0.000000  6.200499e+09
+unc_I129_at_l      441.0  4.264495e+07     0.000000  2.573090e+08
+U236_at_kg         286.0  1.457382e+07  6060.553755  3.343125e+07
+unc_U236_at_kg     286.0  5.442092e+05  8747.926973  7.695057e+06
+U236_at_l          284.0  1.498641e+07  6231.162715  3.435749e+07
+unc_U236_at_l      284.0  5.344472e+05  8994.188551  2.728110e+06
+U238_ppb           286.0  3.042647e+00     2.100575  6.216479e+00
+unc_U238_ppb       285.0  1.938567e-01     0.035725  3.873545e+00
+U236_U238          286.0  1.879611e+03     0.765689  4.082257e+03
+unc_U236_U238      286.0  1.458633e+02     1.042832  7.845516e+02</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="rename-and-standardise-columns" class="level2">
+<h2 class="anchored" data-anchor-id="rename-and-standardise-columns">Rename and standardise columns</h2>
+<p>The raw JOIS columns encode nuclide, unit, and sometimes method in a single string (e.g.&nbsp;<code>I129_at_kg</code>), with a couple of exceptions (<code>U238_ppb</code>, <code>U236_U238</code>). We map CTD column names to MARIS uppercase standards, combine separate date/time string columns, and handle the two special-case columns.</p>
+<p>We address these in three callbacks. All run on the <code>SEAWATER</code> group only, since JOIS has no biota, sediment, or suspended matter.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>FEEDBACK TO DATA PROVIDER
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Column headers in the JOIS and GEOTRACES datasets encode multiple pieces of information (nuclide, unit, measurement method) into a single string. This adds friction to data ingestion, since every new dataset with a different naming convention requires custom parsing logic. MARIS prefers a tidy data layout (<a href="https://www.jstatsoft.org/article/view/v059i10">Wickham 2014, doi:10.18637/jss.v059.i10</a>) where each column holds a single variable, and metadata like nuclide, unit, and method are stored as separate columns, not baked into the header.</p>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/handlers/jois.py#L83" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="renamenuccolscb" class="level3">
+<h3 class="anchored" data-anchor-id="renamenuccolscb">RenameNucColsCB</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> RenameNucColsCB(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    grps:<span class="bu">list</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Groups to process; None = all groups in `tfm.dfs`</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>*Align U238_ppb and U236_U238 column names to {Nuc}_{Unit} pattern before melting.*</p>
+<div id="05d6a6a9" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify RenameNucColsCB renames columns correctly on mock data</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>dfs_mock <span class="op">=</span> {<span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'U238_ppb'</span>: [<span class="fl">1.0</span>], <span class="st">'U236_U238'</span>: [<span class="fl">2.0</span>], <span class="st">'I129_at_kg'</span>: [<span class="fl">3.0</span>]})}</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs_mock, cbs<span class="op">=</span>[RenameNucColsCB()])</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="st">'U238_at_ppb'</span> <span class="kw">in</span> tfm.dfs[<span class="st">'SEAWATER'</span>].columns, <span class="va">True</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="st">'U236_U238_at_ratio'</span> <span class="kw">in</span> tfm.dfs[<span class="st">'SEAWATER'</span>].columns, <span class="va">True</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="st">'I129_at_kg'</span> <span class="kw">in</span> tfm.dfs[<span class="st">'SEAWATER'</span>].columns, <span class="va">True</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RenameNucColsCB: columns renamed correctly on mock data. ✓"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RenameNucColsCB: columns renamed correctly on mock data. ✓</code></pre>
+</div>
+</div>
+<div id="cd682a6f" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[RenameNucColsCB()])</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Columns after RenameNucColsCB:"</span>, [c <span class="cf">for</span> c <span class="kw">in</span> tfm.dfs[<span class="st">'SEAWATER'</span>].columns <span class="cf">if</span> <span class="st">'238'</span> <span class="kw">in</span> c <span class="kw">or</span> <span class="st">'236'</span> <span class="kw">in</span> c])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Columns after RenameNucColsCB: ['U236_at_kg', 'unc_U236_at_kg', 'U236_at_l', 'unc_U236_at_l', 'U238_at_ppb', 'unc_U238_at_ppb', 'U236_U238_at_ratio', 'unc_U236_U238_at_ratio']</code></pre>
+</div>
+</div>
+</section>
+<section id="align-nuclide-column-names" class="level3">
+<h3 class="anchored" data-anchor-id="align-nuclide-column-names">Align nuclide column names</h3>
+<p>Most JOIS concentration columns follow a <code>{Nuclide}_{Unit}</code> pattern (<code>I129_at_kg</code>, <code>I129_at_l</code>, <code>U236_at_kg</code>). Two columns do not:</p>
+<ul>
+<li><code>U238_ppb</code> names the measurand method (parts-per-billion) as the unit part, which would cause the melt split to produce <code>NUCLIDE=U238_at</code> and <code>UNIT=ppb</code>. We rename it to <code>U238_at_ppb</code> so the split is clean.</li>
+<li><code>U236_U238</code> uses an underscore as a separator between two nuclide names, not between nuclide and unit. We rename it to <code>U236_U238_at_ratio</code>.</li>
+</ul>
+<p>The downstream <a href="https://franckalbinet.github.io/marisco/handlers/jois.html#meltjoiscb"><code>MeltJOISCB</code></a> splits every value column on <code>_at_</code> to derive <code>NUCLIDE</code> and <code>UNIT</code>. These renames are done in anticipation of that step, ensuring every column meets the <code>{Nuclide}_{Unit}</code> contract so the melt can proceed consistently.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/handlers/jois.py#L93" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="renamecolscb" class="level3">
+<h3 class="anchored" data-anchor-id="renamecolscb">RenameColsCB</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> RenameColsCB(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    grps:<span class="bu">list</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Groups to process; None = all groups in `tfm.dfs`</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Map JOIS provider CTD and sample columns to MARIS standard names.</em></p>
+<div id="f8056fe3" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify RenameColsCB maps provider columns to MARIS names</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>dfs_mock <span class="op">=</span> {<span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'Latitude_degN'</span>: [<span class="fl">70.5</span>], <span class="st">'Longitude_degE'</span>: [<span class="op">-</span><span class="fl">140.0</span>],</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">'Depth_m'</span>: [<span class="fl">200.0</span>], <span class="st">'sample_number'</span>: [<span class="dv">101</span>]})}</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs_mock, cbs<span class="op">=</span>[RenameColsCB()])</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="st">'LAT'</span> <span class="kw">in</span> tfm.dfs[<span class="st">'SEAWATER'</span>].columns, <span class="va">True</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="st">'LON'</span> <span class="kw">in</span> tfm.dfs[<span class="st">'SEAWATER'</span>].columns, <span class="va">True</span>)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="st">'SMP_DEPTH'</span> <span class="kw">in</span> tfm.dfs[<span class="st">'SEAWATER'</span>].columns, <span class="va">True</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="st">'SMP_ID_PROVIDER'</span> <span class="kw">in</span> tfm.dfs[<span class="st">'SEAWATER'</span>].columns, <span class="va">True</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RenameColsCB: provider columns mapped to MARIS names. ✓"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RenameColsCB: provider columns mapped to MARIS names. ✓</code></pre>
+</div>
+</div>
+<div id="82002cde" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[RenameNucColsCB(), RenameColsCB()])</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Sample of renamed columns:</span><span class="ch">\n</span><span class="st">"</span>, tfm.dfs[<span class="st">'SEAWATER'</span>][[<span class="st">'LAT'</span>, <span class="st">'LON'</span>, <span class="st">'STATION'</span>, <span class="st">'SMP_DEPTH'</span>, <span class="st">'SMP_ID_PROVIDER'</span>]].head(<span class="dv">2</span>).to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sample of renamed columns:
+          LAT         LON STATION    SMP_DEPTH  SMP_ID_PROVIDER
+0  75.000833 -150.001333     CB4  2001.727548            289.0
+1  75.000833 -150.001333     CB4  1501.921299            290.0</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/handlers/jois.py#L105" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="parsedatetimecb" class="level3">
+<h3 class="anchored" data-anchor-id="parsedatetimecb">ParseDateTimeCB</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ParseDateTimeCB(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    col_date:<span class="bu">str</span><span class="op">=</span><span class="st">'Date'</span>, <span class="co"># Source date column name</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    col_time:<span class="bu">str</span><span class="op">=</span><span class="st">'Time'</span>, <span class="co"># Source time column name</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Combine JOIS Date and Time columns into a single TIME column.</em></p>
+<div id="67b7f7a7" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify ParseDateTimeCB combines Date and Time into TIME</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>dfs_mock <span class="op">=</span> {<span class="st">'SEAWATER'</span>: pd.DataFrame({<span class="st">'Date'</span>: [<span class="st">'2021-08-19'</span>], <span class="st">'Time'</span>: [<span class="st">'08:00:00'</span>]})}</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs_mock, cbs<span class="op">=</span>[ParseDateTimeCB()])</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="st">'TIME'</span> <span class="kw">in</span> tfm.dfs[<span class="st">'SEAWATER'</span>].columns, <span class="va">True</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="st">'Date'</span> <span class="kw">not</span> <span class="kw">in</span> tfm.dfs[<span class="st">'SEAWATER'</span>].columns, <span class="va">True</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"ParseDateTimeCB: TIME = </span><span class="sc">{</span>tfm<span class="sc">.</span>dfs[<span class="st">'SEAWATER'</span>][<span class="st">'TIME'</span>]<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">. ✓"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ParseDateTimeCB: TIME = 2021-08-19 08:00:00. ✓</code></pre>
+</div>
+</div>
+<div id="9212e97b" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[RenameNucColsCB(), RenameColsCB(), ParseDateTimeCB()])</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"First 3 TIME values:</span><span class="ch">\n</span><span class="st">"</span>, tfm.dfs[<span class="st">'SEAWATER'</span>][<span class="st">'TIME'</span>].head(<span class="dv">3</span>).to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>First 3 TIME values:
+ 0   2021-08-28 13:29:58
+1   2021-08-28 13:29:58
+2   2021-08-28 13:29:58</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Note for MARIS DB team
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The JOIS datasets include a <code>Pressure_dbar</code> column with CTD pressure values. This parameter is currently not present in the MARIS output schema. If useful for the database, it could be added alongside the other CTD metadata fields. The extra CTD columns (<code>Conservative_Temp</code>, <code>Potential_Temp</code>, <code>Absolute_Salinity</code>, <code>Sigma0</code>, <code>Insitu_Density</code>, <code>unc_129_pct</code>) and the <code>Cruise</code> column are not mapped in the NC_CSV dict (the central remapping from internal column names to NetCDF/CSV output names), so they are dropped after the melt. If the data team decides these fields are useful, the fix should go in NC_CSV, not in this handler.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="reshape-wide-to-long" class="level2">
+<h2 class="anchored" data-anchor-id="reshape-wide-to-long">Reshape wide to long</h2>
+<p>The raw JOIS data uses wide format: each sample has one row, and nuclide-unit concentrations are spread across separate columns (<code>I129_at_kg</code>, <code>I129_at_l</code>, <code>U236_at_kg</code>, etc.). MARIS requires long format (one row per measurement) with columns for <code>NUCLIDE</code>, <code>UNIT</code>, <code>VALUE</code>, and <code>UNC</code>.</p>
+<p><a href="https://franckalbinet.github.io/marisco/handlers/jois.html#meltjoiscb"><code>MeltJOISCB</code></a> melts the value columns, merges the matching uncertainty columns, then splits each column name on <code>_at_</code> to derive the nuclide name and unit. Rows where <code>VALUE</code> is NaN are dropped.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/handlers/jois.py#L125" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="meltjoiscb" class="level3">
+<h3 class="anchored" data-anchor-id="meltjoiscb">MeltJOISCB</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> MeltJOISCB(</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    meta_cols, <span class="co"># Columns to keep as identifiers</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    val_cols, <span class="co"># Value columns to melt</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    val_name:<span class="bu">str</span><span class="op">=</span><span class="st">'VALUE'</span>, <span class="co"># Name of melted value column</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    unc_name:<span class="bu">str</span><span class="op">=</span><span class="st">'UNC'</span>, <span class="co"># Name of uncertainty column</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Reshape JOIS wide nuclide columns to long format with NUCLIDE, UNIT, VALUE, UNC columns.</em></p>
+<div id="909ce60c" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Columns kept as identifiers during the wide-to-long reshape</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>META_COLS <span class="op">=</span> [<span class="st">'Cruise'</span>, <span class="st">'STATION'</span>, <span class="st">'SMP_ID_PROVIDER'</span>, <span class="st">'LAT'</span>, <span class="st">'LON'</span>,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>             <span class="st">'TIME'</span>, <span class="st">'Pressure_dbar'</span>, <span class="st">'SMP_DEPTH'</span>, <span class="st">'TEMP'</span>, <span class="st">'SAL'</span>]</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Columns to melt into VALUE/UNC long format</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>VAL_COLS <span class="op">=</span> [<span class="st">'I129_at_kg'</span>, <span class="st">'I129_at_l'</span>, <span class="st">'U236_at_kg'</span>, <span class="st">'U236_at_l'</span>,</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">'U238_at_ppb'</span>, <span class="st">'U236_U238_at_ratio'</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="53e8e9bd" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify MeltJOISCB produces correct NUCLIDE, UNIT, VALUE, UNC columns on mock data</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>dfs_mock <span class="op">=</span> {<span class="st">'SEAWATER'</span>: pd.DataFrame({</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Cruise'</span>: [<span class="st">'2021'</span>], <span class="st">'STATION'</span>: [<span class="st">'CB4'</span>], <span class="st">'SMP_ID_PROVIDER'</span>: [<span class="dv">1</span>],</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'I129_at_kg'</span>: [<span class="fl">6.4e8</span>], <span class="st">'unc_I129_at_kg'</span>: [<span class="fl">2.0e7</span>],</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'I129_at_l'</span>: [<span class="fl">6.6e8</span>], <span class="st">'unc_I129_at_l'</span>: [<span class="fl">2.1e7</span>],</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>})}</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>MOCK_META <span class="op">=</span> [<span class="st">'Cruise'</span>, <span class="st">'STATION'</span>, <span class="st">'SMP_ID_PROVIDER'</span>]</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>MOCK_VALS <span class="op">=</span> [<span class="st">'I129_at_kg'</span>, <span class="st">'I129_at_l'</span>]</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs_mock, cbs<span class="op">=</span>[MeltJOISCB(MOCK_META, MOCK_VALS)])</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> tfm.dfs[<span class="st">'SEAWATER'</span>]</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">len</span>(out), <span class="dv">2</span>)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>test_eq(out[<span class="st">'NUCLIDE'</span>].tolist(), [<span class="st">'I129'</span>, <span class="st">'I129'</span>])</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>test_eq(out[<span class="st">'UNIT'</span>].tolist(), [<span class="st">'at_kg'</span>, <span class="st">'at_l'</span>])</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>test_eq(out[<span class="st">'VALUE'</span>].tolist(), [<span class="fl">6.4e8</span>, <span class="fl">6.6e8</span>])</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MeltJOISCB on mock data: 2 rows, correct NUCLIDE/UNIT split. ✓"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>MeltJOISCB on mock data: 2 rows, correct NUCLIDE/UNIT split. ✓</code></pre>
+</div>
+</div>
+<div id="016a33d5" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[RenameNucColsCB(), RenameColsCB(), ParseDateTimeCB(),</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                             MeltJOISCB(META_COLS, VAL_COLS)])</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> tfm.dfs[<span class="st">'SEAWATER'</span>]</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>out<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NUCLIDE values:"</span>, out[<span class="st">'NUCLIDE'</span>].unique())</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"UNIT values:"</span>, out[<span class="st">'UNIT'</span>].unique())</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(out[[<span class="st">'NUCLIDE'</span>, <span class="st">'UNIT'</span>, <span class="st">'VALUE'</span>, <span class="st">'UNC'</span>]].head(<span class="dv">6</span>).to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Shape: (2024, 14)
+NUCLIDE values: ['I129' 'U236' 'U238' 'U236_U238']
+UNIT values: ['at_kg' 'at_l' 'at_ppb' 'at_ratio']
+  NUCLIDE   UNIT         VALUE           UNC
+0    I129  at_kg  6.398086e+08  2.027918e+07
+1    I129  at_kg  1.315774e+09  4.084218e+07
+2    I129  at_kg  1.409492e+09  4.401294e+07
+3    I129  at_kg  1.433159e+09  4.477813e+07
+4    I129  at_kg  1.267384e+09  3.931040e+07
+5    I129  at_kg  1.903570e+09  5.869902e+07</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>FEEDBACK TO DATA PROVIDER
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Uncertainty values in 2024 are three orders of magnitude lower than in 2021-2023 (relative uncertainty ~0.0002% versus ~3-5%), with no documented change in analytical method or instrumentation. All three uncertainty representations (<code>unc_I129_at_kg</code>, <code>unc_I129_at_l</code>, <code>unc_129_pct</code>) are internally consistent within each year. The provider should confirm whether this reflects a genuine precision improvement or a data reporting issue.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="convert-u-238-units" class="level2">
+<h2 class="anchored" data-anchor-id="convert-u-238-units">Convert U-238 units</h2>
+<p>JOIS reports U-238 in parts-per-billion (ppb, mass of U per mass of seawater), while MARIS requires atoms per kg. <a href="https://franckalbinet.github.io/marisco/handlers/jois.html#convertu238cb"><code>ConvertU238CB</code></a> converts the VALUE column for U-238 rows using:</p>
+<p><span class="math display">\[\text{atoms/kg} = C_{\text{ppb}} \times 10^{-9} \times \frac{N_A}{M_{238}}\]</span></p>
+<p>where <span class="math inline">\(N_A = 6.02214076 \times 10^{23}\ \text{mol}^{-1}\)</span> is Avogadro’s number and <span class="math inline">\(M_{238} = 238.05\ \text{g/mol}\)</span> is the molar mass of U-238, giving a conversion factor of <span class="math inline">\(2.530 \times 10^{12}\ \text{atoms/kg per ppb}\)</span>. Rows with other nuclides are left unchanged.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/handlers/jois.py#L154" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="convertu238cb" class="level3">
+<h3 class="anchored" data-anchor-id="convertu238cb">ConvertU238CB</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ConvertU238CB(</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    grps:<span class="bu">list</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Groups to process; None = all groups in `tfm.dfs`</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Convert U-238 VALUE from ppb to atoms/kg.</em></p>
+<div id="5e5ebb16" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert U-238 from ppb to atoms/kg: ppb * 1e-9 * (1/238.05) * 6.02214076e23</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>U238_PPB_TO_AT_KG <span class="op">=</span> <span class="fl">2.529_697e12</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="02241aef" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify ConvertU238CB scales VALUE and UNC for U-238 only</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>dfs_mock <span class="op">=</span> {<span class="st">'SEAWATER'</span>: pd.DataFrame({</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'NUCLIDE'</span>: [<span class="st">'I129'</span>, <span class="st">'U238'</span>],</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'UNIT'</span>: [<span class="st">'at_kg'</span>, <span class="st">'at_ppb'</span>],</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'VALUE'</span>: [<span class="fl">1.0</span>, <span class="fl">2.0</span>],</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'UNC'</span>: [<span class="fl">0.1</span>, <span class="fl">0.2</span>],</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>})}</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs_mock, cbs<span class="op">=</span>[ConvertU238CB()])</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> tfm.dfs[<span class="st">'SEAWATER'</span>]</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>test_eq(out.loc[out[<span class="st">'NUCLIDE'</span>]<span class="op">==</span><span class="st">'U238'</span>, <span class="st">'VALUE'</span>].iloc[<span class="dv">0</span>], <span class="fl">2.0</span> <span class="op">*</span> U238_PPB_TO_AT_KG)</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>test_eq(out.loc[out[<span class="st">'NUCLIDE'</span>]<span class="op">==</span><span class="st">'U238'</span>, <span class="st">'UNC'</span>].iloc[<span class="dv">0</span>], <span class="fl">0.2</span> <span class="op">*</span> U238_PPB_TO_AT_KG)</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>test_eq(out.loc[out[<span class="st">'NUCLIDE'</span>]<span class="op">==</span><span class="st">'U238'</span>, <span class="st">'UNIT'</span>].iloc[<span class="dv">0</span>], <span class="st">'at_kg'</span>)</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ConvertU238CB: I-129 unchanged, U-238 scaled, UNIT updated. ✓"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ConvertU238CB: I-129 unchanged, U-238 scaled, UNIT updated. ✓</code></pre>
+</div>
+</div>
+<div id="823c50cb" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[RenameNucColsCB(), RenameColsCB(), ParseDateTimeCB(),</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                             MeltJOISCB(META_COLS, VAL_COLS),</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                             ConvertU238CB()])</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> tfm.dfs[<span class="st">'SEAWATER'</span>]</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>u238 <span class="op">=</span> out[out[<span class="st">'NUCLIDE'</span>]<span class="op">==</span><span class="st">'U238'</span>]</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"U-238 rows: </span><span class="sc">{</span><span class="bu">len</span>(u238)<span class="sc">}</span><span class="ss">, mean VALUE = </span><span class="sc">{</span>u238[<span class="st">'VALUE'</span>]<span class="sc">.</span>mean()<span class="sc">:.2e}</span><span class="ss"> atoms/kg"</span>)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>i129 <span class="op">=</span> out[out[<span class="st">'NUCLIDE'</span>]<span class="op">==</span><span class="st">'I129'</span>]</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"I-129 rows: </span><span class="sc">{</span><span class="bu">len</span>(i129)<span class="sc">}</span><span class="ss">, mean VALUE = </span><span class="sc">{</span>i129[<span class="st">'VALUE'</span>]<span class="sc">.</span>mean()<span class="sc">:.2e}</span><span class="ss"> atoms/kg"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>U-238 rows: 286, mean VALUE = 7.70e+12 atoms/kg
+I-129 rows: 882, mean VALUE = 1.11e+09 atoms/kg</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="remap-nomenclatures-to-maris-identifiers" class="level2">
+<h2 class="anchored" data-anchor-id="remap-nomenclatures-to-maris-identifiers">Remap nomenclatures to MARIS identifiers</h2>
+<p>The melt produces string columns: <code>NUCLIDE</code> (I129, U236, U238, U236_U238), <code>UNIT</code> (at_kg, at_l, at_ppb, at_ratio), and missing <code>LAB</code> and <code>AREA</code> columns. MARIS stores these as integer foreign-key IDs from the central nomenclatures.</p>
+<p><a href="https://franckalbinet.github.io/marisco/api/callbacks.html#remapcb"><code>RemapCB</code></a> maps source column values through a lookup table to a target column. For constants like <code>LAB</code> (ETH Zurich/LIP, ID 345) and <code>AREA</code> (Beaufort Sea, ID 4256), an empty LUT with a <code>default_val</code> injects the same value for every row.</p>
+<div id="8b39ea1c" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MARIS nuclide IDs confirmed via get_lut('NUCLIDE')</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>NUCLIDE_LUT <span class="op">=</span> {<span class="st">'I129'</span>: <span class="dv">28</span>, <span class="st">'U236'</span>: <span class="dv">108</span>, <span class="st">'U238'</span>: <span class="dv">64</span>, <span class="st">'U236_U238'</span>: <span class="dv">131</span>}</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co"># MARIS unit IDs confirmed via get_lut('UNIT')</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>UNIT_LUT <span class="op">=</span> {<span class="st">'at_kg'</span>: <span class="dv">9</span>, <span class="st">'at_l'</span>: <span class="dv">12</span>, <span class="st">'at_ratio'</span>: <span class="dv">6</span>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="2ff3a212" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify RemapCB assigns correct NUCLIDE, UNIT, LAB, AREA IDs</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>dfs_mock <span class="op">=</span> {<span class="st">'SEAWATER'</span>: pd.DataFrame({</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'NUCLIDE'</span>: [<span class="st">'I129'</span>, <span class="st">'U236'</span>],</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'UNIT'</span>: [<span class="st">'at_kg'</span>, <span class="st">'at_l'</span>],</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'VALUE'</span>: [<span class="fl">1.0</span>, <span class="fl">2.0</span>],</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'UNC'</span>: [<span class="fl">0.1</span>, <span class="fl">0.2</span>],</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>})}</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs_mock, cbs<span class="op">=</span>[</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>NUCLIDE_LUT, col_remap<span class="op">=</span><span class="st">'NUCLIDE'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>),</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>UNIT_LUT, col_remap<span class="op">=</span><span class="st">'UNIT'</span>, col_src<span class="op">=</span><span class="st">'UNIT'</span>),</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>{}, col_remap<span class="op">=</span><span class="st">'LAB'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>, default_val<span class="op">=</span><span class="dv">345</span>),</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>{}, col_remap<span class="op">=</span><span class="st">'AREA'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>, default_val<span class="op">=</span><span class="dv">4256</span>),</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> tfm.dfs[<span class="st">'SEAWATER'</span>]</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>test_eq(out[<span class="st">'NUCLIDE'</span>].tolist(), [<span class="dv">28</span>, <span class="dv">108</span>])</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>test_eq(out[<span class="st">'UNIT'</span>].tolist(), [<span class="dv">9</span>, <span class="dv">12</span>])</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>test_eq(out[<span class="st">'LAB'</span>].tolist(), [<span class="dv">345</span>, <span class="dv">345</span>])</span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>test_eq(out[<span class="st">'AREA'</span>].tolist(), [<span class="dv">4256</span>, <span class="dv">4256</span>])</span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RemapCB: all nomenclatures mapped to correct MARIS IDs. ✓"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RemapCB: all nomenclatures mapped to correct MARIS IDs. ✓</code></pre>
+</div>
+</div>
+<div id="01473475" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    RenameNucColsCB(), RenameColsCB(), ParseDateTimeCB(),</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    MeltJOISCB(META_COLS, VAL_COLS),</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    ConvertU238CB(),</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>NUCLIDE_LUT, col_remap<span class="op">=</span><span class="st">'NUCLIDE'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>),</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>UNIT_LUT, col_remap<span class="op">=</span><span class="st">'UNIT'</span>, col_src<span class="op">=</span><span class="st">'UNIT'</span>),</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>{}, col_remap<span class="op">=</span><span class="st">'LAB'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>, default_val<span class="op">=</span><span class="dv">345</span>),</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>{}, col_remap<span class="op">=</span><span class="st">'AREA'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>, default_val<span class="op">=</span><span class="dv">4256</span>),</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> tfm.dfs[<span class="st">'SEAWATER'</span>]</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(out[[<span class="st">'NUCLIDE'</span>, <span class="st">'UNIT'</span>, <span class="st">'LAB'</span>, <span class="st">'AREA'</span>]].drop_duplicates().to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      NUCLIDE  UNIT  LAB  AREA
+0          28     9  345  4256
+441        28    12  345  4256
+958       108     9  345  4256
+1400      108    12  345  4256
+1840       64     9  345  4256
+2281      131     6  345  4256</code></pre>
+</div>
+</div>
+</section>
+<section id="standardise-final-columns" class="level2">
+<h2 class="anchored" data-anchor-id="standardise-final-columns">Standardise final columns</h2>
+<p>Three shared callbacks complete the pipeline:</p>
+<ul>
+<li><a href="https://franckalbinet.github.io/marisco/api/callbacks.html#sanitizelonlatcb"><code>SanitizeLonLatCB</code></a>: validates longitude/latitude ranges and ensures correct sign convention</li>
+<li><a href="https://franckalbinet.github.io/marisco/api/callbacks.html#encodetimecb"><code>EncodeTimeCB</code></a>: encodes the TIME column into the NetCDF-compatible numeric representation</li>
+<li><a href="https://franckalbinet.github.io/marisco/api/callbacks.html#addsampleidcb"><code>AddSampleIDCB</code></a>: assigns a sequential <code>SMP_ID</code> and preserves the provider’s <code>SMP_ID_PROVIDER</code></li>
+</ul>
+<p>All three are imported from <code>marisco.callbacks</code> and require no configuration for JOIS.</p>
+<div id="a894d4af" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    RenameNucColsCB(), RenameColsCB(), ParseDateTimeCB(),</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    MeltJOISCB(META_COLS, VAL_COLS),</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    ConvertU238CB(),</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>NUCLIDE_LUT, col_remap<span class="op">=</span><span class="st">'NUCLIDE'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>),</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>UNIT_LUT, col_remap<span class="op">=</span><span class="st">'UNIT'</span>, col_src<span class="op">=</span><span class="st">'UNIT'</span>),</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>{}, col_remap<span class="op">=</span><span class="st">'LAB'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>, default_val<span class="op">=</span><span class="dv">345</span>),</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>    RemapCB(lut<span class="op">=</span>{}, col_remap<span class="op">=</span><span class="st">'AREA'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>, default_val<span class="op">=</span><span class="dv">4256</span>),</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>    SanitizeLonLatCB(),</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>    EncodeTimeCB(),</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>    AddSampleIDCB(col_provider<span class="op">=</span><span class="st">'SMP_ID_PROVIDER'</span>),</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>tfm()</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> tfm.dfs[<span class="st">'SEAWATER'</span>]</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Final shape: </span><span class="sc">{</span>out<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Columns:"</span>, out.columns.tolist())</span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(out[[<span class="st">'SMP_ID'</span>, <span class="st">'SMP_ID_PROVIDER'</span>, <span class="st">'NUCLIDE'</span>, <span class="st">'UNIT'</span>, <span class="st">'LAB'</span>, <span class="st">'AREA'</span>]].head(<span class="dv">4</span>).to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Final shape: (2016, 17)
+Columns: ['Cruise', 'STATION', 'SMP_ID_PROVIDER', 'LAT', 'LON', 'TIME', 'Pressure_dbar', 'SMP_DEPTH', 'TEMP', 'SAL', 'VALUE', 'UNC', 'NUCLIDE', 'UNIT', 'LAB', 'AREA', 'SMP_ID']
+   SMP_ID SMP_ID_PROVIDER  NUCLIDE  UNIT  LAB  AREA
+0       1           289.0       28     9  345  4256
+1       2           290.0       28     9  345  4256
+2       3           291.0       28     9  345  4256
+3       4           292.0       28     9  345  4256</code></pre>
+</div>
+</div>
+<div id="7670dc35" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Final data summary (uppercase columns only):"</span>)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>upper_cols <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> out.columns <span class="cf">if</span> c.isupper()]</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(out[upper_cols].describe().to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Final data summary (uppercase columns only):
+               LAT          LON          TIME    SMP_DEPTH         TEMP          SAL         VALUE           UNC      NUCLIDE         UNIT     LAB    AREA       SMP_ID
+count  2016.000000  2016.000000  2.016000e+03  2016.000000  2016.000000  2016.000000  2.016000e+03  2.015000e+03  2016.000000  2016.000000  2016.0  2016.0  2016.000000
+mean     74.860128  -145.420826  1.670466e+09   750.954670    -0.133983    33.437905  1.088666e+12  6.931932e+10    70.189980     9.650298   345.0  4256.0  1008.500000
+std       2.590004     7.100110  2.049542e+07   893.294636     0.835686     2.459200  2.702033e+12  2.975590e+11    41.316164     2.018581     0.0     0.0   582.113391
+min      70.539500  -153.320167  1.630157e+09     4.179505    -1.586100    24.756100  0.000000e+00  0.000000e+00    28.000000     6.000000   345.0  4256.0     1.000000
+25%      72.599667  -151.575833  1.664062e+09   151.645681    -0.549900    33.105800  9.085735e+06  2.997537e+05    28.000000     9.000000   345.0  4256.0   504.750000
+50%      75.005167  -144.719000  1.664717e+09   393.656724    -0.249700    34.747200  1.045061e+08  1.853332e+06    64.000000     9.000000   345.0  4256.0  1008.500000
+75%      77.006333  -140.014042  1.665390e+09  1002.757663     0.411200    34.879600  1.946451e+09  7.579162e+07   108.000000    12.000000   345.0  4256.0  1512.250000
+max      79.691500  -122.945167  1.726664e+09  3743.997720     5.142400    34.959500  1.572581e+13  9.798895e+12   131.000000    12.000000   345.0  4256.0  2016.000000</code></pre>
+</div>
+</div>
+</section>
+<section id="netcdf-encoder" class="level2">
+<h2 class="anchored" data-anchor-id="netcdf-encoder">NetCDF encoder</h2>
+<p>The encoder wraps the full pipeline and writes the standardised data to a NetCDF4 file. Global attributes are assembled via <a href="https://franckalbinet.github.io/marisco/api/metadata.html#globattrsfeeder"><code>GlobAttrsFeeder</code></a> with <a href="https://franckalbinet.github.io/marisco/api/metadata.html#bboxcb"><code>BboxCB</code></a>, <a href="https://franckalbinet.github.io/marisco/api/metadata.html#depthrangecb"><code>DepthRangeCB</code></a>, <a href="https://franckalbinet.github.io/marisco/api/metadata.html#timerangecb"><code>TimeRangeCB</code></a>, plus keywords and processing logs.</p>
+<p>We do not yet have an INIS entry for the JOIS datasets, so <code>INISCB</code> is commented out. The <a href="https://www.iaea.org/resources/databases/inis">IAEA INIS repository</a> will be used for bibliographic metadata once the record is created. A placeholder line is included for future use.</p>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/handlers/geotraces.py#L291" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="get_attrs" class="level3">
+<h3 class="anchored" data-anchor-id="get_attrs">get_attrs</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_attrs(</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>    tfm</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Retrieve global attributes for the JOIS handler.</em></p>
+<div id="5fed230e" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># NetCDF global attributes</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>JOIS_KEYWORDS <span class="op">=</span> [<span class="st">'Beaufort Sea'</span>, <span class="st">'JOIS'</span>, <span class="st">'I-129'</span>, <span class="st">'U-236'</span>, <span class="st">'U-238'</span>, <span class="st">'radionuclides'</span>, <span class="st">'seawater'</span>, <span class="st">'Arctic'</span>]</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_attrs(tfm):</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Retrieve global attributes for the JOIS handler."</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> GlobAttrsFeeder(tfm.dfs, cbs<span class="op">=</span>[</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>        BboxCB(),</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>        DepthRangeCB(),</span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>        TimeRangeCB(),</span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>        <span class="co">#INISCB('XXXXXXXX'),  # </span><span class="al">TODO</span><span class="co">: add INIS record id when available</span></span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>        KeyValuePairCB(<span class="st">'keywords'</span>, <span class="st">', '</span>.join(JOIS_KEYWORDS)),</span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a>        KeyValuePairCB(<span class="st">'publisher_postprocess_logs'</span>, <span class="st">', '</span>.join(tfm.logs)),</span>
+<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a>    ])()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+<p><a href="https://github.com/franckalbinet/marisco/blob/main/marisco/handlers/geotraces.py#L307" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="encode" class="level3">
+<h3 class="anchored" data-anchor-id="encode">encode</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> encode(</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    fname_out:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Output NetCDF file path; defaults to fname_out</span></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Encode JOIS data to NetCDF4.</em></p>
+<div id="1784dfc3" class="cell">
+<details open="" class="code-fold">
+<summary>Exported source</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> encode(fname_out<span class="op">=</span><span class="va">None</span>  <span class="co"># Output NetCDF file path; defaults to fname_out</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>            ):</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Encode JOIS data to NetCDF4."</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    fname_out <span class="op">=</span> fname_out <span class="kw">or</span> <span class="bu">globals</span>().get(<span class="st">'fname_out'</span>, <span class="st">'JOIS_Beaufort_Sea.nc'</span>)</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>    dfs <span class="op">=</span> load_data()</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>    tfm <span class="op">=</span> Transformer(dfs, cbs<span class="op">=</span>[</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>        RenameNucColsCB(), RenameColsCB(), ParseDateTimeCB(),</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>        MeltJOISCB(META_COLS, VAL_COLS),</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>        ConvertU238CB(),</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>        RemapCB(lut<span class="op">=</span>NUCLIDE_LUT, col_remap<span class="op">=</span><span class="st">'NUCLIDE'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>),</span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>        RemapCB(lut<span class="op">=</span>UNIT_LUT, col_remap<span class="op">=</span><span class="st">'UNIT'</span>, col_src<span class="op">=</span><span class="st">'UNIT'</span>),</span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>        RemapCB(lut<span class="op">=</span>{}, col_remap<span class="op">=</span><span class="st">'LAB'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>, default_val<span class="op">=</span><span class="dv">345</span>),</span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>        RemapCB(lut<span class="op">=</span>{}, col_remap<span class="op">=</span><span class="st">'AREA'</span>, col_src<span class="op">=</span><span class="st">'NUCLIDE'</span>, default_val<span class="op">=</span><span class="dv">4256</span>),</span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a>        SanitizeLonLatCB(),</span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a>        EncodeTimeCB(),</span>
+<span id="cb54-16"><a href="#cb54-16" aria-hidden="true" tabindex="-1"></a>        AddSampleIDCB(col_provider<span class="op">=</span><span class="st">'SMP_ID_PROVIDER'</span>),</span>
+<span id="cb54-17"><a href="#cb54-17" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb54-18"><a href="#cb54-18" aria-hidden="true" tabindex="-1"></a>    tfm()</span>
+<span id="cb54-19"><a href="#cb54-19" aria-hidden="true" tabindex="-1"></a>    encoder <span class="op">=</span> NetCDFEncoder(tfm.dfs, dest_fname<span class="op">=</span>fname_out,</span>
+<span id="cb54-20"><a href="#cb54-20" aria-hidden="true" tabindex="-1"></a>                            global_attrs<span class="op">=</span>get_attrs(tfm))</span>
+<span id="cb54-21"><a href="#cb54-21" aria-hidden="true" tabindex="-1"></a>    encoder.encode()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="9297a1d6" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Encode to NetCDF</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>encode(<span class="st">'../../_data/output/jois.nc'</span>)</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"JOIS NetCDF written."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>JOIS NetCDF written.</code></pre>
+</div>
+</div>
+<div id="e0b7d259" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co">#decode(fname_in='../../_data/output/jois.nc', verbose=True)</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="co">#to_csv('../../_data/output/jois.nc')</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

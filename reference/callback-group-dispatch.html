@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>callback-group-dispatch – marisco</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-2593923cf60a9aa2fc04e718582542c7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="marisco">
+<meta property="og:site_name" content="marisco">
+<meta name="twitter:title" content="marisco">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marisco</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/franckalbinet/marisco"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARISCO</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">How-to</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/writing-a-handler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Write a new handler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to/reconcile-nomenclature.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reconcile nomenclatures</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Data Reference</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Data Guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/field-definition.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Field Definitions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/sample-id-coverage.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sample ID Coverage</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Handlers</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/geotraces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geotraces</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/helcom.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HELCOM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/maris_legacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MARIS Legacy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/jois.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Joint Ocean Ice Study</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/ospar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OSPAR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../handlers/tepco.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TEPCO</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/configs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metadata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/encoders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Encoders</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/match.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Match</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/geo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Geo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/nc2csv.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NetCDF to CSV</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#callback-group-dispatch-audit-diagnosis-and-design" id="toc-callback-group-dispatch-audit-diagnosis-and-design" class="nav-link active" data-scroll-target="#callback-group-dispatch-audit-diagnosis-and-design">Callback group dispatch — audit, diagnosis, and design</a>
+  <ul>
+  <li><a href="#status" id="toc-status" class="nav-link" data-scroll-target="#status">Status</a></li>
+  <li><a href="#context" id="toc-context" class="nav-link" data-scroll-target="#context">Context</a></li>
+  <li><a href="#audit-iteration-patterns-found-across-handlers" id="toc-audit-iteration-patterns-found-across-handlers" class="nav-link" data-scroll-target="#audit-iteration-patterns-found-across-handlers">Audit — iteration patterns found across handlers</a></li>
+  <li><a href="#diagnosis" id="toc-diagnosis" class="nav-link" data-scroll-target="#diagnosis">Diagnosis</a></li>
+  <li><a href="#design-pergroupcb" id="toc-design-pergroupcb" class="nav-link" data-scroll-target="#design-pergroupcb">Design — <code>PerGroupCB</code></a>
+  <ul>
+  <li><a href="#callbacks.ipynb-migrated" id="toc-callbacks.ipynb-migrated" class="nav-link" data-scroll-target="#callbacks.ipynb-migrated">callbacks.ipynb — migrated ✅</a></li>
+  <li><a href="#helcom.ipynb-migrated" id="toc-helcom.ipynb-migrated" class="nav-link" data-scroll-target="#helcom.ipynb-migrated">helcom.ipynb — migrated ✅</a></li>
+  </ul></li>
+  <li><a href="#example-rewrites" id="toc-example-rewrites" class="nav-link" data-scroll-target="#example-rewrites">Example rewrites</a>
+  <ul>
+  <li><a href="#key-not-needed-adddepthcb-helcom" id="toc-key-not-needed-adddepthcb-helcom" class="nav-link" data-scroll-target="#key-not-needed-adddepthcb-helcom">1. Key not needed — <code>AddDepthCB</code> (helcom)</a></li>
+  <li><a href="#key-used-as-config-lookup-parsetimecb-ospar" id="toc-key-used-as-config-lookup-parsetimecb-ospar" class="nav-link" data-scroll-target="#key-used-as-config-lookup-parsetimecb-ospar">2. Key used as config lookup — <code>ParseTimeCB</code> (ospar)</a></li>
+  <li><a href="#scoped-to-a-single-group-enhancespeciescb-ospar" id="toc-scoped-to-a-single-group-enhancespeciescb-ospar" class="nav-link" data-scroll-target="#scoped-to-a-single-group-enhancespeciescb-ospar">3. Scoped to a single group — <code>EnhanceSpeciesCB</code> (ospar)</a></li>
+  </ul></li>
+  <li><a href="#todo-redesign-dfs_dropped-tracking" id="toc-todo-redesign-dfs_dropped-tracking" class="nav-link" data-scroll-target="#todo-redesign-dfs_dropped-tracking">TODO — redesign <code>dfs_dropped</code> tracking</a></li>
+  <li><a href="#todo-revisit-data-dependent-lut-lambdas" id="toc-todo-revisit-data-dependent-lut-lambdas" class="nav-link" data-scroll-target="#todo-revisit-data-dependent-lut-lambdas">TODO — revisit data-dependent LUT lambdas</a>
+  <ul>
+  <li><a href="#geotraces.ipynb-migrated" id="toc-geotraces.ipynb-migrated" class="nav-link" data-scroll-target="#geotraces.ipynb-migrated">geotraces.ipynb — migrated ✅</a></li>
+  <li><a href="#maris_legacy.ipynb-migrated" id="toc-maris_legacy.ipynb-migrated" class="nav-link" data-scroll-target="#maris_legacy.ipynb-migrated">maris_legacy.ipynb — migrated ✅</a></li>
+  </ul></li>
+  <li><a href="#what-does-not-change" id="toc-what-does-not-change" class="nav-link" data-scroll-target="#what-does-not-change">What does NOT change</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><h1 class="title display-7"></h1></header><div class="quarto-title-block"><div class="quarto-title-tools-only"><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+
+
+
+
+<section id="callback-group-dispatch-audit-diagnosis-and-design" class="level1">
+<h1>Callback group dispatch — audit, diagnosis, and design</h1>
+<section id="status" class="level2">
+<h2 class="anchored" data-anchor-id="status">Status</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Notebook</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>nbs/api/callbacks.ipynb</code></td>
+<td>✅ done</td>
+</tr>
+<tr class="even">
+<td><code>nbs/handlers/helcom.ipynb</code></td>
+<td>✅ done</td>
+</tr>
+<tr class="odd">
+<td><code>nbs/handlers/ospar.ipynb</code></td>
+<td>✅ done</td>
+</tr>
+<tr class="even">
+<td><code>nbs/handlers/geotraces.ipynb</code></td>
+<td>✅ done</td>
+</tr>
+<tr class="odd">
+<td><code>nbs/handlers/maris_legacy.ipynb</code></td>
+<td>✅ done</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="context" class="level2">
+<h2 class="anchored" data-anchor-id="context">Context</h2>
+<p>Every handler callback that operates on <code>tfm.dfs</code> must iterate over the groups (<code>SEAWATER</code>, <code>BIOTA</code>, <code>SEDIMENT</code>, <code>SUSPENDED_MATTER</code>). There is no shared abstraction for this in <code>Callback</code>, so every callback re-implements the loop.</p>
+<hr>
+</section>
+<section id="audit-iteration-patterns-found-across-handlers" class="level2">
+<h2 class="anchored" data-anchor-id="audit-iteration-patterns-found-across-handlers">Audit — iteration patterns found across handlers</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Pattern</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>for grp, df in tfm.dfs.items():</code></td>
+<td><code>SanitizeLonLatCB</code>, <code>EncodeTimeCB</code>, ospar <code>ParseTimeCB</code>, ospar <code>SanitizeValueCB</code></td>
+</tr>
+<tr class="even">
+<td><code>for k in tfm.dfs.keys():</code></td>
+<td>helcom <code>CastStationToStringCB</code>, ospar <code>DropNAColumnsCB</code>, ospar <code>RemapNuclideNameCB</code></td>
+</tr>
+<tr class="odd">
+<td><code>for df in tfm.dfs.values():</code></td>
+<td>helcom <code>ParseTimeCB</code>, <code>AddDepthCB</code>, <code>AddSalinityCB</code>, <code>AddStationCB</code>, <code>RemapFiltCB</code></td>
+</tr>
+<tr class="even">
+<td><code>for _, df in tfm.dfs.items():</code></td>
+<td>helcom <code>AddSampleIDCB</code>, geotraces <code>AddSampleIDCB</code>, ospar <code>AddSampleIdCB</code></td>
+</tr>
+<tr class="odd">
+<td><code>tfm.df[col] = ...</code> <em>(single df)</em></td>
+<td>all geotraces pre-split callbacks</td>
+</tr>
+<tr class="even">
+<td><code>tfm.dfs['BIOTA']</code> <em>(direct key)</em></td>
+<td>ospar <code>EnhanceSpeciesCB</code>, <code>AddBodypartTempCB</code></td>
+</tr>
+<tr class="odd">
+<td><code>if grp in tfm.dfs: tfm.dfs[grp]...</code> <em>(conditional single group)</em></td>
+<td>helcom <code>SplitSedimentValuesCB</code>, helcom <code>NormalizeUncCB</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="diagnosis" class="level2">
+<h2 class="anchored" data-anchor-id="diagnosis">Diagnosis</h2>
+<p>The <code>Callback</code> base class defines only <code>order = 0</code>. It provides no protocol for <em>how</em> to visit groups. Consequences:</p>
+<ol type="1">
+<li><strong>Duplication</strong> — the loop is written from scratch in every callback.</li>
+<li><strong>Inconsistency</strong> — four syntactic variants for the same semantic act.</li>
+<li><strong>No shared missing-group policy</strong> — some callbacks silently skip a missing group, others raise a <code>KeyError</code>, others add an explicit <code>if grp in tfm.dfs</code> guard. Behaviour depends on which variant the author happened to pick.</li>
+<li><strong>Group scoping is ad-hoc</strong> — <code>RemapCB</code> already has a <code>dest_grps</code> parameter for this purpose, but no other callback reuses that pattern.</li>
+</ol>
+<p>The missing abstraction barrier is the question:</p>
+<blockquote class="blockquote">
+<p><strong>“Do I act on one group at a time, or do I need cross-group state?”</strong></p>
+</blockquote>
+<p>For the vast majority of callbacks the answer is <em>one group at a time</em>. The iteration is pure boilerplate and should not be visible in the subclass.</p>
+<hr>
+</section>
+<section id="design-pergroupcb" class="level2">
+<h2 class="anchored" data-anchor-id="design-pergroupcb">Design — <code>PerGroupCB</code></h2>
+<p><strong>Implemented in <code>nbs/api/callbacks.ipynb</code>.</strong> Key decisions made during implementation:</p>
+<ul>
+<li>Template method is named <code>each_grp</code>: <code>process_group</code> was too verbose; <code>each</code> was too generic (hides the group aspect); <code>each_grp</code> is short, uses the <code>grp</code> abbreviation already established in the codebase, and is unambiguous</li>
+<li>Loop iterates over <code>self.grps or tfm.dfs</code> directly (dict iteration yields keys; no intermediate variable)</li>
+<li>Missing-group guard lives in <code>__call__</code>, not in subclasses</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PerGroupCB(Callback):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Calls `each_grp` for each group in `tfm.dfs`; set `grps` to restrict to specific groups."</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    grps: <span class="bu">list</span> <span class="op">=</span> <span class="va">None</span>  <span class="co"># None → all groups; explicit list restricts to those groups only</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp <span class="kw">in</span> (<span class="va">self</span>.grps <span class="kw">or</span> tfm.dfs):</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> grp <span class="kw">in</span> tfm.dfs: <span class="va">self</span>.each_grp(grp, tfm.dfs[grp], tfm)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> each_grp(<span class="va">self</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                 grp: <span class="bu">str</span>,          <span class="co"># Group key e.g. 'SEAWATER', 'BIOTA'</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                 df: pd.DataFrame,  <span class="co"># DataFrame for this group</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                 tfm,               <span class="co"># Parent Transformer</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                 ): <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>__call__</code> owns: which groups to visit, the missing-group guard, and the loop.<br>
+<code>each_grp</code> owns: the transformation logic for a single group.</p>
+<p>The <code>grps</code> class variable is the scoping hook: - <code>grps = None</code> → all groups (default) - <code>grps = ['BIOTA']</code> → single group, class-level - set in <code>__init__</code> for runtime-configurable scoping</p>
+<p>Cross-group callbacks (<code>CompareDfsAndTfmCB</code>, <code>SplitSedimentValuesCB</code>) keep their full <code>__call__</code> override — they legitimately need cross-group state.</p>
+<section id="callbacks.ipynb-migrated" class="level3">
+<h3 class="anchored" data-anchor-id="callbacks.ipynb-migrated">callbacks.ipynb — migrated ✅</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Callback</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>SanitizeLonLatCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="even">
+<td><code>LowerStripNameCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="odd">
+<td><code>AddSampleTypeIdColumnCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="even">
+<td><code>SelectColumnsCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="odd">
+<td><code>RenameColumnsCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="even">
+<td><code>ParseTimeCB</code></td>
+<td>added as shared callback (ISO8601 string → datetime)</td>
+</tr>
+<tr class="odd">
+<td><code>EncodeTimeCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="even">
+<td><code>DecodeTimeCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="odd">
+<td><code>UniqueIndexCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="even">
+<td><code>RemapCB</code></td>
+<td><strong>kept as <code>Callback</code></strong> — has own <code>dest_grps</code> scoping + loads LUT in <code>__call__</code></td>
+</tr>
+<tr class="odd">
+<td><code>RemoveAllNAValuesCB</code></td>
+<td><strong>kept as <code>Callback</code></strong> — iterates over derived <code>cols_dict</code>, not directly over <code>tfm.dfs</code></td>
+</tr>
+<tr class="even">
+<td><code>CompareDfsAndTfmCB</code></td>
+<td><strong>kept as <code>Callback</code></strong> — cross-group by design</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="helcom.ipynb-migrated" class="level3">
+<h3 class="anchored" data-anchor-id="helcom.ipynb-migrated">helcom.ipynb — migrated ✅</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Callback</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ParseTimeCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="even">
+<td><code>SanitizeValueCB</code></td>
+<td>migrated — <code>dfs_dropped</code> side-channel removed (see TODO below)</td>
+</tr>
+<tr class="odd">
+<td><code>RemapUnitCB</code></td>
+<td>migrated — per-group if/elif in <code>each_grp</code></td>
+</tr>
+<tr class="even">
+<td><code>RemapDetectionLimitCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="odd">
+<td><code>RemapSedimentCB</code></td>
+<td>migrated — <code>grps</code> set from <code>sed_grp_name</code> in <code>__init__</code></td>
+</tr>
+<tr class="even">
+<td><code>RemapFiltCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="odd">
+<td><code>AddSampleIDCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="even">
+<td><code>AddDepthCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="odd">
+<td><code>AddSalinityCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="even">
+<td><code>AddStationCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="odd">
+<td><code>AddTemperatureCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="even">
+<td><code>RemapSedSliceTopBottomCB</code></td>
+<td>migrated — <code>grps = ['SEDIMENT']</code></td>
+</tr>
+<tr class="odd">
+<td><code>LookupDryWetPercentWeightCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="even">
+<td><code>RemapNuclideNameCB</code></td>
+<td>migrated — <code>__call__</code> builds LUT, <code>each_grp</code> applies it</td>
+</tr>
+<tr class="odd">
+<td><code>ParseCoordinates</code></td>
+<td>migrated + <strong>renamed <code>ParseCoordinatesCB</code></strong></td>
+</tr>
+<tr class="even">
+<td><code>SplitSedimentValuesCB</code></td>
+<td><strong>kept as <code>Callback</code></strong> — creates new groups by splitting</td>
+</tr>
+<tr class="odd">
+<td><code>NormalizeUncCB</code></td>
+<td><strong>kept as <code>Callback</code></strong> — iterates <code>self.coi</code> (list of tuples), not <code>tfm.dfs</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="example-rewrites" class="level2">
+<h2 class="anchored" data-anchor-id="example-rewrites">Example rewrites</h2>
+<section id="key-not-needed-adddepthcb-helcom" class="level3">
+<h3 class="anchored" data-anchor-id="key-not-needed-adddepthcb-helcom">1. Key not needed — <code>AddDepthCB</code> (helcom)</h3>
+<p>Before:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> AddDepthCB(Callback):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Ensure depth values are floats and add 'SMP_DEPTH' and 'TOT_DEPTH' columns."</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm: Transformer):</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> df <span class="kw">in</span> tfm.dfs.values():</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">'sdepth'</span> <span class="kw">in</span> df.columns:</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                df[<span class="st">'SMP_DEPTH'</span>] <span class="op">=</span> df[<span class="st">'sdepth'</span>].astype(<span class="bu">float</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">'tdepth'</span> <span class="kw">in</span> df.columns:</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                df[<span class="st">'TOT_DEPTH'</span>] <span class="op">=</span> df[<span class="st">'tdepth'</span>].astype(<span class="bu">float</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>After:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> AddDepthCB(PerGroupCB):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Ensure depth values are floats and add 'SMP_DEPTH' and 'TOT_DEPTH' columns."</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> each_grp(<span class="va">self</span>, grp, df, tfm):</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'sdepth'</span> <span class="kw">in</span> df.columns: df[<span class="st">'SMP_DEPTH'</span>] <span class="op">=</span> df[<span class="st">'sdepth'</span>].astype(<span class="bu">float</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'tdepth'</span> <span class="kw">in</span> df.columns: df[<span class="st">'TOT_DEPTH'</span>] <span class="op">=</span> df[<span class="st">'tdepth'</span>].astype(<span class="bu">float</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="key-used-as-config-lookup-parsetimecb-ospar" class="level3">
+<h3 class="anchored" data-anchor-id="key-used-as-config-lookup-parsetimecb-ospar">2. Key used as config lookup — <code>ParseTimeCB</code> (ospar)</h3>
+<p>Before:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ParseTimeCB(Callback):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, col_src, col_dst, <span class="bu">format</span>): fc.store_attr()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp, df <span class="kw">in</span> tfm.dfs.items():</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>            src_col <span class="op">=</span> <span class="va">self</span>.col_src.get(grp)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>            df[<span class="va">self</span>.col_dst] <span class="op">=</span> pd.to_datetime(df[src_col], <span class="bu">format</span><span class="op">=</span><span class="va">self</span>.<span class="bu">format</span>, errors<span class="op">=</span><span class="st">'coerce'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>After:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ParseTimeCB(PerGroupCB):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, col_src, col_dst, <span class="bu">format</span>): fc.store_attr()</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> each_grp(<span class="va">self</span>, grp, df, tfm):</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        df[<span class="va">self</span>.col_dst] <span class="op">=</span> pd.to_datetime(df[<span class="va">self</span>.col_src.get(grp)], <span class="bu">format</span><span class="op">=</span><span class="va">self</span>.<span class="bu">format</span>, errors<span class="op">=</span><span class="st">'coerce'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="scoped-to-a-single-group-enhancespeciescb-ospar" class="level3">
+<h3 class="anchored" data-anchor-id="scoped-to-a-single-group-enhancespeciescb-ospar">3. Scoped to a single group — <code>EnhanceSpeciesCB</code> (ospar)</h3>
+<p>Before:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EnhanceSpeciesCB(Callback):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> tfm.dfs[<span class="st">'BIOTA'</span>]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        df[<span class="st">'SPECIES'</span>] <span class="op">=</span> df.<span class="bu">apply</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>            <span class="kw">lambda</span> row: row[<span class="st">'enhanced_species'</span>] <span class="cf">if</span> row[<span class="st">'SPECIES'</span>] <span class="kw">in</span> [<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                        <span class="kw">and</span> pd.notnull(row[<span class="st">'enhanced_species'</span>]) <span class="cf">else</span> row[<span class="st">'SPECIES'</span>], axis<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>After:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EnhanceSpeciesCB(PerGroupCB):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    grps <span class="op">=</span> [<span class="st">'BIOTA'</span>]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> each_grp(<span class="va">self</span>, grp, df, tfm):</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        df[<span class="st">'SPECIES'</span>] <span class="op">=</span> df.<span class="bu">apply</span>(</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>            <span class="kw">lambda</span> row: row[<span class="st">'enhanced_species'</span>] <span class="cf">if</span> row[<span class="st">'SPECIES'</span>] <span class="kw">in</span> [<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                        <span class="kw">and</span> pd.notnull(row[<span class="st">'enhanced_species'</span>]) <span class="cf">else</span> row[<span class="st">'SPECIES'</span>], axis<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The group guard (<code>if 'BIOTA' in tfm.dfs</code>) moves from ad-hoc call-site logic into the base class. A typo in the group name previously silenced the error; now the base class handles it uniformly for all subclasses.</p>
+<hr>
+</section>
+</section>
+<section id="todo-redesign-dfs_dropped-tracking" class="level2">
+<h2 class="anchored" data-anchor-id="todo-redesign-dfs_dropped-tracking">TODO — redesign <code>dfs_dropped</code> tracking</h2>
+<p><code>SanitizeValueCB</code> used to populate <code>tfm.dfs_dropped</code> (a side-channel dict of removed rows) alongside the sanitizing logic. These are two concerns in one place:</p>
+<ol type="1">
+<li>Sanitizing — drop NaN rows, standardize to <code>VALUE</code> column → belongs in <code>SanitizeValueCB</code></li>
+<li>Tracking removals — before/after row diff → <code>CompareDfsAndTfmCB</code> already does this properly</li>
+</ol>
+<p>During the <code>PerGroupCB</code> migration, the <code>dfs_dropped</code> mechanism was removed from <code>SanitizeValueCB</code>. A proper removal-tracking design should be revisited separately, likely by ensuring <code>CompareDfsAndTfmCB</code> is composed after <code>SanitizeValueCB</code> in every handler pipeline that needs it.</p>
+<hr>
+</section>
+<section id="todo-revisit-data-dependent-lut-lambdas" class="level2">
+<h2 class="anchored" data-anchor-id="todo-revisit-data-dependent-lut-lambdas">TODO — revisit data-dependent LUT lambdas</h2>
+<p><code>lut_nuclides</code> takes <code>df</code> (unique values from runtime data) unlike all other zero-arg LUT lambdas. This creates a redundancy with the exploration workflow and leaks data-gathering into the callback. Needs further design thought to align with the broader LUT closure pattern.</p>
+<hr>
+<section id="geotraces.ipynb-migrated" class="level3">
+<h3 class="anchored" data-anchor-id="geotraces.ipynb-migrated">geotraces.ipynb — migrated ✅</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Callback</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>AddSampleIDCB</code></td>
+<td>migrated</td>
+</tr>
+<tr class="even">
+<td><code>ParseTimeCB</code></td>
+<td>migrated — <code>time_col_name</code> moved from <code>__call__</code> arg to <code>__init__</code> param</td>
+</tr>
+</tbody>
+</table>
+<p>Pre-dispatch callbacks (<code>SelectColsOfInterestCB</code>, <code>WideToLongCB</code>, <code>ExtractUnitCB</code>, <code>ExtractFilteringStatusCB</code>, <code>ExtractSamplingMethodCB</code>, <code>RenameNuclideCB</code>, <code>StandardizeUnitCB</code>, <code>RenameColumnCB</code>, <code>UnshiftLongitudeCB</code>) operate on <code>tfm.df</code> (single dataframe, before <code>DispatchToGroupCB</code>) — these remain as <code>Callback</code> by design.</p>
+<p><code>DispatchToGroupCB</code> keeps its full <code>__call__</code> — it <em>produces</em> <code>tfm.dfs</code> from <code>tfm.df</code> (cross-group by design).</p>
+</section>
+<section id="maris_legacy.ipynb-migrated" class="level3">
+<h3 class="anchored" data-anchor-id="maris_legacy.ipynb-migrated">maris_legacy.ipynb — migrated ✅</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Callback</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>CastStationToStringCB</code></td>
+<td>migrated — conditional <code>if 'STATION' in df.columns</code> moves into <code>each_grp</code></td>
+</tr>
+<tr class="even">
+<td><code>DropNAColumnsCB</code></td>
+<td>migrated — <code>each_grp</code> writes back via <code>tfm.dfs[grp]</code> (returns new DataFrame)</td>
+</tr>
+<tr class="odd">
+<td><code>SanitizeDetectionLimitCB</code></td>
+<td>migrated — <code>fn_lut()</code> called in <code>each_grp</code> (cheap static LUT)</td>
+</tr>
+<tr class="even">
+<td><code>ParseTimeCB</code></td>
+<td><strong>extracted to <code>callbacks.ipynb</code></strong> as shared callback; removed from both geotraces and maris_legacy; both handlers now import from <code>marisco.callbacks</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="what-does-not-change" class="level2">
+<h2 class="anchored" data-anchor-id="what-does-not-change">What does NOT change</h2>
+<p>Callbacks that require cross-group state or a fundamentally different dispatch strategy keep their full <code>__call__</code>:</p>
+<ul>
+<li><code>CompareDfsAndTfmCB</code> — computes diffs <em>between</em> original and transformed dfs</li>
+<li><code>SplitSedimentValuesCB</code> — creates new groups by splitting one group</li>
+<li><code>DispatchToGroupCB</code> (geotraces) — <em>produces</em> <code>tfm.dfs</code> from <code>tfm.df</code></li>
+<li><code>RemapNuclideNameCB</code> (helcom/ospar) — calls <code>get_unique_across_dfs</code> first</li>
+</ul>
+<p>These are not special cases to be worked around — they are legitimately cross-group operations and belong at the <code>Callback</code> level, not <code>PerGroupCB</code>.</p>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/franckalbinet\.github\.io\/marisco");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Callback group dispatch — audit, diagnosis, and design</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## Status</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Notebook <span class="pp">|</span> Status <span class="pp">|</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/api/callbacks.ipynb`</span> <span class="pp">|</span> ✅ done <span class="pp">|</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/handlers/helcom.ipynb`</span> <span class="pp">|</span> ✅ done <span class="pp">|</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/handlers/ospar.ipynb`</span> <span class="pp">|</span> ✅ done <span class="pp">|</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/handlers/geotraces.ipynb`</span> <span class="pp">|</span> ✅ done <span class="pp">|</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nbs/handlers/maris_legacy.ipynb`</span> <span class="pp">|</span> ✅ done <span class="pp">|</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="fu">## Context</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>Every handler callback that operates on <span class="in">`tfm.dfs`</span> must iterate over the groups</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>(<span class="in">`SEAWATER`</span>, <span class="in">`BIOTA`</span>, <span class="in">`SEDIMENT`</span>, <span class="in">`SUSPENDED_MATTER`</span>). There is no shared</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>abstraction for this in <span class="in">`Callback`</span>, so every callback re-implements the loop.</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="fu">## Audit — iteration patterns found across handlers</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Pattern <span class="pp">|</span> Where <span class="pp">|</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`for grp, df in tfm.dfs.items():`</span> <span class="pp">|</span> <span class="in">`SanitizeLonLatCB`</span>, <span class="in">`EncodeTimeCB`</span>, ospar <span class="in">`ParseTimeCB`</span>, ospar <span class="in">`SanitizeValueCB`</span> <span class="pp">|</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`for k in tfm.dfs.keys():`</span> <span class="pp">|</span> helcom <span class="in">`CastStationToStringCB`</span>, ospar <span class="in">`DropNAColumnsCB`</span>, ospar <span class="in">`RemapNuclideNameCB`</span> <span class="pp">|</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`for df in tfm.dfs.values():`</span> <span class="pp">|</span> helcom <span class="in">`ParseTimeCB`</span>, <span class="in">`AddDepthCB`</span>, <span class="in">`AddSalinityCB`</span>, <span class="in">`AddStationCB`</span>, <span class="in">`RemapFiltCB`</span> <span class="pp">|</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`for _, df in tfm.dfs.items():`</span> <span class="pp">|</span> helcom <span class="in">`AddSampleIDCB`</span>, geotraces <span class="in">`AddSampleIDCB`</span>, ospar <span class="in">`AddSampleIdCB`</span> <span class="pp">|</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`tfm.df[col] = ...`</span> *(single df)* <span class="pp">|</span> all geotraces pre-split callbacks <span class="pp">|</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`tfm.dfs['BIOTA']`</span> *(direct key)* <span class="pp">|</span> ospar <span class="in">`EnhanceSpeciesCB`</span>, <span class="in">`AddBodypartTempCB`</span> <span class="pp">|</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`if grp in tfm.dfs: tfm.dfs[grp]...`</span> *(conditional single group)* <span class="pp">|</span> helcom <span class="in">`SplitSedimentValuesCB`</span>, helcom <span class="in">`NormalizeUncCB`</span> <span class="pp">|</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="fu">## Diagnosis</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>The <span class="in">`Callback`</span> base class defines only <span class="in">`order = 0`</span>. It provides no protocol</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>for *how* to visit groups. Consequences:</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Duplication** — the loop is written from scratch in every callback.</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Inconsistency** — four syntactic variants for the same semantic act.</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**No shared missing-group policy** — some callbacks silently skip a missing</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>   group, others raise a <span class="in">`KeyError`</span>, others add an explicit <span class="in">`if grp in tfm.dfs`</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>   guard. Behaviour depends on which variant the author happened to pick.</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Group scoping is ad-hoc** — <span class="in">`RemapCB`</span> already has a <span class="in">`dest_grps`</span> parameter</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>   for this purpose, but no other callback reuses that pattern.</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>The missing abstraction barrier is the question:</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **"Do I act on one group at a time, or do I need cross-group state?"**</span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>For the vast majority of callbacks the answer is *one group at a time*. The</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>iteration is pure boilerplate and should not be visible in the subclass.</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a><span class="fu">## Design — `PerGroupCB`</span></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>**Implemented in `nbs/api/callbacks.ipynb`.** Key decisions made during implementation:</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Template method is named <span class="in">`each_grp`</span>: <span class="in">`process_group`</span> was too verbose; <span class="in">`each`</span> was too generic (hides the group aspect); <span class="in">`each_grp`</span> is short, uses the <span class="in">`grp`</span> abbreviation already established in the codebase, and is unambiguous</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Loop iterates over <span class="in">`self.grps or tfm.dfs`</span> directly (dict iteration yields keys; no intermediate variable)</span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Missing-group guard lives in <span class="in">`__call__`</span>, not in subclasses</span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PerGroupCB(Callback):</span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Calls `each_grp` for each group in `tfm.dfs`; set `grps` to restrict to specific groups."</span></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>    grps: <span class="bu">list</span> <span class="op">=</span> <span class="va">None</span>  <span class="co"># None → all groups; explicit list restricts to those groups only</span></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp <span class="kw">in</span> (<span class="va">self</span>.grps <span class="kw">or</span> tfm.dfs):</span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> grp <span class="kw">in</span> tfm.dfs: <span class="va">self</span>.each_grp(grp, tfm.dfs[grp], tfm)</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> each_grp(<span class="va">self</span>,</span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>                 grp: <span class="bu">str</span>,          <span class="co"># Group key e.g. 'SEAWATER', 'BIOTA'</span></span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>                 df: pd.DataFrame,  <span class="co"># DataFrame for this group</span></span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>                 tfm,               <span class="co"># Parent Transformer</span></span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>                 ): <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a><span class="in">`__call__`</span> owns: which groups to visit, the missing-group guard, and the loop.  </span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a><span class="in">`each_grp`</span> owns: the transformation logic for a single group.</span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>The <span class="in">`grps`</span> class variable is the scoping hook:</span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`grps = None`</span> → all groups (default)</span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`grps = ['BIOTA']`</span> → single group, class-level</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>set in <span class="in">`__init__`</span> for runtime-configurable scoping</span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>Cross-group callbacks (<span class="in">`CompareDfsAndTfmCB`</span>, <span class="in">`SplitSedimentValuesCB`</span>) keep</span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>their full <span class="in">`__call__`</span> override — they legitimately need cross-group state.</span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a><span class="fu">### callbacks.ipynb — migrated ✅</span></span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Callback <span class="pp">|</span> Note <span class="pp">|</span></span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`SanitizeLonLatCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`LowerStripNameCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`AddSampleTypeIdColumnCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`SelectColumnsCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`RenameColumnsCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ParseTimeCB`</span> <span class="pp">|</span> added as shared callback (ISO8601 string → datetime) <span class="pp">|</span></span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`EncodeTimeCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`DecodeTimeCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`UniqueIndexCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`RemapCB`</span> <span class="pp">|</span> **kept as `Callback`** — has own <span class="in">`dest_grps`</span> scoping + loads LUT in <span class="in">`__call__`</span> <span class="pp">|</span></span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`RemoveAllNAValuesCB`</span> <span class="pp">|</span> **kept as `Callback`** — iterates over derived <span class="in">`cols_dict`</span>, not directly over <span class="in">`tfm.dfs`</span> <span class="pp">|</span></span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`CompareDfsAndTfmCB`</span> <span class="pp">|</span> **kept as `Callback`** — cross-group by design <span class="pp">|</span></span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a><span class="fu">### helcom.ipynb — migrated ✅</span></span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Callback <span class="pp">|</span> Note <span class="pp">|</span></span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ParseTimeCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`SanitizeValueCB`</span> <span class="pp">|</span> migrated — <span class="in">`dfs_dropped`</span> side-channel removed (see TODO below) <span class="pp">|</span></span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`RemapUnitCB`</span> <span class="pp">|</span> migrated — per-group if/elif in <span class="in">`each_grp`</span> <span class="pp">|</span></span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`RemapDetectionLimitCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`RemapSedimentCB`</span> <span class="pp">|</span> migrated — <span class="in">`grps`</span> set from <span class="in">`sed_grp_name`</span> in <span class="in">`__init__`</span> <span class="pp">|</span></span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`RemapFiltCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`AddSampleIDCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`AddDepthCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`AddSalinityCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`AddStationCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`AddTemperatureCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`RemapSedSliceTopBottomCB`</span> <span class="pp">|</span> migrated — <span class="in">`grps = ['SEDIMENT']`</span> <span class="pp">|</span></span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`LookupDryWetPercentWeightCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`RemapNuclideNameCB`</span> <span class="pp">|</span> migrated — <span class="in">`__call__`</span> builds LUT, <span class="in">`each_grp`</span> applies it <span class="pp">|</span></span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ParseCoordinates`</span> <span class="pp">|</span> migrated + **renamed `ParseCoordinatesCB`** <span class="pp">|</span></span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`SplitSedimentValuesCB`</span> <span class="pp">|</span> **kept as `Callback`** — creates new groups by splitting <span class="pp">|</span></span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`NormalizeUncCB`</span> <span class="pp">|</span> **kept as `Callback`** — iterates <span class="in">`self.coi`</span> (list of tuples), not <span class="in">`tfm.dfs`</span> <span class="pp">|</span></span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a><span class="fu">## Example rewrites</span></span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. Key not needed — `AddDepthCB` (helcom)</span></span>
+<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a>Before:</span>
+<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> AddDepthCB(Callback):</span>
+<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Ensure depth values are floats and add 'SMP_DEPTH' and 'TOT_DEPTH' columns."</span></span>
+<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm: Transformer):</span>
+<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> df <span class="kw">in</span> tfm.dfs.values():</span>
+<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">'sdepth'</span> <span class="kw">in</span> df.columns:</span>
+<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a>                df[<span class="st">'SMP_DEPTH'</span>] <span class="op">=</span> df[<span class="st">'sdepth'</span>].astype(<span class="bu">float</span>)</span>
+<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">'tdepth'</span> <span class="kw">in</span> df.columns:</span>
+<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a>                df[<span class="st">'TOT_DEPTH'</span>] <span class="op">=</span> df[<span class="st">'tdepth'</span>].astype(<span class="bu">float</span>)</span>
+<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a>After:</span>
+<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> AddDepthCB(PerGroupCB):</span>
+<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a>    <span class="co">"Ensure depth values are floats and add 'SMP_DEPTH' and 'TOT_DEPTH' columns."</span></span>
+<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> each_grp(<span class="va">self</span>, grp, df, tfm):</span>
+<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'sdepth'</span> <span class="kw">in</span> df.columns: df[<span class="st">'SMP_DEPTH'</span>] <span class="op">=</span> df[<span class="st">'sdepth'</span>].astype(<span class="bu">float</span>)</span>
+<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'tdepth'</span> <span class="kw">in</span> df.columns: df[<span class="st">'TOT_DEPTH'</span>] <span class="op">=</span> df[<span class="st">'tdepth'</span>].astype(<span class="bu">float</span>)</span>
+<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. Key used as config lookup — `ParseTimeCB` (ospar)</span></span>
+<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a>Before:</span>
+<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ParseTimeCB(Callback):</span>
+<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, col_src, col_dst, <span class="bu">format</span>): fc.store_attr()</span>
+<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> grp, df <span class="kw">in</span> tfm.dfs.items():</span>
+<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a>            src_col <span class="op">=</span> <span class="va">self</span>.col_src.get(grp)</span>
+<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a>            df[<span class="va">self</span>.col_dst] <span class="op">=</span> pd.to_datetime(df[src_col], <span class="bu">format</span><span class="op">=</span><span class="va">self</span>.<span class="bu">format</span>, errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
+<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a>After:</span>
+<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ParseTimeCB(PerGroupCB):</span>
+<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, col_src, col_dst, <span class="bu">format</span>): fc.store_attr()</span>
+<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> each_grp(<span class="va">self</span>, grp, df, tfm):</span>
+<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a>        df[<span class="va">self</span>.col_dst] <span class="op">=</span> pd.to_datetime(df[<span class="va">self</span>.col_src.get(grp)], <span class="bu">format</span><span class="op">=</span><span class="va">self</span>.<span class="bu">format</span>, errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
+<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3. Scoped to a single group — `EnhanceSpeciesCB` (ospar)</span></span>
+<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a>Before:</span>
+<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EnhanceSpeciesCB(Callback):</span>
+<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, tfm):</span>
+<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> tfm.dfs[<span class="st">'BIOTA'</span>]</span>
+<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a>        df[<span class="st">'SPECIES'</span>] <span class="op">=</span> df.<span class="bu">apply</span>(</span>
+<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a>            <span class="kw">lambda</span> row: row[<span class="st">'enhanced_species'</span>] <span class="cf">if</span> row[<span class="st">'SPECIES'</span>] <span class="kw">in</span> [<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>]</span>
+<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a>                        <span class="kw">and</span> pd.notnull(row[<span class="st">'enhanced_species'</span>]) <span class="cf">else</span> row[<span class="st">'SPECIES'</span>], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb8-194"><a href="#cb8-194" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-195"><a href="#cb8-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a>After:</span>
+<span id="cb8-197"><a href="#cb8-197" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EnhanceSpeciesCB(PerGroupCB):</span>
+<span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a>    grps <span class="op">=</span> [<span class="st">'BIOTA'</span>]</span>
+<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> each_grp(<span class="va">self</span>, grp, df, tfm):</span>
+<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a>        df[<span class="st">'SPECIES'</span>] <span class="op">=</span> df.<span class="bu">apply</span>(</span>
+<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a>            <span class="kw">lambda</span> row: row[<span class="st">'enhanced_species'</span>] <span class="cf">if</span> row[<span class="st">'SPECIES'</span>] <span class="kw">in</span> [<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>]</span>
+<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a>                        <span class="kw">and</span> pd.notnull(row[<span class="st">'enhanced_species'</span>]) <span class="cf">else</span> row[<span class="st">'SPECIES'</span>], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a>The group guard (<span class="in">`if 'BIOTA' in tfm.dfs`</span>) moves from ad-hoc call-site logic</span>
+<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a>into the base class. A typo in the group name previously silenced the error;</span>
+<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a>now the base class handles it uniformly for all subclasses.</span>
+<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a><span class="fu">## TODO — redesign `dfs_dropped` tracking</span></span>
+<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a><span class="in">`SanitizeValueCB`</span> used to populate <span class="in">`tfm.dfs_dropped`</span> (a side-channel dict of removed rows)</span>
+<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a>alongside the sanitizing logic. These are two concerns in one place:</span>
+<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Sanitizing — drop NaN rows, standardize to <span class="in">`VALUE`</span> column → belongs in <span class="in">`SanitizeValueCB`</span></span>
+<span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Tracking removals — before/after row diff → <span class="in">`CompareDfsAndTfmCB`</span> already does this properly</span>
+<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a>During the <span class="in">`PerGroupCB`</span> migration, the <span class="in">`dfs_dropped`</span> mechanism was removed from</span>
+<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a><span class="in">`SanitizeValueCB`</span>. A proper removal-tracking design should be revisited separately,</span>
+<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a>likely by ensuring <span class="in">`CompareDfsAndTfmCB`</span> is composed after <span class="in">`SanitizeValueCB`</span> in every</span>
+<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a>handler pipeline that needs it.</span>
+<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a><span class="fu">## TODO — revisit data-dependent LUT lambdas</span></span>
+<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a><span class="in">`lut_nuclides`</span> takes <span class="in">`df`</span> (unique values from runtime data) unlike all other zero-arg LUT lambdas.</span>
+<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a>This creates a redundancy with the exploration workflow and leaks data-gathering into the callback.</span>
+<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a>Needs further design thought to align with the broader LUT closure pattern.</span>
+<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a><span class="fu">### geotraces.ipynb — migrated ✅</span></span>
+<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Callback <span class="pp">|</span> Note <span class="pp">|</span></span>
+<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`AddSampleIDCB`</span> <span class="pp">|</span> migrated <span class="pp">|</span></span>
+<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ParseTimeCB`</span> <span class="pp">|</span> migrated — <span class="in">`time_col_name`</span> moved from <span class="in">`__call__`</span> arg to <span class="in">`__init__`</span> param <span class="pp">|</span></span>
+<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a>Pre-dispatch callbacks (<span class="in">`SelectColsOfInterestCB`</span>, <span class="in">`WideToLongCB`</span>, <span class="in">`ExtractUnitCB`</span>, <span class="in">`ExtractFilteringStatusCB`</span>, <span class="in">`ExtractSamplingMethodCB`</span>, <span class="in">`RenameNuclideCB`</span>, <span class="in">`StandardizeUnitCB`</span>, <span class="in">`RenameColumnCB`</span>, <span class="in">`UnshiftLongitudeCB`</span>) operate on <span class="in">`tfm.df`</span> (single dataframe, before <span class="in">`DispatchToGroupCB`</span>) — these remain as <span class="in">`Callback`</span> by design.</span>
+<span id="cb8-243"><a href="#cb8-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-244"><a href="#cb8-244" aria-hidden="true" tabindex="-1"></a><span class="in">`DispatchToGroupCB`</span> keeps its full <span class="in">`__call__`</span> — it *produces* <span class="in">`tfm.dfs`</span> from <span class="in">`tfm.df`</span> (cross-group by design).</span>
+<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a><span class="fu">### maris_legacy.ipynb — migrated ✅</span></span>
+<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Callback <span class="pp">|</span> Note <span class="pp">|</span></span>
+<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`CastStationToStringCB`</span> <span class="pp">|</span> migrated — conditional <span class="in">`if 'STATION' in df.columns`</span> moves into <span class="in">`each_grp`</span> <span class="pp">|</span></span>
+<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`DropNAColumnsCB`</span> <span class="pp">|</span> migrated — <span class="in">`each_grp`</span> writes back via <span class="in">`tfm.dfs[grp]`</span> (returns new DataFrame) <span class="pp">|</span></span>
+<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`SanitizeDetectionLimitCB`</span> <span class="pp">|</span> migrated — <span class="in">`fn_lut()`</span> called in <span class="in">`each_grp`</span> (cheap static LUT) <span class="pp">|</span></span>
+<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ParseTimeCB`</span> <span class="pp">|</span> **extracted to `callbacks.ipynb`** as shared callback; removed from both geotraces and maris_legacy; both handlers now import from <span class="in">`marisco.callbacks`</span> <span class="pp">|</span></span>
+<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a><span class="fu">## What does NOT change</span></span>
+<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a>Callbacks that require cross-group state or a fundamentally different dispatch</span>
+<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a>strategy keep their full <span class="in">`__call__`</span>:</span>
+<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`CompareDfsAndTfmCB`</span> — computes diffs *between* original and transformed dfs</span>
+<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`SplitSedimentValuesCB`</span> — creates new groups by splitting one group</span>
+<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`DispatchToGroupCB`</span> (geotraces) — *produces* <span class="in">`tfm.dfs`</span> from <span class="in">`tfm.df`</span></span>
+<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`RemapNuclideNameCB`</span> (helcom/ospar) — calls <span class="in">`get_unique_across_dfs`</span> first</span>
+<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a>These are not special cases to be worked around — they are legitimately</span>
+<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a>cross-group operations and belong at the <span class="in">`Callback`</span> level, not <span class="in">`PerGroupCB`</span>.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/franckalbinet/marisco/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

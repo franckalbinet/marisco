@@ -1,11 +1,11 @@
-bodypar_id,detection,drywt,latitude,longitude,nuclide_id,percentwt,sampdepth,samplabcode,species_id,station,begperiod,uncertaint,unit_id,activity,wetwt,samptype_id,ref_id,taxonname,taxonrank,taxondb,taxondb_id,taxondb_url
-54,=,,54.22,13.72,4,0.1692,0.0,BBFFG1999001,96,BGBODD,1999-06-15,58.87,4,841.0,,2,100,Fucus vesiculosus,species,Wikidata,Q754755,https://www.wikidata.org/wiki/Q754755
-52,<,,54.7,15.96,9,0.3145,55.5,BBFFG1987140,50,87/45,1987-12-17,0.0,5,0.0326,,2,100,Clupea harengus,species,Wikidata,Q2396858,https://www.wikidata.org/wiki/Q2396858
-54,=,,57.3352,12.0742,2,0.22,0.0,BSSSM2008013,96,SWR25,2008-11-03,0.704,4,17.6,,2,100,Fucus vesiculosus,species,Wikidata,Q754755,https://www.wikidata.org/wiki/Q754755
-52,=,75.9,54.5833,19.0,31,0.33,0.0,BCLOR1992003,192,GD.BAY,1992-03-28,0.532,5,1.9,230.0,2,100,Pleuronectes platessa,species,Wikidata,Q27098,https://www.wikidata.org/wiki/Q27098
-52,<,409.7016,55.08,16.38,67,0.24387,72.0,BBFFG2006018,99,BBHOL5,2006-12-04,,5,3.2e-05,1680.0,2,100,Gadus morhua,species,Wikidata,Q199788,https://www.wikidata.org/wiki/Q199788
-1,<,,54.22,13.72,31,0.4065,0.0,BBFFG1998008,129,BGBODD,1998-10-12,0.0,4,0.209,,2,100,Mytilus edulis,species,Wikidata,Q27855,https://www.wikidata.org/wiki/Q27855
-52,=,60.9,54.9167,18.1667,4,0.29,0.0,BCLOR1995035,191,PL2,1995-09-12,7.28,5,104.0,210.0,2,100,Platichthys flesus,species,Wikidata,Q214034,https://www.wikidata.org/wiki/Q214034
-52,=,323.43262,55.7,15.16,12,0.2283,71.0,BBFFG1991015,99,BBHOL4,1991-12-16,0.000535,5,0.00535,1416.7,2,100,Gadus morhua,species,Wikidata,Q199788,https://www.wikidata.org/wiki/Q199788
-52,<,188.0776,54.49167,11.446667,31,0.1864,0.0,BVTIG2011005,99,BMEB12,2011-03-03,,5,0.0082,1009.0,2,100,Gadus morhua,species,Wikidata,Q199788,https://www.wikidata.org/wiki/Q199788
-1,=,,60.3767,18.4,4,,0.0,BNCRS1994011,122,SWF108,1994-10-10,13.0,4,130.0,,2,100,Macoma balthica,species,Wikidata,Q805778,https://www.wikidata.org/wiki/Q805778
+samplabcode,longitude,latitude,sampdepth,begperiod,station,nuclide_id,activity,unit_id,uncertaint,detection,BIO_GROUP,species_id,bodypar_id,drywt,wetwt,percentwt,samptype_id,ref_id,taxonname,taxonrank,taxondb,taxondb_id,taxondb_url
+BBFFG1999001,13.72,54.22,0.0,929404800,BGBODD,4,841.0,4,58.87,=,11,96,54,,,0.1692,2,100,Fucus vesiculosus,species,Wikidata,Q754755,https://www.wikidata.org/wiki/Q754755
+BBFFG1987140,15.96,54.7,55.5,566697600,87/45,9,0.0326,5,0.0,<,4,50,52,,,0.3145,2,100,Clupea harengus,species,Wikidata,Q2396858,https://www.wikidata.org/wiki/Q2396858
+BSSSM2008013,12.0742,57.3352,0.0,1225670400,SWR25,2,17.6,4,0.704,=,11,96,54,,,0.22,2,100,Fucus vesiculosus,species,Wikidata,Q754755,https://www.wikidata.org/wiki/Q754755
+BCLOR1992003,19.0,54.5833,0.0,701740800,GD.BAY,31,1.9,5,0.532,=,4,192,52,75.9,230.0,0.33,2,100,Pleuronectes platessa,species,Wikidata,Q27098,https://www.wikidata.org/wiki/Q27098
+BBFFG2006018,16.38,55.08,72.0,1165190400,BBHOL5,67,3.2e-05,5,,<,4,99,52,409.7016,1680.0,0.24387,2,100,Gadus morhua,species,Wikidata,Q199788,https://www.wikidata.org/wiki/Q199788
+BBFFG1998008,13.72,54.22,0.0,908150400,BGBODD,31,0.209,4,0.0,<,14,129,1,,,0.4065,2,100,Mytilus edulis,species,Wikidata,Q27855,https://www.wikidata.org/wiki/Q27855
+BCLOR1995035,18.1667,54.9167,0.0,810864000,PL2,4,104.0,5,7.28,=,4,191,52,60.9,210.0,0.29,2,100,Platichthys flesus,species,Wikidata,Q214034,https://www.wikidata.org/wiki/Q214034
+BBFFG1991015,15.16,55.7,71.0,692841600,BBHOL4,12,0.00535,5,0.000535,=,4,99,52,323.43262,1416.7,0.2283,2,100,Gadus morhua,species,Wikidata,Q199788,https://www.wikidata.org/wiki/Q199788
+BVTIG2011005,11.446667,54.49167,0.0,1299110400,BMEB12,31,0.0082,5,,<,4,99,52,188.0776,1009.0,0.1864,2,100,Gadus morhua,species,Wikidata,Q199788,https://www.wikidata.org/wiki/Q199788
+BNCRS1994011,18.4,60.3767,0.0,781747200,SWF108,4,130.0,4,13.0,=,14,122,1,,,,2,100,Macoma balthica,species,Wikidata,Q805778,https://www.wikidata.org/wiki/Q805778

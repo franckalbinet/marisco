@@ -26,9 +26,7 @@ website:
           - api/configs.ipynb
           - api/metadata.ipynb
           - api/encoders.ipynb
-          - api/decoders.ipynb
           - api/match.ipynb
           - api/geo.ipynb
-          - api/utils.ipynb
-          - api/netcdf2csv.ipynb
+          - api/nc2csv.ipynb
       

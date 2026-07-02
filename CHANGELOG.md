@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.0] - 2026-07-02
+
+  ### Changed
+  - Refactored `netcdf2csv` module into a simpler, cleaner `nc2csv` module
+  - Removed obsolete modules and fixed downstream implications across handlers
+
 ## [1.5.0] - 2026-06-29
 
 ### Added

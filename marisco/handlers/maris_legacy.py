@@ -22,8 +22,6 @@ from ..encoders import NetCDFEncoder
 from ..configs import NA, NC_DTYPES, get_lut, lut_path, cache_path
 from ..match import uniq_across_dfs, lut_from, fuzzy_merge, fix_lut, make_lut, make_lut_from
 from ..geo import ddmm_to_dd
-from ..utils import ExtractNetcdfContents
-from ..netcdf2csv import decode
 
 import warnings
 warnings.filterwarnings('ignore')

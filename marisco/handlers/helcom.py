@@ -21,14 +21,13 @@ import re
 from ..configs import NA, NC_DTYPES, get_lut, lut_path, cache_path
 from ..match import uniq_across_dfs, lut_from, fuzzy_merge, fix_lut, make_lut, make_lut_from
 from ..geo import ddmm_to_dd
-from ..utils import ExtractNetcdfContents
 from ..callbacks import (
     Callback, PerGroupCB, Transformer,
     EncodeTimeCB, LowerStripNameCB, SanitizeLonLatCB,
     CompareDfsAndTfmCB, RemapCB)
 from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder
-from ..netcdf2csv import decode
+from ..nc2csv import to_csv
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -420,6 +419,7 @@ def encode(
     ) -> None:
     "Encode data to NetCDF."
     dfs = load_data(src_dir)
+    dfs = {k: v.sample(10, random_state=42) for k, v in dfs.items()}
     tfm = Transformer(dfs, cbs=[
                             LowerStripNameCB(col_src='nuclide', col_dst='NUCLIDE'),
                             RemapCB(lut=nuclide_lut, col_remap='NUCLIDE', col_src='NUCLIDE'),

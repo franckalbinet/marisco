@@ -35,9 +35,8 @@ from marisco.metadata import (
 )
 
 from ..configs import AVOGADRO, get_lut, lut_path
-
-from ..netcdf2csv import decode
 from ..encoders import NetCDFEncoder
+from ..nc2csv import to_csv
 
 # %% ../../nbs/handlers/geotraces.ipynb #d02bf0a9
 fname_in = '../../_data/geotraces/GEOTRACES_IDP2021_v2/seawater/ascii/GEOTRACES_IDP2021_Seawater_Discrete_Sample_Data_v2.csv'

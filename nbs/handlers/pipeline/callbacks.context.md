@@ -1,0 +1,310 @@
+# Source Notebook: callbacks.ipynb
+
+### Cell [1] - Role: Module Declaration (default_exp)
+```python
+#| default_exp handlers.pipeline.callbacks
+```
+
+# Pipeline callbacks
+
+Additive callback extensions used only by the declarative intake pipeline.
+
+### Cell [3] - Role: Production Implementation (Exported)
+```python
+#| export
+from __future__ import annotations
+from collections import defaultdict
+from typing import Any, ClassVar, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
+from pydantic import BaseModel, ConfigDict, Field
+
+from marisco.callbacks import (
+    EncodeTimeCB,
+    PerGroupCB,
+    RemapCB,
+    SanitizeLonLatCB,
+    run_cbs,
+)
+```
+
+### Cell [4] - Role: Production Implementation (Exported)
+```python
+#| export
+class PipelineState(BaseModel):
+    "Pure data vessel for declarative pipeline DataFrames and audit logs."
+    model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True)
+
+    _SINGLE_KEY: ClassVar[str] = ""
+
+    dfs: Dict[str, pd.DataFrame] = Field(default_factory=dict)
+    logs: List[str] = Field(default_factory=list)
+    custom_maps: Any = Field(default_factory=lambda: defaultdict(lambda: defaultdict(dict)))
+
+    @property
+    def is_single_df(self) -> bool:
+        return self._SINGLE_KEY in self.dfs and len(self.dfs) == 1
+
+    @property
+    def df(self) -> Optional[pd.DataFrame]:
+        return self.dfs.get(self._SINGLE_KEY)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name == 'df':
+            if self._SINGLE_KEY not in self.dfs and self.dfs:
+                raise ValueError(
+                    "Cannot assign state.df in multi-group state "
+                    f"(active groups: {list(self.dfs)}). Use state.dfs[grp] instead."
+                )
+            self.dfs[self._SINGLE_KEY] = value
+            return
+        super().__setattr__(name, value)
+
+
+def run_pipeline(state: PipelineState, cbs: list) -> None:
+    "Execute callbacks on state in place and accumulate their audit logs."
+    run_cbs(cbs, state)
+```
+
+### Cell [5] - Role: Production Implementation (Exported)
+```python
+#| export
+class RenameColsCB(PerGroupCB):
+    "Rename provider columns to MARIS names and cast declared columns to strings."
+    class Schema(BaseModel):
+        mapping: dict[str, str] = Field(default_factory=dict)
+        string_cast: list[str] = Field(default_factory=list)
+
+    def __init__(self, mapping: dict = None, string_cast: list = None):
+        self.cfg = self.Schema(mapping=mapping or {}, string_cast=string_cast or [])
+
+    def each_grp(self, grp, df, tfm):
+        df.rename(columns=self.cfg.mapping, inplace=True)
+        for col in self.cfg.string_cast:
+            df[col] = df[col].astype(str)
+
+
+class SoftRemapCB(PerGroupCB):
+    "Remap source tokens to MARIS IDs; an empty LUT is a Null-Object no-op."
+    class Schema(BaseModel):
+        col_src: str
+        col_remap: str
+        lut: dict[str, Any] = Field(default_factory=dict)
+        default_val: Any = 0
+
+    def __init__(self, col_src: str, col_remap: str, lut: dict = None, default_val: Any = 0, grps: list[str] = None):
+        self.cfg = self.Schema(
+            col_src=col_src, col_remap=col_remap, lut=lut or {}, default_val=default_val
+        )
+        self.grps = [None] if not self.cfg.lut else grps
+
+    def each_grp(self, grp, df, tfm):
+        df[self.cfg.col_remap] = (
+            df[self.cfg.col_src].map(lambda token: self.cfg.lut.get(token, self.cfg.default_val)).astype(int)
+        )
+
+
+class SoftMeltWideNuclidesCB(PerGroupCB):
+    "Reshape wide nuclide columns to long format; an empty spec is a safe no-op."
+    class Schema(BaseModel):
+        spec: list = Field(default_factory=list)
+
+    def __init__(self, spec: list = None, grp: str = 'SEAWATER'):
+        self.cfg = self.Schema(spec=spec or [])
+        self.grps = [grp]
+
+    def each_grp(self, grp, df, tfm):
+        frames = []
+        for spec in self.cfg.spec:
+            sub = df.loc[df[spec['val']].notna()].copy()
+            sub['NUCLIDE'] = spec['nuclide']
+            sub['VALUE'] = sub[spec['val']]
+            sub['UNC'] = sub[spec['unc']]
+            sub['UNIT'] = spec['unit']
+            sub['LAB'] = spec['lab']
+            frames.append(sub)
+        tfm.dfs[grp] = pd.concat(frames or [df], ignore_index=True)
+
+
+class SoftParseDateTimeCB(PerGroupCB):
+    "Parse date and time columns into UTC-aware TIME; no date column is a no-op."
+    class Schema(BaseModel):
+        col_date: Optional[str] = None
+        col_time: Optional[str] = None
+        fmt: str = '%Y-%m-%d'
+
+    def __init__(self, col_date = None, col_time = None, fmt = '%Y-%m-%d'):
+        self.cfg = self.Schema(col_date=col_date, col_time=col_time, fmt=fmt)
+        self.grps = None if col_date else [None]
+
+    def each_grp(self, grp, df, tfm):
+        date_str = df[self.cfg.col_date].astype(str)
+        time_str = df.get(self.cfg.col_time, pd.Series('', index=df.index)).astype(str)
+        df['TIME'] = pd.to_datetime(
+            (date_str + ' ' + time_str).str.strip(), format=self.cfg.fmt, utc=True
+        )
+
+
+class SoftConvertUnitCB(PerGroupCB):
+    "Apply a scalar unit conversion; a missing rule is a Null-Object no-op."
+    class UnitConversionRule(BaseModel):
+        nuclide: str
+        src_unit: str
+        dst_unit: str
+        factor: float
+
+    def __init__(self, rule: dict = None):
+        self.grps = [None] if rule is None else None
+        if rule:
+            self.cfg = self.UnitConversionRule(**rule)
+
+    def each_grp(self, grp, df, tfm):
+        mask = (df['NUCLIDE'] == self.cfg.nuclide) & (df['UNIT'] == self.cfg.src_unit)
+        df.loc[mask, 'VALUE'] *= self.cfg.factor
+        df.loc[mask, 'UNC'] *= self.cfg.factor
+        df.loc[mask, 'UNIT'] = self.cfg.dst_unit
+```
+
+### Cell [6] - Role: Production Implementation (Exported)
+```python
+#| export
+class SoftRelToAbsUncCB(PerGroupCB):
+    "Convert relative uncertainty to absolute; no value column is a no-op."
+    class Schema(BaseModel):
+        col_value: Optional[str] = None
+        col_unc_rel: str = 'UNC_REL'
+        factor: float = 100.0
+
+    def __init__(self, col_value = None, col_unc_rel = 'UNC_REL', factor = 100.0):
+        self.cfg = self.Schema(col_value=col_value, col_unc_rel=col_unc_rel, factor=factor)
+        self.grps = [None] if col_value is None else None
+
+    def each_grp(self, grp, df, tfm):
+        df['UNC'] = df[self.cfg.col_unc_rel] * df[self.cfg.col_value] / self.cfg.factor
+
+
+class SoftExtractUnitFromColCB(PerGroupCB):
+    "Extract a unit string with a regex; no source column is a no-op."
+    class Schema(BaseModel):
+        src_col: Optional[str] = None
+        dst_col: str = 'UNIT'
+        pattern: str = r'\((.*?)\)'
+
+    def __init__(self, src_col = None, dst_col = 'UNIT', pattern = r'\((.*?)\)'):
+        self.cfg = self.Schema(src_col=src_col, dst_col=dst_col, pattern=pattern)
+        self.grps = [None] if src_col is None else None
+
+    def each_grp(self, grp, df, tfm):
+        df[self.cfg.dst_col] = df[self.cfg.src_col].str.extract(self.cfg.pattern, expand=False)
+
+
+class SoftShiftLonCB(PerGroupCB):
+    "Shift a longitude convention; no shift is a Null-Object no-op."
+    class Schema(BaseModel):
+        col: str = 'LON'
+        shift: Optional[float] = None
+
+    def __init__(self, col = 'LON', shift = None):
+        self.cfg = self.Schema(col=col, shift=shift)
+        self.grps = [None] if shift is None else None
+
+    def each_grp(self, grp, df, tfm):
+        df[self.cfg.col] = df[self.cfg.col] - self.cfg.shift
+
+
+class SoftDMStoDecimalCB(PerGroupCB):
+    "Convert degree-minute-second columns to decimal degrees; no degree column is a no-op."
+    class Schema(BaseModel):
+        col_deg: Optional[str] = None
+        col_min: str = 'MIN'
+        col_sec: str = 'SEC'
+        col_dir: Optional[str] = None
+        dst_col: str = 'LAT'
+        neg_dir: list = Field(default_factory=lambda: ['S', 'W'])
+
+    def __init__(self, col_deg = None, col_min = 'MIN', col_sec = 'SEC', col_dir = None, dst_col = 'LAT', neg_dir = None):
+        self.cfg = self.Schema(
+            col_deg=col_deg, col_min=col_min, col_sec=col_sec, col_dir=col_dir,
+            dst_col=dst_col, neg_dir=neg_dir or ['S', 'W']
+        )
+        self.grps = [None] if col_deg is None else None
+
+    def each_grp(self, grp, df, tfm):
+        decimal = df[self.cfg.col_deg] + df[self.cfg.col_min] / 60 + df[self.cfg.col_sec] / 3600
+        df[self.cfg.dst_col] = np.where(
+            df[self.cfg.col_dir].isin(self.cfg.neg_dir), -decimal, decimal
+        )
+
+
+class SoftAssetRemapCB(RemapCB):
+    "Resolve a remap LUT from a literal mapping, MARIS LUT, or pipeline asset."
+    def __init__(self, col_src: str, col_remap: str, lut: dict = None, lut_key: str = None, key_col: str = None, val_col: str = None, asset_path: str = None, default_val: int = 0, grps: list = None):
+        from marisco.configs import get_lut, lut_path
+
+        resolved = (
+            lut if lut is not None
+            else get_lut(lut_key, key=key_col, value=val_col) if lut_key is not None
+            else pd.read_csv(lut_path() / asset_path).set_index(key_col)[val_col].to_dict()
+        )
+        super().__init__(
+            lut=resolved, col_remap=col_remap, col_src=col_src,
+            default_val=default_val, grps=grps
+        )
+
+
+class SoftRegexTransformCB(PerGroupCB):
+    "Extract named regex groups into declared columns; no source column is a no-op."
+    class Schema(BaseModel):
+        src_col: Optional[str] = None
+        pattern: str = r'(?P<VAL>.*)'
+        dst_cols: list[str] = Field(default_factory=list)
+        cast: str = 'str'
+
+    def __init__(self, src_col: str = None, pattern: str = r'(?P<VAL>.*)', dst_cols: list = None, cast: str = 'str', grps: list = None):
+        self.cfg = self.Schema(
+            src_col=src_col, pattern=pattern, dst_cols=dst_cols or [], cast=cast
+        )
+        self.grps = [None] if src_col is None else grps
+
+    def each_grp(self, grp, df, tfm):
+        extracted = df[self.cfg.src_col].str.extract(self.cfg.pattern)
+        cast_fn = {
+            'float': pd.to_numeric,
+            'int': lambda series: pd.to_numeric(series).astype(int),
+            'str': lambda series: series,
+        }.get(self.cfg.cast, lambda series: series)
+        for col in self.cfg.dst_cols:
+            df[col] = cast_fn(extracted[col])
+```
+
+### Cell [7] - Role: Production Implementation (Exported)
+```python
+#| export
+_PIPELINE_TIME_UNITS = 'seconds since 1970-01-01 00:00:00.0'
+
+
+class _GuardedEncodeTimeCB(EncodeTimeCB):
+    "Encode TIME when present; otherwise degrade to a Null-Object."
+    def __init__(self, col_time: str = 'TIME', verbose: bool = False):
+        super().__init__(
+            col_time=col_time, verbose=verbose, fn_units=lambda: _PIPELINE_TIME_UNITS
+        )
+
+    def __call__(self, tfm):
+        self.grps = (
+            [None] if any('TIME' not in df.columns for df in tfm.dfs.values()) else None
+        )
+        super().__call__(tfm)
+
+
+class _GuardedSanitizeLonLatCB(SanitizeLonLatCB):
+    "Sanitize coordinates when present; otherwise degrade to a Null-Object."
+    def __call__(self, tfm):
+        self.grps = (
+            [None]
+            if any('LON' not in df.columns or 'LAT' not in df.columns for df in tfm.dfs.values())
+            else None
+        )
+        super().__call__(tfm)
+```

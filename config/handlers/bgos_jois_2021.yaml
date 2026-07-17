@@ -1,0 +1,50 @@
+handler:
+  module_name: handlers.bgos_jois_2021
+  title: "BGOS-JOIS 2021"
+  description: >
+    Boundary-loader-backed ingestion of the BGOS-JOIS-2021 Zenodo ZIP archive,
+    with ZIP extraction and Excel cell cleanup localized entirely in the custom loader.
+
+data_source:
+  url: "https://zenodo.org/records/18880401/files/annabel-payne/BGOS-JOIS-2021-v1.0.1.zip?download=1"
+  fname_out: "bgos_jois_2021.nc"
+  zenodo_id: "18880401"
+  format: xlsx
+
+loader:
+  path: "config.handlers.bgos_jois_2021_loader.load_and_cleanse"
+
+columns:
+  Station: STATION
+  sample_number: SMP_ID_PROVIDER
+  Latitude_degN: LAT
+  Longitude_degE: LON
+  DateTime: TIME
+  Depth_m: SMP_DEPTH
+  Temperature_degC: TEMP
+  Salinity_psu: SAL
+
+rename_cols:
+  mapping: {}
+  string_cast: [STATION, SMP_ID_PROVIDER]
+
+melt:
+  meta_cols: [STATION, SMP_ID_PROVIDER, LAT, LON, TIME, SMP_DEPTH, TEMP, SAL]
+  spec:
+    - {val: I129_at_kg, unc: unc_I129_at_kg, nuclide: I129, unit: at_kg, lab: UNSET}
+
+unit_conversions: []
+
+nomenclatures:
+  nuclide_lut: {I129: 28}
+  unit_lut: {at_kg: 9}
+  lab_lut: {UNSET: 0}
+  lab_constants: {}
+  area_default: 0
+
+output:
+  keywords: [Beaufort Sea, BGOS, JOIS, I-129, seawater, Arctic, Zenodo 18880401]
+  global_attrs:
+    title: "BGOS-JOIS 2021"
+    summary: "Boundary-loader-backed ingestion of the BGOS-JOIS-2021 Zenodo ZIP archive."
+    metadata_link: "https://zenodo.org/records/18880401"

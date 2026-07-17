@@ -1,0 +1,51 @@
+handler:
+  module_name: handlers.si_radionuclides_and_metadata
+  title: "SI radionuclides and metadata"
+  description: >
+    Boundary-loader-backed ingestion of the Zenodo 16914587 supplementary
+    Excel workbook, with raw-provider columns mapped declaratively to MARIS.
+
+data_source:
+  url: "https://zenodo-rdm.web.cern.ch/records/16914587/files/SI_radionuclides_and_metadata.xlsx?download=1"
+  fname_out: "si_radionuclides_and_metadata.nc"
+  zenodo_id: "16914587"
+  format: xlsx
+
+loader:
+  path: "config.handlers.si_radionuclides_and_metadata_loader.load_and_cleanse"
+
+columns:
+  Latitude_degN: LAT
+  Longitude_degE: LON
+  Date: TIME
+  Station: STATION
+  Sample_ID: SMP_ID_PROVIDER
+  Pressure_dbar: SMP_DEPTH
+  Temperature_degC: TEMP
+  Salinity_psu: SAL
+
+rename_cols:
+  mapping: {}
+  string_cast: [STATION, SMP_ID_PROVIDER]
+
+melt:
+  meta_cols: [STATION, SMP_ID_PROVIDER, LAT, LON, TIME, SMP_DEPTH, TEMP, SAL]
+  spec:
+    - {val: I129_at_kg, unc: unc_I129_at_kg, nuclide: I129, unit: at_kg, lab: UNSET}
+    - {val: U236_at_kg, unc: unc_U236_at_kg, nuclide: U236, unit: at_kg, lab: UNSET}
+
+unit_conversions: []
+
+nomenclatures:
+  nuclide_lut: {I129: 28, U236: 108}
+  unit_lut: {at_kg: 9}
+  lab_lut: {UNSET: 0}
+  lab_constants: {}
+  area_default: 0
+
+output:
+  keywords: [Davis Strait, radionuclides, seawater, Zenodo 16914587]
+  global_attrs:
+    title: "SI radionuclides and metadata"
+    summary: "Boundary-loader-backed ingestion of the Zenodo 16914587 supplementary Excel workbook."
+    metadata_link: "https://zenodo-rdm.web.cern.ch/records/16914587"

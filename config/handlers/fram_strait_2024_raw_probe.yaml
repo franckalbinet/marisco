@@ -1,0 +1,51 @@
+handler:
+  module_name: handlers.fram_strait_2024_raw_probe
+  title: "Fram Strait 2024 Raw Probe"
+  description: >
+    Canonical raw-probe contract used to prove that verify() catches surviving
+    physical NaNs before any boundary cleansing is applied.
+
+data_source:
+  url: "https://zenodo-rdm.web.cern.ch/records/18607759/files/2024JC021211-sup-0003-Table%20SI-S03_v2.xlsx?download=1"
+  fname_out: "fram_strait_2024_raw_probe.nc"
+  zenodo_id: "18607759"
+  format: xlsx
+
+loader:
+  path: "config.handlers.fram_strait_2024_loader.load_probe_raw"
+
+columns:
+  STATION: STATION
+  LAT: LAT
+  LON: LON
+  TIME: TIME
+  SMP_DEPTH: SMP_DEPTH
+  SAL: SAL
+  TEMP: TEMP
+  NUCLIDE: NUCLIDE
+  VALUE: VALUE
+  UNC: UNC
+  UNIT: UNIT
+  LAB: LAB
+
+rename_cols:
+  mapping: {}
+  string_cast: []
+
+parse_datetime: {}
+
+melt:
+  meta_cols: []
+  spec: []
+
+unit_conversions: []
+
+nomenclatures:
+  nuclide_lut: {I129: 28, U236: 108}
+  unit_lut: {at_kg: 9}
+  lab_lut: {UNSET: 0}
+  lab_constants: {}
+  area_default: 0
+
+output:
+  keywords: [Fram Strait, raw probe, seawater, radionuclides]

@@ -1,0 +1,64 @@
+handler:
+  module_name: handlers.fram_strait_2024
+  title: "Fram Strait 2024 SI-S03"
+  description: >
+    Boundary-cleaned seawater radionuclide data from supplementary Table S3
+    in Zenodo record 18607759. The custom local loader reads the Excel sheet,
+    removes footnotes and non-MARIS metadata columns, forward-fills the merged
+    Year cells, normalizes year tokens to YYYY strings, and rescales 129I and
+    236U concentrations from header-declared 10^7 / 10^6 atoms per kilogram to
+    plain atoms per kilogram before entering the shared core pipeline.
+
+data_source:
+  url: "https://zenodo-rdm.web.cern.ch/records/18607759/files/2024JC021211-sup-0003-Table%20SI-S03_v2.xlsx?download=1"
+  fname_out: "fram_strait_2024_si_s03.nc"
+  zenodo_id: "18607759"
+  format: xlsx
+
+loader:
+  path: "config.handlers.fram_strait_2024_loader.load_and_cleanse"
+
+columns:
+  Station: STATION
+  Latitude: LAT
+  Longitude: LON
+  Depth: SMP_DEPTH
+  Salinity: SAL
+  Theta_C: TEMP
+
+rename_cols:
+  mapping: {}
+  string_cast: [STATION]
+
+parse_datetime:
+  col_date: Year
+  format: "%Y"
+
+melt:
+  meta_cols: [STATION, LAT, LON, TIME, SMP_DEPTH, SAL, TEMP]
+  spec:
+    - {val: I129_at_kg, unc: I129_unc_at_kg, nuclide: I129, unit: at_kg, lab: UNSET}
+    - {val: U236_at_kg, unc: U236_unc_at_kg, nuclide: U236, unit: at_kg, lab: UNSET}
+
+unit_conversions: []
+
+nomenclatures:
+  nuclide_lut: {I129: 28, U236: 108}
+  unit_lut: {at_kg: 9}
+  lab_lut: {UNSET: 0}
+  lab_constants: {}
+  area_default: 0
+
+output:
+  keywords:
+    - Fram Strait
+    - I-129
+    - U-236
+    - seawater
+    - radionuclides
+    - Arctic Ocean
+  global_attrs:
+    title: "Fram Strait 2024 SI-S03"
+    summary: "Boundary-cleaned seawater radionuclide data from supplementary Table SI-S03 in Zenodo record 18607759."
+    references: "10.1029/2024JC021211"
+    metadata_link: "https://zenodo-rdm.web.cern.ch/records/18607759"

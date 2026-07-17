@@ -1,0 +1,55 @@
+# Declarative Intake Architecture handler skeleton
+# Full policy: /INTAKE_GOVERNANCE.md
+
+handler:
+  module_name: handlers.my_dataset
+  title: "My Dataset YYYY"
+  description: "Short dataset description."
+
+data_source:
+  url: "https://zenodo.org/records/XXXXXXX/files/my_data.csv?download=1"
+  fname_out: "my_dataset.nc"
+  zenodo_id: "XXXXXXX"
+  format: csv
+
+# WARNING: Logical mapping only. Physical cleaning belongs in _loader.py.
+columns:
+  Latitude_degN: LAT
+  Longitude_degE: LON
+  Date: TIME
+  Station: STATION
+  Sample_ID: SMP_ID_PROVIDER
+
+nomenclatures:
+  nuclide_lut: {Cs137: 2}
+  unit_lut: {Bq_kg: 1}
+  lab_lut: {UNSET: 0}
+  lab_constants: {}
+  area_default: 0
+
+output:
+  keywords: [radionuclides, seawater]
+  global_attrs:
+    title: "My Dataset YYYY"
+    summary: "Boundary-cleaned dataset summary."
+    metadata_link: "https://zenodo.org/records/XXXXXXX"
+
+# Advanced examples: uncomment only when needed. See /INTAKE_GOVERNANCE.md.
+# loader:
+#   path: "config.handlers.my_dataset_loader.load_and_cleanse"
+#   args: {}
+#
+# parse_datetime:
+#   col_date: Date
+#   col_time: Time
+#   format: "%d/%m/%Y %H:%M:%S"
+# time_format: null
+# normalize_case: {nuclide: NUCLIDE}
+# rename_cols:
+#   mapping: {}
+#   string_cast: [STATION, SMP_ID_PROVIDER]
+# melt:
+#   meta_cols: [STATION, SMP_ID_PROVIDER, LAT, LON, TIME]
+#   spec:
+#     - {val: I129_at_kg, unc: unc_I129_at_kg, nuclide: I129, unit: at_kg, lab: UNSET}
+# unit_conversions: []

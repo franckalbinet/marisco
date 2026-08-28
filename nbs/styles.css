@@ -32,14 +32,6 @@
     margin-top: 0;
 }
 
-div.description {
-    padding-left: 2px;
-    padding-top: 5px;
-    font-style: italic;
-    font-size: 135%;
-    opacity: 70%;
-}
-
 .navbar {
     background-color: #3a6494
 }

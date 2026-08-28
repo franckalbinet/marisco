@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 1.9.1
+
+### New Features
+
+- Improve doc layout and make docstrings consistent ([#55](https://github.com/franckalbinet/marisco/issues/55))
+
+
 ## 1.9.0
 
 ### Breaking Changes

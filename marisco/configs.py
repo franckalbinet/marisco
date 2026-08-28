@@ -210,23 +210,23 @@ NC_GLOBAL_ATTRS = {
 
 # %% ../nbs/api/configs.ipynb #09a81790
 def lut_path() -> Path:              # Path to LUTs directory
-    "Return the path to the lookup tables directory."
+    "Return the path to the lookup tables directory"
     return _pkg_files('marisco') / 'files/lut'
 
 # %% ../nbs/api/configs.ipynb #8836df19
 def lut_fname(key: str               # NC_DTYPES key, e.g. 'SPECIES', 'UNIT', 'DL'
               ) -> Path:             # Full path to the lookup table Excel file
-    "Return the full path to a lookup table file by its NC_DTYPES key."
+    "Return the full path to a lookup table file by its NC_DTYPES key"
     return lut_path() / NC_DTYPES[key]['fname']
 
 # %% ../nbs/api/configs.ipynb #e6be254c
 def nc_tpl_path() -> Path:           # Path to MARIS NetCDF template
-    "Return the path to the MARIS NetCDF template file."
+    "Return the path to the MARIS NetCDF template file"
     return _pkg_files('marisco') / 'files/nc/maris-template.nc'
 
 # %% ../nbs/api/configs.ipynb #4dca0ad3
 def cache_path() -> Path: # Path to cache directory
-    "Return the path to the cache directory, creating it if needed."
+    "Return the path to the cache directory, creating it if needed"
     p = Path.home() / '.cache' / 'marisco'
     p.mkdir(parents=True, exist_ok=True)
     return p
@@ -239,7 +239,7 @@ NETCDF_TO_PYTHON_TYPE = {
 
 # %% ../nbs/api/configs.ipynb #97b6b0ec
 def get_time_units() -> str:
-    "Get the units attribute of the time variable from a NetCDF file."
+    "Get the units attribute of the time variable from a NetCDF file"
     with Dataset(nc_tpl_path(), 'r') as nc:
         for group in nc.groups.values():
             if 'time' in group.variables:
@@ -268,7 +268,7 @@ def sanitize(
 # %% ../nbs/api/configs.ipynb #57772123
 def try_int(x:Any         # Value to attempt integer conversion on
             )->int|Any:   # Integer if successful, or the original value
-    "Try to convert `x` to an integer."
+    "Try to convert `x` to an integer"
     try:
         return int(x)
     except (ValueError, TypeError):
@@ -286,7 +286,7 @@ def get_lut(
     check_duplicates: bool=False, # Check for duplicates in lookup table
     as_df: bool=False # Return DataFrame instead of dict (for fuzzy_merge etc.)
     ) -> Union[Dict[str, int], pd.DataFrame]: # MARIS lookup table (key, value) or (key, value) DataFrame
-    "Convert MARIS db lookup table excel file to dictionary or DataFrame."
+    "Convert MARIS db lookup table excel file to dictionary or DataFrame"
     if src_dir is None: src_dir = lut_path()
     
     # Resolve from NC_DTYPES if the first arg is a known key
@@ -316,7 +316,7 @@ def get_lut(
 
 # %% ../nbs/api/configs.ipynb #b6ab8d15
 class Enums():
-    "Hold and filter MARIS NetCDF enumeration types loaded from lookup tables."
+    "Hold and filter MARIS NetCDF enumeration types loaded from lookup tables"
     def __init__(self,
                  lut_src_dir: str,                         # Directory containing lookup tables
                  dtypes: Dict[str, Dict[str, str]] = NC_DTYPES  # Dict keyed by NC_DTYPES key, each is {name, fname, key, value}
@@ -327,7 +327,7 @@ class Enums():
 # %% ../nbs/api/configs.ipynb #9641a970
 @patch
 def lookup(self: Enums) -> Dict[str, Dict[str, int]]:
-    "Load all enumeration types defined in `NC_DTYPES` as `{name: id}` dictionaries, available via `self.types[var_name]`."
+    "Load all enumeration types defined in `NC_DTYPES` as `{name: id}` dictionaries, available via `self.types[var_name]`"
     types = {}
     for var_name in self.dtypes:
         lut = get_lut(var_name, src_dir=self.lut_src_dir)
@@ -340,5 +340,5 @@ def filter(self: Enums,
            var_name: str,      # NC_DTYPES key for the enumeration, e.g. 'SPECIES'
            values: list        # Enumeration IDs to keep
           ) -> Dict[str, int]:
-    "Return a subset of an enumeration keeping only entries whose id is in `values`."
+    "Return a subset of an enumeration keeping only entries whose id is in `values`"
     return {name: id for name, id in self.types[var_name].items() if id in values}

@@ -25,7 +25,7 @@ from .configs import cache_path, lut_fname, NC_DTYPES, get_lut
 def uniq_across_dfs(dfs:Dict[str,pd.DataFrame],  # Dict of group DataFrames
                     col:str,                      # Column to extract unique values from
                    )->list:                      # Unique values across all group DataFrames
-    "Unique column values across all group DataFrames."
+    "Unique column values across all group DataFrames"
     return list(set().union(*(df[col].unique() for df in dfs.values() if col in df.columns)))
 
 # %% ../nbs/api/match.ipynb #62f0f918
@@ -34,7 +34,7 @@ def lut_from(
         col: str,                     # Column to extract unique values from
         incl_nchars: bool=False       # Include n_chars column?
         ) -> pd.DataFrame:            # Source lookup table
-    "Build a source lookup table from unique values across all DataFrames."
+    "Build a source lookup table from unique values across all DataFrames"
     vals = sorted(uniq_across_dfs(dfs, col))
     df = pd.DataFrame(vals, columns=['value'])
     if incl_nchars: df['n_chars'] = df['value'].str.len()
@@ -48,7 +48,7 @@ def fuzzy_merge(left: pd.DataFrame,        # Left DataFrame (provider codes)
                 dist_fn: Callable=levenshtein_distance,  # Distance/similarity function
                 lowercase: bool=True,      # Normalise strings to lowercase before comparing?
                ) -> pd.DataFrame:          # Left rows augmented with best right match + score
-    "For each row in left, find closest row in right by dist_fn."
+    "For each row in left, find closest row in right by dist_fn"
     rows = []
     for _, lrow in left.iterrows():
         best_d = float('inf')
@@ -70,7 +70,7 @@ def fix_lut(merged: pd.DataFrame,
             right_on: str,
             id_col: str,
            ) -> pd.DataFrame:
-    "Replace matched entries with expert overrides by name."
+    "Replace matched entries with expert overrides by name"
     merged = merged.copy()
     for src_val, target_name in overrides.items():
         mask_ref = maris[right_on] == target_name
@@ -91,7 +91,7 @@ def make_lut_from(
     fixes:dict=None,    # Expert overrides: {source_value: maris_name}
     cache_tag:str=None, # If set, cache `merged` as `{cache_tag}.pkl` under cache_path()
     ) -> Callable:       # Function dict->dict: takes dfs, returns lookup dict
-    "Factory: returns a callable that builds a lookup dict from provider data at call time."
+    "Factory: returns a callable that builds a lookup dict from provider data at call time"
     cfg, maris = NC_DTYPES[lut_key], get_lut(lut_key, as_df=True)
     def _lut(dfs):
         cf = cache_path() / f'{cache_tag}.pkl' if cache_tag else None
@@ -108,7 +108,7 @@ def make_lut(
         fixes:dict=None, # Expert overrides: {source_value: maris_name}
         cache_tag:str=None, # If set, cache `merged` as `{cache_tag}.pkl`
         ) -> Callable: # Function dict->dict: takes dfs, returns lookup dict
-    "Convenience: derives provider LUT from dfs dict via lut_from, then wraps in make_lut_from."
+    "Convenience: derives provider LUT from dfs dict via lut_from, then wraps in make_lut_from"
     return make_lut_from(lambda dfs: lut_from(dfs, lut_key), 'value', 'value', lut_key, fixes, cache_tag)
 
 # %% ../nbs/api/match.ipynb #c9818fb4
@@ -116,7 +116,7 @@ def parse_ref_ids(
     ref_ids,  # Comma-separated string of ints, or list of ints; None to return all valid ids
     valid=None  # Optional collection of known-good ids to validate against
 ) -> list:  # List of ints
-    "Parse `ref_ids` into a list of ints, optionally checked against `valid`."
+    "Parse `ref_ids` into a list of ints, optionally checked against `valid`"
     if ref_ids is None: return list(valid) if valid is not None else []
     if isinstance(ref_ids, str):
         try: ref_ids = [int(i.strip()) for i in ref_ids.split(',') if i.strip()]

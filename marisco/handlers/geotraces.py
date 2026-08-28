@@ -15,25 +15,8 @@ import pandas as pd
 import numpy as np
 import re
 
-from marisco.callbacks import (
-    Callback, 
-    PerGroupCB,
-    Transformer, 
-    ParseTimeCB,
-    SanitizeLonLatCB, 
-    EncodeTimeCB,
-    RemapCB
-)
-
-from marisco.metadata import (
-    GlobAttrsFeeder, 
-    BboxCB,
-    DepthRangeCB, 
-    TimeRangeCB,
-    ZoteroCB,
-    KeyValuePairCB
-)
-
+from ..callbacks import Callback, PerGroupCB, Transformer, ParseTimeCB, SanitizeLonLatCB, EncodeTimeCB, RemapCB
+from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB
 from ..configs import AVOGADRO, get_lut, lut_path
 from ..encoders import NetCDFEncoder
 from ..nc2csv import to_csv
@@ -59,7 +42,7 @@ nuclides_pattern = ['^TRITI', '^Th_228', '^Th_23[024]', '^Pa_231',
 
 # %% ../../nbs/handlers/geotraces.ipynb #fa7ae0ca
 class SelectColsOfInterestCB(Callback):
-    "Select columns of interest from the wide Geotraces dataframe."
+    "Select columns of interest from the wide Geotraces dataframe"
     def __init__(self,
                  common_coi: list,       # Non-nuclide columns always kept as id_vars
                  nuclides_pattern: list  # Regex patterns matching nuclide column names
@@ -71,7 +54,7 @@ class SelectColsOfInterestCB(Callback):
 
 # %% ../../nbs/handlers/geotraces.ipynb #b060bb07-5565-4928-8b43-4abc5e64eb97
 class WideToLongCB(Callback):
-    "Reshape wide nuclide columns to long format so unit, method, and filter status can be extracted from column names."
+    "Reshape wide nuclide columns to long format so unit, method, and filter status can be extracted from column names"
     def __init__(self,
                  common_coi: list,         # Non-nuclide columns kept as id_vars in melt
                  nuclides_pattern: list,   # Regex patterns identifying nuclide columns
@@ -89,7 +72,7 @@ class WideToLongCB(Callback):
 
 # %% ../../nbs/handlers/geotraces.ipynb #3e982489-7c69-4b6d-9930-8f786220ad5b
 class ExtractUnitCB(Callback):
-    "Extract measurement unit from nuclide column names (e.g. 'Cs_137_D_CONC_BOTTLE [uBq/kg]' → 'uBq/kg')."
+    "Extract measurement unit from nuclide column names (e.g. 'Cs_137_D_CONC_BOTTLE [uBq/kg]' → 'uBq/kg')"
     def __init__(self,
                  var_name: str='NUCLIDE'  # Column containing nuclide names with embedded units in brackets
                  ): 
@@ -114,7 +97,7 @@ phase = {
 
 # %% ../../nbs/handlers/geotraces.ipynb #3ba72b3a-a013-4b5d-881a-9fd0a7e8b74c
 class ExtractFilteringStatusCB(Callback):
-    "Extract filtering status and sample-type group from nuclide column names using phase code (e.g. _D_, _T_, _TP_)."
+    "Extract filtering status and sample-type group from nuclide column names using phase code (e.g. _D_, _T_, _TP_)"
     def __init__(self,
                  phase: dict,              # Phase code → {FILT, group} mapping (e.g. {'D': {'FILT': 1, 'group': 'SEAWATER'}})
                  var_name: str='NUCLIDE'   # Column containing nuclide names with embedded phase codes
@@ -147,7 +130,7 @@ smp_method = {
 
 # %% ../../nbs/handlers/geotraces.ipynb #3b4663f8-6cb1-45c3-8437-97a6ba9c5214
 class ExtractSamplingMethodCB(Callback):
-    "Extract sampling method from nuclide names."
+    "Extract sampling method from nuclide names"
     def __init__(self, 
                  smp_method:dict = smp_method, # Sampling method lookup table
                  var_name='NUCLIDE',            # Column name containing nuclide names
@@ -168,7 +151,7 @@ nuclides_name = {'TRITIUM': 'h3', 'Pu_239_Pu_240': 'pu239_240_tot'}
 
 # %% ../../nbs/handlers/geotraces.ipynb #06cc02db-47e0-4fe9-8586-d76bcb5c4615
 class RenameNuclideCB(Callback):
-    "Remap nuclides name to MARIS standard."
+    "Remap nuclides name to MARIS standard"
     def __init__(self,
                  nuclides_name: dict,     # Provider-specific name overrides e.g. {'TRITIUM': 'h3'}
                  var_name: str='NUCLIDE'  # Column containing nuclide names to standardize
@@ -199,7 +182,7 @@ units_lut = {
 
 # %% ../../nbs/handlers/geotraces.ipynb #070abb88-c987-4eec-b0dc-7b69a61c0093
 class StandardizeUnitCB(Callback):
-    "Remap Geotraces unit strings to MARIS unit IDs, rescaling measurement values by the appropriate conversion factor where units share a common MARIS unit ID (e.g. uBq/kg and mBq/kg both map to ID 3 but differ 1000x)."
+    "Remap Geotraces unit strings to MARIS unit IDs, rescaling measurement values by the appropriate conversion factor where units share a common MARIS unit ID (e.g. uBq/kg and mBq/kg both map to ID 3 but differ 1000x)"
     def __init__(self, 
                  units_lut: dict,              # Unit string → {id, factor} conversion mapping
                  unit_col_name: str='UNIT',    # Column containing unit strings to remap
@@ -229,7 +212,7 @@ renaming_rules = {
 
 # %% ../../nbs/handlers/geotraces.ipynb #5a1b1521-a4d4-4839-a2c1-444c31332ef2
 class RenameColumnCB(Callback):
-    "Remap Geotraces-specific coordinate, depth, and sample-ID column names to MARIS standard nomenclature."
+    "Remap Geotraces-specific coordinate, depth, and sample-ID column names to MARIS standard nomenclature"
     def __init__(self,
                  lut: dict=renaming_rules  # Provider column name → MARIS standard name mapping
                  ): store_attr()
@@ -239,7 +222,7 @@ class RenameColumnCB(Callback):
 
 # %% ../../nbs/handlers/geotraces.ipynb #ee266cb0-ad2f-4548-b68b-80d0f33ef403
 class UnshiftLongitudeCB(Callback):
-    "Shift longitudes from Geotraces [0, 360] convention to MARIS [-180, 180] by subtracting 180."
+    "Shift longitudes from Geotraces [0, 360] convention to MARIS [-180, 180] by subtracting 180"
     def __init__(self,
                  lon_col_name: str='LON'  # Column containing longitudes in [0, 360] to shift
                  ): 
@@ -249,7 +232,7 @@ class UnshiftLongitudeCB(Callback):
 
 # %% ../../nbs/handlers/geotraces.ipynb #347a0371-c6e4-4b7d-b1f8-8ffb00509e42
 class DispatchToGroupCB(Callback):
-    "Split flat dataframe into per-group dict keyed by sample type (SEAWATER, SUSPENDED_MATTER, …)."
+    "Split flat dataframe into per-group dict keyed by sample type (SEAWATER, SUSPENDED_MATTER, …)"
     def __init__(self,
                  group_name: str='GROUP'  # Column whose distinct values become the output dict keys
                  ): 
@@ -262,7 +245,7 @@ class DispatchToGroupCB(Callback):
 
 # %% ../../nbs/handlers/geotraces.ipynb #6da45d74
 class AddSampleIDCB(PerGroupCB):
-    "Assign a sequential SMP_ID per sample-type group; cast SMP_ID_PROVIDER (BODC Bottle Number) to string for NetCDF VLEN compatibility."
+    "Assign a sequential SMP_ID per sample-type group; cast SMP_ID_PROVIDER (BODC Bottle Number) to string for NetCDF VLEN compatibility"
     def each_grp(self,
                  grp: str,          # Group key e.g. 'SEAWATER', 'SUSPENDED_MATTER'
                  df: pd.DataFrame,  # DataFrame for this group
@@ -293,7 +276,7 @@ def get_attrs(
         zotero_key, 
         kw=kw
         ):
-    "Retrieve global attributes from Geotraces dataset."
+    "Retrieve global attributes from Geotraces dataset"
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
         DepthRangeCB(),

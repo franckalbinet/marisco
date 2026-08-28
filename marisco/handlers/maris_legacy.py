@@ -41,7 +41,7 @@ lut_smp_type = {
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #b76e4cad
 class DataLoader:
-    "Load MARIS dump data filtered by ref_id, returning one DataFrame per sample type group."
+    "Load MARIS dump data filtered by ref_id, returning one DataFrame per sample type group"
     def __init__(self,
                  fname: str,                     # Path to the MARIS global dump CSV
                  exclude_ref_id: list[int]=None, # ref_ids to skip (None = skip none)
@@ -64,14 +64,14 @@ class DataLoader:
 def get_zotero_key(
     dfs:dict  # Dict of {group_name: DataFrame} per sample type
     )->str:   # Zotero key extracted from URL
-    "Extract Zotero bibliography key from the MARIS dump DataFrame."
+    "Extract Zotero bibliography key from the MARIS dump DataFrame"
     return dfs[next(iter(dfs))][['zoterourl']].iloc[0].values[0].split('/')[-1]
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #7fd56197
 def get_fname(
     dfs:dict  # Dict of {group_name: DataFrame} per sample type
     )->str:   # NetCDF filename like "12345.nc"
-    "Construct NetCDF filename from the ref_id in the data."
+    "Construct NetCDF filename from the ref_id in the data"
     return f"{next(iter(dfs.values()))['ref_id'].iloc[0]}.nc"
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #e72d5b55
@@ -113,7 +113,7 @@ class CastStationToStringCB(PerGroupCB):
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #819703e6
 class DropNAColumnsCB(PerGroupCB):
-    "Drop variable containing only NaN or 'Not available' (id=0 in MARIS lookup tables)."
+    "Drop variable containing only NaN or 'Not available' (id=0 in MARIS lookup tables)"
     def __init__(
         self, 
         na_value:int=0  # MARIS NA id to drop (default 0)
@@ -132,7 +132,7 @@ lut_dl = get_lut('DL', key='name', value='id')
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #e5352604
 class AddSampleIDCB(PerGroupCB):
-    "Cast SMP_ID to int and SMP_ID_PROVIDER to string (renamed from samplabcode in the pipeline)."
+    "Cast SMP_ID to int and SMP_ID_PROVIDER to string (renamed from samplabcode in the pipeline)"
     def each_grp(self, grp, df, tfm):
         df['SMP_ID'] = df['SMP_ID'].astype(int)
         df['SMP_ID_PROVIDER'] = df['SMP_ID_PROVIDER'].fillna('').astype(str)
@@ -151,7 +151,7 @@ kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #ca5357b7
 def get_attrs(tfm, zotero_key, kw=kw):
-    "Retrieve global attributes from MARIS dump."
+    "Retrieve global attributes from MARIS dump"
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
         DepthRangeCB(),

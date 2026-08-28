@@ -21,10 +21,7 @@ import re
 from ..configs import NA, NC_DTYPES, get_lut, lut_path, cache_path
 from ..match import uniq_across_dfs, lut_from, fuzzy_merge, fix_lut, make_lut, make_lut_from
 from ..geo import ddmm_to_dd
-from ..callbacks import (
-    Callback, PerGroupCB, Transformer,
-    EncodeTimeCB, LowerStripNameCB, SanitizeLonLatCB,
-    CompareDfsAndTfmCB, RemapCB)
+from ..callbacks import Callback, PerGroupCB, Transformer, EncodeTimeCB, LowerStripNameCB, SanitizeLonLatCB, CompareDfsAndTfmCB, RemapCB
 from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder
 from ..nc2csv import to_csv
@@ -48,7 +45,7 @@ default_smp_types = {
 def load_data(
         fname_in # Path to raw HELCOM csv dataset
         ):
-    "Load HELCOM data; returns dict of DataFrames keyed by sample type."
+    "Load HELCOM data; returns dict of DataFrames keyed by sample type"
     res = {}
     for prefix,smp_type in default_smp_types.items():
         smp = pd.read_csv(f'{fname_in}/{prefix}01.csv').rename(str.lower, axis='columns')
@@ -80,7 +77,7 @@ nuclide_lut = make_lut('NUCLIDE', fixes=fixes_nuclide_names)
 
 # %% ../../nbs/handlers/helcom.ipynb #1a682a3e
 class ParseTimeCB(PerGroupCB):
-    "Parse HELCOM DATE (MM/DD/YY HH:MM:SS) with fallback to YEAR/MONTH/DAY."
+    "Parse HELCOM DATE (MM/DD/YY HH:MM:SS) with fallback to YEAR/MONTH/DAY"
     def each_grp(self, grp, df, tfm):
         df['TIME'] = pd.to_datetime(df['date'], format='%m/%d/%y %H:%M:%S', errors='coerce')
         for c in ['day','month']: df.loc[df[c]==0,c] = 1
@@ -107,7 +104,7 @@ coi_sediment = {
 
 # %% ../../nbs/handlers/helcom.ipynb #83480f98
 class MeltSedimentValuesCB(PerGroupCB):
-    "Melt HELCOM dual-value sediment rows into separate rows per measurement type (Bq/kg, Bq/m²)."
+    "Melt HELCOM dual-value sediment rows into separate rows per measurement type (Bq/kg, Bq/m²)"
     grps = ['SEDIMENT']
     def __init__(self, coi:dict  # Column-of-interest mapping, keyed by unit variant (kg, m²)
             ): store_attr()
@@ -129,7 +126,7 @@ coi_val = {'SEAWATER' : {'VALUE': 'value_bq/m³'},
 
 # %% ../../nbs/handlers/helcom.ipynb #15d74eed
 class SanitizeValueCB(PerGroupCB):
-    "Sanitize measurement values by removing blanks and standardizing to use the `VALUE` column."
+    "Sanitize measurement values by removing blanks and standardizing to use the `VALUE` column"
     def __init__(self,
                  coi: Dict[str, Dict[str, str]], # Columns of interest. Format: {group_name: {'VALUE': 'column_name'}}
                  ):
@@ -149,7 +146,7 @@ coi_units_unc = {
 
 # %% ../../nbs/handlers/helcom.ipynb #9b18c837
 class NormalizeUncCB(PerGroupCB):
-    "Convert relative uncertainty (percent) to absolute (standard) uncertainty per group."
+    "Convert relative uncertainty (percent) to absolute (standard) uncertainty per group"
     def __init__(self,
                  coi: dict=coi_units_unc,  # {group: (meas_col, unc_col)}
                 ):
@@ -173,7 +170,7 @@ lut_units = {
 
 # %% ../../nbs/handlers/helcom.ipynb #5ec5a0ef
 class RemapUnitCB(PerGroupCB):
-    "Set the MARIS-standard UNIT column from per-sample-type conventions (column name, basis column, or melt result)."
+    "Set the MARIS-standard UNIT column from per-sample-type conventions (column name, basis column, or melt result)"
     def __init__(self,
                  lut_units: dict=lut_units  # Per-group unit mapping: group -> literal ID or {basis_code -> ID}
                 ):
@@ -191,7 +188,7 @@ coi_dl = {'SEAWATER' : {'DL' : '< value_bq/m³'},
 
 # %% ../../nbs/handlers/helcom.ipynb #5ae05527
 class RemapDetectionLimitCB(PerGroupCB):
-    "Map HELCOM `<` / detected-value conventions to MARIS detection-limit integer codes (2 for DL, 1 for detected)."
+    "Map HELCOM `<` / detected-value conventions to MARIS detection-limit integer codes (2 for DL, 1 for detected)"
     def __init__(self, 
                  coi: dict,  # Dict of column hosting the detection limit info for each sample type
                 ):
@@ -253,7 +250,7 @@ sed_replace_lut = {56: -99, 73: -99}
 
 # %% ../../nbs/handlers/helcom.ipynb #82d99eb0
 class CleanSedimentCodesCB(PerGroupCB):
-    "Replace invalid HELCOM SEDI codes with -99 sentinel before nomenclature lookup."
+    "Replace invalid HELCOM SEDI codes with -99 sentinel before nomenclature lookup"
     grps = ['SEDIMENT']
     def __init__(self, 
                  replace_lut # sediment helcom -> maris lookup table
@@ -274,32 +271,32 @@ lut_filtered = {
 
 # %% ../../nbs/handlers/helcom.ipynb #b030cb94
 class AddSampleIDCB(PerGroupCB):
-    "Assign internal sequential SMP_ID and preserve provider KEY as SMP_ID_PROVIDER."
+    "Assign internal sequential SMP_ID and preserve provider KEY as SMP_ID_PROVIDER"
     def each_grp(self, grp, df, tfm):
         df['SMP_ID'] = range(1, len(df) + 1)
         df['SMP_ID_PROVIDER'] = df['key'].astype(str)
 
 # %% ../../nbs/handlers/helcom.ipynb #28f14b73
 class AddDepthCB(PerGroupCB):
-    "Rename HELCOM sdepth/tdepth columns to MARIS-standard SMP_DEPTH/TOT_DEPTH and cast as float."
+    "Rename HELCOM sdepth/tdepth columns to MARIS-standard SMP_DEPTH/TOT_DEPTH and cast as float"
     def each_grp(self, grp, df, tfm):
         if 'sdepth' in df.columns: df['SMP_DEPTH'] = df['sdepth'].astype(float)
         if 'tdepth' in df.columns: df['TOT_DEPTH'] = df['tdepth'].astype(float)
 
 # %% ../../nbs/handlers/helcom.ipynb #666d97c9
 class AddSalinityCB(PerGroupCB):
-    "Add salinity (SAL) from HELCOM salin column where present."
+    "Add salinity (SAL) from HELCOM salin column where present"
     def each_grp(self, grp, df, tfm):
         if 'salin' in df.columns: df['SAL'] = df['salin'].astype(float)
 
 # %% ../../nbs/handlers/helcom.ipynb #498f0460
 class AddStationCB(PerGroupCB):
-    "Add station to all DataFrames."
+    "Add station to all DataFrames"
     def each_grp(self, grp, df, tfm): df['STATION'] = df['station'].fillna('').astype(str)
 
 # %% ../../nbs/handlers/helcom.ipynb #047afa7e
 class AddTemperatureCB(PerGroupCB):
-    "Add temperature (TEMP) from HELCOM ttemp column."
+    "Add temperature (TEMP) from HELCOM ttemp column"
     grps = ['SEAWATER']
     def each_grp(self, grp, df, tfm): 
         df['TEMP'] = df['ttemp'].astype(float)
@@ -307,7 +304,7 @@ class AddTemperatureCB(PerGroupCB):
 
 # %% ../../nbs/handlers/helcom.ipynb #cf398df9
 class RemapSedSliceTopBottomCB(PerGroupCB):
-    "Remap Sediment slice top and bottom to MARIS format."
+    "Remap Sediment slice top and bottom to MARIS format"
     grps = ['SEDIMENT']
     def each_grp(self, grp, df, tfm):
         df['TOP'] = df['uppsli']
@@ -318,14 +315,14 @@ basis_fix = {'F': 'W'}
 
 # %% ../../nbs/handlers/helcom.ipynb #c52a2ae0
 class CleanBasisCB(PerGroupCB):
-    "Map basis F to W (BIOTA)."
+    "Map basis F to W (BIOTA)"
     grps = ['BIOTA']
     def each_grp(self, grp, df, tfm):
         df['basis'] = df['basis'].replace(basis_fix)
 
 # %% ../../nbs/handlers/helcom.ipynb #daab6923
 class PercentWeightCB(PerGroupCB):
-    "Compute PERCENTWT = dw% / 100 (SEDIMENT)."
+    "Compute PERCENTWT = dw% / 100 (SEDIMENT)"
     grps = ['SEDIMENT']
     def each_grp(self, grp, df, tfm):
         df['PERCENTWT'] = df['dw%'] / 100
@@ -333,7 +330,7 @@ class PercentWeightCB(PerGroupCB):
 
 # %% ../../nbs/handlers/helcom.ipynb #6a9ffff7
 class WeightCB(PerGroupCB):
-    "Compute DRYWT / WETWT from weight + basis (BIOTA)."
+    "Compute DRYWT / WETWT from weight + basis (BIOTA)"
     grps = ['BIOTA']
     def each_grp(self, grp, df, tfm):
         df['PERCENTWT'] = df['dw%'] / 100
@@ -346,7 +343,7 @@ class WeightCB(PerGroupCB):
 
 # %% ../../nbs/handlers/helcom.ipynb #623f9222
 class ParseCoordinatesCB(PerGroupCB):
-    "Parse lat/lon from decimal-degree or degree-minute columns, preferring decimal."
+    "Parse lat/lon from decimal-degree or degree-minute columns, preferring decimal"
     def __init__(self, fn_convert_cor):
         store_attr()
 
@@ -386,7 +383,7 @@ def get_attrs(
     zotero_key: str, # Zotero dataset record key
     kw: list = kw # List of keywords
     ) -> dict: # Global attributes
-    "Retrieve all global attributes."
+    "Retrieve all global attributes"
     return GlobAttrsFeeder(tfm.dfs, cbs=[
         BboxCB(),
         DepthRangeCB(),

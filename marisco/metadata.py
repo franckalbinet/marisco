@@ -29,7 +29,7 @@ from .callbacks import run_cbs, Callback
 
 # %% ../nbs/api/metadata.ipynb #6db2b6ee
 class GlobAttrsFeeder:
-    "Produce NetCDF global attributes as specified by the callbacks."
+    "Produce NetCDF global attributes as specified by the callbacks"
     def __init__(self, 
                  dfs: Dict[str, pd.DataFrame], # Dictionary of NetCDF group DataFrames
                  cbs: List[Callback]=None, # Callbacks
@@ -99,7 +99,7 @@ class TimeRangeCB(Callback):
 
 # %% ../nbs/api/metadata.ipynb #761032af
 class ZoteroClient:
-    "Zotero API client to fetch a bibliographic record."
+    "Zotero API client to fetch a bibliographic record"
     def __init__(self, 
                  item_id: str, # Zotero item key to retrieve
                  lib_id: str,  # Zotero library ID
@@ -137,7 +137,7 @@ class ZoteroClient:
 
 # %% ../nbs/api/metadata.ipynb #1328e775
 class ZoteroCB(Callback):
-    "Populate global attributes from Zotero bibliographic metadata."
+    "Populate global attributes from Zotero bibliographic metadata"
     def __init__(self, 
                  itemId,   # Zotero item key to retrieve
                 ): store_attr()
@@ -157,7 +157,7 @@ def fetch_inis(
     inis_id:str,   # INIS record identifier (e.g. 'vq0ha-86k24')
     base_url:str=INIS_API # API base URL
     ) -> dict:    # Raw INIS record payload
-    "Fetch an INIS record from the InvenioRDM API via curl."
+    "Fetch an INIS record from the InvenioRDM API via curl"
     url = f"{base_url}/{inis_id}"
     r = subprocess.run([find_curl(), '-sS', '-H', 'Accept: application/json', url],
                        capture_output=True, text=True, check=True)
@@ -165,7 +165,7 @@ def fetch_inis(
 
 # %% ../nbs/api/metadata.ipynb #e578b23a
 def find_curl() -> str:
-    "Return path to curl, or raise FileNotFoundError."
+    "Return path to curl, or raise FileNotFoundError"
     path = shutil.which('curl')
     if not path: raise FileNotFoundError(
         "curl not found. Install curl (https://curl.se) — it's required to fetch INIS records.")
@@ -173,7 +173,7 @@ def find_curl() -> str:
 
 # %% ../nbs/api/metadata.ipynb #ac02991e
 class INISClient:
-    "Retrieve INIS metadata from the InvenioRDM API."
+    "Retrieve INIS metadata from the InvenioRDM API"
     def __init__(self,
                  inis_id:str,   # INIS record identifier (e.g. 'vq0ha-86k24')
                  base_url:str=INIS_API # API base URL
@@ -223,7 +223,7 @@ class INISClient:
 
 # %% ../nbs/api/metadata.ipynb #fd6f5646
 class InisCB(Callback):
-    "Populate global attributes from INIS metadata."
+    "Populate global attributes from INIS metadata"
     def __init__(self,
                  inis_id:str, # INIS record identifier to retrieve
                  base_url:str=INIS_API # API base URL
@@ -239,7 +239,7 @@ class InisCB(Callback):
 
 # %% ../nbs/api/metadata.ipynb #daff6f7e
 class KeyValuePairCB(Callback):
-    "Add a single key-value pair as a NetCDF global attribute."
+    "Add a single key-value pair as a NetCDF global attribute"
     def __init__(self, 
                  k, # NetCDF global attribute key name
                  v  # NetCDF global attribute value

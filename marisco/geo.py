@@ -19,7 +19,7 @@ from typing import Tuple
 def get_bbox(df: pd.DataFrame,                                # DataFrame with coordinate columns
              coord_cols: Tuple[str, str] = ('LON', 'LAT')     # Column names for (longitude, latitude)
             ) -> MultiPoint:                                  # Bounding box as a shapely envelope
-    "Bounding box of a DataFrame's coordinates as a shapely envelope (Polygon)."
+    "Bounding box of a DataFrame's coordinates as a shapely envelope (Polygon)"
     x, y = coord_cols        
     arr = [(row[x], row[y]) for _, row in df.iterrows()]
     return MultiPoint(arr).envelope
@@ -28,7 +28,7 @@ def get_bbox(df: pd.DataFrame,                                # DataFrame with c
 # %% ../nbs/api/geo.ipynb #ba4de56f
 def ddmm_to_dd(ddmmmm:float  # Coord in DDMM.MMMM format (e.g. 45.34 → 45°34')
               )->float:      # Same coord in decimal degrees
-    "Convert DDMM.MMMM to decimal degrees."
+    "Convert DDMM.MMMM to decimal degrees"
     mins, degs = modf(ddmmmm)
     return round(int(degs) + mins*100/60, 6)
 

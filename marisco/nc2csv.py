@@ -19,7 +19,7 @@ from cftime import num2date
 def read_nc_grps(
     fname # Path to netcdf file
     ):
-    "Read a MARIS NetCDF file and return {group: DataFrame} dict."
+    "Read a MARIS NetCDF file and return {group: DataFrame} dict"
     with Dataset(fname, 'r') as nc:
         dfs = {}
         for gn, grp in nc.groups.items():
@@ -34,14 +34,14 @@ def keep_csv_cols(
     dfs:dict,           # dict of DataFrames keyed by sample group
     cols:list=CSV_VARS  # columns to keep (defaults to CSV_VARS)
 ):
-    "Keep only columns listed in `cols`."
+    "Keep only columns listed in `cols`"
     return {g: df[[c for c in cols if c in df.columns]] for g, df in dfs.items()}
 
 # %% ../nbs/api/nc2csv.ipynb #957af715
 def decode_time(
     dfs:dict          # dict of DataFrames keyed by sample group
 ):
-    "Decode TIME from epoch seconds to datetime."
+    "Decode TIME from epoch seconds to datetime"
     units = get_time_units()
     for df in dfs.values():
         df['TIME'] = df['TIME'].apply(lambda x: num2date(x, units=units, only_use_cftime_datetimes=False))
@@ -50,7 +50,7 @@ def decode_time(
 def add_sample_type(
     dfs:dict      # dict of DataFrames keyed by sample group
 ):
-    "Add SAMPLE_TYPE column using group ID mapping."
+    "Add SAMPLE_TYPE column using group ID mapping"
     for grp, df in dfs.items(): df['SAMPLE_TYPE'] = SMP_TYPE_LUT[grp]
 
 # %% ../nbs/api/nc2csv.ipynb #47129db6
@@ -58,7 +58,7 @@ def add_ref_id(
     dfs:dict,          # dict of DataFrames keyed by sample group
     ref_id:int=None         # Reference ID to add as REF_ID column
 ):
-    "Add REF_ID column if `ref_id` is provided."
+    "Add REF_ID column if `ref_id` is provided"
     if ref_id is None: return
     for df in dfs.values(): df['REF_ID'] = ref_id
 
@@ -73,7 +73,7 @@ TAXON_COLS = {
 
 # %% ../nbs/api/nc2csv.ipynb #1e19e146
 def get_taxon_cols()->dict:       # {col_name: {species_id: value}} mapping
-    "Read species lookup table, return `{col_name: {species_id: value}}` dict."
+    "Read species lookup table, return `{col_name: {species_id: value}}` dict"
     f = Path(lut_path()) / lut_fname('SPECIES')
     cols = ['species_id'] + list(TAXON_COLS)
     df = pd.read_excel(f)[cols].set_index('species_id')
@@ -83,7 +83,7 @@ def get_taxon_cols()->dict:       # {col_name: {species_id: value}} mapping
 def add_taxon_info(
     dfs:dict       # dict of DataFrames keyed by sample group
 ):
-    "Add taxon columns to BIOTA from species lookup."
+    "Add taxon columns to BIOTA from species lookup"
     if 'BIOTA' not in dfs: return
     cols = get_taxon_cols()
     for col, lut in cols.items():
@@ -97,7 +97,7 @@ def map_lut(
     value:str='id',       # LUT value column
     reverse:bool=True     # Reverse the mapping direction
 ):
-    "Map columns using get_lut."
+    "Map columns using get_lut"
     for col in cols:
         lut = get_lut(col, key=key, value=value, reverse=reverse)
         for df in dfs.values():
@@ -107,7 +107,7 @@ def map_lut(
 def decode_csv_vars(
     dfs:dict       # dict of DataFrames keyed by sample group
 ):
-    "Decode enumerated columns marked as `state='decoded'` in CSV_DTYPES."
+    "Decode enumerated columns marked as `state='decoded'` in CSV_DTYPES"
     decoded = [c for c,cfg in CSV_DTYPES.items() if cfg['state']=='decoded' and c not in ('DL','FILT')]
     for col in decoded:
         lut = get_lut(col, reverse=True)
@@ -120,7 +120,7 @@ def to_csv_files(
     fname_in:str,          # Input NetCDF file path
     dest_out:str=None      # Destination path stem; defaults to fname_in stem
 ):
-    "Rename columns and write one CSV per group."
+    "Rename columns and write one CSV per group"
     fstem = Path(dest_out or Path(fname_in).with_suffix(''))
     paths = []
     for grp, df in dfs.items():
@@ -136,7 +136,7 @@ def to_csv(
     dest_out:str=None,     # Destination path stem; defaults to parent of fname_in
     ref_id:int=None        # Reference ID to add as REF_ID column
 ):
-    "Convert MARIS standard NetCDF file to import-ready CSV files."
+    "Convert MARIS standard NetCDF file to import-ready CSV files"
     dfs = keep_csv_cols(read_nc_grps(fname_in))
     decode_time(dfs)
     add_sample_type(dfs)

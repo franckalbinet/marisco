@@ -27,7 +27,7 @@ The harmonised data reaches users through three channels: the [explore portal](h
 
 | Handler | Description | Status |
 |----|----|----|
-| [FRAM STRAIT](handlers/fram_strait.html) | Fram Strait iodine-129 seawater radionuclide data | Active |
+| [FRAM STRAIT](handlers/fram_strait.html) | Fram Strait 2002-2025 Iodine-129 seawater radionuclide data | Active |
 | [GEOTRACES](handlers/geotraces.html) | BODC GEOTRACES oceanographic radionuclide data | Active |
 | [HELCOM](handlers/helcom.html) | Baltic Sea marine environment monitoring data | Active |
 | [JOIS](handlers/jois.html) | BGOS-JOIS Beaufort Sea seawater radionuclide data | Active |

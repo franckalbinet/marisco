@@ -20,7 +20,7 @@ website:
           - handlers/helcom.ipynb
           - handlers/maris_legacy.ipynb
           - handlers/jois.ipynb
-          - handlers/fram_strait_2025.ipynb
+          - handlers/fram_strait.ipynb
           - handlers/ospar.ipynb          
           - handlers/tepco.ipynb
       - section: API

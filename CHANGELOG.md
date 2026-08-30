@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 1.9.2
+
+### New Features
+
+- [FRAM STRAIT] Extend fram strait handler data coverage to 2002-2025 ([#56](https://github.com/franckalbinet/marisco/issues/56))
+
+
 ## 1.9.1
 
 ### New Features

@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 1.9.3
+
+### New Features
+
+- Extend Fram Strait handler to 2020-2021 records and multi-lab (ETH + VERA) measurements ([#57](https://github.com/franckalbinet/marisco/issues/57))
+
+
 ## 1.9.2
 
 ### New Features

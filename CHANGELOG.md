@@ -2,6 +2,14 @@
 
 <!-- do not remove -->
 
+## 1.9.7
+
+### New Features
+
+- Use an SPDX license expression and drop missing files from MANIFEST.in ([#67](https://github.com/franckalbinet/marisco/issues/67))
+- Show MARIS data team callouts as notes, distinct from data provider callouts ([#66](https://github.com/franckalbinet/marisco/issues/66))
+
+
 ## 1.9.6
 
 ### Bugs Squashed

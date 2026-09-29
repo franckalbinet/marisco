@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 1.9.4
+
+### Bugs Squashed
+
+- [FRAM STRAIT] Cells exported twice, and export fails with nbdev < 3.3 ([#58](https://github.com/franckalbinet/marisco/issues/58))
+
+
 ## 1.9.3
 
 ### New Features

@@ -2,6 +2,21 @@
 
 <!-- do not remove -->
 
+## 1.9.5
+
+### New Features
+
+- LowerStripNameCB accepts grps, and lut_from skips missing values ([#64](https://github.com/franckalbinet/marisco/issues/64))
+- Add an 'Under review' handler status that marisco-ingest runs with a note ([#63](https://github.com/franckalbinet/marisco/issues/63))
+- Define each handler's callback pipeline once with get_cbs() ([#62](https://github.com/franckalbinet/marisco/issues/62))
+- [OSPAR] Migrate handler to fuzzy-match nomenclature reconciliation and HELCOM style ([#61](https://github.com/franckalbinet/marisco/issues/61))
+
+### Bugs Squashed
+
+- [GEOTRACES] encode() fails because RemapCB no longer accepts fn_lut ([#60](https://github.com/franckalbinet/marisco/issues/60))
+- [HELCOM] encode() writes only 10 random records per sample type ([#59](https://github.com/franckalbinet/marisco/issues/59))
+
+
 ## 1.9.4
 
 ### Bugs Squashed

@@ -4,7 +4,7 @@
 __all__ = ['RECORDS', 'status', 'lut_cols', 'META_COLS', 'VAL_COLS', 'U238_PPB_TO_AT_KG', 'NUCLIDE_LUT', 'UNIT_LUT',
            'JOIS_KEYWORDS', 'norm_cols', 'extract_scales', 'apply_scales', 'load_data', 'RenameNucColsCB',
            'RenameColsCB', 'ParseDateTimeCB', 'MeltJOISCB', 'ConvertU238CB', 'AddLabCB', 'AddDetectionLimitCB',
-           'get_attrs', 'encode']
+           'get_cbs', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/jois.ipynb #d541866d
 from fastcore.all import *
@@ -170,6 +170,22 @@ class AddDetectionLimitCB(PerGroupCB):
     def each_grp(self, grp, df, tfm): 
         tfm.dfs[grp] = df.assign(DL=1)
 
+# %% ../../nbs/handlers/jois.ipynb #c2c46a0b
+def get_cbs() -> list:
+    "Callbacks, in pipeline order, that turn raw JOIS data into MARIS-standard DataFrames"
+    return [
+        RenameNucColsCB(), RenameColsCB(lut_cols), ParseDateTimeCB(),
+        MeltJOISCB(META_COLS, VAL_COLS),
+        ConvertU238CB(),
+        RemapCB(lut=NUCLIDE_LUT, col_remap='NUCLIDE', col_src='NUCLIDE'),
+        RemapCB(lut=UNIT_LUT, col_remap='UNIT', col_src='UNIT'),
+        AddLabCB(),
+        AddDetectionLimitCB(),
+        SanitizeLonLatCB(),
+        EncodeTimeCB(),
+        AddSampleIDCB(col_provider='SMP_ID_PROVIDER')
+        ]
+
 # %% ../../nbs/handlers/jois.ipynb #5fed230e
 # NetCDF global attributes
 JOIS_KEYWORDS = ['Beaufort Sea', 'JOIS', 'I-129', 'U-236', 'U-238', 'radionuclides', 'seawater', 'Arctic']
@@ -193,18 +209,7 @@ def encode(
         ):
     "BGOS-JOIS Beaufort Sea seawater radionuclide data"
     dfs = load_data()
-    tfm = Transformer(dfs, cbs=[
-        RenameNucColsCB(), RenameColsCB(lut_cols), ParseDateTimeCB(),
-        MeltJOISCB(META_COLS, VAL_COLS),
-        ConvertU238CB(),
-        RemapCB(lut=NUCLIDE_LUT, col_remap='NUCLIDE', col_src='NUCLIDE'),
-        RemapCB(lut=UNIT_LUT, col_remap='UNIT', col_src='UNIT'),
-        AddLabCB(),
-        AddDetectionLimitCB(),
-        SanitizeLonLatCB(),
-        EncodeTimeCB(),
-        AddSampleIDCB(col_provider='SMP_ID_PROVIDER'),
-    ])
+    tfm = Transformer(dfs, cbs=get_cbs())
     tfm()
     encoder = NetCDFEncoder(tfm.dfs, dest_fname=dest,
                             global_attrs=get_attrs(tfm))

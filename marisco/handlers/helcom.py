@@ -10,7 +10,7 @@ __all__ = ['src_dir', 'zotero_key', 'status', 'default_smp_types', 'fixes_nuclid
            'ParseTimeCB', 'MeltSedimentValuesCB', 'SanitizeValueCB', 'NormalizeUncCB', 'RemapUnitCB',
            'RemapDetectionLimitCB', 'CleanSedimentCodesCB', 'AddSampleIDCB', 'AddDepthCB', 'AddSalinityCB',
            'AddStationCB', 'AddTemperatureCB', 'RemapSedSliceTopBottomCB', 'CleanBasisCB', 'PercentWeightCB',
-           'WeightCB', 'ParseCoordinatesCB', 'get_attrs', 'encode']
+           'WeightCB', 'ParseCoordinatesCB', 'get_cbs', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/helcom.ipynb #3a8d979f
 from fastcore.all import *
@@ -365,6 +365,63 @@ class ParseCoordinatesCB(PerGroupCB):
         tfm.dfs[grp] = df[(df['LAT'].notna()) & (df['LON'].notna()) & (df['LAT'] != 0) & (df['LON'] != 0)]
 
 
+# %% ../../nbs/handlers/helcom.ipynb #df30cd0b
+def get_cbs() -> list:
+    "Callbacks, in pipeline order, that turn raw HELCOM data into MARIS-standard DataFrames"
+    return [
+        # Nuclide normalisation and mapping
+        LowerStripNameCB(col_src='nuclide', col_dst='NUCLIDE'),
+        RemapCB(lut=nuclide_lut, col_remap='NUCLIDE', col_src='NUCLIDE'),
+
+        # Time
+        ParseTimeCB(),
+        EncodeTimeCB(),
+
+        # Value columns (sediment melt, value, uncertainty)
+        MeltSedimentValuesCB(coi_sediment),
+        SanitizeValueCB(coi_val),
+        NormalizeUncCB(),
+
+        # Unit and detection limit
+        RemapUnitCB(),
+        RemapDetectionLimitCB(coi_dl),
+
+        # BIOTA lookups: species, body part, biological group
+        RemapCB(lut=species_lut, col_remap='SPECIES', col_src='rubin', grps=['BIOTA']),
+        RemapCB(lut=lut_tissues, col_remap='BODY_PART', col_src='tissue', grps=['BIOTA']),
+        RemapCB(lut=lut_biogroup, col_remap='BIO_GROUP', col_src='SPECIES', grps=['BIOTA']),
+
+        # Sediment type
+        CleanSedimentCodesCB(replace_lut=sed_replace_lut),
+        RemapCB(lut=sediment_lut, col_remap='SED_TYPE', col_src='sedi', grps=['SEDIMENT']),
+
+        # Filtering status (seawater)
+        RemapCB(lut=lut_filtered, col_remap='FILT', col_src='filt', grps=['SEAWATER']),
+
+        # Sample identifiers
+        AddSampleIDCB(),
+
+        # Depth, salinity, temperature
+        AddDepthCB(),
+        AddSalinityCB(),
+        AddTemperatureCB(),
+
+        # Sediment slice positions
+        RemapSedSliceTopBottomCB(),
+
+        # Weights (BIOTA and SEDIMENT)
+        CleanBasisCB(),
+        PercentWeightCB(),
+        WeightCB(),
+
+        # Coordinates
+        ParseCoordinatesCB(ddmm_to_dd),
+        SanitizeLonLatCB(),
+
+        # Station
+        AddStationCB()
+    ]
+
 # %% ../../nbs/handlers/helcom.ipynb #8c293bb1
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
       'Earth Science > Human Dimensions > Environmental Impacts > Nuclear Radiation Exposure',
@@ -401,35 +458,9 @@ def encode(
     ) -> None:
     "Baltic Sea marine environment monitoring data"
     dfs = load_data(src or src_dir)
-    dfs = {k: v.sample(10, random_state=42) for k, v in dfs.items()}
-    tfm = Transformer(dfs, cbs=[
-                            LowerStripNameCB(col_src='nuclide', col_dst='NUCLIDE'),
-                            RemapCB(lut=nuclide_lut, col_remap='NUCLIDE', col_src='NUCLIDE'),
-                            ParseTimeCB(),
-                            EncodeTimeCB(),
-                            MeltSedimentValuesCB(coi_sediment),
-                            SanitizeValueCB(coi_val),
-                            NormalizeUncCB(),
-                            RemapUnitCB(),
-                            RemapDetectionLimitCB(coi_dl),
-                            RemapCB(lut=species_lut, col_remap='SPECIES', col_src='rubin', grps=['BIOTA']),
-                            RemapCB(lut=lut_tissues, col_remap='BODY_PART', col_src='tissue', grps=['BIOTA']),
-                            RemapCB(lut=lut_biogroup, col_remap='BIO_GROUP', col_src='SPECIES', grps=['BIOTA']),
-                            CleanSedimentCodesCB(replace_lut=sed_replace_lut),
-                            RemapCB(lut=sediment_lut, col_remap='SED_TYPE', col_src='sedi', grps=['SEDIMENT']),
-                            RemapCB(lut=lut_filtered, col_remap='FILT', col_src='filt', grps=['SEAWATER']),
-                            AddSampleIDCB(),
-                            AddDepthCB(),
-                            AddSalinityCB(),
-                            AddTemperatureCB(),
-                            RemapSedSliceTopBottomCB(),
-                            CleanBasisCB(),
-                            PercentWeightCB(),
-                            WeightCB(),
-                            ParseCoordinatesCB(ddmm_to_dd),
-                            SanitizeLonLatCB(),
-                            AddStationCB()
-                            ])
+    # For a quick test file, keep 10 random records per sample type:
+    # dfs = {k: v.sample(10, random_state=42) for k, v in dfs.items()}
+    tfm = Transformer(dfs, cbs=get_cbs())
     tfm()
     encoder = NetCDFEncoder(tfm.dfs, 
                             dest_fname=dest, 
@@ -438,3 +469,4 @@ def encode(
                             verbose=kwargs.get('verbose', False),
                            )
     encoder.encode()
+

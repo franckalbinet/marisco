@@ -31,7 +31,7 @@ The harmonised data reaches users through three channels: the [explore portal](h
 | [GEOTRACES](handlers/geotraces.html) | BODC GEOTRACES oceanographic radionuclide data | Active |
 | [HELCOM](handlers/helcom.html) | Baltic Sea marine environment monitoring data | Active |
 | [JOIS](handlers/jois.html) | BGOS-JOIS Beaufort Sea seawater radionuclide data | Active |
-| [OSPAR](handlers/ospar.html) | OSPAR data | Under refactoring |
+| [OSPAR](handlers/ospar.html) | OSPAR radioactive substances monitoring data (seawater and biota) | Under review |
 | [TEPCO](handlers/tepco.html) | TEPCO data | Under refactoring |
 
 ## Install

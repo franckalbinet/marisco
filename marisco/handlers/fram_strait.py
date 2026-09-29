@@ -3,7 +3,8 @@
 # %% auto #0
 __all__ = ['META_COLS', 'ETH_COLS', 'VERA_COLS', 'RAW_COLS', 'RECORDS', 'status', 'MEAS_PAT', 'U238_PPB_TO_AT_KG', 'NUCLIDE_LUT',
            'UNIT_LUT', 'LAB_LUT', 'FS_KEYWORDS', 'load_data', 'RenameColsCB', 'ParseDateTimeCB', 'AddDepthCB',
-           'MeltFramStraitCB', 'ConvertU238CB', 'AddDetectionLimitCB', 'FormatStationCB', 'get_attrs', 'encode']
+           'MeltFramStraitCB', 'ConvertU238CB', 'AddDetectionLimitCB', 'FormatStationCB', 'get_cbs', 'get_attrs',
+           'encode']
 
 # %% ../../nbs/handlers/fram_strait.ipynb #d541866d
 from fastcore.all import *
@@ -198,6 +199,25 @@ class FormatStationCB(PerGroupCB):
     def each_grp(self, grp, df, tfm):
         df["STATION"] = df["STATION"].astype(str)
 
+# %% ../../nbs/handlers/fram_strait.ipynb #672faa94
+def get_cbs() -> list:
+    "Callbacks, in pipeline order, that turn raw Fram Strait data into MARIS-standard DataFrames"
+    return [
+        RenameColsCB(),
+        ParseDateTimeCB(),
+        AddDepthCB(),
+        MeltFramStraitCB(),
+        ConvertU238CB(),
+        RemapCB(lut=NUCLIDE_LUT, col_remap='NUCLIDE', col_src='NUCLIDE'),
+        RemapCB(lut=UNIT_LUT, col_remap='UNIT', col_src='UNIT'),
+        RemapCB(lut=LAB_LUT, col_remap='LAB', col_src='LAB'),
+        AddDetectionLimitCB(),
+        SanitizeLonLatCB(),
+        EncodeTimeCB(),
+        AddSampleIDCB(col_provider="SMP_ID_PROVIDER"),
+        FormatStationCB()
+        ]
+
 # %% ../../nbs/handlers/fram_strait.ipynb #5fed230e
 FS_KEYWORDS = [
     "Fram Strait","Greenland Sea","I-129","U-236","U-238","radionuclides","seawater","Arctic Ocean",
@@ -221,22 +241,9 @@ def encode(
         ):
     "Fram Strait 2020-2025 I-129, U-236, U-238 seawater radionuclide data"
     dfs = load_data()
-    tfm = Transformer(dfs, cbs=[
-        RenameColsCB(),
-        ParseDateTimeCB(),
-        AddDepthCB(),
-        MeltFramStraitCB(),
-        ConvertU238CB(),
-        RemapCB(lut=NUCLIDE_LUT, col_remap='NUCLIDE', col_src='NUCLIDE'),
-        RemapCB(lut=UNIT_LUT, col_remap='UNIT', col_src='UNIT'),
-        RemapCB(lut=LAB_LUT, col_remap='LAB', col_src='LAB'),
-        AddDetectionLimitCB(),
-        SanitizeLonLatCB(),
-        EncodeTimeCB(),
-        AddSampleIDCB(col_provider="SMP_ID_PROVIDER"),
-        FormatStationCB()
-        ])
+    tfm = Transformer(dfs, cbs=get_cbs())
     tfm()
     encoder = NetCDFEncoder(tfm.dfs, dest_fname=dest,
                             global_attrs=get_attrs(tfm))
     encoder.encode()
+

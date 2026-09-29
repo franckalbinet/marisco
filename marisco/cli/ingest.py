@@ -42,7 +42,9 @@ def main(
     if ds not in hs:
         print(S.red(f"Invalid handler name: {ds}. Available handlers: {', '.join(hs)}"))
         sys.exit(1)
-    if hs[ds] != 'Active':
+    if hs[ds] == 'Under review':
+        print(S.yellow(f"Note: {ds} is Under review. Its curation decisions await review by the MARIS data team."))
+    elif hs[ds] != 'Active':
         print(S.yellow(f"Warning: {ds} is {hs[ds]}"))
         sys.exit(1)
     encode = import_handler(f'marisco.handlers.{ds}')

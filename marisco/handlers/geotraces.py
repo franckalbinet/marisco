@@ -6,7 +6,7 @@
 __all__ = ['fname_in', 'zotero_key', 'status', 'load_data', 'common_coi', 'nuclides_pattern', 'phase', 'smp_method',
            'nuclides_name', 'units_lut', 'renaming_rules', 'lut_nuclides', 'kw', 'SelectColsOfInterestCB',
            'WideToLongCB', 'ExtractUnitCB', 'ExtractFilteringStatusCB', 'ExtractSamplingMethodCB', 'RenameNuclideCB',
-           'StandardizeUnitCB', 'RenameColumnCB', 'UnshiftLongitudeCB', 'DispatchToGroupCB', 'AddSampleIDCB',
+           'StandardizeUnitCB', 'RenameColumnCB', 'UnshiftLongitudeCB', 'DispatchToGroupCB', 'AddSampleIDCB', 'get_cbs',
            'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/geotraces.ipynb #3a8d979f
@@ -256,7 +256,29 @@ class AddSampleIDCB(PerGroupCB):
 
 # %% ../../nbs/handlers/geotraces.ipynb #57f34e80
 # Lookup table: MARIS nc_name → nuclide_id
-lut_nuclides = lambda: get_lut('NUCLIDE', reverse=False)
+lut_nuclides = get_lut('NUCLIDE', reverse=False)
+
+
+# %% ../../nbs/handlers/geotraces.ipynb #a8a628b9
+def get_cbs() -> list:
+    "Callbacks, in pipeline order, that turn the raw GEOTRACES table into MARIS-standard DataFrames"
+    return [
+        SelectColsOfInterestCB(common_coi, nuclides_pattern),
+        WideToLongCB(common_coi, nuclides_pattern),
+        ExtractUnitCB(),
+        ExtractFilteringStatusCB(phase),
+        ExtractSamplingMethodCB(smp_method),
+        RenameNuclideCB(nuclides_name),
+        StandardizeUnitCB(units_lut),
+        RenameColumnCB(renaming_rules),
+        UnshiftLongitudeCB(),
+        DispatchToGroupCB(),
+        AddSampleIDCB(),
+        ParseTimeCB(),
+        EncodeTimeCB(),
+        SanitizeLonLatCB(),
+        RemapCB(lut=lut_nuclides, col_remap='NUCLIDE', col_src='NUCLIDE')
+        ]
 
 # %% ../../nbs/handlers/geotraces.ipynb #f98fd736
 kw = ['oceanography', 'Earth Science > Oceans > Ocean Chemistry> Radionuclides',
@@ -295,23 +317,7 @@ def encode(
     "BODC GEOTRACES oceanographic radionuclide data"
     assert src, "geotraces requires `src`, the path to the raw IDP2021 discrete sample CSV"
     df = pd.read_csv(src)
-    tfm = Transformer(df, cbs=[
-        SelectColsOfInterestCB(common_coi, nuclides_pattern),
-        WideToLongCB(common_coi, nuclides_pattern),
-        ExtractUnitCB(),
-        ExtractFilteringStatusCB(phase),
-        ExtractSamplingMethodCB(smp_method),
-        RenameNuclideCB(nuclides_name),
-        StandardizeUnitCB(units_lut),
-        RenameColumnCB(renaming_rules),
-        UnshiftLongitudeCB(),
-        DispatchToGroupCB(),
-        AddSampleIDCB(),
-        ParseTimeCB(),
-        EncodeTimeCB(),
-        SanitizeLonLatCB(),
-        RemapCB(fn_lut=lut_nuclides, col_remap='NUCLIDE', col_src='NUCLIDE')
-        ])
+    tfm = Transformer(df, cbs=get_cbs())
     
     tfm()
     encoder = NetCDFEncoder(tfm.dfs, 
@@ -320,3 +326,4 @@ def encode(
                             verbose=kwargs.get('verbose', False)
                            )
     encoder.encode()
+

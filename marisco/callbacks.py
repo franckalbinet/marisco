@@ -153,9 +153,11 @@ class LowerStripNameCB(PerGroupCB):
     def __init__(self, 
                  col_src: str, # Source column name e.g. 'Nuclide'
                  col_dst: str=None, # Destination column name
-                 fn_transform: Callable=lambda x: x.lower().strip() # Transformation function
+                 fn_transform: Callable=lambda x: x.lower().strip(), # Transformation function
+                 grps: list=None # Groups to process; None = all groups in `tfm.dfs`
                  ):
-        store_attr()
+        store_attr(but='grps')
+        super().__init__(grps)
         self.__doc__ = f"Convert '{col_src}' column values to lowercase, strip spaces, and store in '{col_dst}' column."
         if not col_dst: self.col_dst = col_src
         

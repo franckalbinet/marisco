@@ -34,8 +34,8 @@ def lut_from(
         col: str,                     # Column to extract unique values from
         incl_nchars: bool=False       # Include n_chars column?
         ) -> pd.DataFrame:            # Source lookup table
-    "Build a source lookup table from unique values across all DataFrames"
-    vals = sorted(uniq_across_dfs(dfs, col))
+    "Build a source lookup table from unique values across all DataFrames, skipping missing values"
+    vals = sorted(v for v in uniq_across_dfs(dfs, col) if pd.notna(v))
     df = pd.DataFrame(vals, columns=['value'])
     if incl_nchars: df['n_chars'] = df['value'].str.len()
     return df

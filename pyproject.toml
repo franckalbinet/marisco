@@ -32,7 +32,7 @@ marisco-export = "marisco.cli.export:main"
 version = {attr = "marisco.__version__"}
 
 [tool.setuptools.packages.find]
-include = ["marisco"]
+include = ["marisco", "marisco.*"]
 
 [tool.setuptools.package-data]
 marisco = ["files/lut/*.xlsx", "files/nc/*.nc"]

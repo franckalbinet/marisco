@@ -30,19 +30,6 @@ def _prefix_lab_cols(df: pd.DataFrame, lab: str, cols: list) -> pd.DataFrame:
     ren = {c: f'{lab}_{c}' for c in cols} | {f'unc_{c}': f'{lab}_unc_{c}' for c in cols}
     return df.rename(columns=ren)
 
-# %% ../../nbs/handlers/fram_strait.ipynb #51a1926a
-def _prefix_lab_cols(df: pd.DataFrame, lab: str, cols: list) -> pd.DataFrame:
-    "Prefix `cols` and their `unc_` twins with `lab_`, recording which lab produced them"
-    ren = {c: f'{lab}_{c}' for c in cols} | {f'unc_{c}': f'{lab}_unc_{c}' for c in cols}
-    return df.rename(columns=ren)
-
-# %% ../../nbs/handlers/fram_strait.ipynb #4401aeb4
-def _prefer_vera(df: pd.DataFrame, stem: str) -> pd.DataFrame:
-    "Where VERA reported `stem`, clear ETH's measurement (value and unc)"
-    (v, vu), (e, eu) = _lab_meas('VERA', stem), _lab_meas('ETH', stem)
-    df.loc[df[v].notna(), [e, eu]] = np.nan
-    return df
-
 # %% ../../nbs/handlers/fram_strait.ipynb #4401aeb4
 def _prefer_vera(df: pd.DataFrame, stem: str) -> pd.DataFrame:
     "Where VERA reported `stem`, clear ETH's measurement (value and unc)"
@@ -129,7 +116,6 @@ def load_data() -> dict:
         df = pd.read_csv(io.BytesIO(resp.content), encoding="utf-8-sig")
         parts.append(rec["adapter"](df))
     return {"SEAWATER": pd.concat(parts, ignore_index=True)}
-
 
 # %% ../../nbs/handlers/fram_strait.ipynb #4a497743
 class RenameColsCB(PerGroupCB):

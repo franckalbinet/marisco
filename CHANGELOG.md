@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 1.9.6
+
+### Bugs Squashed
+
+- [Packaging] Wheel omits marisco.cli and several handlers ([#65](https://github.com/franckalbinet/marisco/issues/65))
+
+
 ## 1.9.5
 
 ### New Features

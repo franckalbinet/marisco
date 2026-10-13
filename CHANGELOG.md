@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 1.9.8
+
+### Bugs Squashed
+
+- INIS and Zotero clients hide fetch errors ([#68](https://github.com/franckalbinet/marisco/issues/68))
+
+
 ## 1.9.7
 
 ### New Features

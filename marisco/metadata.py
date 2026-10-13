@@ -106,8 +106,7 @@ class ZoteroClient:
                  api_key: str  # Zotero API key
                 ) -> None:
         store_attr()
-        try: self.item = self.get_item(item_id)
-        except Exception: self.item = None
+        self.item = self.get_item(item_id)
     
     def exist(self) -> bool: return self.item is not None
     
@@ -156,12 +155,15 @@ INIS_API = "https://inis.iaea.org/api/records"
 def fetch_inis(
     inis_id:str,   # INIS record identifier (e.g. 'vq0ha-86k24')
     base_url:str=INIS_API # API base URL
-    ) -> dict:    # Raw INIS record payload
+    ) -> dict|None: # Raw INIS record payload, or None if the record does not exist
     "Fetch an INIS record from the InvenioRDM API via curl"
     url = f"{base_url}/{inis_id}"
-    r = subprocess.run([find_curl(), '-sS', '-H', 'Accept: application/json', url],
+    r = subprocess.run([find_curl(), '-sS', '-H', 'Accept: application/json', '-w', r'\n%{http_code}', url],
                        capture_output=True, text=True, check=True)
-    return json.loads(r.stdout)
+    body, status = r.stdout.rsplit('\n', 1)
+    if status == '404': return None
+    if status != '200': raise OSError(f"INIS returned HTTP {status} for {url}")
+    return json.loads(body)
 
 # %% ../nbs/api/metadata.ipynb #e578b23a
 def find_curl() -> str:
@@ -179,12 +181,9 @@ class INISClient:
                  base_url:str=INIS_API # API base URL
                  ) -> None:
         store_attr()
-        try: self.item = fetch_inis(inis_id, base_url)
-        except Exception: self.item = None
+        self.item = fetch_inis(inis_id, base_url)
 
-    def exist(self) -> bool:
-        "Does the record exist? The API returns {'status': 404, ...} (not an HTTP 404) for missing IDs, so check for a top-level 'id' key rather than relying on an exception."
-        return self.item is not None and 'id' in self.item
+    def exist(self) -> bool: return self.item is not None
 
     @property
     def title(self) -> str:

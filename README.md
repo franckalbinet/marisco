@@ -11,7 +11,7 @@ MARISCO is being developed as the data processing foundation of MARIS: a Python 
 
 MARIS does not impose a data schema on providers. It accepts data in whatever form it arrives, and it makes the cost of that acceptance visible.
 
-Each dataset is processed by a dedicated *handler*, a Jupyter notebook that documents every curation decision alongside the code that implements it. Unit conversions, nuclide nomenclature mapping, coordinate standardisation, outlier flags: every choice is visible, traceable, and auditable. Some formats need less work than others, and the handler makes that difference plain. If you are a data provider, see [contributing data](how-to/contributing-data.ipynb) for what this means for your dataset.
+Each dataset is processed by a dedicated *handler*, a Jupyter notebook that documents every curation decision alongside the code that implements it. Unit conversions, nuclide nomenclature mapping, coordinate standardisation, outlier flags: every choice is visible, traceable, and auditable. Some formats need less work than others, and the handler makes that difference plain. If you are a data provider, see [contributing data](https://franckalbinet.github.io/marisco/how-to/contributing-data.html) for what this means for your dataset.
 
 This is deliberate. The friction a dataset creates is a signal, and surfacing it is the point. It tells the MARIS team how much work a provider’s format really requires, it gives the provider a concrete, itemised record of what to improve, and it makes the next release of the dataset cheaper to ingest. Over time, the easiest path for everyone is for providers to align with the MARIS way of organising data, not because it is imposed, but because the cost of not doing so is visible.
 
@@ -27,12 +27,12 @@ The harmonised data reaches users through three channels: the [explore portal](h
 
 | Handler | Description | Status |
 |----|----|----|
-| [FRAM STRAIT](handlers/fram_strait.html) | Fram Strait 2020-2025 I-129, U-236, U-238 seawater radionuclide data | Active |
-| [GEOTRACES](handlers/geotraces.html) | BODC GEOTRACES oceanographic radionuclide data | Active |
-| [HELCOM](handlers/helcom.html) | Baltic Sea marine environment monitoring data | Active |
-| [JOIS](handlers/jois.html) | BGOS-JOIS Beaufort Sea seawater radionuclide data | Active |
-| [OSPAR](handlers/ospar.html) | OSPAR radioactive substances monitoring data (seawater and biota) | Under review |
-| [TEPCO](handlers/tepco.html) | TEPCO data | Under refactoring |
+| [FRAM STRAIT](https://franckalbinet.github.io/marisco/handlers/fram_strait.html) | Fram Strait 2020-2025 I-129, U-236, U-238 seawater radionuclide data | Active |
+| [GEOTRACES](https://franckalbinet.github.io/marisco/handlers/geotraces.html) | BODC GEOTRACES oceanographic radionuclide data | Active |
+| [HELCOM](https://franckalbinet.github.io/marisco/handlers/helcom.html) | Baltic Sea marine environment monitoring data | Active |
+| [JOIS](https://franckalbinet.github.io/marisco/handlers/jois.html) | BGOS-JOIS Beaufort Sea seawater radionuclide data | Active |
+| [OSPAR](https://franckalbinet.github.io/marisco/handlers/ospar.html) | OSPAR radioactive substances monitoring data (seawater and biota) | Under review |
+| [TEPCO](https://franckalbinet.github.io/marisco/handlers/tepco.html) | TEPCO data | Under refactoring |
 
 ## Install
 
@@ -47,6 +47,8 @@ Two environment variables may be required depending on the dataset:
   ``` console
   export ZOTERO_API_KEY=your_api_key_here
   ```
+
+  VS Code reads environment variables only when it starts. To set the key without restarting VS Code, put `ZOTERO_API_KEY=your_api_key_here` in a `.env` file at the root of your VS Code workspace, then restart the notebook kernel.
 
 - **INIS**: bibliographic metadata is being progressively migrated from Zotero to the [IAEA INIS database](https://www.iaea.org/resources/databases/inis). The [`INISClient`](https://franckalbinet.github.io/marisco/api/metadata.html#inisclient) fetches records via [curl](https://curl.se/), which must be installed separately. In the near term both systems coexist; INIS will supersede Zotero as the migration completes.
 
@@ -107,18 +109,18 @@ Documentation is organised into two groups.
 
 Practical walkthroughs for common tasks:
 
-- [Contributing data to MARIS](how-to/contributing-data.ipynb): how a data provider delivers a dataset to the repository
-- [Writing a new handler](how-to/writing-a-handler.ipynb): step-by-step guide to adding a new data provider to the MARISCO pipeline
-- [Nomenclature reconciliation](how-to/reconcile-nomenclature.ipynb): repeatable procedure for mapping provider names (nuclides, species, units, …) to MARIS standard identifiers
-- [Explore a MARIS NetCDF file](how-to/explore-nc.ipynb): step-by-step guide to reading a MARIS NetCDF file: global metadata, group structure, lookup tables and nomenclatures, and each sample-type dataset as a [pandas](https://pandas.pydata.org) DataFrame
+- [Contributing data to MARIS](https://franckalbinet.github.io/marisco/how-to/contributing-data.html): how a data provider delivers a dataset to the repository
+- [Writing a new handler](https://franckalbinet.github.io/marisco/how-to/writing-a-handler.html): step-by-step guide to adding a new data provider to the MARISCO pipeline
+- [Nomenclature reconciliation](https://franckalbinet.github.io/marisco/how-to/reconcile-nomenclature.html): repeatable procedure for mapping provider names (nuclides, species, units, …) to MARIS standard identifiers
+- [Explore a MARIS NetCDF file](https://franckalbinet.github.io/marisco/how-to/explore-nc.html): step-by-step guide to reading a MARIS NetCDF file: global metadata, group structure, lookup tables and nomenclatures, and each sample-type dataset as a [pandas](https://pandas.pydata.org) DataFrame
 
 ### Reference
 
 Detailed specifications and reference material:
 
-- [Reporting template](reference/reporting-template.ipynb): the MARIS data reporting template as documentation, with the general instructions, per-sample-type column tables, and lookup lists
-- [Field Definitions](reference/field-definition.ipynb): complete field-by-field reference with MARISCO column names, NetCDF variable names, CSV variable names, types, and lookup tables
-- [MARIS database schema](reference/maris-db-schema.ipynb): the master database `sample` and `measure` tables, their mandatory columns, and their constraints
+- [Reporting template](https://franckalbinet.github.io/marisco/reference/reporting-template.html): the MARIS data reporting template as documentation, with the general instructions, per-sample-type column tables, and lookup lists
+- [Field Definitions](https://franckalbinet.github.io/marisco/reference/field-definition.html): complete field-by-field reference with MARISCO column names, NetCDF variable names, CSV variable names, types, and lookup tables
+- [MARIS database schema](https://franckalbinet.github.io/marisco/reference/maris-db-schema.html): the master database `sample` and `measure` tables, their mandatory columns, and their constraints
 
 ## Development
 
@@ -133,7 +135,7 @@ ncgen -4 -o nbs/files/nc/maris-template.nc nbs/files/cdl/maris.cdl
 ```
 
 - Contributor guidance on architecture, coding conventions, and handler documentation style lives in the `CRAFTs/` notebooks at the repository root.
-- [Writing a new handler](how-to/writing-a-handler.ipynb) walks through adding a new data provider to the pipeline.
+- [Writing a new handler](https://franckalbinet.github.io/marisco/how-to/writing-a-handler.html) walks through adding a new data provider to the pipeline.
 
 ## Acknowledgements
 

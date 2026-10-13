@@ -11,9 +11,8 @@ __all__ = ['AVOGADRO', 'NA', 'NC_DIM', 'NC_CSV', 'NC_VARS', 'CSV_VARS', 'NC_GROU
 
 # %% ../nbs/api/configs.ipynb #3f92bc7b
 from pathlib import Path
-import os
 import re
-from typing import Any, Dict, Union
+from typing import Any
 import pandas as pd
 from fastcore.all import *
 from netCDF4 import Dataset
@@ -29,7 +28,7 @@ NA = 'Not available'
 NC_DIM = 'id'
 
 # %% ../nbs/api/configs.ipynb #4b2f250d
-NC_CSV = {
+NC_CSV = {  # chkstyle: ignore-node
     'AREA':            ('area',          'area'),
     'BIO_GROUP':       ('bio_group',     None),
     'BODY_PART':       ('body_part',     'bodypar_id'),
@@ -78,124 +77,114 @@ NC_VARS  = {k: v[0] for k,v in NC_CSV.items() if v[0] is not None}
 CSV_VARS = {k: v[1] for k,v in NC_CSV.items() if v[1] is not None}
 
 # %% ../nbs/api/configs.ipynb #9a7deced
-NC_GROUPS = {'BIOTA': 'biota',
-             'SEAWATER': 'seawater',
-             'SEDIMENT': 'sediment',
-             'SUSPENDED_MATTER': 'suspended_matter'}
+NC_GROUPS = dict(BIOTA='biota', SEAWATER='seawater', SEDIMENT='sediment', SUSPENDED_MATTER='suspended_matter')
 
 # %% ../nbs/api/configs.ipynb #6a751b6e
-SMP_TYPE_LUT = {
-    'SEAWATER': 1,
-    'BIOTA': 2,
-    'SEDIMENT': 3,
-    'SUSPENDED_MATTER': 4
-}
+SMP_TYPE_LUT = dict(SEAWATER=1, BIOTA=2, SEDIMENT=3, SUSPENDED_MATTER=4)
 
 # %% ../nbs/api/configs.ipynb #6423b1ee
-NC_DTYPES = {
+NC_DTYPES = {  # chkstyle: ignore-node
     'AREA': {
-        'name': 'area_t', 
+        'name': 'area_t',
         'fname': 'dbo_area.xlsx',
-        'key': 'displayName', 
+        'key': 'displayName',
         'value':'areaId'
     },
     'BIO_GROUP': {
-        'name': 'bio_group_t', 
+        'name': 'bio_group_t',
         'fname': 'dbo_biogroup.xlsx',
-        'key': 'biogroup', 
+        'key': 'biogroup',
         'value':'biogroup_id'
     },
     'BODY_PART': {
-        'name': 'body_part_t', 
+        'name': 'body_part_t',
         'fname': 'dbo_bodypar.xlsx',
-        'key': 'bodypar', 
+        'key': 'bodypar',
         'value':'bodypar_id'
     },
     'COUNT_MET': {
-        'name': 'count_met_t', 
+        'name': 'count_met_t',
         'fname': 'dbo_counmet.xlsx',
         'key': 'counmet',
         'value':'counmet_id'
     },
     'DL': {
-        'name': 'dl_t', 
+        'name': 'dl_t',
         'fname': 'dbo_detectlimit.xlsx',
-        'key': 'name_sanitized', 
+        'key': 'name_sanitized',
         'value':'id'
     },
     'FILT': {
-        'name': 'filt_t', 
+        'name': 'filt_t',
         'fname': 'dbo_filtered.xlsx',
         'key': 'name',
         'value':'id'
     },
     'NUCLIDE': {
-        'name': 'nuclide_t', 
+        'name': 'nuclide_t',
         'fname': 'dbo_nuclide.xlsx',
         'key': 'nc_name',
         'value':'nuclide_id'
     },
     'PREP_MET': {
-        'name': 'prep_met_t', 
-        'fname': 'dbo_prepmet.xlsx', 
+        'name': 'prep_met_t',
+        'fname': 'dbo_prepmet.xlsx',
         'key': 'prepmet',
         'value':'prepmet_id'
     },
     'SAMP_MET': {
-        'name': 'samp_met_t', 
-        'fname': 'dbo_sampmet.xlsx', 
+        'name': 'samp_met_t',
+        'fname': 'dbo_sampmet.xlsx',
         'key': 'sampmet',
         'value':'sampmet_id'
     },
     'SED_TYPE': {
-        'name': 'sed_type_t', 
-        'fname': 'dbo_sedtype.xlsx', 
-        'key': 'sedtype', 
+        'name': 'sed_type_t',
+        'fname': 'dbo_sedtype.xlsx',
+        'key': 'sedtype',
         'value':'sedtype_id'
     },
     'SPECIES': {
-        'name': 'species_t', 
-        # 'fname': 'dbo_species_cleaned.xlsx',
+        'name': 'species_t',
         'fname': 'dbo_species_2024_11_19.xlsx',
-        'key': 'species', 
+        'key': 'species',
         'value':'species_id'
     },
     'UNIT': {
-        'name': 'unit_t', 
-        'fname': 'dbo_unit.xlsx', 
-        'key': 'unit_sanitized', 
+        'name': 'unit_t',
+        'fname': 'dbo_unit.xlsx',
+        'key': 'unit_sanitized',
         'value':'unit_id'
     },
     'LAB': {
-        'name': 'lab_t', 
-        #'fname': 'dbo_lab.xlsx', 
-        'fname': 'dbo_lab_cleaned.xlsx', 
-        'key': 'lab', 
+        'name': 'lab_t',
+        'fname': 'dbo_lab_cleaned.xlsx',
+        'key': 'lab',
         'value':'lab_id'
     }
 }
 
 # %% ../nbs/api/configs.ipynb #f0f94538
-CSV_DTYPES = {
+CSV_DTYPES = {  # chkstyle: ignore-node
     'AREA': {'state': 'decoded'},
-    'NUCLIDE': {'state': 'encoded'},  # encoded nuclide_id
-    'UNIT': {'state': 'encoded'},  # encoded unit_id
+    'NUCLIDE': {'state': 'encoded'},
+    'UNIT': {'state': 'encoded'},
     'DL': {'state': 'decoded'},
     'FILT': {'state': 'decoded'},
-    'COUNT_MET': {'state': 'encoded'},  # encoded counmet_id
-    'SAMP_MET': {'state': 'encoded'},  # encoded sampmet_id
-    'PREP_MET': {'state': 'encoded'},  # encoded prepmet_id
-    'SPECIES': {'state': 'encoded'},  # encoded species_id
-    'BODY_PART': {'state': 'encoded'},  # encoded bodypar_id
-    'SED_TYPE': {'state': 'encoded'},  # encoded sedtype_id
-    'LAB': {'state': 'encoded'},  # encoded lab_id
+    'COUNT_MET': {'state': 'encoded'},
+    'SAMP_MET': {'state': 'encoded'},
+    'PREP_MET': {'state': 'encoded'},
+    'SPECIES': {'state': 'encoded'},
+    'BODY_PART': {'state': 'encoded'},
+    'SED_TYPE': {'state': 'encoded'},
+    'LAB': {'state': 'encoded'},
 }
 
 # %% ../nbs/api/configs.ipynb #e5b80558
 ZOTERO_LIB_ID = '2432820'
 
 # %% ../nbs/api/configs.ipynb #0fece031
-NC_GLOBAL_ATTRS = {
+NC_GLOBAL_ATTRS = {  # chkstyle: ignore-node
     'id', 'title', 'summary', 'keywords', 'history',
     'keywords_vocabulary', 'keywords_vocabulary_url',
     'record', 'featureType', 'cdm_data_type', 'Conventions',
@@ -214,8 +203,9 @@ def lut_path() -> Path:              # Path to LUTs directory
     return _pkg_files('marisco') / 'files/lut'
 
 # %% ../nbs/api/configs.ipynb #8836df19
-def lut_fname(key: str               # NC_DTYPES key, e.g. 'SPECIES', 'UNIT', 'DL'
-              ) -> Path:             # Full path to the lookup table Excel file
+def lut_fname(
+    key: str # NC_DTYPES key, e.g. 'SPECIES', 'UNIT', 'DL'
+) -> Path: # Full path to the lookup table Excel file
     "Return the full path to a lookup table file by its NC_DTYPES key"
     return lut_path() / NC_DTYPES[key]['fname']
 
@@ -232,113 +222,80 @@ def cache_path() -> Path: # Path to cache directory
     return p
 
 # %% ../nbs/api/configs.ipynb #f63b3971
-NETCDF_TO_PYTHON_TYPE = {
-    'u8': int,
-    'f4': float
-    }
+NETCDF_TO_PYTHON_TYPE = {'u8': int, 'f4': float}
 
 # %% ../nbs/api/configs.ipynb #97b6b0ec
 def get_time_units() -> str:
     "Get the units attribute of the time variable from a NetCDF file"
     with Dataset(nc_tpl_path(), 'r') as nc:
         for group in nc.groups.values():
-            if 'time' in group.variables:
-                return group.variables['time'].units
+            if 'time' in group.variables: return group.variables['time'].units
     raise ValueError("Time variable not found in NetCDF file")
 
 # %% ../nbs/api/configs.ipynb #7e994e93
 def sanitize(
     s: str|float # String or float to sanitize
-    ) -> str|float:  # Sanitized string or original float
-    """
-    Sanitize dictionary key to comply with NetCDF enumeration type:
-    
-    - Remove `(`, `)`, `.`, `/`, `-`
-    - Strip the string
-    - Return original value if it's not a string (e.g., NaN)
-    """
+) -> str|float: # Sanitized string, or the original value if it is NA
+    "Sanitize a lookup-table key for use in a NetCDF enumeration type"
     if isinstance(s, str):
         s = re.sub(r'[().]', '', s)
         return re.sub(r'[/-]', ' ', s).strip()
-    elif pd.isna(s):  # This covers np.nan, None, and pandas NaT
-        return s
-    else:
-        return str(s).strip()
+    elif pd.isna(s): return s
+    else: return str(s).strip()
 
 # %% ../nbs/api/configs.ipynb #57772123
-def try_int(x:Any         # Value to attempt integer conversion on
-            )->int|Any:   # Integer if successful, or the original value
+def try_int(
+    x: Any # Value to attempt integer conversion on
+) -> int|Any: # Integer if successful, or the original value
     "Try to convert `x` to an integer"
-    try:
-        return int(x)
-    except (ValueError, TypeError):
-        return x
+    try: return int(x)
+    except (ValueError, TypeError): return x
 
 # %% ../nbs/api/configs.ipynb #0d172382
-# too long for our coding standard - NEED REFACTORING
 def get_lut(
     key_or_fname: str, # NC_DTYPES key (e.g. 'NUCLIDE') or Excel filename
-    key: Optional[str]=None, # Column for dict keys; inferred from NC_DTYPES if applicable
-    value: Optional[str]=None, # Column for dict values; inferred from NC_DTYPES if applicable
-    src_dir: Optional[str]=None, # Directory containing lookup tables (default: lut_path())
+    key: str|None=None, # Column for dict keys; inferred from NC_DTYPES if applicable
+    value: str|None=None, # Column for dict values; inferred from NC_DTYPES if applicable
+    src_dir: str|None=None, # Directory containing lookup tables (default: lut_path())
     do_sanitize: bool=True, # Sanitization required?
     reverse: bool=False, # Reverse lookup table (value, key)
     check_duplicates: bool=False, # Check for duplicates in lookup table
     as_df: bool=False # Return DataFrame instead of dict (for fuzzy_merge etc.)
-    ) -> Union[Dict[str, int], pd.DataFrame]: # MARIS lookup table (key, value) or (key, value) DataFrame
+) -> dict[str, int]|pd.DataFrame: # MARIS lookup table (key, value) or (key, value) DataFrame
     "Convert MARIS db lookup table excel file to dictionary or DataFrame"
-    if src_dir is None: src_dir = lut_path()
-    
-    # Resolve from NC_DTYPES if the first arg is a known key
-    if key_or_fname in NC_DTYPES:
-        cfg = NC_DTYPES[key_or_fname]
-        fname = cfg['fname']
-        if key is None: key = cfg['key']
-        if value is None: value = cfg['value']
-    else:
-        fname = key_or_fname
-    
-    fname = Path(src_dir) / fname
-    df = pd.read_excel(fname, usecols=[key, value]).dropna(subset=value)
-    
-    if check_duplicates:
-        duplicates = df[key][df[key].duplicated()].tolist()
-        if duplicates: print(f"Warning: {fname.name}: found duplicate keys: {duplicates}")
-        
-    df[value] = df[value].astype('int')
+    spec = NC_DTYPES.get(key_or_fname, {})
+    key, value = ifnone(key, spec.get('key')), ifnone(value, spec.get('value'))
+    fname = Path(ifnone(src_dir, lut_path())) / spec.get('fname', key_or_fname)
+    df = pd.read_excel(fname, usecols=[key, value]).dropna(subset=value).astype({value: int})
+    if check_duplicates and (dups := df[key][df[key].duplicated()].tolist()):
+        print(f"Warning: {fname.name}: found duplicate keys: {dups}")
     if as_df: return df
-    
-    df = df.set_index(key)
-    lut = df[value].to_dict()
+    lut = df.set_index(key)[value].to_dict()
     if do_sanitize: lut = {sanitize(k): v for k, v in lut.items()}
-    lut = {try_int(k): try_int(v) for k, v in lut.items()}    
+    lut = {try_int(k): try_int(v) for k, v in lut.items()}
     return {v: k for k, v in lut.items()} if reverse else lut
 
 # %% ../nbs/api/configs.ipynb #b6ab8d15
 class Enums():
     "Hold and filter MARIS NetCDF enumeration types loaded from lookup tables"
     def __init__(self,
-                 lut_src_dir: str,                         # Directory containing lookup tables
-                 dtypes: Dict[str, Dict[str, str]] = NC_DTYPES  # Dict keyed by NC_DTYPES key, each is {name, fname, key, value}
-                ):
+        lut_src_dir: str, # Directory containing lookup tables
+        dtypes: dict[str, dict]=NC_DTYPES # Dict keyed by NC_DTYPES key, each is {name, fname, key, value}
+    ):
         store_attr()
         self.types = self.lookup()
 
 # %% ../nbs/api/configs.ipynb #9641a970
 @patch
-def lookup(self: Enums) -> Dict[str, Dict[str, int]]:
+def lookup(self: Enums) -> dict[str, dict[str, int]]:
     "Load all enumeration types defined in `NC_DTYPES` as `{name: id}` dictionaries, available via `self.types[var_name]`"
-    types = {}
-    for var_name in self.dtypes:
-        lut = get_lut(var_name, src_dir=self.lut_src_dir)
-        types[var_name] = lut
-    return types
+    return {var_name: get_lut(var_name, src_dir=self.lut_src_dir) for var_name in self.dtypes}
 
 # %% ../nbs/api/configs.ipynb #fb029d82
 @patch
 def filter(self: Enums,
-           var_name: str,      # NC_DTYPES key for the enumeration, e.g. 'SPECIES'
-           values: list        # Enumeration IDs to keep
-          ) -> Dict[str, int]:
+    var_name: str,      # NC_DTYPES key for the enumeration, e.g. 'SPECIES'
+    values: list        # Enumeration IDs to keep
+) -> dict[str, int]:
     "Return a subset of an enumeration keeping only entries whose id is in `values`"
     return {name: id for name, id in self.types[var_name].items() if id in values}

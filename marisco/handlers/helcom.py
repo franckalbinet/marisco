@@ -465,7 +465,6 @@ def encode(
     encoder = NetCDFEncoder(tfm.dfs, 
                             dest_fname=dest, 
                             global_attrs=get_attrs(tfm, zotero_key=zotero_key, kw=kw),
-                            # custom_maps=tfm.custom_maps,
                             verbose=kwargs.get('verbose', False),
                            )
     encoder.encode()

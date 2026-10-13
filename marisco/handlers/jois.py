@@ -15,10 +15,11 @@ import requests
 import zipfile
 import io
 
-from ..callbacks import PerGroupCB, Callback, Transformer, EncodeTimeCB, SanitizeLonLatCB, RemapCB, AddSampleIDCB, get_lut
+from ..callbacks import PerGroupCB, Callback, Transformer, EncodeTimeCB, SanitizeLonLatCB, RemapCB, AddSampleIDCB
 from ..metadata import GlobAttrsFeeder, ZoteroCB, BboxCB, DepthRangeCB, TimeRangeCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder
 from ..nc2csv import to_csv
+from ..configs import get_lut
 
 # %% ../../nbs/handlers/jois.ipynb #585e1b91
 RECORDS = {

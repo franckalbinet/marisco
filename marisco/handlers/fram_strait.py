@@ -14,11 +14,11 @@ import requests
 import io
 import gsw
 
-from ..callbacks import PerGroupCB, Transformer, EncodeTimeCB, SanitizeLonLatCB, RemapCB, AddSampleIDCB, get_lut
+from ..callbacks import PerGroupCB, Transformer, EncodeTimeCB, SanitizeLonLatCB, RemapCB, AddSampleIDCB
 from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder
 from ..nc2csv import to_csv
-from ..callbacks import get_lut
+from ..configs import get_lut
 
 # %% ../../nbs/handlers/fram_strait.ipynb #60e56f06
 def _lab_meas(lab: str, stem: str) -> tuple:

@@ -6,26 +6,67 @@ Docs: https://franckalbinet.github.io/marisco/api/callbacks.html.md"""
 
 # %% ../nbs/api/callbacks.ipynb #5a293345
 from __future__ import annotations
-import copy
 from fastcore.all import *
 from operator import attrgetter
-from cftime import date2num ,num2date
-import numpy as np
-import pandas as pd
-from typing import List, Dict, Callable, Any, Optional, Union
-from collections import defaultdict
-from .configs import get_lut, get_time_units, NC_GROUPS, SMP_TYPE_LUT
+from cftime import date2num, num2date
+import numpy as np, pandas as pd
+from typing import Callable, Any
+from .configs import get_time_units, SMP_TYPE_LUT
 
 # %% auto #0
-__all__ = ['Callback', 'PerGroupCB', 'run_cbs', 'Transformer', 'SanitizeLonLatCB', 'RemapCB', 'LowerStripNameCB',
-           'AddSampleTypeIdColumnCB', 'RenameColumnsCB', 'RemoveAllNAValuesCB', 'MeltWideNuclidesCB', 'AddSampleIDCB',
-           'CompareDfsAndTfmCB', 'UniqueIndexCB', 'ParseTimeCB', 'EncodeTimeCB', 'DecodeTimeCB']
+__all__ = ['Callback', 'run_cbs', 'Transformer', 'PerGroupCB', 'SanitizeLonLatCB', 'RemoveAllNAValuesCB', 'RemapCB',
+           'LowerStripNameCB', 'AddSampleTypeIdColumnCB', 'RenameColumnsCB', 'MeltWideNuclidesCB', 'AddSampleIDCB',
+           'UniqueIndexCB', 'CompareDfsAndTfmCB', 'ParseTimeCB', 'EncodeTimeCB', 'DecodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb #4e58c73c
-class Callback(): 
+class Callback():
     "Base class for callbacks"
     order = 0
     def __init__(self): pass
+
+# %% ../nbs/api/callbacks.ipynb #61702d17
+def run_cbs(
+    cbs: list[Callback], # List of callbacks to run
+    obj: Any # Object to pass to the callbacks
+):
+    "Run the callbacks in the order they are specified"
+    for cb in sorted(cbs, key=attrgetter('order')):
+        if cb.__doc__: obj.logs.append(cb.__doc__)
+        cb(obj)
+
+# %% ../nbs/api/callbacks.ipynb #82a6611d
+class Transformer():
+    "Transform the dataframe(s) according to the specified callbacks"
+    def __init__(self,
+        data: dict[str, pd.DataFrame]|pd.DataFrame, # Data to be transformed
+        cbs: list[Callback]|None=None, # List of callbacks to run
+        inplace: bool=False # Whether to modify the dataframe(s) in place
+    ):
+        store_attr()
+        self.is_single_df = isinstance(data, pd.DataFrame)
+        self.df, self.dfs = self._prepare_data(data, inplace)
+        self.logs = []
+
+    def _prepare_data(self, data, inplace):
+        if self.is_single_df: return (data if inplace else data.copy()), None
+        return None, (data if inplace else {k: v.copy() for k, v in data.items()})
+
+    def __call__(self):
+        "Transform the dataframe(s) according to the specified callbacks."
+        if self.cbs: run_cbs(self.cbs, self)
+        return self.df if self.dfs is None else self.dfs
+
+# %% ../nbs/api/callbacks.ipynb #a69ecfc0
+@patch
+def unique(self:Transformer,
+    col_name: str # Column to read in every group
+) -> np.ndarray: # Sorted distinct values
+    "Distinct non-NA values of `col_name` across all groups"
+    if self.is_single_df: values = self.df.get(col_name, pd.Series()).dropna().values
+    else:
+        columns = [df.get(col_name) for df in self.dfs.values() if df.get(col_name) is not None]
+        values = np.concatenate([col.dropna().values for col in columns]) if columns else []
+    return np.unique(values)
 
 # %% ../nbs/api/callbacks.ipynb #0414ac1d
 class PerGroupCB(Callback):
@@ -33,8 +74,8 @@ class PerGroupCB(Callback):
     grps: list = None
 
     def __init__(self,
-                 grps: list=None  # Groups to process; None = all groups in `tfm.dfs`
-                 ):
+        grps: list=None  # Groups to process; None = all groups in `tfm.dfs`
+    ):
         if grps is not None: self.grps = grps
 
     def __call__(self, tfm):
@@ -44,66 +85,21 @@ class PerGroupCB(Callback):
 # %% ../nbs/api/callbacks.ipynb #92cf2c26
 @patch
 def each_grp(self:PerGroupCB,
-             grp: str,          # Group key e.g. `'SEAWATER'`, `'BIOTA'`
-             df: pd.DataFrame,  # DataFrame for this group
-             tfm,               # Parent `Transformer`
-             ):
+    grp: str,          # Group key e.g. `'SEAWATER'`, `'BIOTA'`
+    df: pd.DataFrame,  # DataFrame for this group
+    tfm,               # Parent `Transformer`
+):
     "Override to implement per-group transformation logic"
     raise NotImplementedError
-
-# %% ../nbs/api/callbacks.ipynb #61702d17
-def run_cbs(
-    cbs: List[Callback], # List of callbacks to run
-    obj: Any # Object to pass to the callbacks
-    ):
-    "Run the callbacks in the order they are specified"
-    for cb in sorted(cbs, key=attrgetter('order')):
-        if cb.__doc__: obj.logs.append(cb.__doc__)
-        cb(obj)
-
-# %% ../nbs/api/callbacks.ipynb #82a6611d
-class Transformer():
-    "Transform the dataframe(s) according to the specified callbacks"
-    def __init__(self, 
-                 data: Union[Dict[str, pd.DataFrame], pd.DataFrame], # Data to be transformed
-                 cbs: Optional[List[Callback]]=None, # List of callbacks to run
-                 custom_maps: Dict = None,
-                 inplace: bool=False # Whether to modify the dataframe(s) in place
-                 ): 
-        store_attr()
-        self.is_single_df = isinstance(data, pd.DataFrame)
-        self.df, self.dfs = self._prepare_data(data, inplace)
-        self.logs = []
-        self.custom_maps = custom_maps or defaultdict(lambda: defaultdict(dict))
-            
-    def _prepare_data(self, data, inplace):
-        if self.is_single_df:
-            return (data if inplace else data.copy()), None
-        else:
-            return None, (data if inplace else {k: v.copy() for k, v in data.items()})
-    
-    def unique(self, col_name: str) -> np.ndarray:
-        "Distinct values of a specific column present in all groups."
-        if self.is_single_df:
-            values = self.df.get(col_name, pd.Series()).dropna().values
-        else:
-            columns = [df.get(col_name) for df in self.dfs.values() if df.get(col_name) is not None]
-            values = np.concatenate([col.dropna().values for col in columns]) if columns else []
-        return np.unique(values)
-        
-    def __call__(self):
-        "Transform the dataframe(s) according to the specified callbacks."
-        if self.cbs: run_cbs(self.cbs, self)
-        return self.df if self.dfs is None else self.dfs
 
 # %% ../nbs/api/callbacks.ipynb #097d66b6
 class SanitizeLonLatCB(PerGroupCB):
     "Drop rows with invalid longitude & latitude values. Convert `,` separator to `.` separator"
-    def __init__(self, 
-                 lon_col: str='LON', # Longitude column name
-                 lat_col: str='LAT', # Latitude column name
-                 verbose: bool=False # Whether to print the number of invalid longitude & latitude values
-                 ):
+    def __init__(self,
+        lon_col: str='LON', # Longitude column name
+        lat_col: str='LAT', # Latitude column name
+        verbose: bool=False # Whether to print the number of invalid longitude & latitude values
+    ):
         store_attr()
 
     def each_grp(self, grp, df, tfm):
@@ -117,16 +113,30 @@ class SanitizeLonLatCB(PerGroupCB):
             print(f'The "{grp}" group contains {mask_goob.sum()} data points with unrealistic {self.lon_col} or {self.lat_col} values.')
         tfm.dfs[grp] = df.loc[~(mask_zeroes | mask_goob)]
 
+# %% ../nbs/api/callbacks.ipynb #1ea2cc64
+class RemoveAllNAValuesCB(Callback):
+    "Remove rows with all NA values in specified columns"
+    def __init__(self,
+        cols_to_check: dict[str, list]|list,  # Dict or list of columns to check
+        how: str='all'  # How to handle NA values 'all' or 'any'
+    ):
+        store_attr()
+
+    def __call__(self, tfm):
+        cols_dict = self.cols_to_check if isinstance(self.cols_to_check, dict) else {k: self.cols_to_check for k in tfm.dfs}
+
+        for sample_type, columns in cols_dict.items(): tfm.dfs[sample_type].dropna(subset=columns, how=self.how, inplace=True)
+
 # %% ../nbs/api/callbacks.ipynb #8c905654
 class RemapCB(PerGroupCB):
     "Remap source values to MARIS standard identifiers using a lookup table"
     def __init__(self,
-                 lut: dict|Callable,  # Lookup: dict, or callable(dfs)->dict
-                 col_remap: str,            # Destination column to create
-                 col_src: str,              # Source column with provider values
-                 default_val: int=0,        # Value assigned to unmapped source values
-                 grps: list[str]=None,      # Groups to process (None = all)
-                ):
+        lut: dict|Callable,  # Lookup: dict, or callable(dfs)->dict
+        col_remap: str,            # Destination column to create
+        col_src: str,              # Source column with provider values
+        default_val: int=0,        # Value assigned to unmapped source values
+        grps: list[str]=None,      # Groups to process (None = all)
+    ):
         store_attr()
         grp_str = ', '.join(str(g) for g in grps) if grps else 'all'
         self.__doc__ = f"Remap values from '{col_src}' to '{col_remap}' for groups: {grp_str}."
@@ -143,24 +153,22 @@ class RemapCB(PerGroupCB):
         self._resolved_lut = self._resolve_lut(tfm)
         super().__call__(tfm)
 
-    def each_grp(self, grp, df, tfm):
-        df[self.col_remap] = (df[self.col_src]
-            .map(self._resolved_lut).fillna(self.default_val).astype(int))
+    def each_grp(self, grp, df, tfm): df[self.col_remap] = df[self.col_src].map(self._resolved_lut).fillna(self.default_val).astype(int)
 
 # %% ../nbs/api/callbacks.ipynb #bd1917a0
 class LowerStripNameCB(PerGroupCB):
     "Convert values to lowercase and strip any trailing spaces"
-    def __init__(self, 
-                 col_src: str, # Source column name e.g. 'Nuclide'
-                 col_dst: str=None, # Destination column name
-                 fn_transform: Callable=lambda x: x.lower().strip(), # Transformation function
-                 grps: list=None # Groups to process; None = all groups in `tfm.dfs`
-                 ):
+    def __init__(self,
+        col_src: str, # Source column name e.g. 'Nuclide'
+        col_dst: str=None, # Destination column name
+        fn_transform: Callable=lambda x: x.lower().strip(), # Transformation function
+        grps: list=None # Groups to process; None = all groups in `tfm.dfs`
+    ):
         store_attr(but='grps')
         super().__init__(grps)
         self.__doc__ = f"Convert '{col_src}' column values to lowercase, strip spaces, and store in '{col_dst}' column."
         if not col_dst: self.col_dst = col_src
-        
+
     def _safe_transform(self, value):
         "Ensure value is not NA and apply transformation function."
         return value if pd.isna(value) else self.fn_transform(str(value))
@@ -170,53 +178,32 @@ class LowerStripNameCB(PerGroupCB):
 # %% ../nbs/api/callbacks.ipynb #949d6471
 class AddSampleTypeIdColumnCB(PerGroupCB):
     "Add a column with the sample type as defined in the CDL"
-    def __init__(self, 
-                 lut: dict=SMP_TYPE_LUT, # Lookup table for sample type
-                 col_name: str='SAMPLE_TYPE' # Column name to store the sample type id
-                 ): 
+    def __init__(self,
+        lut: dict=SMP_TYPE_LUT, # Lookup table for sample type
+        col_name: str='SAMPLE_TYPE' # Column name to store the sample type id
+    ):
         store_attr()
-        
+
     def each_grp(self, grp, df, tfm): df[self.col_name] = self.lut[grp]
 
 # %% ../nbs/api/callbacks.ipynb #9da3e703
 class RenameColumnsCB(PerGroupCB):
     "Rename variables to MARIS standard names, keeping only renamed columns"
     def __init__(self,
-                 renaming_rules: dict # Renaming rules {old_name: new_name}
-                 ): 
+        renaming_rules: dict # Renaming rules {old_name: new_name}
+    ):
         store_attr()
-        
+
     def each_grp(self, grp, df, tfm): tfm.dfs[grp] = df[self.renaming_rules.keys()].rename(columns=self.renaming_rules)
 
-
-# %% ../nbs/api/callbacks.ipynb #1ea2cc64
-class RemoveAllNAValuesCB(Callback):
-    "Remove rows with all NA values in specified columns"
-    def __init__(self, 
-                 cols_to_check: Union[Dict[str, list], list],  # Dict or list of columns to check
-                 how: str='all'  # How to handle NA values 'all' or 'any'
-                ):
-        store_attr()
-
-    def __call__(self, tfm):
-        # Convert list to dict if cols_to_check is a list
-        cols_dict = (self.cols_to_check if isinstance(self.cols_to_check, dict) 
-                    else {k: self.cols_to_check for k in tfm.dfs.keys()})
-        
-        for sample_type, columns in cols_dict.items():
-            tfm.dfs[sample_type].dropna(
-                subset=columns,
-                how=self.how,
-                inplace=True
-            )
 
 # %% ../nbs/api/callbacks.ipynb #d7982397
 class MeltWideNuclidesCB(Callback):
     "Reshape wide nuclide columns to long format using a named-dict spec"
     def __init__(self,
-                 spec: list,           # List of dicts with keys: val, unc, nuclide, unit, lab
-                 grp:  str='SEAWATER', # Group in tfm.dfs to reshape
-                 ):
+        spec: list,           # List of dicts with keys: val, unc, nuclide, unit, lab
+        grp:  str='SEAWATER', # Group in tfm.dfs to reshape
+    ):
         store_attr()
 
     def __call__(self, tfm):
@@ -231,15 +218,14 @@ class MeltWideNuclidesCB(Callback):
             sub['UNIT']    = s['unit']
             sub['LAB']     = s['lab']
             frames.append(sub)
-        if frames:
-            tfm.dfs[self.grp] = pd.concat(frames, ignore_index=True)
+        if frames: tfm.dfs[self.grp] = pd.concat(frames, ignore_index=True)
 
 # %% ../nbs/api/callbacks.ipynb #7bb09e18
 class AddSampleIDCB(PerGroupCB):
     "Assign 1-based sequential SMP_ID; optionally cast a provider ID column to str for NetCDF VLEN compatibility"
     def __init__(self,
-                 col_provider: str=None,  # Provider ID column to cast to str; None = skip
-                 ):
+        col_provider: str=None,  # Provider ID column to cast to str; None = skip
+    ):
         store_attr()
 
     def each_grp(self, grp, df, tfm):
@@ -251,27 +237,33 @@ class AddSampleIDCB(PerGroupCB):
                 col = col.astype('Int64')  # whole-number floats (e.g. 289.0) -> int first, so str is "289" not "289.0"
             tfm.dfs[grp][self.col_provider] = col.astype(str).astype(object)
 
+# %% ../nbs/api/callbacks.ipynb #3653a68d
+class UniqueIndexCB(PerGroupCB):
+    "Set unique index for each group"
+    def __init__(self, index_name='ID'): store_attr()
+
+    def each_grp(self, grp, df, tfm): tfm.dfs[grp] = df.reset_index(drop=True).reset_index(names=[self.index_name])
+
 # %% ../nbs/api/callbacks.ipynb #8cf07327
 class CompareDfsAndTfmCB(Callback):
     "Create a dataframe of removed data and track changes in row counts due to transformations"  # TODO: refactor - too long
-    def __init__(self, 
-                 dfs: Dict[str, pd.DataFrame]  # Original dataframes
-                 ): 
+    def __init__(self,
+        dfs: dict[str, pd.DataFrame]  # Original dataframes
+    ):
         store_attr()
-        
+
     def __call__(self, tfm: Transformer) -> None:
         self._initialize_tfm_attributes(tfm)
-        for grp in tfm.dfs.keys():
-            self._compute_changes(grp, tfm)
+        for grp in tfm.dfs.keys(): self._compute_changes(grp, tfm)
 
     def _initialize_tfm_attributes(self, tfm: Transformer) -> None:
         tfm.dfs_removed = {}
         tfm.compare_stats = {}
 
-    def _compute_changes(self, 
-                         grp: str,  # The group key
-                         tfm: Transformer  # The transformation object containing `dfs`
-                        ) -> None:
+    def _compute_changes(self,
+        grp: str,  # The group key
+        tfm: Transformer  # The transformation object containing `dfs`
+    ) -> None:
         "Compute and store changes including data removed and created during transformation."
         original_df = self.dfs[grp]
         transformed_df = tfm.dfs[grp]
@@ -284,36 +276,23 @@ class CompareDfsAndTfmCB(Callback):
 
         # Store results
         tfm.dfs_removed[grp] = original_df.loc[original_df.index.difference(transformed_df.index)]
-        tfm.compare_stats[grp] = {
-            'Original row count (dfs)': original_count,
-            'Transformed row count (tfm.dfs)': transformed_count,
-            'Rows removed from original (tfm.dfs_removed)': removed_count,
-            'Rows created in transformed (tfm.dfs_created)': created_count
-        }
-
-# %% ../nbs/api/callbacks.ipynb #3653a68d
-class UniqueIndexCB(PerGroupCB):
-    "Set unique index for each group"
-    def __init__(self, index_name='ID'): store_attr()
-        
-    def each_grp(self, grp, df, tfm):
-        tfm.dfs[grp] = df.reset_index(drop=True).reset_index(names=[self.index_name])
+        tfm.compare_stats[grp] = {'Original row count (dfs)': original_count, 'Transformed row count (tfm.dfs)': transformed_count,
+            'Rows removed from original (tfm.dfs_removed)': removed_count, 'Rows created in transformed (tfm.dfs_created)': created_count}
 
 # %% ../nbs/api/callbacks.ipynb #c787de45
 class ParseTimeCB(PerGroupCB):
     "Parse time column from ISO8601 string to datetime"
     def __init__(self, time_col_name: str='TIME'): store_attr()
-    def each_grp(self, grp, df, tfm):
-        df[self.time_col_name] = pd.to_datetime(df[self.time_col_name], format='ISO8601')
+    def each_grp(self, grp, df, tfm): df[self.time_col_name] = pd.to_datetime(df[self.time_col_name], format='ISO8601')
 
 # %% ../nbs/api/callbacks.ipynb #7f03e81c
 class EncodeTimeCB(PerGroupCB):
-    "Encode time as seconds since epoch"    
-    def __init__(self, 
-                   col_time: str='TIME',  # Time column name
-                   verbose: bool=False,  # Print warning about missing time values
-                   fn_units: Callable=get_time_units # Function returning the time units
-                 ): 
+    "Encode time as seconds since epoch"
+    def __init__(self,
+        col_time: str='TIME',  # Time column name
+        verbose: bool=False,  # Print warning about missing time values
+        fn_units: Callable=get_time_units # Function returning the time units
+    ):
         store_attr()
         self.units = fn_units()
 
@@ -325,18 +304,17 @@ class EncodeTimeCB(PerGroupCB):
 
 # %% ../nbs/api/callbacks.ipynb #41dcef31
 class DecodeTimeCB(PerGroupCB):
-    "Decode time from seconds since epoch to datetime format"    
-    def __init__(self, 
-                 col_time: str='TIME',
-                 fn_units: Callable=get_time_units # Function returning the time units
-                 ): 
+    "Decode time from seconds since epoch to datetime format"
+    def __init__(self,
+        col_time: str='TIME',  # Time column name
+        verbose: bool=False,  # Print warning about missing time values
+        fn_units: Callable=get_time_units # Function returning the time units
+    ):
         store_attr()
         self.units = fn_units()
 
     def each_grp(self, grp, df, tfm):
         n_missing = df[self.col_time].isna().sum()
-        if n_missing: print(f"Warning: {n_missing} missing time value(s) in {grp}.")
+        if self.verbose and n_missing: print(f"Warning: {n_missing} missing time value(s) in {grp}.")
         tfm.dfs[grp] = df[df[self.col_time].notna()]
-        tfm.dfs[grp][self.col_time] = tfm.dfs[grp][self.col_time].apply(
-            lambda x: num2date(x, units=self.units, only_use_cftime_datetimes=False)
-        )
+        tfm.dfs[grp][self.col_time] = tfm.dfs[grp][self.col_time].apply(lambda x: num2date(x, units=self.units, only_use_cftime_datetimes=False))

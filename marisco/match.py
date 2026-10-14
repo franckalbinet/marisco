@@ -45,6 +45,9 @@ def fuzzy_merge(
     lowercase:bool=True # Compare in lowercase?
 ) -> pd.DataFrame: # `left` rows with the columns of their closest `right` row and a `score`
     "Pair each row of `left` with the closest row of `right` by `dist_fn`"
+    if shared := sorted(set(left.columns) & set(right.columns)): raise ValueError(f"`left` and `right` share columns {shared}")
+    for df, col in ((left, left_on), (right, right_on)):
+        if (na := df[col].isna()).any(): raise ValueError(f"Missing values in `{col}` at rows {df.index[na].tolist()}")
     norm = str.lower if lowercase else noop
     rrecs = right.to_dict('records')
     rvals = [norm(r[right_on]) for r in rrecs]

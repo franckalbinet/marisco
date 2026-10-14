@@ -9,6 +9,7 @@ website:
           - onboarding/setup.ipynb
           - onboarding/find-your-way.ipynb
           - onboarding/supervise.ipynb
+          - onboarding/first-handler.ipynb
           - onboarding/cheatsheet.ipynb
       - section: "How-to"
         contents:

@@ -12,7 +12,7 @@ __all__ = ['TAXON_COLS', 'read_nc_grps', 'keep_csv_cols', 'decode_time', 'add_sa
 from pathlib import Path
 from netCDF4 import Dataset
 import pandas as pd
-from .configs import CSV_VARS, CSV_DTYPES, get_lut, get_time_units, lut_fname, lut_path, SMP_TYPE_LUT, NC_VARS
+from .configs import CSV_VARS, CSV_DTYPES, get_lut, get_time_units, lut_fname, SMP_TYPE_LUT, NC_VARS
 from cftime import num2date
 
 # %% ../nbs/api/nc2csv.ipynb #c20e593d
@@ -43,8 +43,7 @@ def decode_time(
 ):
     "Decode TIME from epoch seconds to datetime"
     units = get_time_units()
-    for df in dfs.values():
-        df['TIME'] = df['TIME'].apply(lambda x: num2date(x, units=units, only_use_cftime_datetimes=False))
+    for df in dfs.values(): df['TIME'] = df['TIME'].apply(lambda x: num2date(x, units=units, only_use_cftime_datetimes=False))
 
 # %% ../nbs/api/nc2csv.ipynb #9e978105
 def add_sample_type(
@@ -63,18 +62,12 @@ def add_ref_id(
     for df in dfs.values(): df['REF_ID'] = ref_id
 
 # %% ../nbs/api/nc2csv.ipynb #a1c55b21
-TAXON_COLS = {
-    'Taxonname': 'TAXONNAME',
-    'Taxonrank': 'TAXONRANK',
-    'TaxonDB': 'TAXONDB',
-    'TaxonDBID': 'TAXONDBID',
-    'TaxonDBURL': 'TAXONDBURL',
-}
+TAXON_COLS = dict(Taxonname='TAXONNAME', Taxonrank='TAXONRANK', TaxonDB='TAXONDB', TaxonDBID='TAXONDBID', TaxonDBURL='TAXONDBURL')
 
 # %% ../nbs/api/nc2csv.ipynb #1e19e146
-def get_taxon_cols()->dict:       # {col_name: {species_id: value}} mapping
+def get_taxon_cols() -> dict: # {col_name: {species_id: value}} mapping
     "Read species lookup table, return `{col_name: {species_id: value}}` dict"
-    f = Path(lut_path()) / lut_fname('SPECIES')
+    f = lut_fname('SPECIES')
     cols = ['species_id'] + list(TAXON_COLS)
     df = pd.read_excel(f)[cols].set_index('species_id')
     return {v: df[c].to_dict() for c, v in TAXON_COLS.items()}
@@ -86,8 +79,7 @@ def add_taxon_info(
     "Add taxon columns to BIOTA from species lookup"
     if 'BIOTA' not in dfs: return
     cols = get_taxon_cols()
-    for col, lut in cols.items():
-        dfs['BIOTA'][col] = dfs['BIOTA']['SPECIES'].map(lut).fillna('Unknown')
+    for col, lut in cols.items(): dfs['BIOTA'][col] = dfs['BIOTA']['SPECIES'].map(lut).fillna('Unknown')
 
 # %% ../nbs/api/nc2csv.ipynb #5607711f
 def map_lut(
@@ -109,16 +101,13 @@ def decode_csv_vars(
 ):
     "Decode enumerated columns marked as `state='decoded'` in CSV_DTYPES"
     decoded = [c for c,cfg in CSV_DTYPES.items() if cfg['state']=='decoded' and c not in ('DL','FILT')]
-    for col in decoded:
-        lut = get_lut(col, reverse=True)
-        for df in dfs.values():
-            if col in df.columns: df[col] = df[col].map(lut)
+    map_lut(dfs, decoded, key=None, value=None)
 
 # %% ../nbs/api/nc2csv.ipynb #63e84356
 def to_csv_files(
     dfs:dict,              # dict of DataFrames keyed by sample group
     fname_in:str,          # Input NetCDF file path
-    dest_out:str=None      # Destination path stem; defaults to fname_in stem
+    dest_out:str=None      # Destination path stem; defaults to `fname_in` without its suffix
 ):
     "Rename columns and write one CSV per group"
     fstem = Path(dest_out or Path(fname_in).with_suffix(''))
@@ -133,7 +122,7 @@ def to_csv_files(
 # %% ../nbs/api/nc2csv.ipynb #26cb1c0a
 def to_csv(
     fname_in:str,          # MARIS standard NetCDF file path
-    dest_out:str=None,     # Destination path stem; defaults to parent of fname_in
+    dest_out:str=None,     # Destination path stem; defaults to `fname_in` without its suffix
     ref_id:int=None        # Reference ID to add as REF_ID column
 ):
     "Convert MARIS standard NetCDF file to import-ready CSV files"

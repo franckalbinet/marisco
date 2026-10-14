@@ -96,7 +96,7 @@ lut_cols = {
 
 # %% ../../nbs/handlers/jois.ipynb #4a497743
 class RenameColsCB(PerGroupCB):
-    "Map JOIS provider CTD and sample columns to MARIS standard names"
+    "Map JOIS provider CTD and sample columns to MARIS standard column names"
     def __init__(self, lut): store_attr()
     def each_grp(self, grp, df, tfm): df.rename(columns=self.lut, inplace=True)
 

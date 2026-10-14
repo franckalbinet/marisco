@@ -2,6 +2,26 @@
 
 <!-- do not remove -->
 
+## 1.11.0
+
+### Breaking Changes
+
+- NetCDF template: `smp_id` is removed and `profile_id` ("Data provider profile ID") is added. `id_provider` is now "Data provider sample ID". The depth variables use the CF standard names `depth` and `sea_floor_depth_below_sea_surface`
+- Handler callbacks that shared a name with a `marisco.callbacks` callback are renamed: `ParseHelcomTimeCB` and `AddHelcomSampleIDCB` in `helcom`, `ParseOsparTimeCB` and `AddOsparSampleIDCB` in `ospar`, `AddGeotracesSampleIDCB` in `geotraces`, and `CastSampleIDCB` in `maris_legacy` ([#82](https://github.com/franckalbinet/marisco/issues/82))
+- `maris_legacy` no longer exports `fname_in`
+
+### New Features
+
+- `fram_strait` documents its curation for the data provider: a curation summary, per-cruise statistics and a "What the pipeline drops" section ([#81](https://github.com/franckalbinet/marisco/issues/81))
+- Reference page listing every callback in `marisco.callbacks` and in each handler ([#82](https://github.com/franckalbinet/marisco/issues/82))
+- The field-definition summary table is generated from `NC_CSV` and the NetCDF template
+
+### Bugs Squashed
+
+- `maris_legacy` exports `encode` again. `marisco-ingest maris_legacy` failed in 1.9.8 and 1.10.0 ([#81](https://github.com/franckalbinet/marisco/issues/81))
+- NetCDF template: "seal level" is corrected to "sea level"
+
+
 ## 1.10.0
 
 ### Breaking Changes

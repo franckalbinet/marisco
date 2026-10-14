@@ -3,6 +3,10 @@ website:
     collapse-level: 1
     contents:
       - index.ipynb
+      - section: "Onboarding"
+        contents:
+          - onboarding/index.ipynb
+          - onboarding/setup.ipynb
       - section: "How-to"
         contents:
           - how-to/contributing-data.ipynb    

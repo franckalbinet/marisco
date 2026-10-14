@@ -103,7 +103,11 @@ Use `--dest` to choose a different output stem.
 
 ## Documentation
 
-Documentation is organised into two groups.
+Documentation is organised into three groups.
+
+### Onboarding
+
+A staged path for MARIS team members who will create handlers with the help of an AI agent. It starts with [setting up your machine](https://franckalbinet.github.io/marisco/onboarding/setup.html).
 
 ### How-to guides
 

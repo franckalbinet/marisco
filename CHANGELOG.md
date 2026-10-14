@@ -2,6 +2,26 @@
 
 <!-- do not remove -->
 
+## 1.10.0
+
+### Breaking Changes
+
+- `metadata`: `ZoteroClient.get_item` is replaced by `fetch_zotero(item_id, lib_id, api_key)`, and `itemId` by `ZoteroCB(item_id)`. `INISClient.doi` and `INISClient.url` are properties. `fetch_inis` returns `None` on HTTP 404 and raises `OSError` on other non-200 statuses ([#76](https://github.com/franckalbinet/marisco/issues/76))
+- `callbacks`: `Transformer` no longer takes `custom_maps`, and `CompareDfsAndTfmCB` is removed ([#76](https://github.com/franckalbinet/marisco/issues/76), [#72](https://github.com/franckalbinet/marisco/issues/72))
+- `match`: `make_lut` and `make_lut_from` no longer take `cache_tag` ([#69](https://github.com/franckalbinet/marisco/issues/69)). `fix_lut` warns with `warnings.warn` instead of printing ([#76](https://github.com/franckalbinet/marisco/issues/76)). `fuzzy_merge` raises `ValueError` when its tables share a column name or a match column has a missing value ([#71](https://github.com/franckalbinet/marisco/issues/71))
+- `configs`: `cache_path` is removed
+- `helcom` and `maris_legacy` no longer turn off all warnings when imported
+
+### New Features
+
+- `fuzzy_merge` is about 5 times faster ([#75](https://github.com/franckalbinet/marisco/issues/75))
+
+### Bugs Squashed
+
+- Fix small defects in the api notebooks ([#72](https://github.com/franckalbinet/marisco/issues/72))
+- `maris_legacy` no longer fails with `KeyError: 'SMP_ID_PROVIDER'` on datasets without provider sample ids
+
+
 ## 1.9.8
 
 ### Bugs Squashed

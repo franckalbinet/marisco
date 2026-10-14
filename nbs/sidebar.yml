@@ -8,6 +8,7 @@ website:
           - onboarding/index.ipynb
           - onboarding/setup.ipynb
           - onboarding/find-your-way.ipynb
+          - onboarding/supervise.ipynb
           - onboarding/cheatsheet.ipynb
       - section: "How-to"
         contents:

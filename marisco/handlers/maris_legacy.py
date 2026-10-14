@@ -15,7 +15,7 @@ import re
 from ..callbacks import (
     Callback, PerGroupCB, Transformer,
     EncodeTimeCB, RenameColumnsCB, LowerStripNameCB, SanitizeLonLatCB,
-    CompareDfsAndTfmCB, RemapCB, ParseTimeCB, EncodeTimeCB)
+    RemapCB, ParseTimeCB)
 
 from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder

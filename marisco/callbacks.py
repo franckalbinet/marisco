@@ -16,7 +16,7 @@ from .configs import get_time_units, SMP_TYPE_LUT
 # %% auto #0
 __all__ = ['Callback', 'run_cbs', 'Transformer', 'PerGroupCB', 'SanitizeLonLatCB', 'RemoveAllNAValuesCB', 'RemapCB',
            'LowerStripNameCB', 'AddSampleTypeIdColumnCB', 'RenameColumnsCB', 'MeltWideNuclidesCB', 'AddSampleIDCB',
-           'UniqueIndexCB', 'CompareDfsAndTfmCB', 'ParseTimeCB', 'EncodeTimeCB', 'DecodeTimeCB']
+           'UniqueIndexCB', 'ParseTimeCB', 'EncodeTimeCB', 'DecodeTimeCB']
 
 # %% ../nbs/api/callbacks.ipynb #4e58c73c
 class Callback():
@@ -243,41 +243,6 @@ class UniqueIndexCB(PerGroupCB):
     def __init__(self, index_name='ID'): store_attr()
 
     def each_grp(self, grp, df, tfm): tfm.dfs[grp] = df.reset_index(drop=True).reset_index(names=[self.index_name])
-
-# %% ../nbs/api/callbacks.ipynb #8cf07327
-class CompareDfsAndTfmCB(Callback):
-    "Create a dataframe of removed data and track changes in row counts due to transformations"  # TODO: refactor - too long
-    def __init__(self,
-        dfs: dict[str, pd.DataFrame]  # Original dataframes
-    ):
-        store_attr()
-
-    def __call__(self, tfm: Transformer) -> None:
-        self._initialize_tfm_attributes(tfm)
-        for grp in tfm.dfs.keys(): self._compute_changes(grp, tfm)
-
-    def _initialize_tfm_attributes(self, tfm: Transformer) -> None:
-        tfm.dfs_removed = {}
-        tfm.compare_stats = {}
-
-    def _compute_changes(self,
-        grp: str,  # The group key
-        tfm: Transformer  # The transformation object containing `dfs`
-    ) -> None:
-        "Compute and store changes including data removed and created during transformation."
-        original_df = self.dfs[grp]
-        transformed_df = tfm.dfs[grp]
-
-        # Calculate differences
-        original_count = len(original_df.index)
-        transformed_count = len(transformed_df.index)
-        removed_count = len(original_df.index.difference(transformed_df.index))
-        created_count = len(transformed_df.index.difference(original_df.index))
-
-        # Store results
-        tfm.dfs_removed[grp] = original_df.loc[original_df.index.difference(transformed_df.index)]
-        tfm.compare_stats[grp] = {'Original row count (dfs)': original_count, 'Transformed row count (tfm.dfs)': transformed_count,
-            'Rows removed from original (tfm.dfs_removed)': removed_count, 'Rows created in transformed (tfm.dfs_created)': created_count}
 
 # %% ../nbs/api/callbacks.ipynb #c787de45
 class ParseTimeCB(PerGroupCB):

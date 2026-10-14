@@ -17,7 +17,7 @@ import numpy as np
 
 from ..configs import NA, NC_DTYPES, get_lut
 from ..match import uniq_across_dfs, lut_from, fuzzy_merge, fix_lut, make_lut
-from ..callbacks import Callback, PerGroupCB, Transformer, EncodeTimeCB, LowerStripNameCB, SanitizeLonLatCB, CompareDfsAndTfmCB, RemapCB, RemoveAllNAValuesCB
+from ..callbacks import Callback, PerGroupCB, Transformer, EncodeTimeCB, LowerStripNameCB, SanitizeLonLatCB, RemapCB, RemoveAllNAValuesCB
 from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder
 from ..nc2csv import to_csv

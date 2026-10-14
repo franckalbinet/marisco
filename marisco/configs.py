@@ -7,7 +7,7 @@ Docs: https://franckalbinet.github.io/marisco/api/configs.html.md"""
 # %% auto #0
 __all__ = ['AVOGADRO', 'NA', 'NC_DIM', 'NC_CSV', 'NC_VARS', 'CSV_VARS', 'NC_GROUPS', 'SMP_TYPE_LUT', 'NC_DTYPES', 'CSV_DTYPES',
            'ZOTERO_LIB_ID', 'NC_GLOBAL_ATTRS', 'NETCDF_TO_PYTHON_TYPE', 'lut_path', 'lut_fname', 'nc_tpl_path',
-           'cache_path', 'get_time_units', 'sanitize', 'try_int', 'get_lut', 'Enums']
+           'get_time_units', 'sanitize', 'try_int', 'get_lut', 'Enums']
 
 # %% ../nbs/api/configs.ipynb #3f92bc7b
 from pathlib import Path
@@ -213,13 +213,6 @@ def lut_fname(
 def nc_tpl_path() -> Path:           # Path to MARIS NetCDF template
     "Return the path to the MARIS NetCDF template file"
     return _pkg_files('marisco') / 'files/nc/maris-template.nc'
-
-# %% ../nbs/api/configs.ipynb #4dca0ad3
-def cache_path() -> Path: # Path to cache directory
-    "Return the path to the cache directory, creating it if needed"
-    p = Path.home() / '.cache' / 'marisco'
-    p.mkdir(parents=True, exist_ok=True)
-    return p
 
 # %% ../nbs/api/configs.ipynb #f63b3971
 NETCDF_TO_PYTHON_TYPE = {'u8': int, 'f4': float}

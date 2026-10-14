@@ -18,7 +18,7 @@ import pandas as pd
 import numpy as np
 import re
 
-from ..configs import NA, NC_DTYPES, get_lut, lut_path, cache_path
+from ..configs import NA, NC_DTYPES, get_lut, lut_path
 from ..match import uniq_across_dfs, lut_from, fuzzy_merge, fix_lut, make_lut, make_lut_from
 from ..geo import ddmm_to_dd
 from ..callbacks import Callback, PerGroupCB, Transformer, EncodeTimeCB, LowerStripNameCB, SanitizeLonLatCB, CompareDfsAndTfmCB, RemapCB

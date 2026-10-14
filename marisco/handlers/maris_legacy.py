@@ -19,7 +19,7 @@ from ..callbacks import (
 
 from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, ZoteroCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder
-from ..configs import NA, NC_DTYPES, get_lut, lut_path, cache_path
+from ..configs import NA, NC_DTYPES, get_lut, lut_path
 from ..match import uniq_across_dfs, lut_from, fuzzy_merge, fix_lut, make_lut, make_lut_from, parse_ref_ids
 from ..geo import ddmm_to_dd
 

@@ -26,9 +26,6 @@ from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, Zoter
 from ..encoders import NetCDFEncoder
 from ..nc2csv import to_csv
 
-import warnings
-warnings.filterwarnings('ignore')
-
 # %% ../../nbs/handlers/helcom.ipynb #715e849d
 src_dir = 'https://raw.githubusercontent.com/franckalbinet/maris-crawlers/refs/heads/main/data/processed/HELCOM%20MORS'
 zotero_key ='26VMZZ2Q' # HELCOM MORS zotero key

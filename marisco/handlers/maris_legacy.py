@@ -23,9 +23,6 @@ from ..configs import NA, NC_DTYPES, get_lut, lut_path
 from ..match import uniq_across_dfs, lut_from, fuzzy_merge, fix_lut, make_lut, make_lut_from, parse_ref_ids
 from ..geo import ddmm_to_dd
 
-import warnings
-warnings.filterwarnings('ignore')
-
 # %% ../../nbs/handlers/maris_legacy.ipynb #d02bf0a9
 #fname_in = Path().home() / 'pro/data/maris/2025-06-03 MARIS_QA_shapetype_id = 1.txt'
 fname_in = '../../_data/2025-06-03-MARIS-QA.txt'

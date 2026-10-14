@@ -10,24 +10,23 @@ __all__ = ['get_bbox', 'ddmm_to_dd']
 # %% ../nbs/api/geo.ipynb #9a6d74ff
 from math import modf
 from fastcore.all import *
-import numpy as np
 import pandas as pd
 from shapely import MultiPoint
-from typing import Tuple
+from shapely.geometry.base import BaseGeometry
 
 # %% ../nbs/api/geo.ipynb #85d76742
-def get_bbox(df: pd.DataFrame,                                # DataFrame with coordinate columns
-             coord_cols: Tuple[str, str] = ('LON', 'LAT')     # Column names for (longitude, latitude)
-            ) -> MultiPoint:                                  # Bounding box as a shapely envelope
-    "Bounding box of a DataFrame's coordinates as a shapely envelope (Polygon)"
-    x, y = coord_cols        
-    arr = [(row[x], row[y]) for _, row in df.iterrows()]
-    return MultiPoint(arr).envelope
+def get_bbox(
+    df: pd.DataFrame, # DataFrame with coordinate columns
+    coord_cols: tuple[str, str]=('LON', 'LAT') # Column names for (longitude, latitude)
+) -> BaseGeometry: # Envelope: a Polygon, or a Point when all coordinates are equal
+    "Bounding box of a DataFrame's coordinates as a shapely envelope"
+    return MultiPoint(df[list(coord_cols)].to_numpy()).envelope
 
 
 # %% ../nbs/api/geo.ipynb #ba4de56f
-def ddmm_to_dd(ddmmmm:float  # Coord in DDMM.MMMM format (e.g. 45.34 → 45°34')
-              )->float:      # Same coord in decimal degrees
+def ddmm_to_dd(
+    ddmmmm: float # Coord in DDMM.MMMM format (e.g. 45.34 → 45°34')
+) -> float: # Same coord in decimal degrees
     "Convert DDMM.MMMM to decimal degrees"
     mins, degs = modf(ddmmmm)
     return round(int(degs) + mins*100/60, 6)

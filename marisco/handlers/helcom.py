@@ -7,8 +7,8 @@ __all__ = ['src_dir', 'zotero_key', 'status', 'default_smp_types', 'fixes_nuclid
            'coi_val', 'coi_units_unc', 'lut_units', 'coi_dl', 'provider_lut_species', 'fixes_species', 'species_lut',
            'provider_lut_tissues', 'fixes_biota_tissues', 'lut_tissues', 'lut_biogroup', 'provider_lut_sed',
            'fixes_sediments', 'sed_replace_lut', 'sediment_lut', 'lut_filtered', 'basis_fix', 'kw', 'load_data',
-           'ParseTimeCB', 'MeltSedimentValuesCB', 'SanitizeValueCB', 'NormalizeUncCB', 'RemapUnitCB',
-           'RemapDetectionLimitCB', 'CleanSedimentCodesCB', 'AddSampleIDCB', 'AddDepthCB', 'AddSalinityCB',
+           'ParseHelcomTimeCB', 'MeltSedimentValuesCB', 'SanitizeValueCB', 'NormalizeUncCB', 'RemapUnitCB',
+           'RemapDetectionLimitCB', 'CleanSedimentCodesCB', 'AddHelcomSampleIDCB', 'AddDepthCB', 'AddSalinityCB',
            'AddStationCB', 'AddTemperatureCB', 'RemapSedSliceTopBottomCB', 'CleanBasisCB', 'PercentWeightCB',
            'WeightCB', 'ParseCoordinatesCB', 'get_cbs', 'get_attrs', 'encode']
 
@@ -73,7 +73,7 @@ fixes_nuclide_names = {
 nuclide_lut = make_lut('NUCLIDE', fixes=fixes_nuclide_names)
 
 # %% ../../nbs/handlers/helcom.ipynb #1a682a3e
-class ParseTimeCB(PerGroupCB):
+class ParseHelcomTimeCB(PerGroupCB):
     "Parse HELCOM DATE (MM/DD/YY HH:MM:SS) with fallback to YEAR/MONTH/DAY"
     def each_grp(self, grp, df, tfm):
         df['TIME'] = pd.to_datetime(df['date'], format='%m/%d/%y %H:%M:%S', errors='coerce')
@@ -267,7 +267,7 @@ lut_filtered = {
 }
 
 # %% ../../nbs/handlers/helcom.ipynb #b030cb94
-class AddSampleIDCB(PerGroupCB):
+class AddHelcomSampleIDCB(PerGroupCB):
     "Assign internal sequential SMP_ID and preserve provider KEY as SMP_ID_PROVIDER"
     def each_grp(self, grp, df, tfm):
         df['SMP_ID'] = range(1, len(df) + 1)
@@ -371,7 +371,7 @@ def get_cbs() -> list:
         RemapCB(lut=nuclide_lut, col_remap='NUCLIDE', col_src='NUCLIDE'),
 
         # Time
-        ParseTimeCB(),
+        ParseHelcomTimeCB(),
         EncodeTimeCB(),
 
         # Value columns (sediment melt, value, uncertainty)
@@ -396,7 +396,7 @@ def get_cbs() -> list:
         RemapCB(lut=lut_filtered, col_remap='FILT', col_src='filt', grps=['SEAWATER']),
 
         # Sample identifiers
-        AddSampleIDCB(),
+        AddHelcomSampleIDCB(),
 
         # Depth, salinity, temperature
         AddDepthCB(),

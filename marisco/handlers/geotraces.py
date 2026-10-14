@@ -6,8 +6,8 @@
 __all__ = ['fname_in', 'zotero_key', 'status', 'load_data', 'common_coi', 'nuclides_pattern', 'phase', 'smp_method',
            'nuclides_name', 'units_lut', 'renaming_rules', 'lut_nuclides', 'kw', 'SelectColsOfInterestCB',
            'WideToLongCB', 'ExtractUnitCB', 'ExtractFilteringStatusCB', 'ExtractSamplingMethodCB', 'RenameNuclideCB',
-           'StandardizeUnitCB', 'RenameColumnCB', 'UnshiftLongitudeCB', 'DispatchToGroupCB', 'AddSampleIDCB', 'get_cbs',
-           'get_attrs', 'encode']
+           'StandardizeUnitCB', 'RenameColumnCB', 'UnshiftLongitudeCB', 'DispatchToGroupCB', 'AddGeotracesSampleIDCB',
+           'get_cbs', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/geotraces.ipynb #3a8d979f
 from fastcore.all import *
@@ -244,7 +244,7 @@ class DispatchToGroupCB(Callback):
             tfm.dfs[key] = tfm.dfs[key].drop(self.group_name, axis=1)
 
 # %% ../../nbs/handlers/geotraces.ipynb #6da45d74
-class AddSampleIDCB(PerGroupCB):
+class AddGeotracesSampleIDCB(PerGroupCB):
     "Assign a sequential SMP_ID per sample-type group; cast SMP_ID_PROVIDER (BODC Bottle Number) to string for NetCDF VLEN compatibility"
     def each_grp(self,
                  grp: str,          # Group key e.g. 'SEAWATER', 'SUSPENDED_MATTER'
@@ -273,7 +273,7 @@ def get_cbs() -> list:
         RenameColumnCB(renaming_rules),
         UnshiftLongitudeCB(),
         DispatchToGroupCB(),
-        AddSampleIDCB(),
+        AddGeotracesSampleIDCB(),
         ParseTimeCB(),
         EncodeTimeCB(),
         SanitizeLonLatCB(),

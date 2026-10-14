@@ -4,7 +4,7 @@
 
 # %% auto #0
 __all__ = ['fname_in', 'status', 'lut_smp_type', 'cois_renaming_rules', 'lut_dl', 'kw', 'DataLoader', 'get_zotero_key',
-           'get_fname', 'CastStationToStringCB', 'DropNAColumnsCB', 'AddSampleIDCB', 'get_attrs']
+           'get_fname', 'CastStationToStringCB', 'DropNAColumnsCB', 'CastSampleIDCB', 'get_attrs']
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #3a8d979f
 from fastcore.all import *
@@ -126,7 +126,7 @@ class DropNAColumnsCB(PerGroupCB):
 lut_dl = get_lut('DL', key='name', value='id')
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #e5352604
-class AddSampleIDCB(PerGroupCB):
+class CastSampleIDCB(PerGroupCB):
     "Cast SMP_ID to int and SMP_ID_PROVIDER to string (renamed from samplabcode in the pipeline)"
     def each_grp(self, grp, df, tfm):
         df['SMP_ID'] = df['SMP_ID'].astype(int)

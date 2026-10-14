@@ -5,10 +5,10 @@
 # %% auto #0
 __all__ = ['src_dir', 'zotero_key', 'status', 'default_smp_types', 'nan_cols_to_check', 'fixes_nuclide_names', 'nuclide_lut',
            'coi_val', 'coi_unc', 'lut_units', 'coi_dl', 'lut_dl', 'fixes_species', 'species_lut',
-           'lut_biogroup_species', 'fixes_body_part', 'body_part_lut', 'lut_biogroup', 'kw', 'load_data', 'ParseTimeCB',
-           'SanitizeValueCB', 'NormalizeUncCB', 'RemapUnitCB', 'RemapDetectionLimitCB', 'EnhanceSpeciesCB',
-           'NormalizeBodyPartCB', 'AddSampleIDCB', 'AddDepthCB', 'dms_to_dd', 'ParseCoordinatesCB', 'AddStationCB',
-           'get_cbs', 'get_attrs', 'encode']
+           'lut_biogroup_species', 'fixes_body_part', 'body_part_lut', 'lut_biogroup', 'kw', 'load_data',
+           'ParseOsparTimeCB', 'SanitizeValueCB', 'NormalizeUncCB', 'RemapUnitCB', 'RemapDetectionLimitCB',
+           'EnhanceSpeciesCB', 'NormalizeBodyPartCB', 'AddOsparSampleIDCB', 'AddDepthCB', 'dms_to_dd',
+           'ParseCoordinatesCB', 'AddStationCB', 'get_cbs', 'get_attrs', 'encode']
 
 # %% ../../nbs/handlers/ospar.ipynb #3a8d979f
 from fastcore.all import *
@@ -72,7 +72,7 @@ fixes_nuclide_names = {
 nuclide_lut = make_lut('NUCLIDE', fixes=fixes_nuclide_names)
 
 # %% ../../nbs/handlers/ospar.ipynb #8b105f65
-class ParseTimeCB(PerGroupCB):
+class ParseOsparTimeCB(PerGroupCB):
     "Parse OSPAR `sampling date` (MM/DD/YY HH:MM:SS) into TIME"
     def each_grp(self, grp, df, tfm):
         df['TIME'] = pd.to_datetime(df['sampling date'], format='%m/%d/%y %H:%M:%S', errors='coerce')
@@ -222,7 +222,7 @@ body_part_lut = make_lut('BODY_PART', fixes=fixes_body_part)
 lut_biogroup = get_lut('SPECIES', key='species_id', value='biogroup_id')
 
 # %% ../../nbs/handlers/ospar.ipynb #ab23d0cb
-class AddSampleIDCB(PerGroupCB):
+class AddOsparSampleIDCB(PerGroupCB):
     "Assign internal sequential SMP_ID and preserve OSPAR `sample id` as SMP_ID_PROVIDER"
     def each_grp(self, grp, df, tfm):
         df['SMP_ID'] = range(1, len(df) + 1)
@@ -269,7 +269,7 @@ def get_cbs() -> list:
         LowerStripNameCB(col_src='nuclide', col_dst='NUCLIDE'),
         RemapCB(lut=nuclide_lut, col_remap='NUCLIDE', col_src='NUCLIDE'),
         # Time
-        ParseTimeCB(),
+        ParseOsparTimeCB(),
         EncodeTimeCB(),
         # Value, uncertainty, unit and detection limit
         SanitizeValueCB(coi_val),
@@ -289,7 +289,7 @@ def get_cbs() -> list:
         SanitizeLonLatCB(),
         AddStationCB(),
         # Sample identifiers, once all record drops are done
-        AddSampleIDCB()
+        AddOsparSampleIDCB()
     ]
 
 # %% ../../nbs/handlers/ospar.ipynb #104bf6d8

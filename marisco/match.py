@@ -1,4 +1,4 @@
-"""Nomenclature reconciliation: fuzzy matching, lookup tables, and external API resolution.
+"""Nomenclature reconciliation: fuzzy matching provider codes against MARIS lookup tables.
 
 Docs: https://franckalbinet.github.io/marisco/api/match.html.md"""
 
@@ -8,74 +8,67 @@ Docs: https://franckalbinet.github.io/marisco/api/match.html.md"""
 __all__ = ['uniq_across_dfs', 'lut_from', 'fuzzy_merge', 'fix_lut', 'make_lut_from', 'make_lut', 'parse_ref_ids']
 
 # %% ../nbs/api/match.ipynb #a8d5cbaf
-import sys
-from pathlib import Path
-from dataclasses import dataclass
-from math import modf
+import warnings
+from typing import Callable
 from fastcore.all import *
 import pandas as pd
-import numpy as np
-from tqdm import tqdm
-import requests
-from jellyfish import levenshtein_distance, jaro_winkler_similarity
-from typing import List, Dict, Callable, Tuple, Optional, Union
-from .configs import cache_path, lut_fname, NC_DTYPES, get_lut
+from jellyfish import levenshtein_distance
+from .configs import NC_DTYPES, get_lut
 
 # %% ../nbs/api/match.ipynb #d43d3e58
-def uniq_across_dfs(dfs:Dict[str,pd.DataFrame],  # Dict of group DataFrames
-                    col:str,                      # Column to extract unique values from
-                   )->list:                      # Unique values across all group DataFrames
-    "Unique column values across all group DataFrames"
+def uniq_across_dfs(
+    dfs:dict[str, pd.DataFrame], # Group name to DataFrame, e.g. `{'SEAWATER': df}`
+    col:str # Column to collect values from
+) -> list: # Distinct values, in no particular order
+    "Distinct values of `col` across all group DataFrames, skipping groups without it"
     return list(set().union(*(df[col].unique() for df in dfs.values() if col in df.columns)))
 
 # %% ../nbs/api/match.ipynb #62f0f918
 def lut_from(
-        dfs: Dict[str, pd.DataFrame], # Dict of group DataFrames
-        col: str,                     # Column to extract unique values from
-        incl_nchars: bool=False       # Include n_chars column?
-        ) -> pd.DataFrame:            # Source lookup table
-    "Build a source lookup table from unique values across all DataFrames, skipping missing values"
+    dfs:dict[str, pd.DataFrame], # Group name to DataFrame, e.g. `{'SEAWATER': df}`
+    col:str, # Column to collect values from
+    incl_nchars:bool=False # Add an `n_chars` column with each value's length?
+) -> pd.DataFrame: # Provider table with a sorted `value` column
+    "Provider table of the distinct, non-missing values of `col` across all groups"
     vals = sorted(v for v in uniq_across_dfs(dfs, col) if pd.notna(v))
     df = pd.DataFrame(vals, columns=['value'])
     if incl_nchars: df['n_chars'] = df['value'].str.len()
     return df
 
 # %% ../nbs/api/match.ipynb #d70e5adf
-def fuzzy_merge(left: pd.DataFrame,        # Left DataFrame (provider codes)
-                right: pd.DataFrame,       # Right DataFrame (MARIS references)
-                left_on: str='value',      # Column in `left` to match on
-                right_on: str='name',      # Column in `right` to match on
-                dist_fn: Callable=levenshtein_distance,  # Distance/similarity function
-                lowercase: bool=True,      # Normalise strings to lowercase before comparing?
-               ) -> pd.DataFrame:          # Left rows augmented with best right match + score
-    "For each row in left, find closest row in right by dist_fn"
-    rows = []
-    for _, lrow in left.iterrows():
-        best_d = float('inf')
-        best_rrow = None
-        for _, rrow in right.iterrows():
-            d = dist_fn(lrow[left_on].lower() if lowercase else lrow[left_on],
-                        rrow[right_on].lower() if lowercase else rrow[right_on])
-            if d < best_d:
-                best_d = d
-                best_rrow = rrow
-        rows.append({**lrow.to_dict(), **best_rrow.to_dict(), 'score': best_d})
-    return pd.DataFrame(rows)
+def fuzzy_merge(
+    left:pd.DataFrame, # Provider table
+    right:pd.DataFrame, # MARIS reference table
+    left_on:str='value', # Column in `left` to match on
+    right_on:str='name', # Column in `right` to match on
+    dist_fn:Callable=levenshtein_distance, # Distance function, where lower means closer
+    lowercase:bool=True # Compare in lowercase?
+) -> pd.DataFrame: # `left` rows with the columns of their closest `right` row and a `score`
+    "Pair each row of `left` with the closest row of `right` by `dist_fn`"
+    norm = str.lower if lowercase else noop
+    rrecs = right.to_dict('records')
+    rvals = [norm(r[right_on]) for r in rrecs]
+    def _best(lrec):
+        ds = [dist_fn(norm(lrec[left_on]), rv) for rv in rvals]
+        i = min(range(len(ds)), key=ds.__getitem__)
+        return {**lrec, **rrecs[i], 'score': ds[i]}
+    return pd.DataFrame([_best(o) for o in left.to_dict('records')])
 
 # %% ../nbs/api/match.ipynb #5f728fe5
-def fix_lut(merged: pd.DataFrame,
-            overrides: dict,
-            maris: pd.DataFrame,
-            left_on: str,
-            right_on: str,
-            id_col: str,
-           ) -> pd.DataFrame:
+def fix_lut(
+    merged:pd.DataFrame, # Output of `fuzzy_merge`
+    overrides:dict, # Expert overrides: {provider value: MARIS name}
+    maris:pd.DataFrame, # MARIS reference table
+    left_on:str, # Provider value column
+    right_on:str, # MARIS name column
+    id_col:str # MARIS id column
+) -> pd.DataFrame: # Copy of `merged` with the overridden rows corrected and scored 0
     "Replace matched entries with expert overrides by name"
     merged = merged.copy()
     for src_val, target_name in overrides.items():
         mask_ref = maris[right_on] == target_name
         if not mask_ref.any():
-            print(f"Warning: '{target_name}' not found in MARIS {right_on} table — skipping override for '{src_val}'", file=sys.stderr, flush=True)
+            warnings.warn(f"'{target_name}' not found in MARIS {right_on} table, skipping override for '{src_val}'")
             continue
         mid = maris.loc[mask_ref, id_col].iloc[0]
         mask = merged[left_on] == src_val
@@ -84,13 +77,13 @@ def fix_lut(merged: pd.DataFrame,
 
 # %% ../nbs/api/match.ipynb #7111b0dd
 def make_lut_from(
-    mk_prov,           # Callable(dict->DataFrame) or static provider DataFrame
-    key_col:str,        # Column name for the Lut key (source value to look up)
-    match_col:str,      # Column in provider LUT to fuzzy-match against MARIS ref
-    lut_key:str,        # NC_DTYPES key for the MARIS ref LUT to reconcile against, e.g. 'NUCLIDE' or 'SPECIES'
-    fixes:dict=None,    # Expert overrides: {source_value: maris_name}
-    ) -> Callable:       # Function dict->dict: takes dfs, returns lookup dict
-    "Factory: returns a callable that builds a lookup dict from provider data at call time"
+    mk_prov, # Function from `dfs` to the provider table, or the table itself
+    key_col:str, # Provider column the data uses, which becomes the lookup key
+    match_col:str, # Provider column matched against the MARIS names
+    lut_key:str, # `NC_DTYPES` key of the MARIS table, e.g. `'NUCLIDE'` or `'SPECIES'`
+    fixes:dict|None=None # Expert overrides: {`match_col` value: MARIS name}
+) -> Callable: # Function from `dfs` to a {provider value: MARIS id} dict
+    "Lookup builder that matches a provider table against a MARIS table when called"
     cfg, maris = NC_DTYPES[lut_key], get_lut(lut_key, as_df=True)
     def _lut(dfs):
         prov = mk_prov(dfs) if callable(mk_prov) else mk_prov
@@ -101,17 +94,17 @@ def make_lut_from(
 
 # %% ../nbs/api/match.ipynb #1630669d
 def make_lut(
-        lut_key:str, # NC_DTYPES key for the MARIS ref. LUT to reconcile against, e.g. 'NUCLIDE' or 'SPECIES'
-        fixes:dict=None, # Expert overrides: {source_value: maris_name}
-        ) -> Callable: # Function dict->dict: takes dfs, returns lookup dict
-    "Convenience: derives provider LUT from dfs dict via lut_from, then wraps in make_lut_from"
+    lut_key:str, # `NC_DTYPES` key of the MARIS table, and the `dfs` column holding the provider values
+    fixes:dict|None=None # Expert overrides: {provider value: MARIS name}
+) -> Callable: # Function from `dfs` to a {provider value: MARIS id} dict
+    "Lookup builder for providers without a nomenclature table: matches the values found in `dfs`"
     return make_lut_from(lambda dfs: lut_from(dfs, lut_key), 'value', 'value', lut_key, fixes)
 
 # %% ../nbs/api/match.ipynb #c9818fb4
 def parse_ref_ids(
-    ref_ids,  # Comma-separated string of ints, or list of ints; None to return all valid ids
-    valid=None  # Optional collection of known-good ids to validate against
-) -> list:  # List of ints
+    ref_ids:str|list[int]|None, # Comma-separated ids, a list of ids, or None for all valid ids
+    valid:list[int]|None=None # Known ids to check against
+) -> list[int]: # Parsed ids
     "Parse `ref_ids` into a list of ints, optionally checked against `valid`"
     if ref_ids is None: return list(valid) if valid is not None else []
     if isinstance(ref_ids, str):

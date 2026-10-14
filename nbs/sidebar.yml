@@ -32,4 +32,5 @@ website:
           - api/match.ipynb
           - api/geo.ipynb
           - api/nc2csv.ipynb
+          - reference/callback-inventory.ipynb
       

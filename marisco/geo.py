@@ -22,7 +22,6 @@ def get_bbox(
     "Bounding box of a DataFrame's coordinates as a shapely envelope"
     return MultiPoint(df[list(coord_cols)].to_numpy()).envelope
 
-
 # %% ../nbs/api/geo.ipynb #ba4de56f
 def ddmm_to_dd(
     ddmmmm: float # Coord in DDMM.MMMM format (e.g. 45.34 → 45°34')
@@ -30,4 +29,3 @@ def ddmm_to_dd(
     "Convert DDMM.MMMM to decimal degrees"
     mins, degs = modf(ddmmmm)
     return round(int(degs) + mins*100/60, 6)
-

@@ -89,13 +89,10 @@ def make_lut_from(
     match_col:str,      # Column in provider LUT to fuzzy-match against MARIS ref
     lut_key:str,        # NC_DTYPES key for the MARIS ref LUT to reconcile against, e.g. 'NUCLIDE' or 'SPECIES'
     fixes:dict=None,    # Expert overrides: {source_value: maris_name}
-    cache_tag:str=None, # If set, cache `merged` as `{cache_tag}.pkl` under cache_path()
     ) -> Callable:       # Function dict->dict: takes dfs, returns lookup dict
     "Factory: returns a callable that builds a lookup dict from provider data at call time"
     cfg, maris = NC_DTYPES[lut_key], get_lut(lut_key, as_df=True)
     def _lut(dfs):
-        cf = cache_path() / f'{cache_tag}.pkl' if cache_tag else None
-        if cf and cf.exists(): return pd.read_pickle(cf)
         prov = mk_prov(dfs) if callable(mk_prov) else mk_prov
         m = fuzzy_merge(prov, maris, left_on=match_col, right_on=cfg['key'])
         if fixes: m = fix_lut(m, fixes, maris, left_on=match_col, right_on=cfg['key'], id_col=cfg['value'])
@@ -106,10 +103,9 @@ def make_lut_from(
 def make_lut(
         lut_key:str, # NC_DTYPES key for the MARIS ref. LUT to reconcile against, e.g. 'NUCLIDE' or 'SPECIES'
         fixes:dict=None, # Expert overrides: {source_value: maris_name}
-        cache_tag:str=None, # If set, cache `merged` as `{cache_tag}.pkl`
         ) -> Callable: # Function dict->dict: takes dfs, returns lookup dict
     "Convenience: derives provider LUT from dfs dict via lut_from, then wraps in make_lut_from"
-    return make_lut_from(lambda dfs: lut_from(dfs, lut_key), 'value', 'value', lut_key, fixes, cache_tag)
+    return make_lut_from(lambda dfs: lut_from(dfs, lut_key), 'value', 'value', lut_key, fixes)
 
 # %% ../nbs/api/match.ipynb #c9818fb4
 def parse_ref_ids(

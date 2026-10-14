@@ -24,8 +24,8 @@ from ..match import uniq_across_dfs, lut_from, fuzzy_merge, fix_lut, make_lut, m
 from ..geo import ddmm_to_dd
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #d02bf0a9
-#fname_in = Path().home() / 'pro/data/maris/2025-06-03 MARIS_QA_shapetype_id = 1.txt'
-fname_in = '../../_data/2025-06-03-MARIS-QA.txt'
+fname_in = Path().home() / 'pro/data/maris/2025-06-03 MARIS_QA_shapetype_id = 1.txt'
+# fname_in = '../../_data/2025-06-03-MARIS-QA.txt'
 status = 'Active'
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #15a3a9c8
@@ -110,19 +110,17 @@ class CastStationToStringCB(PerGroupCB):
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #819703e6
 class DropNAColumnsCB(PerGroupCB):
-    "Drop variable containing only NaN or 'Not available' (id=0 in MARIS lookup tables)"
-    def __init__(
-        self, 
-        na_value:int=0  # MARIS NA id to drop (default 0)
-        ): store_attr()
-    def isMarisNA(self, col:pd.Series )->bool:              
-        return len(col.unique()) == 1 and col.iloc[0] == self.na_value
-    def dropMarisNA(self, df:pd.DataFrame)->pd.DataFrame:        
-        na_cols = [col for col in df.columns if self.isMarisNA(df[col])]
-        return df.drop(labels=na_cols, axis=1)
-    def each_grp(self, grp:str, df:pd.DataFrame, tfm:Transformer):   
-        tfm.dfs[grp] = df.dropna(axis=1, how="all")
-        tfm.dfs[grp] = self.dropMarisNA(tfm.dfs[grp])
+    "Drop columns containing only NaN or 'Not available' (id=0 in MARIS lookup tables), except those in `keep`"
+    def __init__(self,
+        na_value:int=0, # MARIS NA id to drop
+        keep:tuple=('SMP_ID_PROVIDER',) # Columns to keep even when empty
+    ): store_attr()
+    def isMarisNA(self, col:pd.Series)->bool: return len(col.unique()) == 1 and col.iloc[0] == self.na_value
+    def dropMarisNA(self, df:pd.DataFrame)->pd.DataFrame:
+        return df.drop(columns=[c for c in df.columns if c not in self.keep and self.isMarisNA(df[c])])
+    def each_grp(self, grp:str, df:pd.DataFrame, tfm:Transformer):
+        empty = [c for c in df.columns if c not in self.keep and df[c].isna().all()]
+        tfm.dfs[grp] = self.dropMarisNA(df.drop(columns=empty))
 
 # %% ../../nbs/handlers/maris_legacy.ipynb #0c0f2450
 lut_dl = get_lut('DL', key='name', value='id')

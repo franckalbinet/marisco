@@ -2,6 +2,19 @@
 
 <!-- do not remove -->
 
+## 1.11.1
+
+### Breaking Changes
+
+- `Transformer` accepts only a dict of DataFrames keyed by group name. It no longer accepts a single DataFrame, and `tfm.df` and `tfm.is_single_df` are removed. To process a flat table, load it as one group, such as `{'RAW': df}`, and split it into MARIS groups before encoding, as `geotraces` does ([#70](https://github.com/franckalbinet/marisco/issues/70))
+
+### Bugs Squashed
+
+- `PerGroupCB` callbacks fail when `Transformer` holds a single DataFrame ([#70](https://github.com/franckalbinet/marisco/issues/70))
+- `NetCDFEncoder` checks that every group name is in `NC_GROUPS` before it writes any file. Before, an unknown name raised a bare `KeyError` partway through encoding and left a partial file ([#70](https://github.com/franckalbinet/marisco/issues/70))
+- `geotraces.load_data` reads the file it is given. Before, it ignored its `fname` argument and read `fname_in`
+
+
 ## 1.11.0
 
 ### Breaking Changes

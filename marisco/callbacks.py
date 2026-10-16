@@ -36,25 +36,20 @@ def run_cbs(
 
 # %% ../nbs/api/callbacks.ipynb #82a6611d
 class Transformer():
-    "Transform the dataframe(s) according to the specified callbacks"
+    "Transform groups of dataframes according to the specified callbacks"
     def __init__(self,
-        data: dict[str, pd.DataFrame]|pd.DataFrame, # Data to be transformed
+        data: dict[str, pd.DataFrame], # Groups to transform, keyed by group name
         cbs: list[Callback]|None=None, # List of callbacks to run
-        inplace: bool=False # Whether to modify the dataframe(s) in place
+        inplace: bool=False # Whether to modify the groups in place
     ):
         store_attr()
-        self.is_single_df = isinstance(data, pd.DataFrame)
-        self.df, self.dfs = self._prepare_data(data, inplace)
+        self.dfs = data if inplace else {k: v.copy() for k, v in data.items()}
         self.logs = []
 
-    def _prepare_data(self, data, inplace):
-        if self.is_single_df: return (data if inplace else data.copy()), None
-        return None, (data if inplace else {k: v.copy() for k, v in data.items()})
-
     def __call__(self):
-        "Transform the dataframe(s) according to the specified callbacks."
+        "Run the callbacks on the groups and return them."
         if self.cbs: run_cbs(self.cbs, self)
-        return self.df if self.dfs is None else self.dfs
+        return self.dfs
 
 # %% ../nbs/api/callbacks.ipynb #a69ecfc0
 @patch
@@ -62,10 +57,8 @@ def unique(self:Transformer,
     col_name: str # Column to read in every group
 ) -> np.ndarray: # Sorted distinct values
     "Distinct non-NA values of `col_name` across all groups"
-    if self.is_single_df: values = self.df.get(col_name, pd.Series()).dropna().values
-    else:
-        columns = [df.get(col_name) for df in self.dfs.values() if df.get(col_name) is not None]
-        values = np.concatenate([col.dropna().values for col in columns]) if columns else []
+    columns = [df.get(col_name) for df in self.dfs.values() if df.get(col_name) is not None]
+    values = np.concatenate([col.dropna().values for col in columns]) if columns else []
     return np.unique(values)
 
 # %% ../nbs/api/callbacks.ipynb #0414ac1d
@@ -144,9 +137,7 @@ class RemapCB(PerGroupCB):
     def _resolve_lut(self, tfm):
         "Resolve the LUT: if a callable, call it with tfm's dfs to produce a dict."
         spec = self.lut
-        if callable(spec):
-            dfs = tfm.dfs if not tfm.is_single_df else {'_': tfm.df}
-            spec = spec(dfs)
+        if callable(spec): spec = spec(tfm.dfs)
         return spec
 
     def __call__(self, tfm):

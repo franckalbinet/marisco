@@ -27,7 +27,7 @@ zotero_key = '97UIMEXN'
 status = 'Active'
 
 # %% ../../nbs/handlers/geotraces.ipynb #70d6efc1
-load_data = lambda fname: pd.read_csv(fname_in)
+load_data = lambda fname: {'RAW': pd.read_csv(fname)}
 
 # %% ../../nbs/handlers/geotraces.ipynb #8d3a7bba-39d7-4fc3-8f0e-fb83ff52dcc2
 # Metadata columns always kept as identifiers when reshaping wide → long
@@ -48,9 +48,9 @@ class SelectColsOfInterestCB(Callback):
                  nuclides_pattern: list  # Regex patterns matching nuclide column names
                  ): store_attr()
     def __call__(self, tfm):
-        nuc_of_interest = [c for c in tfm.df.columns if 
+        nuc_of_interest = [c for c in tfm.dfs['RAW'].columns if 
                            any(re.match(pattern, c) for pattern in self.nuclides_pattern)]
-        tfm.df = tfm.df[self.common_coi + nuc_of_interest]
+        tfm.dfs['RAW'] = tfm.dfs['RAW'][self.common_coi + nuc_of_interest]
 
 # %% ../../nbs/handlers/geotraces.ipynb #b060bb07-5565-4928-8b43-4abc5e64eb97
 class WideToLongCB(Callback):
@@ -64,11 +64,11 @@ class WideToLongCB(Callback):
         store_attr()
         
     def __call__(self, tfm):
-        nuc_of_interest = [c for c in tfm.df.columns if 
+        nuc_of_interest = [c for c in tfm.dfs['RAW'].columns if 
                            any(re.match(pattern, c) for pattern in self.nuclides_pattern)]
-        tfm.df = pd.melt(tfm.df, id_vars=self.common_coi, value_vars=nuc_of_interest, 
+        tfm.dfs['RAW'] = pd.melt(tfm.dfs['RAW'], id_vars=self.common_coi, value_vars=nuc_of_interest, 
                           var_name=self.var_name, value_name=self.value_name)
-        tfm.df.dropna(subset=self.value_name, inplace=True)
+        tfm.dfs['RAW'].dropna(subset=self.value_name, inplace=True)
 
 # %% ../../nbs/handlers/geotraces.ipynb #3e982489-7c69-4b6d-9930-8f786220ad5b
 class ExtractUnitCB(Callback):
@@ -84,7 +84,7 @@ class ExtractUnitCB(Callback):
         return match.group(1) if match else None
         
     def __call__(self, tfm):
-        tfm.df[self.unit_col_name] = tfm.df[self.var_name].apply(self.extract_unit)
+        tfm.dfs['RAW'][self.unit_col_name] = tfm.dfs['RAW'][self.var_name].apply(self.extract_unit)
 
 # %% ../../nbs/handlers/geotraces.ipynb #efb9477e-f593-4d15-b8b8-c073bd6bb590
 # Phase code embedded in column names → FILT status and sample type group
@@ -117,8 +117,8 @@ class ExtractFilteringStatusCB(Callback):
         return self.phase[matched_string.group(1)]['group'] if matched_string else None
         
     def __call__(self, tfm):
-        tfm.df[self.filt_col_name] = tfm.df[self.var_name].apply(self.extract_filt_status)
-        tfm.df['GROUP'] = tfm.df[self.var_name].apply(self.extract_group)
+        tfm.dfs['RAW'][self.filt_col_name] = tfm.dfs['RAW'][self.var_name].apply(self.extract_filt_status)
+        tfm.dfs['RAW']['GROUP'] = tfm.dfs['RAW'][self.var_name].apply(self.extract_group)
 
 # %% ../../nbs/handlers/geotraces.ipynb #e7c79502-f09e-49c0-851b-cdb2eca82eac
 # Sampling method code → MARIS method ID mapping (to be validated)
@@ -143,7 +143,7 @@ class ExtractSamplingMethodCB(Callback):
         return self.smp_method[match.group(1)] if match else None
         
     def __call__(self, tfm):
-        tfm.df[self.smp_method_col_name] = tfm.df[self.var_name].apply(self.extract_smp_method)
+        tfm.dfs['RAW'][self.smp_method_col_name] = tfm.dfs['RAW'][self.var_name].apply(self.extract_smp_method)
 
 # %% ../../nbs/handlers/geotraces.ipynb #8eb5c23c-8930-4100-b9bc-d536d2b8d3b6
 # Provider-specific nuclide name overrides for MARIS standardisation
@@ -168,7 +168,7 @@ class RenameNuclideCB(Callback):
         return self.nuclides_name[s] if s in self.nuclides_name else s.lower().replace('_', '')
         
     def __call__(self, tfm):
-        tfm.df[self.var_name] = tfm.df[self.var_name].apply(self.standardize_name)
+        tfm.dfs['RAW'][self.var_name] = tfm.dfs['RAW'][self.var_name].apply(self.standardize_name)
 
 # %% ../../nbs/handlers/geotraces.ipynb #80145187-bb90-4428-9d31-77a82ec916b4
 # Geotraces unit → MARIS unit ID and conversion factor mapping
@@ -192,11 +192,11 @@ class StandardizeUnitCB(Callback):
         
     def __call__(self, tfm):
         # Convert/rescale values
-        tfm.df[self.var_name] *= tfm.df[self.unit_col_name].map(
+        tfm.dfs['RAW'][self.var_name] *= tfm.dfs['RAW'][self.unit_col_name].map(
             {k: v['factor'] for k, v in self.units_lut.items()})
         
         # Match MARIS unit id
-        tfm.df[self.unit_col_name] = tfm.df[self.unit_col_name].map(
+        tfm.dfs['RAW'][self.unit_col_name] = tfm.dfs['RAW'][self.unit_col_name].map(
             {k: v['id'] for k, v in self.units_lut.items()})
 
 # %% ../../nbs/handlers/geotraces.ipynb #8896686b
@@ -217,8 +217,8 @@ class RenameColumnCB(Callback):
                  lut: dict=renaming_rules  # Provider column name → MARIS standard name mapping
                  ): store_attr()
     def __call__(self, tfm):
-        new_col_names = [self.lut[name] if name in self.lut else name for name in tfm.df.columns]
-        tfm.df.columns = new_col_names
+        new_col_names = [self.lut[name] if name in self.lut else name for name in tfm.dfs['RAW'].columns]
+        tfm.dfs['RAW'].columns = new_col_names
 
 # %% ../../nbs/handlers/geotraces.ipynb #ee266cb0-ad2f-4548-b68b-80d0f33ef403
 class UnshiftLongitudeCB(Callback):
@@ -228,20 +228,18 @@ class UnshiftLongitudeCB(Callback):
                  ): 
         store_attr()
     def __call__(self, tfm):
-        tfm.df[self.lon_col_name] = tfm.df[self.lon_col_name] - 180
+        tfm.dfs['RAW'][self.lon_col_name] = tfm.dfs['RAW'][self.lon_col_name] - 180
 
 # %% ../../nbs/handlers/geotraces.ipynb #347a0371-c6e4-4b7d-b1f8-8ffb00509e42
 class DispatchToGroupCB(Callback):
-    "Split flat dataframe into per-group dict keyed by sample type (SEAWATER, SUSPENDED_MATTER, …)"
+    "Replace the `'RAW'` group with one group per sample type (SEAWATER, SUSPENDED_MATTER, …)"
     def __init__(self,
                  group_name: str='GROUP'  # Column whose distinct values become the output dict keys
                  ): 
         store_attr()
         
     def __call__(self, tfm):
-        tfm.dfs = dict(tuple(tfm.df.groupby(self.group_name)))
-        for key in tfm.dfs:
-            tfm.dfs[key] = tfm.dfs[key].drop(self.group_name, axis=1)
+        tfm.dfs = {k: v.drop(columns=self.group_name) for k, v in tfm.dfs.pop('RAW').groupby(self.group_name)}
 
 # %% ../../nbs/handlers/geotraces.ipynb #6da45d74
 class AddGeotracesSampleIDCB(PerGroupCB):
@@ -316,8 +314,7 @@ def encode(
         ):
     "BODC GEOTRACES oceanographic radionuclide data"
     assert src, "geotraces requires `src`, the path to the raw IDP2021 discrete sample CSV"
-    df = pd.read_csv(src)
-    tfm = Transformer(df, cbs=get_cbs())
+    tfm = Transformer(load_data(src), cbs=get_cbs())
     
     tfm()
     encoder = NetCDFEncoder(tfm.dfs, 

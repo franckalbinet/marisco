@@ -27,6 +27,8 @@ class NetCDFEncoder:
         verbose: bool=False, # Print currently written NetCDF group and variable names
     ):
         store_attr()
+        unknown = set(dfs) - set(NC_GROUPS)
+        if unknown: raise ValueError(f"Unknown group names {sorted(unknown)}; valid names are {list(NC_GROUPS)}")
         self.src_fname = fn_src_fname()
         self.enum_dtypes = {}
         self.nc_to_cols = {v:k for k,v in NC_VARS.items()}

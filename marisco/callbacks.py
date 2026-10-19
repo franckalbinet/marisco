@@ -111,7 +111,7 @@ class RemoveAllNAValuesCB(Callback):
     "Remove rows with all NA values in specified columns"
     def __init__(self,
         cols_to_check: dict[str, list]|list,  # Dict or list of columns to check
-        how: str='all'  # How to handle NA values 'all' or 'any'
+        how: str='any'  # How to handle NA values 'all' or 'any'
     ):
         store_attr()
 

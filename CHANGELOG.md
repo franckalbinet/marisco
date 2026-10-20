@@ -2,6 +2,18 @@
 
 <!-- do not remove -->
 
+## 1.12.0
+
+### Breaking Changes
+
+- Track new TITANICA Zenodo records against encoded datasets ([#86](https://github.com/franckalbinet/marisco/issues/86))
+
+### New Features
+
+- Track new TITANICA Zenodo records against encoded datasets ([#86](https://github.com/franckalbinet/marisco/issues/86))
+- Remove dead code and unused imports ([#73](https://github.com/franckalbinet/marisco/issues/73))
+
+
 ## 1.11.1
 
 ### Breaking Changes

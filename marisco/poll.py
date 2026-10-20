@@ -12,6 +12,7 @@ import pandas as pd
 from importlib import import_module
 from .cli.ingest import handlers
 from .invenio import fetch_latest, community_records
+from .configs import ZENODO_COMMUNITY
 
 # %% ../nbs/api/poll.ipynb #5f1ee981
 def handler_records() -> pd.DataFrame: # One row per record: `handler`, `key` (the `RECORDS` key) and `record_id`
@@ -32,7 +33,7 @@ def check_records(
 # %% ../nbs/api/poll.ipynb #33e55cf9
 def new_datasets(
     checked: pd.DataFrame, # Records, as `check_records` returns them
-    slug: str='titanica' # Zenodo community
+    slug: str=ZENODO_COMMUNITY # Zenodo community
 ) -> pd.DataFrame: # One row per dataset: `record_id` of its latest version, `parent_id`, `created` and `title`
     "Datasets in community `slug` that no handler reads"
     parents = set(checked.parent_id)

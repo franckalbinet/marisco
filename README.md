@@ -101,6 +101,14 @@ NetCDF4 file.
 
 Use `--dest` to choose a different output stem.
 
+### Check Zenodo for new datasets and versions
+
+``` console
+$ marisco-poll
+```
+
+The command lists each Zenodo record that a handler reads and whose dataset has a newer version, with the id of the newer record. It also lists the datasets in the TITANICA Zenodo community that no handler reads. Use `--community` to check another community.
+
 ## Documentation
 
 Documentation is organised into three groups.

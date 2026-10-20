@@ -27,6 +27,7 @@ dev = ['nbdev', 'ipykernel', 'twine', 'toolslm']
 [project.scripts]
 marisco-ingest = "marisco.cli.ingest:main"
 marisco-export = "marisco.cli.export:main"
+marisco-poll = "marisco.cli.poll:main"
 
 [tool.setuptools.dynamic]
 version = {attr = "marisco.__version__"}

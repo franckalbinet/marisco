@@ -571,4 +571,7 @@ d = { 'settings': { 'branch': 'main',
                                 'marisco.nc2csv.map_lut': ('api/nc2csv.html#map_lut', 'marisco/nc2csv.py'),
                                 'marisco.nc2csv.read_nc_grps': ('api/nc2csv.html#read_nc_grps', 'marisco/nc2csv.py'),
                                 'marisco.nc2csv.to_csv': ('api/nc2csv.html#to_csv', 'marisco/nc2csv.py'),
-                                'marisco.nc2csv.to_csv_files': ('api/nc2csv.html#to_csv_files', 'marisco/nc2csv.py')}}}
+                                'marisco.nc2csv.to_csv_files': ('api/nc2csv.html#to_csv_files', 'marisco/nc2csv.py')},
+            'marisco.poll': { 'marisco.poll.check_records': ('api/poll.html#check_records', 'marisco/poll.py'),
+                              'marisco.poll.handler_records': ('api/poll.html#handler_records', 'marisco/poll.py'),
+                              'marisco.poll.new_datasets': ('api/poll.html#new_datasets', 'marisco/poll.py')}}}

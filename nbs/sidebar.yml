@@ -37,6 +37,7 @@ website:
           - api/configs.ipynb
           - api/metadata.ipynb
           - api/invenio.ipynb
+          - api/poll.ipynb
           - api/encoders.ipynb
           - api/match.ipynb
           - api/geo.ipynb

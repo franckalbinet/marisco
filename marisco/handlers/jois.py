@@ -8,28 +8,28 @@ __all__ = ['RECORDS', 'status', 'lut_cols', 'META_COLS', 'VAL_COLS', 'U238_PPB_T
 
 # %% ../../nbs/handlers/jois.ipynb #d541866d
 from fastcore.all import *
-import pandas as pd
-import numpy as np
-import re
-import requests
-import zipfile
-import io
-
-from ..callbacks import PerGroupCB, Callback, Transformer, EncodeTimeCB, SanitizeLonLatCB, RemapCB, AddSampleIDCB
-from ..metadata import GlobAttrsFeeder, ZoteroCB, BboxCB, DepthRangeCB, TimeRangeCB, KeyValuePairCB
+import pandas as pd, re, zipfile, io
+from ..callbacks import PerGroupCB, Transformer, EncodeTimeCB, SanitizeLonLatCB, RemapCB, AddSampleIDCB
+from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder
-from ..nc2csv import to_csv
-from ..configs import get_lut
+from ..invenio import fetch_file
 
 # %% ../../nbs/handlers/jois.ipynb #585e1b91
 RECORDS = {
-    2021: {'url': 'https://zenodo.org/records/18880401/files/annabel-payne/BGOS-JOIS-2021-v1.0.1.zip?download=1'},
-    2022: {'url': 'https://zenodo.org/records/18880777/files/annabel-payne/BGOS-JOIS-2022-v1.0.1.zip?download=1'},
-    2023: {'url': 'https://zenodo.org/records/18880591/files/annabel-payne/BGOS-JOIS-2023-v1.0.zip?download=1'},
-    2024: {'url': 'https://zenodo.org/records/18880497/files/annabel-payne/BGOS-JOIS-2024-v1.0.1.zip?download=1'},
+    2021: {'zenodo': 18880401, 'file': 'annabel-payne/BGOS-JOIS-2021-v1.0.1.zip'},
+    2022: {'zenodo': 18880777, 'file': 'annabel-payne/BGOS-JOIS-2022-v1.0.1.zip'},
+    2023: {'zenodo': 18880591, 'file': 'annabel-payne/BGOS-JOIS-2023-v1.0.zip'},
+    2024: {'zenodo': 18880497, 'file': 'annabel-payne/BGOS-JOIS-2024-v1.0.1.zip'},
 }
 
 status = 'Active'
+
+# %% ../../nbs/handlers/jois.ipynb #f981936f
+def _fetch(rec: dict) -> pd.DataFrame:
+    "Download the ZIP file of `rec`, an entry of `RECORDS`, and read the first sheet of the Excel file inside it"
+    with zipfile.ZipFile(io.BytesIO(fetch_file(rec['zenodo'], rec['file']))) as z:
+        xl_name = next(n for n in z.namelist() if n.lower().endswith(('.xlsx', '.xls')))
+        return pd.ExcelFile(io.BytesIO(z.read(xl_name))).parse(sheet_name=0)
 
 # %% ../../nbs/handlers/jois.ipynb #ac122ce2
 def norm_cols(cols  # Column names to normalise
@@ -65,10 +65,7 @@ def load_data():
     "Fetch all JOIS records from Zenodo, align column names, apply scale factors, and return a single `SEAWATER` DataFrame"
     parts = []
     for r in RECORDS.values():
-        resp = requests.get(r['url'], timeout=60); resp.raise_for_status()
-        with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
-            xl_name = next(n for n in z.namelist() if n.lower().endswith(('.xlsx', '.xls')))
-            df = pd.ExcelFile(io.BytesIO(z.read(xl_name))).parse(sheet_name=0)
+        df = _fetch(r)
         cols = list(df.columns)
         scales = extract_scales(cols)
         cols = norm_cols(cols)

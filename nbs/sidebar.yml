@@ -36,6 +36,7 @@ website:
           - api/callbacks.ipynb
           - api/configs.ipynb
           - api/metadata.ipynb
+          - api/invenio.ipynb
           - api/encoders.ipynb
           - api/match.ipynb
           - api/geo.ipynb

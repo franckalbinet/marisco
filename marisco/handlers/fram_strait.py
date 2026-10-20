@@ -13,10 +13,11 @@ __all__ = ['status', 'META_COLS', 'ETH_COLS', 'VERA_COLS', 'RAW_COLS', 'RECORDS'
 # %% ../../nbs/handlers/fram_strait.ipynb #d541866d
 from fastcore.all import *
 import pandas as pd, numpy as np
-import requests, io, re, gsw
+import io, re, gsw
 from ..callbacks import PerGroupCB, Transformer, EncodeTimeCB, SanitizeLonLatCB, RemapCB, AddSampleIDCB
 from ..metadata import GlobAttrsFeeder, BboxCB, DepthRangeCB, TimeRangeCB, KeyValuePairCB
 from ..encoders import NetCDFEncoder
+from ..invenio import fetch_file
 
 # %% ../../nbs/handlers/fram_strait.ipynb #1ea99596
 status = 'Active'
@@ -81,41 +82,45 @@ def _normalize_2022_25(df: pd.DataFrame) -> pd.DataFrame:
 # %% ../../nbs/handlers/fram_strait.ipynb #585e1b91
 RECORDS = {  # chkstyle: ignore-node
     "FS2020_21": {
-        "url": "https://zenodo.org/records/19387002/files/FramStrait_2020_2021_radionuclides.csv?download=1",
+        "zenodo": 19387002,
+        "file": "FramStrait_2020_2021_radionuclides.csv",
         "adapter": _normalize_2020_21
     },
     "FS2022_i129": {
-        "url": "https://zenodo.org/records/20425174/files/FS2022_i129.csv?download=1",
+        "zenodo": 20425174,
+        "file": "FS2022_i129.csv",
         "adapter": _normalize_2022_25
     },
     "FS2022S_i129": {
-        "url": "https://zenodo.org/records/20628610/files/FS2022S_data_i129.csv?download=1",
+        "zenodo": 20628610,
+        "file": "FS2022S_data_i129.csv",
         "adapter": _normalize_2022_25
     },
     "FS2023_i129": {
-        "url": "https://zenodo.org/records/20448047/files/FS2023_i129.csv?download=1",
+        "zenodo": 20448047,
+        "file": "FS2023_i129.csv",
         "adapter": _normalize_2022_25
     },
     "FS2024_i129": {
-        "url": "https://zenodo.org/records/20761705/files/FS2024_i129.csv?download=1",
+        "zenodo": 20761705,
+        "file": "FS2024_i129.csv",
         "adapter": _normalize_2022_25
     },
     "FS2025_i129": {
-        "url": "https://zenodo.org/records/20761832/files/FS2025_i129.csv?download=1",
+        "zenodo": 20761832,
+        "file": "FS2025_i129.csv",
         "adapter": _normalize_2022_25
     },
 }
 
 # %% ../../nbs/handlers/fram_strait.ipynb #2766bbff
-def _fetch(url: str) -> pd.DataFrame:
-    "Download the Zenodo CSV file at `url`"
-    resp = requests.get(url, timeout=60)
-    resp.raise_for_status()
-    return pd.read_csv(io.BytesIO(resp.content), encoding="utf-8-sig")
+def _fetch(rec: dict) -> pd.DataFrame:
+    "Download the CSV file of `rec`, an entry of `RECORDS`"
+    return pd.read_csv(io.BytesIO(fetch_file(rec["zenodo"], rec["file"])), encoding="utf-8-sig")
 
 def load_data() -> dict:
     "Fetch Fram Strait CSV records and return one combined SEAWATER DataFrame"
-    return {"SEAWATER": pd.concat([rec["adapter"](_fetch(rec["url"])) for rec in RECORDS.values()], ignore_index=True)}
+    return {"SEAWATER": pd.concat([rec["adapter"](_fetch(rec)) for rec in RECORDS.values()], ignore_index=True)}
 
 # %% ../../nbs/handlers/fram_strait.ipynb #4a497743
 class RenameColsCB(PerGroupCB):

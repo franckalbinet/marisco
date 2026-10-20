@@ -50,7 +50,7 @@ Two environment variables may be required depending on the dataset:
 
   VS Code reads environment variables only when it starts. To set the key without restarting VS Code, put `ZOTERO_API_KEY=your_api_key_here` in a `.env` file at the root of your VS Code workspace, then restart the notebook kernel.
 
-- **INIS**: bibliographic metadata is being progressively migrated from Zotero to the [IAEA INIS database](https://www.iaea.org/resources/databases/inis). The [`INISClient`](https://franckalbinet.github.io/marisco/api/metadata.html#inisclient) fetches records via [curl](https://curl.se/), which must be installed separately. In the near term both systems coexist; INIS will supersede Zotero as the migration completes.
+- **INIS**: bibliographic metadata is being progressively migrated from Zotero to the [IAEA INIS database](https://www.iaea.org/resources/databases/inis). In the near term both systems coexist; INIS will supersede Zotero as the migration completes.
 
 ## Command-line utilities
 

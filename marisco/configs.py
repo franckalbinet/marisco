@@ -6,8 +6,8 @@ Docs: https://franckalbinet.github.io/marisco/api/configs.html.md"""
 
 # %% auto #0
 __all__ = ['AVOGADRO', 'NA', 'NC_DIM', 'NC_CSV', 'NC_VARS', 'CSV_VARS', 'NC_GROUPS', 'SMP_TYPE_LUT', 'NC_DTYPES', 'CSV_DTYPES',
-           'ZOTERO_LIB_ID', 'NC_GLOBAL_ATTRS', 'lut_path', 'lut_fname', 'nc_tpl_path', 'get_time_units', 'sanitize',
-           'try_int', 'get_lut', 'Enums']
+           'ZOTERO_LIB_ID', 'ZENODO_API', 'INIS_API', 'INIS_QA_API', 'NC_GLOBAL_ATTRS', 'lut_path', 'lut_fname',
+           'nc_tpl_path', 'get_time_units', 'sanitize', 'try_int', 'get_lut', 'Enums']
 
 # %% ../nbs/api/configs.ipynb #3f92bc7b
 from pathlib import Path
@@ -182,6 +182,11 @@ CSV_DTYPES = {  # chkstyle: ignore-node
 
 # %% ../nbs/api/configs.ipynb #e5b80558
 ZOTERO_LIB_ID = '2432820'
+
+# %% ../nbs/api/configs.ipynb #c71f6457
+ZENODO_API = 'https://zenodo.org/api'
+INIS_API = 'https://inis.iaea.org/api'
+INIS_QA_API = 'https://inis-qa.iaea.org/api'
 
 # %% ../nbs/api/configs.ipynb #0fece031
 NC_GLOBAL_ATTRS = {  # chkstyle: ignore-node

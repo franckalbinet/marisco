@@ -22,7 +22,7 @@ Documentation = "https://franckalbinet.github.io/marisco"
 marisco = "marisco._modidx:d"
 
 [project.optional-dependencies]
-dev = ['nbdev', 'ipykernel', 'twine', 'toolslm']
+dev = ['nbdev', 'ipykernel', 'twine', 'toolslm', 'matplotlib']
 
 [project.scripts]
 marisco-ingest = "marisco.cli.ingest:main"

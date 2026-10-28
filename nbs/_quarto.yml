@@ -27,7 +27,7 @@ website:
   description: "MARIS companion package and tutorials"
   twitter-card: true
   open-graph: true
-  repo-branch: master
+  repo-branch: main
   repo-url: "https://github.com/franckalbinet/marisco"
   repo-actions: [issue]
   navbar:

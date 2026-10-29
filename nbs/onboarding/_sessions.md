@@ -20,6 +20,6 @@ A log of the onboarding sessions with new MARIS team members. Each entry records
 
 **Went well:** `gh auth login` created and uploaded the SSH key with no problems, and cloning over SSH worked.
 
-**Guide changes:** Step 2 describes the areas of the VS Code window and links VS Code's user interface page and tutorial. Step 3 sets VS Code as Git's editor and checks the settings with `git config --list`. Step 4 explains packages, dependencies and environments before uv is installed, and why the workspace needs Rust. Step 6 opens with what aai-ws and aai-coding do. The cheatsheet adds `rm -r` and `rm -rf`, with a warning.
+**Guide changes:** Step 2 describes the areas of the VS Code window and links VS Code's user interface page and tutorial. Step 3 sets VS Code as Git's editor and checks the settings with `git config --list`. Step 4 explains packages, dependencies and environments before uv is installed, and why the workspace needs Rust. Step 6 opens with what aai-ws and aai-coding do. The cheatsheet adds `rm -r` and `rm -rf`, with a warning (87ab419).
 
 **Next:** Step 6 (aai-ws workspace), step 7 (add marisco), step 8 (open marisco in VS Code), then the setup check.

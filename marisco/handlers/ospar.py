@@ -111,7 +111,7 @@ class NormalizeUncCB(PerGroupCB):
 
 # %% ../../nbs/handlers/ospar.ipynb #0b508ee9
 lut_units = {
-    'bq/l':       (1, 1000), # Bq/L to Bq/m³ (MARIS unit 1)
+    'bq/l':       (1, 100),  # Bq/L to Bq/m³ (MARIS unit 1)
     'bq/kg f.w.': (5, 1),    # Bq/kg fresh weight, stored as Bq/kgw (MARIS unit 5)
 }
 

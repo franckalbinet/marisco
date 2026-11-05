@@ -8,6 +8,7 @@ website:
           - onboarding/index.ipynb
           - onboarding/setup.ipynb
           - onboarding/find-your-way.ipynb
+          - onboarding/toy-handler.ipynb
           - onboarding/supervise.ipynb
           - onboarding/first-handler.ipynb
           - onboarding/cheatsheet.ipynb
